@@ -1,0 +1,83 @@
+set(LIB_NAME libtomcrypt)
+
+set(LIB_SRCS
+	aes.c 
+	base64.c 
+	bits.c 
+	blowfish.c 
+	cast5.c 
+	cbc.c 
+	cfb.c 
+	crypt.c 
+	ctr.c 
+	des.c 
+	dh.c 
+	dsa.c 
+	ecb.c 
+	ecc.c 
+	gf.c 
+	hash.c 
+	hmac.c 
+	keyring.c 
+	md2.c 
+	md4.c 
+	md5.c 
+	mem.c 
+	mpi.c 
+	noekeon.c 
+	ofb.c 
+	omac.c 
+	packet.c 
+	prime.c 
+	rc2.c 
+	rc4.c 
+	rc5.c 
+	rc6.c 
+	rmd128.c 
+	rmd160.c 
+	rsa.c 
+	safer+.c 
+	safer.c 
+	safer_tab.c 
+	sha1.c 
+	sha256.c 
+	sha512.c 
+	skipjack.c 
+	sprng.c 
+	strings.c 
+	tiger.c 
+	twofish.c 
+	twofish_tab.c 
+	xtea.c 
+	yarrow.c
+)
+
+set(LIB_HDRS 
+		mycrypt.h
+		mycrypt_argchk.h
+		mycrypt_cfg.h
+		mycrypt_cipher.h
+		mycrypt_custom.h
+		mycrypt_gf.h
+		mycrypt_hash.h
+		mycrypt_kr.h
+		mycrypt_macros.h
+		mycrypt_misc.h
+		mycrypt_pk.h
+		mycrypt_prng.h
+		tommath.h
+	)
+
+add_library(${LIB_NAME} STATIC ${LIB_SRCS} ${LIB_HDRS})
+
+set_target_properties(
+    ${LIB_NAME} 
+    PROPERTIES 
+    ARCHIVE_OUTPUT_DIRECTORY 
+    ${CMAKE_INSTALL_PREFIX})
+ 
+target_include_directories(
+    ${LIB_NAME}
+	PUBLIC
+		${CMAKE_CURRENT_SOURCE_DIR}
+		)
