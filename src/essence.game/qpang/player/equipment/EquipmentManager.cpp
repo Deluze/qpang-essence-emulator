@@ -56,17 +56,6 @@ void EquipmentManager::initialize(std::shared_ptr<Player> player, uint16_t playe
 
 		res->next();
 	}
-
-	stmt = DATABASE->prepare("SELECT skill_1, skill_2, skill_3 FROM player_skill_cards where player_id = ?");
-	stmt->bindInteger(playerId);
-	res = stmt->fetch();
-
-	if (res->hasResults())
-	{
-		m_skillCards[0] = res->getBigInt("skill_1");
-		m_skillCards[1] = res->getBigInt("skill_2");
-		m_skillCards[2] = res->getBigInt("skill_3");
-	}
 }
 
 std::vector<uint16_t> EquipmentManager::getUnlockedCharacters()
