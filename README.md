@@ -29,6 +29,7 @@ It conists out of:
   - **Most achievements are implemented** (We don't know what the requirements of some achievements are)
   - **Points & Time based matches**
   - **Cash & Coin drops**
+  - **Weapon effects**
 - **Custom in-game commands**
 - **Configurable crane machine**
 - **Configurable shop**
