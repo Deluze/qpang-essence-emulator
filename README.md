@@ -110,3 +110,5 @@ DB_PASS # password of database server
 
 ### Registering users
 This is something you will have to do yourself, create a script, a back-end, form or anything that will insert the correct data into the database (check `users`, `players`, `player_equipement`, `player_stats` tables in the database).
+
+On executing the database script a default user 'admin' was created. You can login with the following credentials: User => `admin` Password => `admin`
