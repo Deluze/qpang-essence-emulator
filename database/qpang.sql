@@ -2831,6 +2831,32 @@ INSERT INTO `levels` (`id`, `name`, `level`, `experience`, `don_reward`, `cash_r
 	(45, 'Goddelijk', 45, 6757000, 500000, 10000, 50, '2020-03-30 23:34:43', '2020-03-30 23:34:43');
 /*!40000 ALTER TABLE `levels` ENABLE KEYS */;
 
+-- Dumping structure for table qpang.maps
+CREATE TABLE IF NOT EXISTS `maps` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `map_id` int(10) unsigned NOT NULL,
+  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dumping data for table qpang.maps: ~11 rows (approximately)
+/*!40000 ALTER TABLE `maps` DISABLE KEYS */;
+INSERT INTO `maps` (`id`, `map_id`, `name`, `created_at`, `updated_at`) VALUES
+	(1, 0, 'Garden', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(2, 1, 'Diorama', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(3, 2, 'Flycastle', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(4, 3, 'Keep', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(5, 4, 'Dollhouse', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(6, 5, 'Sweety', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(7, 6, 'River', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(8, 8, 'Bunker', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(9, 9, 'Temple', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(10, 11, 'Bridge', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(11, 12, 'Castaway', '2020-03-30 23:34:43', '2020-03-30 23:34:43');
+/*!40000 ALTER TABLE `maps` ENABLE KEYS */;
+
 -- Dumping structure for table qpang.map_spawns
 CREATE TABLE IF NOT EXISTS `map_spawns` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
