@@ -309,6 +309,28 @@ CREATE TABLE IF NOT EXISTS `items` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2455 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Dumping structure for table qpang.game_modes
+CREATE TABLE IF NOT EXISTS `game_modes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `mode_id` int(10) unsigned NOT NULL,
+  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dumping data for table qpang.game_modes: ~7 rows (approximately)
+/*!40000 ALTER TABLE `game_modes` DISABLE KEYS */;
+INSERT INTO `game_modes` (`id`, `mode_id`, `name`, `created_at`, `updated_at`) VALUES
+	(1, 1, 'Death Match', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(2, 2, 'Team Death Match', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(3, 3, 'Protect The Essence', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(4, 4, 'VIP', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(5, 5, 'Practice', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(6, 8, 'Public Enemy', '2020-03-30 23:34:43', '2020-03-30 23:34:43'),
+	(7, 9, 'PvE (StO)', '2020-03-30 23:34:43', '2020-03-30 23:34:43');
+/*!40000 ALTER TABLE `game_modes` ENABLE KEYS */;
+
 -- Dumping data for table qpang.items: ~2.453 rows (approximately)
 /*!40000 ALTER TABLE `items` DISABLE KEYS */;
 INSERT INTO `items` (`id`, `seq_id`, `item_id`, `name`, `type`, `aid`, `pay_type`, `price`, `use_up`, `period`, `level`, `status`, `sold_count`, `stock`, `order`, `created_at`, `updated_at`) VALUES
