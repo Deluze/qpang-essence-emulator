@@ -55,7 +55,7 @@ You should have the following pieces of software installed:
 
 - [CMake](https://cmake.org/download/) (add to PATH)
 - [vcpkg](https://github.com/microsoft/vcpkg) (with user wide integration & add to PATH)
-- [MySQL C++ Connector](https://dev.mysql.com/doc/connector-cpp/8.0/en/connector-cpp-installation-binary.html#connector-cpp-installation-binary-windows) (in default path)
+- [MySQL C++ Connector](https://dev.mysql.com/doc/connector-cpp/8.0/en/connector-cpp-installation-binary.html#connector-cpp-installation-binary-windows) (32 bit!! & in default path)
 - [MySQL server](https://dev.mysql.com/downloads/mysql/)
 
 ### Installation steps:
@@ -65,6 +65,7 @@ Assuming you have all the prerequisities listed above.
 git clone https://github.com/Deluze/qpang-essence-emulator
 cd qpang-essence-emulator
 
+vcpkg integrate install
 vcpkg install spdlog
 vcpkg install boost
 
@@ -76,6 +77,8 @@ cmake ../
 # if > VS 2019
 cmake ../ -A Win32
 ```
+
+If the CMake generation failed, please clear the build directory to prevent caching.
 
 After running these steps a visual studio solution should be generated in the build directory and you can open up the project. Open the solution and set the start up projects to `EssenceAuth` and `EssenceGame`.
 
