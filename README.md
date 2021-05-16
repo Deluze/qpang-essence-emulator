@@ -80,7 +80,7 @@ cmake ../ -A Win32
 
 If the CMake generation failed, please clear the build directory to prevent caching.
 
-After running these steps a visual studio solution should be generated in the build directory and you can open up the project. Open the solution and set the start up projects to `EssenceAuth` and `EssenceGame`. Make sure that build mode is set to either Release or RelWithDbgInfo.
+After running these steps a visual studio solution should be generated in the build directory and you can open up the project. Open the solution and set the start up projects to `EssenceAuth` and `EssenceGame`. **Make sure that build mode is set to either `Release` or `RelWithDbgInfo`**.
 
 You can now start your build, the first build should take a while, give it some time. 
 
