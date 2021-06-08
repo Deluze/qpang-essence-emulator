@@ -8,6 +8,7 @@
 #include "ReloadCommand.h"
 #include "UnlimitedCommand.h"
 #include "qpang/chat/command/Command.h"
+#include "qpang/chat/command/commands/PermBanCommand.h"
 #include "qpang/chat/command/commands/DisconnectCommand.h"
 #include "qpang/chat/command/commands/BroadcastCommand.h"
 #include "qpang/chat/command/commands/DisconnectIDCommand.h"
@@ -42,6 +43,7 @@ void CommandManager::initialize()
 		{u"config", new ConfigCommand() },
 		{u"close", new CloseCommand() },
 		{u"ban", new BanCommand()},
+		{u"permban", new PermBanCommand()},
 		{u"database", new DatabaseCommand()},
 		{u"unlimited", new UnlimitedCommand()},
 		{u"reload", new ReloadCommand()},
