@@ -30,8 +30,10 @@ public:
 			return;
 		}
 
+		auto bannedByUserId = player->getUserId();
+
 		const auto currTime = time(NULL);
-		target->ban(currTime + (60 * 60 * 24));
+		target->ban(currTime + (60 * 60 * 24), bannedByUserId);
 
 		player->broadcast(u"Player is banned for 24 hours");
 	}

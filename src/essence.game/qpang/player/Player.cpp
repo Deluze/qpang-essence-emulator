@@ -177,10 +177,10 @@ void Player::apply(std::shared_ptr<RoomSessionPlayer> session)
 {
 }
 
-void Player::ban(time_t until)
+void Player::ban(time_t until, uint32_t bannedByUserId)
 {
 	const auto currTime = time(NULL);
-	DATABASE_DISPATCHER->dispatch("INSERT INTO user_bans (`user_id`, `timestamp_ban`, `timestamp_unban`) VALUES (?, ?, ?)", { m_userId, static_cast<uint64_t>(currTime), static_cast<uint64_t>(until) });
+	DATABASE_DISPATCHER->dispatch("INSERT INTO user_bans (`user_id`, `timestamp_ban`, `timestamp_unban`, `banned_by_user_id`) VALUES (?, ?, ?, ?)", { m_userId, static_cast<uint64_t>(currTime), static_cast<uint64_t>(until), bannedByUserId });
 
 	close();
 }

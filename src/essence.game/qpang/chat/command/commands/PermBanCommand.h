@@ -30,9 +30,11 @@ public:
 			return;
 		}
 
+		auto bannedByUserId = player->getUserId();
+
 		const auto currTime = time(NULL);
 		// 315360000 = 10 years
-		target->ban(currTime + (315360000));
+		target->ban(currTime + (315360000), bannedByUserId);
 
 		player->broadcast(u"Player has been banned indefinetly.");
 	}

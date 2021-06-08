@@ -49,7 +49,7 @@ public:
 	void update();
 	void apply(std::shared_ptr<RoomSessionPlayer> session);
 
-	void ban(time_t until);
+	void ban(time_t until, uint32_t bannedByUserId);
 
 	InventoryManager* getInventoryManager();
 	EquipmentManager* getEquipmentManager();
