@@ -21,6 +21,6 @@ public:
 		
 		Game::instance()->send(ShopItems(items));
 		
-		player->broadcast(u"Reloaded!");
+		player->broadcast(u"Reloaded the shop.");
 	}
 };

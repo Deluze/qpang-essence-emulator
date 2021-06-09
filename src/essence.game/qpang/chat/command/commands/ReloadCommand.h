@@ -18,6 +18,6 @@ public:
 		Game::instance()->getSpawnManager()->initialize();
 		Game::instance()->getCraneManager()->initialize();
 
-		player->broadcast(u"Reloaded!");
+		player->broadcast(u"Reloaded the shopmanager, weaponmanager, spawnmanager and cranemanager.");
 	}
 };

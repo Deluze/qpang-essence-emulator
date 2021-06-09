@@ -22,6 +22,7 @@ public:
 			return;
 
 		auto room = roomPlayer->getRoom();
+
 		room->close();
 	}
 };

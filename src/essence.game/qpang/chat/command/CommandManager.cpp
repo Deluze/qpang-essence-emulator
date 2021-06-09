@@ -46,7 +46,7 @@ void CommandManager::initialize()
 		{u"ban", new BanCommand()},
 		{u"permban", new PermBanCommand()},
 		{u"database", new DatabaseCommand()},
-		{u"unlimited", new UnlimitedCommand()},
+		//{u"unlimited", new UnlimitedCommand()},
 		{u"reload", new ReloadCommand()},
 		{u"spectate", new SpectateCommand()},
 		{u"nickname", new NameChangeCommand()},

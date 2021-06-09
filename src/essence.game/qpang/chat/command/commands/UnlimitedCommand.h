@@ -6,10 +6,11 @@
 #include "qpang/room/RoomPlayer.h"
 #include "qpang/room/Room.h"
 
+// This command is disabled.
 class UnlimitedCommand: public Command
 {
 public:
-	UnlimitedCommand() : Command(4)
+	UnlimitedCommand() : Command(3)
 	{
 
 	}

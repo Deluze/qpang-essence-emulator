@@ -14,5 +14,7 @@ public:
 	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
 		DATABASE_DISPATCHER->executeAll();
+
+		player->broadcast(u"Executed all database queries.");
 	}
 };

@@ -20,7 +20,7 @@ public:
 
 	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
-		const auto message = args.at(0);
+		const auto &message = args.at(0);
 
 		Game::instance()->broadcast(message);
 	}

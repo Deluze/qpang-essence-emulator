@@ -28,19 +28,19 @@ public:
 
 		if (roomPlayer == nullptr)
 		{
-			player->broadcast(refer + u" must be in a room in order to use this command");
+			player->broadcast(refer + u" must be in a room in order to use this command.");
 			return;
 		}
 
 		if (roomPlayer->isPlaying())
 		{
-			player->broadcast(refer + u" must not be in a game in order to use this command");
+			player->broadcast(refer + u" must not be in a game in order to use this command.");
 			return;
 		}
 
 		if (roomPlayer->isReady())
 		{
-			player->broadcast(refer + u" must not be ready in order to use this command");
+			player->broadcast(refer + u" must not be ready in order to use this command.");
 			return;
 		}
 
@@ -48,7 +48,7 @@ public:
 
 		if (!room->isPlaying())
 		{
-			player->broadcast(u"The game must be in session in order to spectate");
+			player->broadcast(u"The game must be in session in order to spectate.");
 			return;
 		}
 

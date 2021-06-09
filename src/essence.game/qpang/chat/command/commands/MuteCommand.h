@@ -38,6 +38,6 @@ public:
 
 		target->mute();
 
-		player->broadcast(u"This player is now muted");
+		player->broadcast(u"This player has been muted indefinetly.");
 	}
 };

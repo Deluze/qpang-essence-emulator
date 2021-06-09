@@ -17,5 +17,7 @@ public:
 	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
 		player->send(UpdateAccount{player});
+
+		player->broadcast(u"Updated account.");
 	}
 };
