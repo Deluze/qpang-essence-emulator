@@ -39,7 +39,6 @@ void Game::initialize()
 	m_lobbyServer = new QpangServer(8005);
 	m_squareServer = new QpangServer(8012);
 
-
 	m_lobbyServer->setAcceptHandler(std::bind(&Game::onLobbyConnection, Game::instance(), std::placeholders::_1));
 	m_squareServer->setAcceptHandler(std::bind(&Game::onSquareConnection, Game::instance(), std::placeholders::_1));
 

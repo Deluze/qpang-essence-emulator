@@ -66,14 +66,14 @@ void Player::setLobbyConn(QpangConnection::Ptr conn)
 }
 
 void Player::setSquareConn(QpangConnection::Ptr conn)
-{	
+{
 	m_squareConn = conn;
 }
 
 void Player::broadcast(const std::u16string& message) const
 {
 	Broadcast br(message);
-	
+
 	if (const auto lobbyConn = m_lobbyConn.lock(); lobbyConn != nullptr)
 		lobbyConn->send(br);
 }
@@ -93,7 +93,7 @@ void Player::send(const LobbyServerPacket& packet) const
 void Player::close()
 {
 	m_mx.lock();
-	
+
 	if (m_isClosed)
 	{
 		m_mx.unlock();
@@ -108,7 +108,7 @@ void Player::close()
 
 	if (auto squareConn = m_squareConn.lock(); squareConn != nullptr)
 		squareConn->close();
-	
+
 	m_mx.unlock();
 
 	setOnlineStatus(false);
@@ -122,7 +122,7 @@ void Player::close()
 
 	m_lobbyConn.reset();
 	m_squareConn.reset();
-	
+
 	update();
 }
 
@@ -132,7 +132,7 @@ bool Player::isClosed()
 }
 
 void Player::whisper(const std::u16string& nickname, const std::u16string& message) const
-{	
+{
 	send(ReceiveWhisper(nickname, message));
 }
 
@@ -156,10 +156,17 @@ void Player::setRoomPlayer(std::shared_ptr<RoomPlayer> roomPlayer)
 	m_roomPlayer = roomPlayer;
 }
 
+void Player::setName(std::u16string name)
+{
+	m_name = name;
+
+	update();
+}
+
 void Player::update()
 {
 	DATABASE_DISPATCHER->dispatch(
-		"UPDATE players SET default_character = ?, don = ?, cash = ?, coins = ?, level = ?, prestige = ?, experience = ? WHERE id = ?",
+		"UPDATE players SET default_character = ?, don = ?, cash = ?, coins = ?, level = ?, prestige = ?, experience = ?, name = ? WHERE id = ?",
 		{
 			m_character,
 			m_don,
@@ -168,6 +175,7 @@ void Player::update()
 			m_level,
 			m_prestige,
 			m_experience,
+			m_name,
 			m_playerId,
 		}
 	);
@@ -180,7 +188,12 @@ void Player::apply(std::shared_ptr<RoomSessionPlayer> session)
 void Player::ban(time_t until, uint32_t bannedByUserId)
 {
 	const auto currTime = time(NULL);
-	DATABASE_DISPATCHER->dispatch("INSERT INTO user_bans (`user_id`, `timestamp_ban`, `timestamp_unban`, `banned_by_user_id`) VALUES (?, ?, ?, ?)", { m_userId, static_cast<uint64_t>(currTime), static_cast<uint64_t>(until), bannedByUserId });
+	DATABASE_DISPATCHER->dispatch("INSERT INTO user_bans (`user_id`, `timestamp_ban`, `timestamp_unban`, `banned_by_user_id`) VALUES (?, ?, ?, ?)", {
+		m_userId,
+		static_cast<uint64_t>(currTime),
+		static_cast<uint64_t>(until),
+		bannedByUserId
+	});
 
 	close();
 }
@@ -323,7 +336,7 @@ void Player::removeCash(uint32_t val)
 		m_cash = 0;
 	else
 		m_cash -= val;
-	
+
 	update();
 }
 
@@ -375,7 +388,7 @@ void Player::unmute()
 	broadcast(u"You have been unmuted and can now use chat again");
 
 	DATABASE_DISPATCHER->dispatch("UPDATE `players` SET `is_muted` = 0 WHERE `id` = ?", { m_playerId });
-}	
+}
 
 bool Player::isMuted()
 {

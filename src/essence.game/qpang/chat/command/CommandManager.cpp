@@ -8,6 +8,7 @@
 #include "ReloadCommand.h"
 #include "UnlimitedCommand.h"
 #include "qpang/chat/command/Command.h"
+#include "qpang/chat/command/commands/NameChangeCommand.h"
 #include "qpang/chat/command/commands/PermBanCommand.h"
 #include "qpang/chat/command/commands/DisconnectCommand.h"
 #include "qpang/chat/command/commands/BroadcastCommand.h"
@@ -48,6 +49,7 @@ void CommandManager::initialize()
 		{u"unlimited", new UnlimitedCommand()},
 		{u"reload", new ReloadCommand()},
 		{u"spectate", new SpectateCommand()},
+		{u"nickname", new NameChangeCommand()},
 	};
 }
 

@@ -61,6 +61,7 @@ public:
 	uint32_t getId();
 	uint32_t getUserId();
 	std::u16string getName();
+	void setName(std::u16string name);
 	uint8_t getRank();
 
 	uint32_t getExperience();
