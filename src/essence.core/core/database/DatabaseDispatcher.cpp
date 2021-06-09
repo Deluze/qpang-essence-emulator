@@ -23,7 +23,7 @@ void DatabaseDispatcher::run()
 		const auto queries = m_queries;
 		m_queries.clear();
 		m_dbMx.unlock();
-		
+
 		for (const auto& [query, binds] : queries)
 		{
 			try
@@ -33,13 +33,18 @@ void DatabaseDispatcher::run()
 				uint8_t index = 1;
 				for (const auto& bind : binds)
 				{
-					if (bind.nullable)
-						if (bind.val == 0)
-							stmt->setNull(index, 0);
+					if (!bind.isString) {
+						if (bind.nullable)
+							if (bind.intVal == 0)
+								stmt->setNull(index, 0);
+							else
+								stmt->setBigInt(index, std::to_string(bind.intVal).c_str());
 						else
-							stmt->setBigInt(index, std::to_string(bind.val).c_str());
-					else
-						stmt->setBigInt(index, std::to_string(bind.val).c_str());
+							stmt->setBigInt(index, std::to_string(bind.intVal).c_str());
+					}
+					else {
+						stmt->setString(index, std::string(bind.stringVal.begin(), bind.stringVal.end()));
+					}
 
 					index++;
 				}
@@ -65,9 +70,9 @@ void DatabaseDispatcher::dispatch(const std::string& query, const std::vector<Bi
 void DatabaseDispatcher::executeAll()
 {
 	m_dbMx.lock();
-	
+
 	std::cout << "DatabaseDispatcher::executeAll started... ";
-	
+
 	for (const auto& [query, binds] : m_queries)
 	{
 		try
@@ -77,14 +82,18 @@ void DatabaseDispatcher::executeAll()
 			uint8_t index = 1;
 			for (const auto& bind : binds)
 			{
-				if (bind.nullable)
-					if (bind.val == 0)
-						stmt->setNull(index, 0);
+				if (!bind.isString) {
+					if (bind.nullable)
+						if (bind.intVal == 0)
+							stmt->setNull(index, 0);
+						else
+							stmt->setBigInt(index, std::to_string(bind.intVal).c_str());
 					else
-						stmt->setBigInt(index, std::to_string(bind.val).c_str());
-				else
-					stmt->setBigInt(index, std::to_string(bind.val).c_str());
-
+						stmt->setBigInt(index, std::to_string(bind.intVal).c_str());
+				}
+				else {
+					stmt->setString(index, std::string(bind.stringVal.begin(), bind.stringVal.end()));
+				}
 				index++;
 			}
 
@@ -98,7 +107,7 @@ void DatabaseDispatcher::executeAll()
 	}
 
 	std::cout << "Done!\n";
-	
+
 	m_queries.clear();
 
 	m_dbMx.unlock();

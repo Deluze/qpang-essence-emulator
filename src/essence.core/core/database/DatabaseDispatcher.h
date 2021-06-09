@@ -20,11 +20,21 @@ public:
 	{
 		Bind(uint64_t val, bool nullable = false)
 		{
-			this->val = val;
+			this->intVal = val;
 			this->nullable = nullable;
 		}
 
-		uint64_t val;
+		Bind(std::u16string val)
+		{
+			this->stringVal = val;
+			this->nullable = nullable;
+			this->isString = true;
+		}
+
+		uint64_t intVal;
+		std::u16string stringVal;
+
+		bool isString = false;
 		bool nullable = false;
 	};
 
