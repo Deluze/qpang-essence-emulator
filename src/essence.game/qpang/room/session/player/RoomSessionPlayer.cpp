@@ -43,6 +43,8 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_startTime = m_joinTime + 30; // have to wait 30 seconds for waiting for players to last
 	m_character = player->getCharacter();
 
+	m_isPermanentlyInvincible = false;
+
 	auto* equipManager = player->getEquipmentManager();
 
 	m_baseHealth = equipManager->getBaseHealth();
@@ -90,7 +92,7 @@ void RoomSessionPlayer::post(GameNetEvent* netEvent)
 void RoomSessionPlayer::initialize()
 {
 	m_isRespawning = false;
-	
+
 	m_effectManager.initialize(shared_from_this());
 	m_weaponManager.initialize(shared_from_this());
 	m_skillManager.initialize(shared_from_this());
@@ -124,7 +126,7 @@ void RoomSessionPlayer::tick()
 void RoomSessionPlayer::start()
 {
 	m_isPlaying = true;
-	
+
 	getPlayer()->getAchievementContainer()->resetRecent();
 
 	m_roomSession->relayExcept<GCGameState>(getPlayer()->getId(), getPlayer()->getId(), 3);
@@ -141,7 +143,7 @@ void RoomSessionPlayer::stop()
 	const auto player = getPlayer();
 
 	const auto curr = shared_from_this();
-	
+
 	player->getEquipmentManager()->finishRound(curr);
 	player->getStatsManager()->apply(curr);
 
@@ -170,6 +172,12 @@ bool RoomSessionPlayer::isPlaying()
 	return m_isPlaying;
 }
 
+void RoomSessionPlayer::makePermanentlyInvincible()
+{
+	m_isInvincible = true;
+	m_isPermanentlyInvincible = true;
+}
+
 void RoomSessionPlayer::makeInvincible()
 {
 	m_isInvincible = true;
@@ -178,6 +186,10 @@ void RoomSessionPlayer::makeInvincible()
 
 void RoomSessionPlayer::removeInvincibility()
 {
+	if (m_isPermanentlyInvincible) {
+		return;
+	}
+
 	m_isInvincible = false;
 	m_roomSession->relayPlaying<GCGameState>(getPlayer()->getId(), 8);
 }
@@ -319,7 +331,7 @@ uint32_t RoomSessionPlayer::getDon()
 
 	if (playtimeDon >= 250)
 		playtimeDon = 250;
-	
+
 	don += 18 * m_kills;
 	don += 7 * m_deaths;
 	don += 10 * m_eventItemPickUps;
@@ -413,7 +425,7 @@ uint32_t RoomSessionPlayer::getExperience()
 
 	if (playTimeExperience >= 500)
 		playTimeExperience = 500;
-	
+
 	experience += 35 * m_kills;
 	experience += 10 * m_deaths;
 	experience += 10 * m_eventItemPickUps;

@@ -38,6 +38,7 @@ public:
 	bool isInvincible();
 	bool isPlaying();
 
+	void makePermanentlyInvincible();
 	void makeInvincible();
 	void removeInvincibility();
 	void addPlayer(RoomSessionPlayer::Ptr player);
@@ -118,6 +119,7 @@ private:
 
 	time_t m_joinTime;
 	time_t m_startTime;
+	time_t m_isPermanentlyInvincible;
 	time_t m_invincibleRemovalTime;
 	time_t m_respawnTime;
 
