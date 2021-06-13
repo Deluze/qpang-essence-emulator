@@ -25,6 +25,7 @@ public:
 			writeShort(channel.currPlayers);
 			writeShort(channel.maxPlayers);
 			writeEmpty(51);
+			writeByte(0);
 		}
 	}
 };
