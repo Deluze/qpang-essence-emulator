@@ -13,13 +13,16 @@ public:
 	{
 
 	}
-	
+
 	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
 		auto roomPlayer = player->getRoomPlayer();
 
-		if (roomPlayer == nullptr)
+		if (roomPlayer == nullptr) {
+			player->broadcast(u"You must be in a room in order to use this command.");
+
 			return;
+		}
 
 		auto room = roomPlayer->getRoom();
 

@@ -172,10 +172,22 @@ bool RoomSessionPlayer::isPlaying()
 	return m_isPlaying;
 }
 
-void RoomSessionPlayer::makePermanentlyInvincible()
+void RoomSessionPlayer::togglePermanentInvincibility()
 {
-	m_isInvincible = true;
-	m_isPermanentlyInvincible = true;
+	if (m_isPermanentlyInvincible) {
+		m_isPermanentlyInvincible = false;
+		removeInvincibility();
+	}
+	else
+	{
+		m_isPermanentlyInvincible = true;
+		m_isInvincible = true;
+	}
+}
+
+bool RoomSessionPlayer::isPermanentlyInvincible() 
+{
+	return m_isPermanentlyInvincible;
 }
 
 void RoomSessionPlayer::makeInvincible()

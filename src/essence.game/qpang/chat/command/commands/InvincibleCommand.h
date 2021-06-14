@@ -38,8 +38,18 @@ public:
 			return;
 		}
 
-		roomPlayer->getRoomSessionPlayer()->makePermanentlyInvincible();
 
-		player->broadcast(u"You are now invincible.");
+		auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
+
+		roomSessionPlayer->togglePermanentInvincibility();
+
+		auto isPermanentlyInvincible = roomSessionPlayer->isPermanentlyInvincible();
+
+		if (isPermanentlyInvincible) {
+			player->broadcast(u"You are now invincible.");
+		}
+		else {
+			player->broadcast(u"You are no longer invincible.");
+		}
 	}
 };

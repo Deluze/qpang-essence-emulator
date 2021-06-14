@@ -56,6 +56,7 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 	player->setSpectating(conn->getPlayer()->getRoomPlayer()->isSpectating());
 
 	m_playerMx.lock();
+
 	for (const auto& [id, session] : m_players)
 	{
 		if(!session->isSpectating())
@@ -67,10 +68,13 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 		if (session->isPlaying())
 			player->post(new GCGameState(id, 3));
 	}
+
+
 	m_players[player->getPlayer()->getId()] = player;
 	m_playerMx.unlock();
 
 	auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), team);
+	
 	player->post(new GCGameState(player->getPlayer()->getId(), 11, 0)); // Necessary to initiate spectator mode in "waiting for players" state
 	player->post(new GCRespawn(player->getPlayer()->getId(), player->getCharacter(), 1, spawn.x, spawn.y, spawn.z));
 
