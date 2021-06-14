@@ -54,14 +54,14 @@ bool Database::connect()
 {
 	try
 	{
-		sql::SQLString host = "127.0.0.1";
-		uint32_t port = 3306;
-		sql::SQLString user = "root";
-		sql::SQLString pass = "";
+		std::string host = CONFIG_MANAGER->getString("DB_HOST");
+		uint32_t port = CONFIG_MANAGER->getInt("DB_PORT");
+		std::string user = CONFIG_MANAGER->getString("DB_USER");
+		std::string pass = CONFIG_MANAGER->getString("DB_PASS");
 
-		sql::SQLString endpoint = std::string("tcp://") + host + std::string(":") + std::to_string(port);
+		std::string endpoint = std::string("tcp://") + host + std::string(":") + std::to_string(port);
 
-		con = driver->connect(endpoint, user, pass);
+		con = driver->connect(endpoint.c_str(), user.c_str(), pass.c_str());
 
 		return true;
 	}
