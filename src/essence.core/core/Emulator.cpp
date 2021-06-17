@@ -6,7 +6,7 @@
 
 #include <iostream>
 #ifdef WIN32
-	#include <Windows.h>
+#include <Windows.h>
 #endif
 
 #include "core/database/Database.h"
@@ -19,18 +19,18 @@ void Emulator::initialize()
 
 	SetConsoleTextAttribute(handle, 13);
 #endif
-	std::cout	<< "                   ^		\n"
-				<< "                  / \\			\n"
-				<< "                 /   \\			\n"
-				<< "                /   Essence		\n"
-				<< "               /       Emulator	\n"
-				<< "              /         \\		\n"
-				<< "              \\         /	    \n"
-				<< "           By: \\       /   	\n"
-				<< "              Dennis &/     	\n"
-				<< "                 Deluze     	\n"
-				<< "                  \\ /     		\n"
-				<< "                   v     		\n \n";
+	std::cout << "                   ^		\n"
+		<< "                  / \\			\n"
+		<< "                 /   \\			\n"
+		<< "                /   Essence		\n"
+		<< "               /       Emulator	\n"
+		<< "              /         \\		\n"
+		<< "              \\         /	    \n"
+		<< "           By: \\       /   	\n"
+		<< "              Dennis &/     	\n"
+		<< "                 Deluze     	\n"
+		<< "                  \\ /     		\n"
+		<< "                   v     		\n \n";
 #ifdef WIN32
 	SetConsoleTextAttribute(handle, FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN);
 #endif
@@ -59,11 +59,22 @@ void Emulator::run()
 
 	std::cout << "Emulator is running! \n";
 
+	auto now = std::chrono::steady_clock().now();
+	auto nextQueryTime = now + std::chrono::hours(1);
+
 	while (m_isRunning)
 	{
-		// do console commands
+		now = std::chrono::steady_clock().now();
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		if (nextQueryTime < now) {
+			std::cout << "Database: Keeping database connection alive.\n";
+
+			const auto statement = DATABASE->prepare("SELECT * FROM qpang.weapons limit 0;");
+
+			statement->fetch();
+
+			nextQueryTime = now + std::chrono::hours(1);
+		}
 	}
 }
 
