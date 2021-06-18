@@ -8,7 +8,7 @@
 
 void Leaderboard::refresh()
 {
-	std::cout << "Loading leaderboard... ";
+	std::cout << "[Leaderboardanager::refresh]: Refreshing leaderboard.\n";
 
 	std::lock_guard<std::mutex> g(m_mx);
 
@@ -41,7 +41,7 @@ void Leaderboard::refresh()
 		res->next();
 	}
 
-	std::cout << "loaded!" << '\n';
+	std::cout << "[LeaderboardManager::refresh]: Refreshed leaderboard.\n";
 }
 
 Leaderboard::Position Leaderboard::getPosition(uint32_t playerId)

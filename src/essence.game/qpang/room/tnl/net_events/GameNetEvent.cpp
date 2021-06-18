@@ -73,5 +73,5 @@ void GameNetEvent::notifyDelivered(EventConnection* ps)
 
 void GameNetEvent::handle(GameConnection* conn, Player::Ptr player)
 {
-	std::cout << "GameNetEvent::handle unhandled event: " << id << std::endl;
+	std::cout << "[GameNetEvent::handle] Unhandled event: " << id << std::endl;
 }

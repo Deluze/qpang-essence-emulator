@@ -17,8 +17,8 @@ void DatabaseDispatcher::run()
 
 	m_isRunning = true;
 
-	auto now = std::chrono::steady_clock().now();
-	auto nextQueryTime = now + std::chrono::hours(1);
+	auto now = std::chrono::system_clock::now();
+	auto nextQueryTime = now + std::chrono::minutes(1);
 
 	while (m_isRunning)
 	{
@@ -57,22 +57,22 @@ void DatabaseDispatcher::run()
 			}
 			catch (const std::exception& e)
 			{
-				std::cout << "DatabaseDispatcher::run " << e.what() << '\n';
+				std::cout << "[DatabaseDispatcher::run]: " << e.what() << '\n';
 			}
 		}
 
-		now = std::chrono::steady_clock().now();
+		now = std::chrono::system_clock::now();
 
 		if (nextQueryTime < now) {
-			std::cout << "Database: Keeping database dispatcher connection alive.\n";
+			std::cout << "[DatabaseDispatcher::run]: Keeping database dispatcher connection alive.\n";
 
-			const auto statement = con->prepareStatement("SELECT * FROM qpang.weapons limit 0;");
+			const auto statement = con->prepareStatement("SELECT * FROM qpang.weapons LIMIT 0;");
 
 			statement->execute();
 
 			delete statement;
 
-			nextQueryTime = now + std::chrono::hours(1);
+			nextQueryTime = now + std::chrono::minutes(1);
 		}
 	}
 }
@@ -88,7 +88,7 @@ void DatabaseDispatcher::executeAll()
 {
 	m_dbMx.lock();
 
-	std::cout << "DatabaseDispatcher::executeAll started... ";
+	std::cout << "[DatabaseDispatcher::executeAll]: Started.";
 
 	for (const auto& [query, binds] : m_queries)
 	{
@@ -119,11 +119,11 @@ void DatabaseDispatcher::executeAll()
 		}
 		catch (const std::exception& e)
 		{
-			std::cout << "DatabaseDispatcher::run " << e.what() << '\n';
+			std::cout << "[DatabaseDispatcher::executeAll]: An exception occurred: " << e.what() << '\n';
 		}
 	}
 
-	std::cout << "Done!\n";
+	std::cout << "[DatabaseDispatcher::executeAll]: Done.\n";
 
 	m_queries.clear();
 
@@ -145,7 +145,7 @@ void DatabaseDispatcher::connect()
 	}
 	catch (const sql::SQLException& e)
 	{
-		std::cout << "Database dispatcher: " << e.what() << std::endl;
+		std::cout << "[DatabaseDispatcher::connect]: An exception occurred: " << e.what() << std::endl;
 
 		m_initialAttemptConnectCount++;
 

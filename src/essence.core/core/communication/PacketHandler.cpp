@@ -21,7 +21,7 @@ void PacketHandler::handle(QpangConnection::Ptr conn, QpangPacket pack)
 		}
 		catch (const std::exception& e)
 		{
-			std::cout << "PacketHandler::handle ID: " << pack.getPacketId() << " -- " << e.what() << std::endl;
+			std::cout << "[PacketHandler::handle]: ID: " << pack.getPacketId() << " -- " << e.what() << std::endl;
 		}
 	}
 }

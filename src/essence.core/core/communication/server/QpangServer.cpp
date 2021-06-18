@@ -25,11 +25,11 @@ void QpangServer::listen()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "QpangServer::listen " << e.what() << "\n";
+		std::cout << "[QpangServer::listen]: " << e.what() << "\n";
 	}
 	catch (...)
 	{
-		std::cout << "QpangServer::listen any exception \n";
+		std::cout << "[QpangServer::listen]: An exception occurred. \n";
 	}
 }
 

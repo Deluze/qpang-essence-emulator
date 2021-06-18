@@ -40,7 +40,7 @@ void Emulator::initialize()
 
 	if (!m_configManager->initialize() || !m_database->initialize())
 	{
-		std::cout << "Errors encountered, can not start emulator. \n";
+		std::cout << "[Emulator]: Errors encountered, can not start emulator.\n";
 		abort();
 	}
 }
@@ -57,24 +57,26 @@ void Emulator::run()
 	for (QpangServer* server : m_servers)
 		boost::thread t(std::bind(&QpangServer::listen, server));
 
-	std::cout << "Emulator is running! \n";
+	std::cout << "[Emulator::run]: Emulator is running.\n";
 
-	auto now = std::chrono::steady_clock().now();
-	auto nextQueryTime = now + std::chrono::hours(1);
+	auto now = std::chrono::system_clock::now();
+	auto nextQueryTime = now + std::chrono::minutes(1);
 
 	while (m_isRunning)
 	{
-		now = std::chrono::steady_clock().now();
+		now = std::chrono::system_clock::now();
 
 		if (nextQueryTime < now) {
-			std::cout << "Database: Keeping database connection alive.\n";
+			std::cout << "[Emulator::run]: Keeping database connection alive.\n";
 
-			const auto statement = DATABASE->prepare("SELECT * FROM qpang.weapons limit 0;");
+			const auto statement = DATABASE->prepare("SELECT * FROM qpang.weapons LIMIT 0;");
 
 			statement->fetch();
 
-			nextQueryTime = now + std::chrono::hours(1);
+			nextQueryTime = now + std::chrono::minutes(1);
 		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 }
 

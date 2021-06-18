@@ -27,7 +27,7 @@ void RoomServer::initialize()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "Game::RunServer: exception: " << e.what() << std::endl;
+		std::cout << "[RoomServer::initialize] An exception occurred: " << e.what() << std::endl;
 		return;
 	}
 }
@@ -48,11 +48,11 @@ void RoomServer::run()
 		}
 		catch (const std::exception& e)
 		{
-			std::cout << "RoomServer::run " << e.what() << "\n";
+			std::cout << "[RoomServer::run]: " << e.what() << "\n";
 		}
 		catch (...)
 		{
-			std::cout << "RoomServer::run unknown exception\n";
+			std::cout << "[RoomServer::run]: Unknown exception.\n";
 		}
 	
 		m_connMx.unlock();
@@ -161,11 +161,11 @@ void RoomServer::processEvent(GameNetEvent* netEvent)
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "RoomServer::processEvent : " << netEvent->id << " - " << e.what() << std::endl;
+		std::cout << "[RoomServer::processEvent]: An exception occurred: " << netEvent->id << " - " << e.what() << std::endl;
 	}
 	catch (...)
 	{
-		std::cout << "RoomServer::processEvent : " << netEvent->id << " - unknown exception \n";
+		std::cout << "[RoomServer::processEvent]: An exception occurred: " << netEvent->id << " - Unknown exception.\n";
 	}
 
 	netEvent->gameConnection->decRef();

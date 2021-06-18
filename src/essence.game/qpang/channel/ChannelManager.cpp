@@ -4,7 +4,7 @@
 
 void ChannelManager::initialize()
 {
-	std::cout << "Loading channels... ";
+	std::cout << "[ChannelManager::initialize]: Loading channels.\n";
 
 	Statement::Ptr stmt = Emulator::instance()->getDatabase()->prepare("SELECT * FROM channels");
 	StatementResult::Ptr res = stmt->fetch();
@@ -24,7 +24,7 @@ void ChannelManager::initialize()
 		res->next();
 	}
 
-	std::cout << m_channels.size() << " loaded! \n";
+	std::cout << "[ChannelManager::initialize]: Loaded " << m_channels.size() << " channels.\n";
 }
 
 std::vector<Channel> ChannelManager::list()

@@ -17,7 +17,7 @@ void ShopManager::initialize()
 	const auto stmt = DATABASE->prepare("SELECT * FROM `items`");
 	const auto res = stmt->fetch();
 
-	std::cout << "Loading shop items... ";
+	std::cout << "[ShopManager::initialize]: Loading shop items.\n";
 
 	while (res->hasNext())
 	{
@@ -41,7 +41,7 @@ void ShopManager::initialize()
 		res->next();
 	}
 
-	std::cout << m_items.size() << " loaded! \n";
+	std::cout << "[ShopManager::initialize]: Loaded " << m_items.size() << " items.\n";
 }
 
 std::vector<ShopItem> ShopManager::list()

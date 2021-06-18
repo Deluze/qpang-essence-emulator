@@ -72,15 +72,15 @@ void Game::tick()
 		{
 			boost::thread t2(&DatabaseDispatcher::run, &m_dbDispatcher);
 			t2.join();
-			std::cout << "Game::run DatabaseDispatcher exited\n";
+			std::cout << "[Game::tick]: DatabaseDispatcher exited.\n";
 		}
 		catch (const std::exception& e)
 		{
-			std::cout << "Game::tick " << e.what() << std::endl;
+			std::cout << "[Game::tick]: An exception occurred: " << e.what() << std::endl;
 		}
 		catch (...)
 		{
-			std::cout << "Game::tick FATAL uncaught exception \n";
+			std::cout << "[Game::tick]: FATAL uncaught exception.\n";
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));

@@ -17,12 +17,12 @@ bool ConfigManager::initialize()
 		output << CONFIG_TEMPLATE_STRING;
 		output.close();
 
-		std::cout << "Config file generated. Please fill in the server settings and restart the server. \n";
+		std::cout << "[ConfigManager::initialize]: Config file generated. Please fill in the server settings and restart the server.\n";
 
 		return false;
 	}
 
-	std::cout << "Parsing configuration file \n";
+	std::cout << "[ConfigManager::initialize]: Parsing configuration file.\n";
 
 	std::string line;
 
@@ -50,7 +50,7 @@ std::string ConfigManager::getSetting(std::string key)
 
 	if (it == m_settings.end())
 	{
-		std::cout << "Config key " << key << " does not exist";
+		std::cout << "[ConfigManager::getSetting]: Config key " << key << " does not exist.\n";
 
 		return "";
 	}
