@@ -66,7 +66,7 @@ void DatabaseDispatcher::run()
 		if (nextQueryTime < now) {
 			std::cout << "[DatabaseDispatcher::run]: Keeping database dispatcher connection alive.\n";
 
-			const auto statement = con->prepareStatement("SELECT * FROM qpang.weapons LIMIT 0;");
+			const auto statement = con->prepareStatement("SELECT * FROM qfighter.weapons LIMIT 0;");
 
 			statement->execute();
 

@@ -8,7 +8,7 @@
 
 void Leaderboard::refresh()
 {
-	std::cout << "[Leaderboardanager::refresh]: Refreshing leaderboard.\n";
+	std::cout << "[LeaderboardManager::refresh]: Refreshing leaderboard.\n";
 
 	std::lock_guard<std::mutex> g(m_mx);
 

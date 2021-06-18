@@ -40,7 +40,7 @@ void Emulator::initialize()
 
 	if (!m_configManager->initialize() || !m_database->initialize())
 	{
-		std::cout << "[Emulator]: Errors encountered, can not start emulator.\n";
+		std::cout << "[Emulator::initialize]: Errors encountered, can not start emulator.\n";
 		abort();
 	}
 }
@@ -69,9 +69,9 @@ void Emulator::run()
 		if (nextQueryTime < now) {
 			std::cout << "[Emulator::run]: Keeping database connection alive.\n";
 
-			const auto statement = DATABASE->prepare("SELECT * FROM qpang.weapons LIMIT 0;");
+			const auto statement = DATABASE->prepare("SELECT * FROM qfighter.weapons LIMIT 0;");
 
-			statement->fetch();
+			statement->execute();
 
 			nextQueryTime = now + std::chrono::minutes(1);
 		}

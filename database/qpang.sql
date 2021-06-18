@@ -14,7 +14,7 @@
 
 
 -- Dumping database structure for qpang
-CREATE DATABASE IF NOT EXISTS `qpang` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE IF NOT EXISTS `qfighter` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `qpang`;
 
 -- Dumping structure for table qpang.channels
