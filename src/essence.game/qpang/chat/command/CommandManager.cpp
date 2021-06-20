@@ -2,7 +2,6 @@
 
 #include <boost/format.hpp>
 
-
 #include "BanCommand.h"
 #include "DatabaseCommand.h"
 #include "ReloadCommand.h"
@@ -50,7 +49,7 @@ void CommandManager::initialize()
 		//{u"unlimited", new UnlimitedCommand()},
 		{u"reload", new ReloadCommand()},
 		{u"spectate", new SpectateCommand()},
-		{u"nickname", new NameChangeCommand()},
+		{u"nc", new NameChangeCommand()},
 		{u"invincible", new InvincibleCommand()}
 	};
 }

@@ -24,7 +24,7 @@ public:
 	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
 		if (args.size() != 2) {
-			player->broadcast(u"Usage: :nickname <player> <nickname>");
+			player->broadcast(u"Usage: :nc <player> <nickname>");
 
 			return;
 		}
@@ -86,6 +86,9 @@ public:
 		Game::instance()->removeClient(targetPlayer);
 
 		if (targetPlayer->isOnline()) {
+			Game::instance()->getCacheManager()->getPlayerCacheManager()->invalidate(targetPlayer->getId());
+			Game::instance()->getCacheManager()->getPlayerCacheManager()->cache(targetPlayer->getName());
+
 			targetPlayer->close();
 		}
 	}
