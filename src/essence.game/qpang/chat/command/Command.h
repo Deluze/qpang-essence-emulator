@@ -36,14 +36,33 @@ public:
 
 	virtual bool canHandle(std::shared_ptr<Player> player)
 	{
-		if (m_rank == 3 && player->getRank() == 4)
-			return false;
-		else if (m_rank == 4 && player->getRank() >= 3)
+		auto playerRank = player->getRank();
+
+		if (m_rank == 3 && playerRank == 3) {
 			return true;
-		else if (m_rank <= player->getRank())
+		}
+
+		if (m_rank == 4 && (playerRank == 3 || playerRank == 4)) {
 			return true;
+		}
+
+		if (m_rank == 1 && (playerRank == 1 || playerRank == 5)) {
+			return true;
+		}
 
 		return false;
+
+		//// If the command rank is GM and the players rank is helper return false.
+		//if (m_rank == 3 && playerRank == 4)
+		//	return false;
+		//// If the command rank is helper and the player rank is GM or helper return true.
+		//else if (m_rank == 4 && (playerRank == 3 || playerRank == 4))
+		//	return true;
+		//// If the command rank is less than or equal to the players rank
+		//else if (m_rank == 1 && (playerRank == 1 || playerRank == 5))
+		//	return true;
+
+		//return false;
 	}
 
 	uint32_t convertToInteger(const std::u16string& arg)
