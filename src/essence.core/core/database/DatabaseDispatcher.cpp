@@ -18,7 +18,7 @@ void DatabaseDispatcher::run()
 	m_isRunning = true;
 
 	auto now = std::chrono::system_clock::now();
-	auto nextQueryTime = now + std::chrono::minutes(1);
+	auto nextQueryTime = now + std::chrono::hours(1);
 
 	while (m_isRunning)
 	{
@@ -64,15 +64,13 @@ void DatabaseDispatcher::run()
 		now = std::chrono::system_clock::now();
 
 		if (nextQueryTime < now) {
-			std::cout << "[DatabaseDispatcher::run]: Keeping database dispatcher connection alive.\n";
-
 			const auto statement = con->prepareStatement("SELECT * FROM qfighter.weapons LIMIT 0;");
 
 			statement->execute();
 
 			delete statement;
 
-			nextQueryTime = now + std::chrono::minutes(1);
+			nextQueryTime = now + std::chrono::hours(1);
 		}
 	}
 }

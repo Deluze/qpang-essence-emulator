@@ -60,20 +60,18 @@ void Emulator::run()
 	std::cout << "[Emulator::run]: Emulator is running.\n";
 
 	auto now = std::chrono::system_clock::now();
-	auto nextQueryTime = now + std::chrono::minutes(1);
+	auto nextQueryTime = now + std::chrono::hours(1);
 
 	while (m_isRunning)
 	{
 		now = std::chrono::system_clock::now();
 
 		if (nextQueryTime < now) {
-			std::cout << "[Emulator::run]: Keeping database connection alive.\n";
-
 			const auto statement = DATABASE->prepare("SELECT * FROM qfighter.weapons LIMIT 0;");
 
-			statement->execute();
+			statement->fetch();
 
-			nextQueryTime = now + std::chrono::minutes(1);
+			nextQueryTime = now + std::chrono::hours(1);
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
