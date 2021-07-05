@@ -176,7 +176,7 @@ void StatsManager::apply(std::shared_ptr<RoomSessionPlayer> player)
 {
 	addKills(player->getKills());
 	addDeaths(player->getDeaths());
-	addPlaytime(player->getPlaytime());
+	addPlaytime(player->getPlaytime());	
 	m_eventItemPickUps += player->getEventItemPickUps();
 
 	save();

@@ -337,6 +337,9 @@ void RoomSession::finish()
 		else
 			player->getPlayer()->getStatsManager()->addNormalLoss();
 
+		// Add slacker point if player has left the game.
+		player->getPlayer()->getStatsManager()->addSlackerPoint();
+
 		player->stop();
 	}
 	m_leaverMx.unlock();

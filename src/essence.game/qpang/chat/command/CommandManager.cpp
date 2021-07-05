@@ -5,6 +5,7 @@
 #include "BanCommand.h"
 #include "DatabaseCommand.h"
 #include "ReloadCommand.h"
+#include "DailyRewardCommand.h"
 #include "UnlimitedCommand.h"
 #include "qpang/chat/command/Command.h"
 #include "qpang/chat/command/commands/NameChangeCommand.h"
@@ -32,15 +33,15 @@ void CommandManager::initialize()
 		{u"dc", new DisconnectCommand() },
 		{u"dcid", new DisconnectIDCommand() },
 		{u"bc", new BroadcastCommand() },
-		{u"force_start", new ForceStartCommand() },
-		{u"force_start_all", new ForceStartAllCommand() },
+		{u"start", new ForceStartCommand() },
+		{u"startall", new ForceStartAllCommand() },
 		{u"mute", new MuteCommand() },
 		{u"unmute", new UnmuteCommand() },
 		{u"update", new UpdateCommand() },
 		{u"finish", new FinishCommand() },
 		{u"leaderboard", new LeaderboardCommand() },
-		{u"position", new PositionCommand() },
-		{u"reload_shop", new ReloadShopCommand() },
+		{u"pos", new PositionCommand() },
+		{u"reloadshop", new ReloadShopCommand() },
 		{u"config", new ConfigCommand() },
 		{u"close", new CloseCommand() },
 		{u"ban", new BanCommand()},
