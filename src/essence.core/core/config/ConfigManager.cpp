@@ -37,6 +37,10 @@ bool ConfigManager::initialize()
 		std::string value = line.substr(off + 1, line.size() - key.size() + 1);
 
 		set(key, value);
+
+		if (key == "GAME_REVISION") {
+			std::cout << "[ConfigManager::initialize]: Game revision: " << value << "\n";
+		}
 	}
 
 	file.close();

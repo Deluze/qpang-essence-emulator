@@ -22,6 +22,12 @@ public:
 	{
 		const auto &message = args.at(0);
 
+		if (message.empty()) {
+			player->broadcast(u"The message you are attempting to broadcast is empty.");
+
+			return;
+		}
+
 		Game::instance()->broadcast(message);
 	}
 };

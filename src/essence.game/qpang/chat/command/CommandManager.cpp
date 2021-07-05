@@ -7,6 +7,7 @@
 #include "ReloadCommand.h"
 #include "DailyRewardCommand.h"
 #include "UnlimitedCommand.h"
+#include "DailyRewardCommand.h"
 #include "qpang/chat/command/Command.h"
 #include "qpang/chat/command/commands/NameChangeCommand.h"
 #include "qpang/chat/command/commands/InvincibleCommand.h"
@@ -51,7 +52,8 @@ void CommandManager::initialize()
 		{u"reload", new ReloadCommand()},
 		{u"spectate", new SpectateCommand()},
 		{u"nc", new NameChangeCommand()},
-		{u"invincible", new InvincibleCommand()}
+		{u"invincible", new InvincibleCommand()},
+		{u"dr", new DailyRewardCommand()}
 	};
 }
 
