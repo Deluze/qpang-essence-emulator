@@ -30,6 +30,12 @@ public:
 			return;
 		}
 
+		if (player->getRank() == 4 && target->getRank() == 3) {
+			player->broadcast(u"You are not permitted to ban a game master.");
+
+			return;
+		}
+
 		auto bannedByUserId = player->getUserId();
 
 		const auto currTime = time(NULL);

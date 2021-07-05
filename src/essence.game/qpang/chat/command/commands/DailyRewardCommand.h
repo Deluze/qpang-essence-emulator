@@ -15,7 +15,7 @@
 class DailyRewardCommand : public Command
 {
 public:
-	DailyRewardCommand() : Command(3)
+	DailyRewardCommand() : Command(1)
 	{
 
 	}
@@ -68,16 +68,28 @@ public:
 		auto lastActivated = result->getBigInt("last_activated");
 
 		auto nextClaimDate = (lastActivated + (86400 * 1000));
+		auto increaseStreakDate = (lastActivated + ((86400 * 1000) * 2));
 
 		// Checks if the "nextClaimDate" is in the past.
 		if (nextClaimDate < currentTimeMillis) {
-			giveDailyRewardToPlayer(player, loginStreak, lastActivated);
+			auto newLoginStreak = loginStreak;
 
-			// TODO: Check if the login streak can continue.
+			// Current date time is greater than last time activated and its less then the increase streak date time.
+			if (currentTimeMillis >= lastActivated && currentTimeMillis <= increaseStreakDate) {
+				newLoginStreak += 1;
+			}
+			else {
+				newLoginStreak = 1;
+			}
 
-			auto preparedStatement = DATABASE->prepare("UPDATE daily_rewards SET last_activated = ? WHERE player_id = ?");
+			giveDailyRewardToPlayer(player, newLoginStreak, lastActivated);
 
-			preparedStatement->bindInteger(currentTimeMillis);
+			auto preparedStatement = DATABASE->prepare(
+				"UPDATE daily_rewards SET last_activated = ?, streak = ? WHERE player_id = ?"
+			);
+
+			preparedStatement->bindLong(currentTimeMillis);
+			preparedStatement->bindInteger(newLoginStreak);
 			preparedStatement->bindInteger(player->getId());
 
 			preparedStatement->execute();
@@ -89,30 +101,36 @@ public:
 			auto minutesLeft = (int)floor((timeLeft / (1000 * 60)) % 60);
 			auto secondsLeft = (int)floor((timeLeft / (1000)) % 60);
 
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			player->broadcast(u"You have already claimed your daily rewards.");
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			
 			char buffer[1000];
-
-			std::cout << "Time left: " << hoursLeft << "h " << minutesLeft << "m " << secondsLeft << "s\n";
-
-			sprintf_s(buffer, "You have recently claimed your daily rewards, "
-				"you can re-claim your rewards in %i hours %i minutes and %i seconds.\n",
+			sprintf_s(buffer, "You can re-claim your rewards in %ih %im and %is.",
 				hoursLeft, minutesLeft, secondsLeft);
 
 			player->broadcast(StringConverter::Utf8ToUtf16(buffer));
-
 
 			return;
 		}
 	}
 
 	void giveDailyRewardToPlayer(std::shared_ptr<Player> player, uint32_t loginStreak, long lastActivated) {
-		player->addCash(50);
-		player->addDon(50);
+		auto amountOfCash = 100;
+		auto amountOfDon = 100;
+		auto amountOfGoldenCoins = 300;
+
+		player->addCash(amountOfCash);
+		player->addDon(amountOfDon);
+		// 1 golden coin = 100, 3 = 300.
+		player->addCoins(amountOfGoldenCoins);
 
 		player->update();
 		player->send(UpdateAccount(player));
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		player->broadcast(u"You have claimed your daily reward and have received 50 don and 50 cash.");
+		player->broadcast(u"You have claimed your daily reward and have received 100 don, 100 cash and 2 golden coins.");
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		player->broadcast(u"Come back tomorrow to re-claim your reward and increase your login streak.");

@@ -8,7 +8,7 @@ class BanCommand : public Command
 public:
 	BanCommand() : Command(4)
 	{
-		
+
 	}
 
 	std::vector<CommandArgument*> getArguments() override
@@ -23,10 +23,16 @@ public:
 		auto nickname = args.at(0);
 
 		auto target = Game::instance()->getPlayer(nickname);
-		
+
 		if (target == nullptr)
 		{
 			player->broadcast(u"This player does not exist.");
+			return;
+		}
+
+		if (player->getRank() == 4 && target->getRank() == 3) {
+			player->broadcast(u"You are not permitted to ban a game master.");
+
 			return;
 		}
 

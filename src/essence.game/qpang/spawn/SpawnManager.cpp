@@ -16,7 +16,7 @@ void SpawnManager::initialize()
 		"SELECT * FROM map_spawns INNER JOIN positions ON positions.id = map_spawns.position_id INNER JOIN maps ON maps.id = map_spawns.map_id INNER JOIN game_modes ON game_modes.id = map_spawns.game_mode_id"
 	)->fetch();
 
-	std::cout << "[SpawnManager::initialize]: Loading player spawns.\n";
+	std::cout << "Loading player spawns.\n";
 
 	m_spawns.clear();
 	m_itemSpawns.clear();
@@ -37,7 +37,7 @@ void SpawnManager::initialize()
 		res->next();
 	}
 
-	std::cout << "[SpawnManager::initialize]: Loading game item spawns.\n";
+	std::cout << "Loading game item spawns.\n";
 
 	res = DATABASE->prepare(
 		"SELECT game_item_spawns.id, maps.map_id, positions.x, positions.y, positions.z FROM game_item_spawns INNER JOIN positions ON positions.id = game_item_spawns.position_id INNER JOIN maps ON maps.id = game_item_spawns.map_id"

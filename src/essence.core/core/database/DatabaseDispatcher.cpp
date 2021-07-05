@@ -57,7 +57,7 @@ void DatabaseDispatcher::run()
 			}
 			catch (const std::exception& e)
 			{
-				std::cout << "[DatabaseDispatcher::run]: " << e.what() << '\n';
+				std::cout << e.what() << '\n';
 			}
 		}
 
@@ -86,7 +86,7 @@ void DatabaseDispatcher::executeAll()
 {
 	m_dbMx.lock();
 
-	std::cout << "[DatabaseDispatcher::executeAll]: Started.";
+	std::cout << "Database dispatcher has started.";
 
 	for (const auto& [query, binds] : m_queries)
 	{
@@ -117,11 +117,11 @@ void DatabaseDispatcher::executeAll()
 		}
 		catch (const std::exception& e)
 		{
-			std::cout << "[DatabaseDispatcher::executeAll]: An exception occurred: " << e.what() << '\n';
+			std::cout << "An exception occurred: " << e.what() << '\n';
 		}
 	}
 
-	std::cout << "[DatabaseDispatcher::executeAll]: Done.\n";
+	std::cout << "Database dispatcher is done.\n";
 
 	m_queries.clear();
 
@@ -143,7 +143,7 @@ void DatabaseDispatcher::connect()
 	}
 	catch (const sql::SQLException& e)
 	{
-		std::cout << "[DatabaseDispatcher::connect]: An exception occurred: " << e.what() << std::endl;
+		std::cout << "An exception occurred: " << e.what() << std::endl;
 
 		m_initialAttemptConnectCount++;
 

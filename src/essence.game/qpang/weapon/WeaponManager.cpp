@@ -14,7 +14,7 @@ void WeaponManager::initialize()
 
 	m_weapons.clear();
 
-	std::cout << "[WeaponManager::initialize]: Loading weapons.\n";
+	std::cout << "Loading weapons.\n";
 
 	while (res->hasNext())
 	{
@@ -37,7 +37,7 @@ void WeaponManager::initialize()
 		res->next();
 	}
 
-	std::cout << "[WeaponManager::initialize]: Loaded " << m_weapons.size() << " weapons.\n";
+	std::cout << "Loaded " << m_weapons.size() << " weapons.\n";
 }
 
 bool WeaponManager::canEquip(uint32_t weaponId, uint16_t characterId)

@@ -15,7 +15,7 @@ bool Database::initialize()
 	{
 		if (connect())
 		{
-			std::cout << "[Database::initialize]: Database connected.\n";
+			std::cout << "Database connected.\n";
 
 			con->setClientOption("OPT_RECONNECT", &m_reconnectState);
 			con->setSchema(CONFIG_MANAGER->getString("DB_NAME").c_str());
@@ -28,7 +28,7 @@ bool Database::initialize()
 		std::cout << e.what() << std::endl;
 	}
 
-	std::cout << "[Database::initialize]: Failed to connect with the database. Please check the credentials.\n";
+	std::cout << "Failed to connect with the database. Please check the credentials.\n";
 
 	driver->threadEnd();
 

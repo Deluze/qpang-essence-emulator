@@ -92,7 +92,7 @@ public:
 
 			if (attempts == maxFailedLogins)
 			{
-				std::cout << "[LoginRequest::handle]: Timed out " << ipAddress << " - Too many failed login attempts.\n";
+				std::cout << "Timed out " << ipAddress << " - Too many failed login attempts.\n";
 				timestamp = time(NULL);
 			}
 

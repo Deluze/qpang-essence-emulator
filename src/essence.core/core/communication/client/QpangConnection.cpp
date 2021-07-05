@@ -45,7 +45,7 @@ void QpangConnection::read()
 	}
 	catch (const boost::system::error_code& e)
 	{
-		std::cout << "[QpangConnection::read] An exception occurred: " << e.message() << std::endl;
+		std::cout << "An exception occurred: " << e.message() << std::endl;
 	}
 }
 
@@ -99,7 +99,7 @@ void QpangConnection::close()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "[QpangConnection::close] An exception occurred: " << e.what() << "\n";
+		std::cout << "An exception occurred: " << e.what() << "\n";
 	}
 
 	try
@@ -112,7 +112,7 @@ void QpangConnection::close()
 	}
 	catch (const boost::system::error_code& e)
 	{
-		std::cout << "[QpangConnection::close] An exception occurred: " << e.message() << "\n";
+		std::cout << "An exception occurred: " << e.message() << "\n";
 	}
 }
 
@@ -191,12 +191,12 @@ void QpangConnection::onHeaderRead(const boost::system::error_code& e)
 		}
 		catch (const boost::system::error_code& e)
 		{
-			std::cout << "[QpangConnection::onPacketReceive] An exception occurred: " << e.message() << std::endl;
+			std::cout << "An exception occurred: " << e.message() << std::endl;
 		}
 	}
 	catch (const std::exception& ee)
 	{
-		std::cout << "[QPangConnection::onPacketReceive]: An exception occurred: " << ee.what() << std::endl;
+		std::cout << "An exception occurred: " << ee.what() << std::endl;
 	}
 }
 
@@ -242,7 +242,7 @@ void QpangConnection::write(std::vector<char> buff)
 	}
 	catch (const boost::system::error_code& ec)
 	{
-		std::cout << "[QpangConnection::write]: An exception occurred: " << ec.message() << std::endl;
+		std::cout << "An exception occurred: " << ec.message() << std::endl;
 		close();
 	}
 }
@@ -251,7 +251,7 @@ void QpangConnection::onWriteFinish(const boost::system::error_code& e)
 {
 	if (e)
 	{
-		std::cout << "[QpangConnection::onWriteFinish]: An error occurred: " << e.message() << std::endl;
+		std::cout << "An error occurred: " << e.message() << std::endl;
 		close();
 	}
 }

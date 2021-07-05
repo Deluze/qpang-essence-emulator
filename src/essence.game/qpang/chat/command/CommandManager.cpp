@@ -53,7 +53,7 @@ void CommandManager::initialize()
 		{u"spectate", new SpectateCommand()},
 		{u"nc", new NameChangeCommand()},
 		{u"invincible", new InvincibleCommand()},
-		{u"dr", new DailyRewardCommand()}
+		{u"dailyrewards", new DailyRewardCommand()}
 	};
 }
 

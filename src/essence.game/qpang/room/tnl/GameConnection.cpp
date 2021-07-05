@@ -82,7 +82,7 @@ void GameConnection::onConnectionTerminated(TNL::NetConnection::TerminationReaso
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "[GameConnection::onConnectionTerminated]: An exception occurred: " << e.what() << std::endl;
+		std::cout << "An exception occurred: " << e.what() << std::endl;
 	}
 }
 
@@ -97,7 +97,7 @@ void GameConnection::onConnectTerminated(TNL::NetConnection::TerminationReason r
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "[GameConnection::onConnectTerminated]: " << e.what() << std::endl;
+		std::cout << e.what() << std::endl;
 	}
 }
 

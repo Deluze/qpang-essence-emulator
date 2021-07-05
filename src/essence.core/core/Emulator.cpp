@@ -40,7 +40,7 @@ void Emulator::initialize()
 
 	if (!m_configManager->initialize() || !m_database->initialize())
 	{
-		std::cout << "[Emulator::initialize]: Errors encountered, can not start emulator.\n";
+		std::cout << "Errors encountered, can not start emulator.\n";
 		abort();
 	}
 }
@@ -57,7 +57,7 @@ void Emulator::run()
 	for (QpangServer* server : m_servers)
 		boost::thread t(std::bind(&QpangServer::listen, server));
 
-	std::cout << "[Emulator::run]: Emulator is running.\n";
+	std::cout << "Emulator is running.\n";
 
 	auto now = std::chrono::system_clock::now();
 	auto nextQueryTime = now + std::chrono::hours(1);
