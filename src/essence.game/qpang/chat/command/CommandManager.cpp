@@ -70,7 +70,7 @@ void CommandManager::handle(std::shared_ptr<Player> player, const std::u16string
 	auto comm = (*it).second;
 
 	if (!comm->canHandle(player))
-		return player->broadcast(u"You don't have the permission to execute this command.");
+		return player->broadcast(u"You do not have the permission to execute this command.");
 
 	std::vector<std::u16string> args;
 
@@ -79,12 +79,12 @@ void CommandManager::handle(std::shared_ptr<Player> player, const std::u16string
 		const auto validators = comm->getArguments();
 
 		if (arg.empty())
-			return player->broadcast(u"No arguments were passed with given command.");
+			return player->broadcast(u"No arguments were passed with the given command.");
 
 		if (validators.size() == 1)
 		{
 			if (!validators[0]->validate(arg))
-				return player->broadcast(u"Argument 0 with given command is invalid.");
+				return player->broadcast(u"The first argument for the given command is invalid.");
 		}
 
 		size_t prevArg{ 0 };
@@ -110,7 +110,7 @@ void CommandManager::handle(std::shared_ptr<Player> player, const std::u16string
 		for (size_t i = 0; i < args.size(); i++)
 		{
 			if (!validators[i]->validate(args[i]))
-				return player->broadcast(u"Arguments with given command are invalid.");
+				return player->broadcast(u"The arguments for the given command are invalid.");
 		}
 	}
 	else

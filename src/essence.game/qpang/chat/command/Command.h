@@ -38,31 +38,28 @@ public:
 	{
 		auto playerRank = player->getRank();
 
+		// GM's may execute all commands.
+		if (playerRank == 3) {
+			return true;
+		}
+
+		// Required rank = GM, player rank must also be GM.
 		if (m_rank == 3 && playerRank == 3) {
 			return true;
 		}
 
+		// Required rank = Helper, player rank must be GM or Helper.
 		if (m_rank == 4 && (playerRank == 3 || playerRank == 4)) {
 			return true;
 		}
 
-		if (m_rank == 1 && (playerRank == 1 || playerRank == 5)) {
+		// Required rank = Player, everyone may execute this command.
+		if (m_rank == 1) {
 			return true;
 		}
 
+		// If the rank is not for Player, Helper or GM, don't allow it to be executed.
 		return false;
-
-		//// If the command rank is GM and the players rank is helper return false.
-		//if (m_rank == 3 && playerRank == 4)
-		//	return false;
-		//// If the command rank is helper and the player rank is GM or helper return true.
-		//else if (m_rank == 4 && (playerRank == 3 || playerRank == 4))
-		//	return true;
-		//// If the command rank is less than or equal to the players rank
-		//else if (m_rank == 1 && (playerRank == 1 || playerRank == 5))
-		//	return true;
-
-		//return false;
 	}
 
 	uint32_t convertToInteger(const std::u16string& arg)
