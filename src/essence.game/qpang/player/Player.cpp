@@ -74,8 +74,9 @@ void Player::broadcast(const std::u16string& message) const
 {
 	Broadcast br(message);
 
-	if (const auto lobbyConn = m_lobbyConn.lock(); lobbyConn != nullptr)
+	if (const auto lobbyConn = m_lobbyConn.lock(); lobbyConn != nullptr) {
 		lobbyConn->send(br);
+	}
 }
 
 void Player::send(const SquareServerPacket& packet) const
@@ -193,7 +194,7 @@ void Player::ban(time_t until, uint32_t bannedByUserId)
 		static_cast<uint64_t>(currTime),
 		static_cast<uint64_t>(until),
 		bannedByUserId
-	});
+		});
 
 	close();
 }
