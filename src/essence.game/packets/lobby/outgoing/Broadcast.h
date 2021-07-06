@@ -12,6 +12,5 @@ public:
 		writeInt(0);
 		writeEmpty(34);
 		writeString(message, message.size() % 254);
-		writeInt(0);
 	}
 };

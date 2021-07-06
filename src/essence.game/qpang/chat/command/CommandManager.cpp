@@ -30,6 +30,8 @@
 
 void CommandManager::initialize()
 {
+	auto dailyRewardCommand = new DailyRewardCommand();
+
 	m_commands = {
 		{u"dc", new DisconnectCommand() },
 		{u"dcid", new DisconnectIDCommand() },
@@ -53,7 +55,10 @@ void CommandManager::initialize()
 		{u"spectate", new SpectateCommand()},
 		{u"nc", new NameChangeCommand()},
 		{u"invincible", new InvincibleCommand()},
-		{u"dailyrewards", new DailyRewardCommand()}
+		{u"dailyrewards", dailyRewardCommand},
+		{u"dailyreward", dailyRewardCommand},
+		{u"daily", dailyRewardCommand},
+		{u"dr", dailyRewardCommand}
 	};
 }
 

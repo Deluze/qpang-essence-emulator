@@ -101,16 +101,15 @@ public:
 			auto minutesLeft = (int)floor((timeLeft / (1000 * 60)) % 60);
 			auto secondsLeft = (int)floor((timeLeft / (1000)) % 60);
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			player->broadcast(u"You have already claimed your daily rewards.");
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			
 			char buffer[1000];
+
 			sprintf_s(buffer, "You can re-claim your rewards in %ih %im and %is.",
 				hoursLeft, minutesLeft, secondsLeft);
 
-			player->broadcast(StringConverter::Utf8ToUtf16(buffer));
+			player->broadcast(
+				u"\nYou have already claimed your daily rewards.\n" +
+				StringConverter::Utf8ToUtf16(buffer)
+			);
 
 			return;
 		}
@@ -129,13 +128,17 @@ public:
 		player->update();
 		player->send(UpdateAccount(player));
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		player->broadcast(u"You have claimed your daily reward and have received 100 don, 100 cash and 2 golden coins.");
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		player->broadcast(
+			u"\nYou have claimed your daily reward and have received 100 don, 100 cash and 2 golden coins.\n"
+			u"Come back tomorrow to re-claim your reward and increase your login streak.\n"
+			u"Re-enter the park to view your updated balance."
+		);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		player->broadcast(u"Come back tomorrow to re-claim your reward and increase your login streak.");
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		//player->broadcast(u"Come back tomorrow to re-claim your reward and increase your login streak.");
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		player->broadcast(u"Re-enter the park to view your updated balance.");
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		//player->broadcast(u"Re-enter the park to view your updated balance.");
 	}
 };
