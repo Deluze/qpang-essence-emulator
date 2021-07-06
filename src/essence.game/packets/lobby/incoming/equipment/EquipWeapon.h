@@ -12,7 +12,7 @@ public:
 	{
 		const auto characterIndex = packet.readShort();
 
-		std::array<uint64_t, 4> weapons;
+		std::array<uint64_t, 4> weapons{};
 
 		for (size_t i = 0; i < 4; i++)
 		{

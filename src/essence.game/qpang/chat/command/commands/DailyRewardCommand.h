@@ -39,63 +39,54 @@ public:
 			return;
 		}
 
-		auto statement = DATABASE->prepare("SELECT * FROM daily_rewards WHERE player_id = ? LIMIT 1");
+		auto playerDailyRewardInfo = getDailyRewardInfoForPlayer(player->getId());
 
-		statement->bindInteger(player->getId());
-
-		auto result = statement->fetch();
-
-		time_t currentTimeMillis = (time(0) * 1000);
+		auto currentTimeInMillis = (time(0) * 1000);
 
 		// Player does not exist in table, give player rewards and create record.
-		if (!result->hasResults()) {
-			giveDailyRewardToPlayer(player, 1, currentTimeMillis);
+		if (!playerDailyRewardInfo->hasResults()) {
+			claimDailyReward(player, 1, currentTimeInMillis);
 
-			auto insertStatement = DATABASE->prepare(
-				"INSERT INTO daily_rewards (player_id, streak, last_activated) VALUES(?, 1, ?)"
-			);
-
-			insertStatement->bindInteger(player->getId());
-			insertStatement->bindLong(currentTimeMillis);
-
-			// Insert record for player daily reward.
-			insertStatement->execute();
+			DATABASE_DISPATCHER->dispatch(
+				"INSERT INTO daily_rewards (player_id, streak, last_activated) VALUES(?, 1, ?)",
+				{
+					player->getId(),
+					currentTimeInMillis
+				});
 
 			return;
 		}
 
-		auto loginStreak = result->getInt("streak");
-		auto lastActivated = result->getBigInt("last_activated");
+		auto dailyLoginStreak = playerDailyRewardInfo->getInt("streak");
+		auto timeLastActivated = playerDailyRewardInfo->getBigInt("last_activated");
 
-		auto nextClaimDate = (lastActivated + (86400 * 1000));
-		auto increaseStreakDate = (lastActivated + ((86400 * 1000) * 2));
+		auto nextDailyRewardClaimDate = (timeLastActivated + (86400 * 1000));
+		auto timeUntillStreakCanBeIncreased = (timeLastActivated + ((86400 * 1000) * 2));
 
 		// Checks if the "nextClaimDate" is in the past.
-		if (nextClaimDate < currentTimeMillis) {
-			auto newLoginStreak = loginStreak;
+		if (nextDailyRewardClaimDate < currentTimeInMillis) {
+			auto newLoginStreak = dailyLoginStreak;
 
 			// Current date time is greater than last time activated and its less then the increase streak date time.
-			if (currentTimeMillis >= lastActivated && currentTimeMillis <= increaseStreakDate) {
+			if (currentTimeInMillis >= timeLastActivated && currentTimeInMillis <= timeUntillStreakCanBeIncreased) {
 				newLoginStreak += 1;
 			}
 			else {
 				newLoginStreak = 1;
 			}
 
-			giveDailyRewardToPlayer(player, newLoginStreak, lastActivated);
+			claimDailyReward(player, newLoginStreak, timeLastActivated);
 
-			auto preparedStatement = DATABASE->prepare(
-				"UPDATE daily_rewards SET last_activated = ?, streak = ? WHERE player_id = ?"
-			);
-
-			preparedStatement->bindLong(currentTimeMillis);
-			preparedStatement->bindInteger(newLoginStreak);
-			preparedStatement->bindInteger(player->getId());
-
-			preparedStatement->execute();
+			DATABASE_DISPATCHER->dispatch(
+				"UPDATE daily_rewards SET last_activated = ?, streak = ? WHERE player_id = ?",
+				{
+					currentTimeInMillis,
+					newLoginStreak,
+					player->getId()
+				});
 		}
 		else {
-			auto timeLeft = (nextClaimDate - currentTimeMillis);
+			auto timeLeft = (nextDailyRewardClaimDate - currentTimeInMillis);
 
 			auto hoursLeft = (int)floor((timeLeft / (1000 * 60 * 60)) % 24);
 			auto minutesLeft = (int)floor((timeLeft / (1000 * 60)) % 60);
@@ -115,7 +106,27 @@ public:
 		}
 	}
 
-	void giveDailyRewardToPlayer(std::shared_ptr<Player> player, uint32_t loginStreak, long lastActivated) {
+	/// <summary>
+	/// Gets the daily reward info from the database for the given player.
+	/// </summary>
+	/// <param name="playerId">The id of the player.</param>
+	StatementResult::Ptr getDailyRewardInfoForPlayer(uint32_t playerId)
+	{
+		auto statement = DATABASE->prepare("SELECT * FROM daily_rewards WHERE player_id = ? LIMIT 1");
+
+		statement->bindInteger(playerId);
+
+		return statement->fetch();
+	}
+
+	/// <summary>
+	/// Gives the daily reward to the player and sends an update packet.
+	/// </summary>
+	/// <param name="player">The player in question.</param>
+	/// <param name="loginStreak">The current login streak of the player.</param>
+	/// <param name="lastActivated">The last time the player has claimed their reward.</param>
+	void claimDailyReward(std::shared_ptr<Player> player, uint32_t loginStreak, long lastActivated)
+	{
 		auto amountOfCash = 100;
 		auto amountOfDon = 100;
 		auto amountOfGoldenCoins = 300;
@@ -128,17 +139,10 @@ public:
 		player->update();
 		player->send(UpdateAccount(player));
 
-		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		player->broadcast(
 			u"\nYou have claimed your daily reward and have received 100 don, 100 cash and 2 golden coins.\n"
 			u"Come back tomorrow to re-claim your reward and increase your login streak.\n"
 			u"Re-enter the park to view your updated balance."
 		);
-
-		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		//player->broadcast(u"Come back tomorrow to re-claim your reward and increase your login streak.");
-
-		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		//player->broadcast(u"Re-enter the park to view your updated balance.");
 	}
 };

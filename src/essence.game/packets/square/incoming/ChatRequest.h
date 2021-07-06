@@ -30,7 +30,7 @@ public:
 		const auto actualMessage = Game::instance()->getChatManager()->chat(player, message);
 
 		if (player->isMuted() && !actualMessage.empty())
-			return player->broadcast(u"You're currently muted. Your message has not been sent");
+			return player->broadcast(u"You are currently muted. Your message has not been sent.");
 
 		if (actualMessage.empty())
 			return;

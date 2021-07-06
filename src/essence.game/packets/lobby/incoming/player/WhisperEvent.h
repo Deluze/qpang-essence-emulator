@@ -21,11 +21,12 @@ public:
 		if (auto player = Game::instance()->getOnlinePlayer(nickname); player != nullptr)
 		{
 			const auto ourPlayer = conn->getPlayer();
+
 			if (ourPlayer != nullptr && ourPlayer->isMuted())
-				return ourPlayer->broadcast(u"You're currently muted. Your message has not been sent");
+				return ourPlayer->broadcast(u"You are currently muted. Your message has not been sent.");
 
 			player->whisper(conn->getPlayer()->getName(), message);
-			conn->send(SendWhisper(nickname, message));
+			conn->send(SendWhisper(player->getName(), message));
 		}
 	}
 };

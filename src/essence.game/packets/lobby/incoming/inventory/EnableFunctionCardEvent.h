@@ -27,7 +27,5 @@ public:
 
 		if (isEquippableFunction(card.itemId))
 			return player->getInventoryManager()->setCardActive(card.id, true);
-	
-
 	}
 };
