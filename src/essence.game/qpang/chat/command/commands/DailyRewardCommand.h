@@ -51,7 +51,7 @@ public:
 				"INSERT INTO daily_rewards (player_id, streak, last_activated) VALUES(?, 1, ?)",
 				{
 					player->getId(),
-					currentTimeInMillis
+					static_cast<uint64_t>(currentTimeInMillis)
 				});
 
 			return;
@@ -80,7 +80,7 @@ public:
 			DATABASE_DISPATCHER->dispatch(
 				"UPDATE daily_rewards SET last_activated = ?, streak = ? WHERE player_id = ?",
 				{
-					currentTimeInMillis,
+					static_cast<uint64_t>(currentTimeInMillis),
 					newLoginStreak,
 					player->getId()
 				});
