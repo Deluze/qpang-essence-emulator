@@ -28,7 +28,8 @@ void Emulator::initialize()
 		<< "              \\         /	    \n"
 		<< "           By: \\       /   	\n"
 		<< "              Dennis &/     	\n"
-		<< "                 Deluze     	\n"
+		<< "                 Deluze &    	\n"
+		<< "				    Yestin		\n"
 		<< "                  \\ /     		\n"
 		<< "                   v     		\n \n";
 #ifdef WIN32
