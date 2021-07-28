@@ -110,12 +110,12 @@ bool PlayerWeaponManager::hasWeapon(uint32_t weaponId)
 
 void PlayerWeaponManager::switchWeapon(uint32_t weaponId)
 {
-	//if (m_weapons[m_selectedWeaponIndex].itemId == weaponId)
-	//{
-	//	// already chose this weapon
-	//	return;
-	//}
-	//
+	if (m_weapons[m_selectedWeaponIndex].itemId == weaponId)
+	{
+		// already chose this weapon
+		return;
+	}
+	
 	for (size_t i = 0; i < m_weapons.size(); i++)
 	{
 		if (m_weapons[i].itemId == weaponId)
