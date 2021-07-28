@@ -19,7 +19,8 @@ public:
 
 		if (player->getInventoryManager()->list().size() >= 200 - times)
 		{
-			
+			player->broadcast(u"You have too many items in your inventory to be able to use the cranemachine.");
+
 			return;
 		}
 
@@ -27,7 +28,8 @@ public:
 
 		if (!crane->isEnabled())
 		{
-			player->broadcast(u"Tell the developers to put something in this crane ;)");
+			player->broadcast(u"The cranemachine is currently out of use.");
+
 			return;
 		}
 
@@ -54,14 +56,16 @@ public:
 		player->removeCoins(coinsNeeded);
 
 		std::vector<InventoryCard> cards;
-		
+
 		for (size_t i = 0; i < times; i++)
 		{
 			auto inventoryCard = crane->getRandomItem();
+
 			inventoryCard.playerOwnerId = player->getId();
 			inventoryCard.isOpened = true;
+
 			player->getInventoryManager()->storeCard(inventoryCard);
-			
+
 			cards.push_back(inventoryCard);
 		}
 
