@@ -23,7 +23,7 @@ public:
 			const auto ourPlayer = conn->getPlayer();
 
 			if (ourPlayer != nullptr && ourPlayer->isMuted())
-				return ourPlayer->broadcast(u"You are currently muted. Your message has not been sent.");
+				return ourPlayer->broadcast(u"You are currently restricted from using the chat.");
 
 			player->whisper(conn->getPlayer()->getName(), message);
 			conn->send(SendWhisper(player->getName(), message));

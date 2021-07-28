@@ -62,7 +62,7 @@ void CommandManager::initialize()
 	};
 }
 
-bool CommandManager::isCommand(const std::u16string& command)
+bool CommandManager::isCommand(std::u16string& command)
 {
 	return m_commands.find(command) != m_commands.cend();
 }
@@ -77,7 +77,7 @@ void CommandManager::handle(std::shared_ptr<Player> player, const std::u16string
 	auto comm = (*it).second;
 
 	if (!comm->canHandle(player))
-		return player->broadcast(u"You do not have the permission to execute this command.");
+		return player->broadcast(u"You do not have permission to execute this command. If you believe this is a mistake, please contact a moderator.");
 
 	std::vector<std::u16string> args;
 

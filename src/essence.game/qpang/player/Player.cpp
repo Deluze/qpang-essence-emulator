@@ -377,7 +377,7 @@ void Player::mute()
 {
 	m_isMuted = true;
 
-	broadcast(u"You have been muted by QPang staff");
+	broadcast(u"You have been restricted from chatting by a moderator.");
 
 	DATABASE_DISPATCHER->dispatch("UPDATE `players` SET `is_muted` = 1 WHERE `id` = ?", { m_playerId });
 }
@@ -386,7 +386,7 @@ void Player::unmute()
 {
 	m_isMuted = false;
 
-	broadcast(u"You have been unmuted and can now use chat again");
+	broadcast(u"Your restriction from talking in chat has been lifted.");
 
 	DATABASE_DISPATCHER->dispatch("UPDATE `players` SET `is_muted` = 0 WHERE `id` = ?", { m_playerId });
 }

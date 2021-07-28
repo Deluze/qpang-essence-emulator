@@ -430,11 +430,11 @@ uint8_t EquipmentManager::getExtraAmmoForWeaponIndex(uint8_t index)
 
 		auto itemId = player->getInventoryManager()->get(equip[6]).itemId;
 
-		if (index == 0 && itemId == 1429409536)
+		if (index == 0 && itemId == 1429409536) // schiet ammo
 			return 1;
-		if (index == 1 && itemId == 1429409792)
+		if (index == 1 && itemId == 1429409792) // lanceer ammo
 			return 1;
-		if (index == 2 && itemId == 1429408001)
+		if (index == 2 && itemId == 1429408001) // werp ammo
 			return 1;
 	}
 

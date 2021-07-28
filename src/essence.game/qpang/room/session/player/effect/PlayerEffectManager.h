@@ -24,6 +24,7 @@ private:
 
 	void removeEffect(uint8_t effectId);
 	void takeDamageFromEffect(const Effect& effect);
+	void healFromEffect(const Effect& effect);
 
 	time_t m_lastTick;
 
