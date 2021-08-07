@@ -98,7 +98,7 @@ public:
 				hoursLeft, minutesLeft, secondsLeft);
 
 			player->broadcast(
-				u"\nYou have already claimed your daily rewards.\n" +
+				u"\nYou have recently claimed your daily rewards.\n" +
 				StringConverter::Utf8ToUtf16(buffer)
 			);
 
@@ -127,22 +127,42 @@ public:
 	/// <param name="lastActivated">The last time the player has claimed their reward.</param>
 	void claimDailyReward(std::shared_ptr<Player> player, uint32_t loginStreak, long lastActivated)
 	{
-		auto amountOfCash = 100;
-		auto amountOfDon = 100;
-		auto amountOfGoldenCoins = 300;
+		auto playerHasIncreasedReward = player->hasIncreasedDailyReward();
 
-		player->addCash(amountOfCash);
-		player->addDon(amountOfDon);
-		// 1 golden coin = 100, 3 = 300.
-		player->addCoins(amountOfGoldenCoins);
+		auto baseAmountOfCash = 50;
+		auto baseAmountOfDon = 1000;
+
+		if (playerHasIncreasedReward)
+		{
+			baseAmountOfCash = 60;
+			baseAmountOfDon = 1200;
+		}
+
+		if (loginStreak > 7) 
+		{
+			loginStreak = 7;
+		}
+
+		float rewardModifier = (loginStreak / static_cast<float>(10));
+
+		int dailyRewardCash = static_cast<int>(baseAmountOfCash * (1 + rewardModifier));
+		int dailyRewardDon = static_cast<int>(baseAmountOfDon * (1 + rewardModifier));
+		
+		player->addCash(dailyRewardCash);
+		player->addDon(dailyRewardDon);
 
 		player->update();
 		player->send(UpdateAccount(player));
 
-		player->broadcast(
-			u"\nYou have claimed your daily reward and have received 100 don, 100 cash and 2 golden coins.\n"
-			u"Come back tomorrow to re-claim your reward and increase your login streak.\n"
-			u"Re-enter the park to view your updated balance."
+		char buffer[1000];
+
+		sprintf_s(buffer, 
+			"\nYou have claimed your daily reward and have received %i cash and %i don.\n"
+			"Your current login-streak is now at %i.\n"
+			"Re-enter the park to view your updated balance.", 
+			(int) dailyRewardCash, (int) dailyRewardDon, loginStreak
 		);
+
+		player->broadcast(StringConverter::Utf8ToUtf16(buffer));
 	}
 };

@@ -96,6 +96,8 @@ public:
 	void unmute();
 	bool isMuted();
 
+	bool hasIncreasedDailyReward();
+
 	bool exists();
 
 	std::shared_ptr<SquarePlayer> getSquarePlayer();
@@ -122,6 +124,10 @@ private:
 	uint32_t m_playTime = 0;
 	time_t m_loginTime = 0;
 	uint32_t m_slackerPoints = 0;
+
+	// new
+	bool m_hasIncreasedDailyReward = false;
+
 	bool m_isMuted = false;
 	bool m_exists = true;
 	bool m_isClosed = false;
