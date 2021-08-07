@@ -9,7 +9,7 @@
 void SpawnManager::initialize()
 {
 	std::lock_guard<std::mutex> lg(m_mx);
-	
+
 	srand(time(NULL));
 
 	auto res = DATABASE->prepare(
@@ -57,14 +57,28 @@ void SpawnManager::initialize()
 	}
 }
 
+Spawn SpawnManager::getRandomPlazaSpawnLocation()
+{
+	std::lock_guard<std::mutex> lg(m_mx);
+
+	if (m_plazaSpawns.empty()) {
+		// TODO: Fallback location.
+		return {};
+	}
+
+	auto index = rand() % m_plazaSpawns.size();
+
+	return m_plazaSpawns[index];
+}
+
 Spawn SpawnManager::getRandomSpawn(uint8_t map, uint8_t team)
 {
 	std::lock_guard<std::mutex> lg(m_mx);
-	
+
 	if (team != 0 && team != 1 && team != 2)
 		return {};
 
-	auto spawns = m_spawns[map][team];
+	auto& spawns = m_spawns[map][team];
 
 	if (spawns.empty())
 		return {};
@@ -77,7 +91,7 @@ Spawn SpawnManager::getRandomSpawn(uint8_t map, uint8_t team)
 Spawn SpawnManager::getRandomTeleportSpawn(uint8_t map)
 {
 	std::lock_guard<std::mutex> lg(m_mx);
-	
+
 	auto spawns = m_spawns[map][98];
 
 	if (spawns.empty())
@@ -91,14 +105,14 @@ Spawn SpawnManager::getRandomTeleportSpawn(uint8_t map)
 std::vector<Spawn> SpawnManager::getItemSpawns(uint8_t map)
 {
 	std::lock_guard<std::mutex> lg(m_mx);
-	
+
 	return m_itemSpawns[map];
 }
 
 Spawn SpawnManager::getEssenceSpawn(uint8_t map)
 {
 	std::lock_guard<std::mutex> lg(m_mx);
-	
+
 	auto spawns = m_spawns[map][99];
 
 	if (spawns.empty())
