@@ -32,7 +32,7 @@ void EquipmentManager::initialize(std::shared_ptr<Player> player, uint16_t playe
 	StatementResult::Ptr res = stmt->fetch();
 
 	std::lock_guard<std::mutex> l(m_mx);
-	
+
 	while (res->hasNext())
 	{
 		std::array<uint64_t, 13> equips;
@@ -68,19 +68,19 @@ std::vector<uint16_t> EquipmentManager::getUnlockedCharacters()
 std::array<uint64_t, 13> EquipmentManager::getEquipmentByCharacter(uint16_t characterId)
 {
 	std::lock_guard<std::mutex> l(m_mx);
-	
+
 	const auto it = m_equips.find(characterId);
 
 	if (it == m_equips.cend())
 		return {};
-	
+
 	return it->second;
 }
 
 std::array<uint64_t, 9> EquipmentManager::getArmorByCharacter(uint16_t characterId)
 {
 	std::lock_guard<std::mutex> l(m_mx);
-	
+
 	auto it = m_equips.find(characterId);
 
 	if (it == m_equips.cend())
@@ -136,7 +136,7 @@ std::array<uint32_t, 4> EquipmentManager::getWeaponItemIdsByCharacter(uint16_t c
 std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t characterId)
 {
 	std::lock_guard<std::mutex> l(m_mx);
-	
+
 	auto it = m_equips.find(characterId);
 
 	if (it == m_equips.cend())
@@ -155,7 +155,7 @@ std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t charact
 std::array<InventoryCard, 3> EquipmentManager::getSkillCards()
 {
 	std::lock_guard<std::mutex> l(m_mx);
-	
+
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
 		InventoryManager* inv = player->getInventoryManager();
@@ -185,7 +185,7 @@ void EquipmentManager::removeFunctionCard(uint64_t cardId)
 void EquipmentManager::unequipItem(uint64_t cardId)
 {
 	std::lock_guard<std::mutex> l(m_mx);
-	
+
 	for (size_t i = 0; i < m_unlockedCharacters.size(); i++)
 	{
 		auto character = m_unlockedCharacters[i];
@@ -363,15 +363,18 @@ uint16_t EquipmentManager::getBaseHealth()
 	{
 		switch (player->getCharacter())
 		{
-		case 850:
-		case 851:
-			return 125;
-		case 578:
-			return 150;
-		case 579:
-			return 90;
-		case 343:
-		case 333:
+		case 850: // sai
+			return 130;
+		case 851: // uru
+			return 160;
+		case 578: // kuma
+			return 200;
+		case 579: // miu miu
+			return 80;
+		case 343: // hana
+			return 100;
+		case 333: // ken
+			return 110;
 		default:
 			return 100;
 		}
@@ -398,6 +401,19 @@ uint16_t EquipmentManager::getBonusHealth()
 		case 1429431040: // orange
 		case 1429409024: // alpha
 		case 1429412097: // yellow helper
+		// Other backpacks
+		case 1429412101:
+		case 1429412102:
+		case 1429412103:
+		case 1429412104:
+		case 1429412105:
+		case 1429412106:
+		case 1429412107:
+		case 1429412108:
+		case 1429412109:
+		case 1429412098:
+		case 1429412099:
+		case 1429412100:
 			return 20;
 		case 1429415424: // novice back
 			return 30;
