@@ -26,8 +26,7 @@ public:
 	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
 		if (args.size() != 2) {
-			player->broadcast(u"Please enter a key and a value.");
-			player->broadcast(u"Usage: :config <key> <value>");
+			player->broadcast(u"Please enter a key and a value. Usage: :config <key> <value>");
 
 			return;
 		}
