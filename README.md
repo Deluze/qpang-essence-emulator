@@ -4,7 +4,7 @@ This is the first ever QPang server emulator that is built around the 2012/03/14
 
 The emulator has been used by "Project Essence" or "QPang.io" and has been used for over 7 months while handling over hundreds of players concurrently.
 
-Join the community for support/questions/chatting: [Discord](https://discord.gg/2AMAZEt).
+Development Playlist: [YouTube](https://youtube.com/playlist?list=PLNhErl4In3cgppX-SUUWOJv7uhttRPQe9).
 
 By: [Dennis](https://github.com/kuroppoi) & [Deluze](https://github.com/Deluze) ♥.
 
