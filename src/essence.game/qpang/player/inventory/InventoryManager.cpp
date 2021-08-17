@@ -161,7 +161,7 @@ bool InventoryManager::addCard(const InventoryCard& card)
 	if (!hasSpace())
 		return false;
 
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	m_cards[card.id] = card;
 
@@ -201,26 +201,33 @@ void InventoryManager::storeCard(InventoryCard& card)
 	addCard(card);
 }
 
-void InventoryManager::useCard(const uint64_t cardId, const uint32_t playtime)
+void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
 {
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
-	auto player = m_player.lock();
+	const auto player = m_player.lock();
 
 	if (player == nullptr)
+	{
 		return;
+	}
 
 	const auto it = m_cards.find(cardId);
 
 	if (it == m_cards.cend())
+	{
 		return;
+	}
 
 	auto& card = it->second;
 
 	const auto periodType = it->second.periodType;
 
 	if (periodType == 254)
+	{
 		return;
+	}
+
 	if (periodType == 3)
 	{
 		if (card.period > 0)
@@ -229,14 +236,14 @@ void InventoryManager::useCard(const uint64_t cardId, const uint32_t playtime)
 		}
 	}
 	else if (periodType == 2)
-		card.period = card.period <= playtime ? 0 : card.period - playtime;
+		card.period = card.period <= period ? 0 : card.period - period;
 
 	if (periodType != 254)
 	{
 		DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = IF(period_type = 3, period - 1, period - ?) "\
 			"WHERE id = ?"
 			, {
-				playtime,
+				period,
 				cardId
 			});
 	}
