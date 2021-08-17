@@ -5,7 +5,7 @@
 class LobbyServerPacket : public ServerPacket
 {
 public:
-	explicit LobbyServerPacket(const uint16_t packetId) : ServerPacket(packetId)
+	LobbyServerPacket(uint16_t packetId) : ServerPacket(packetId)
 	{
 	}
 };

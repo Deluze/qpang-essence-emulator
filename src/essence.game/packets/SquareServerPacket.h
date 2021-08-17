@@ -5,7 +5,7 @@
 class SquareServerPacket : public ServerPacket
 {
 public:
-	explicit SquareServerPacket(const uint16_t packetId) : ServerPacket(packetId)
+	SquareServerPacket(uint16_t packetId) : ServerPacket(packetId)
 	{
 	}
 };
