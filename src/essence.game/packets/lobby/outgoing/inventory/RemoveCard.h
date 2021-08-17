@@ -5,7 +5,7 @@
 class RemoveCard : public LobbyServerPacket
 {
 public:
-	RemoveCard(const uint64_t cardId) : LobbyServerPacket(653)
+	explicit RemoveCard(const uint64_t cardId) : LobbyServerPacket(653)
 	{
 		writeLong(cardId);
 	}
