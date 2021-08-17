@@ -1,14 +1,13 @@
 #pragma once
 
 #include "packets/LobbyServerPacket.h"
-
 #include "qpang/player/Player.h"
 #include "qpang/player/stats/StatsManager.h"
 
 class PlayerInfoInspector : public LobbyServerPacket
 {
 public:
-	PlayerInfoInspector(const Player::Ptr& player) : LobbyServerPacket(692)
+	explicit PlayerInfoInspector(const Player::Ptr& player) : LobbyServerPacket(692)
 	{
 		writeInt(player->getId());
 		writeEmpty(42);
@@ -19,12 +18,14 @@ public:
 		writeByte(player->getRank());
 		writeShort(player->getCharacter());
 
-		auto armor = player->getEquipmentManager()->getArmorItemIdsByCharacter(player->getCharacter());
+		const auto armor = player->getEquipmentManager()->getArmorItemIdsByCharacter(player->getCharacter());
 
 		for (const auto& armorId : armor)
+		{
 			writeInt(armorId);
+		}
 
-		auto weapons = player->getEquipmentManager()->getWeaponItemIdsByCharacter(player->getCharacter());
+		const auto weapons = player->getEquipmentManager()->getWeaponItemIdsByCharacter(player->getCharacter());
 
 		for (const auto& weaponId : weapons)
 		{
@@ -48,10 +49,10 @@ public:
 		writeInt(0); // ?
 		writeInt(1);
 		
-		const auto leaderboardPosition = Game::instance()->getLeaderboard()->getPosition(player->getId());
+		const auto [rank, difference] = Game::instance()->getLeaderboard()->getPosition(player->getId());
 
-		writeInt(leaderboardPosition.rank);
-		writeInt(leaderboardPosition.difference);
+		writeInt(rank);
+		writeInt(difference);
 
 		const auto achievements = player->getAchievementContainer()->list();
 

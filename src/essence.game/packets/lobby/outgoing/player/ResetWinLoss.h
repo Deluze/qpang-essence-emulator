@@ -1,15 +1,13 @@
 #pragma once
 
-#include <string>
-
+#include "packets/LobbyServerPacket.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/stats/StatsManager.h"
-#include "packets/LobbyServerPacket.h"
 
 class ResetWinLoss : public LobbyServerPacket
 {
 public:
-	ResetWinLoss(const Player::Ptr& player, InventoryCard& card) : LobbyServerPacket(842)
+	ResetWinLoss(const Player::Ptr& player, const InventoryCard& card) : LobbyServerPacket(842)
 	{
 		writeInt(0);
 		InventoryCardWriter::write(this, card);

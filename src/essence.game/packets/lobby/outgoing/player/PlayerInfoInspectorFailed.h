@@ -6,7 +6,7 @@
 class PlayerInfoInspectorFailed : public LobbyServerPacket
 {
 public:
-	PlayerInfoInspectorFailed(Player::Ptr player) : LobbyServerPacket(693)
+	explicit PlayerInfoInspectorFailed(Player::Ptr player) : LobbyServerPacket(693)
 	{
 
 	}

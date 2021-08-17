@@ -5,7 +5,7 @@
 class UpdateCharacter : public LobbyServerPacket
 {
 public:
-	UpdateCharacter(uint16_t character) : LobbyServerPacket(680)
+	explicit UpdateCharacter(const uint16_t character) : LobbyServerPacket(680)
 	{
 		writeShort(character);
 	}
