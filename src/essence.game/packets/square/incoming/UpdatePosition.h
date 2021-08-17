@@ -1,19 +1,12 @@
 #pragma once
 
-#include <vector>
-
 #include "core/communication/packet/PacketEvent.h"
-
-#include "qpang/Game.h"
-#include "qpang/square/SquareManager.h"
 #include "qpang/square/SquarePlayer.h"
 
-#include "packets/square/outgoing/Players.h"
-
-class UpdatePosition : public PacketEvent
+class UpdatePosition final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto moveType = packet.readByte();
 		const auto direction = packet.readByte();
@@ -22,12 +15,16 @@ public:
 		const auto player = conn->getPlayer();
 
 		if (player == nullptr)
+		{
 			return;
+		}
 
-		auto squarePlayer = player->getSquarePlayer();
+		const auto squarePlayer = player->getSquarePlayer();
 
 		if (squarePlayer == nullptr)
+		{
 			return;
+		}
 
 		squarePlayer->move(position, direction, moveType);
 	}

@@ -1,14 +1,13 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-
 #include "qpang/player/Player.h"
 #include "qpang/square/SquarePlayer.h"
 
-class LeftInventory : public PacketEvent
+class LeftInventory final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto idk = packet.readInt();
 		const auto character = packet.readShort();
@@ -18,13 +17,17 @@ public:
 		const auto player = conn->getPlayer();
 
 		if (player == nullptr)
+		{
 			return;
+		}
 
 		const auto squarePlayer = player->getSquarePlayer();
 
 		if (squarePlayer == nullptr)
+		{
 			return;
-		
+		}
+
 		squarePlayer->changeWeapon(selectedWeapon);
 	}
 };

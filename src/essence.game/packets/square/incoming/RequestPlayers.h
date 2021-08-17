@@ -1,33 +1,33 @@
 #pragma once
 
 #include <vector>
-#include <algorithm>
 
 #include "core/communication/packet/PacketEvent.h"
-
-#include "qpang/Game.h"
-#include "qpang/square/SquareManager.h"
+#include "packets/square/outgoing/Players.h"
 #include "qpang/square/SquarePlayer.h"
 
-#include "packets/square/outgoing/Players.h"
-
-class RequestPlayers : public PacketEvent
+class RequestPlayers final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		auto player = conn->getPlayer();
+		const auto player = conn->getPlayer();
 
 		if (player == nullptr)
+		{
 			return;
+		}
 
-		auto squarePlayer = player->getSquarePlayer();
+		const auto squarePlayer = player->getSquarePlayer();
 
 		if (squarePlayer == nullptr)
+		{
 			return;
+		}
 
 		const auto square = squarePlayer->getSquare();
 		const auto players = square->listPlayers();
+
 		conn->send(Players(players, player->getId()));
 	}
 };
