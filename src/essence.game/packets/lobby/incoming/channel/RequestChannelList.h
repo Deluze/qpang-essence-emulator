@@ -5,12 +5,12 @@
 #include "qpang/Game.h"
 #include "packets/lobby/outgoing/channel/ChannelList.h"
 
-class RequestChannelList : public PacketEvent
+class RequestChannelList final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		std::vector<Channel> channels = Game::instance()->getChannelManager()->list();
+		const std::vector<Channel> channels = Game::instance()->getChannelManager()->list();
 
 		conn->send(ChannelList(channels));
 	}

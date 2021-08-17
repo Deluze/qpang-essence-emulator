@@ -5,10 +5,10 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/equipment/EquipmentManager.h"
 
-class EquipWeapon : public PacketEvent
+class EquipWeapon final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto characterIndex = packet.readShort();
 

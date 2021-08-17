@@ -7,12 +7,12 @@
 
 #include "packets/lobby/outgoing/equipment/EquippedSkillCards.h"
 
-class RequestEquippedSkillCards : public PacketEvent
+class RequestEquippedSkillCards final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		std::array<InventoryCard, 3> skills = conn->getPlayer()->getEquipmentManager()->getSkillCards();
+		const std::array<InventoryCard, 3> skills = conn->getPlayer()->getEquipmentManager()->getSkillCards();
 
 		conn->send(EquippedSkillCards(skills));
 	}
