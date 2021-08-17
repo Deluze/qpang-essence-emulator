@@ -7,7 +7,7 @@
 class HandshakeResponse : public LobbyServerPacket
 {
 public:
-	HandshakeResponse(const std::array<char, 4>& key) : LobbyServerPacket(2)
+	explicit HandshakeResponse(const std::array<char, 4>& key) : LobbyServerPacket(2)
 	{
 		setCryptoType(BlowfishInstance::CryptoType::PUBLIC);
 
