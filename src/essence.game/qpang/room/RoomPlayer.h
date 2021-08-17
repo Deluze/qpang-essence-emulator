@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <cstdint>
+#include <memory>
 
 class Player;
 class Room;
@@ -15,7 +15,7 @@ public:
 	// ReSharper disable once CppInconsistentNaming
 	using Ptr = std::shared_ptr<RoomPlayer>;
 
-	RoomPlayer(GameConnection* conn, std::shared_ptr<Room> room);
+	RoomPlayer(GameConnection* conn, const std::shared_ptr<Room>& room);
 	~RoomPlayer();
 
 	[[nodiscard]] std::shared_ptr<Player> getPlayer() const;
@@ -38,7 +38,7 @@ public:
 	[[nodiscard]] bool isSpectating() const;
 	void setSpectating(bool isSpectating = true);
 
-	void setRoomSessionPlayer(std::shared_ptr<RoomSessionPlayer> player);
+	void setRoomSessionPlayer(const std::shared_ptr<RoomSessionPlayer>& player);
 	
 	void onStart() const;
 

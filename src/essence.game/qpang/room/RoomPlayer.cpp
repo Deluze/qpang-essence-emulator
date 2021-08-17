@@ -3,10 +3,10 @@
 #include "qpang/room/tnl/GameConnection.h"
 #include "qpang/room/tnl/net_events/GameNetEvent.h"
 
-#include "qpang/room/tnl/net_events/server/gc_ready.hpp"
 #include "qpang/room/tnl/net_events/server/gc_player_change.hpp"
+#include "qpang/room/tnl/net_events/server/gc_ready.hpp"
 
-RoomPlayer::RoomPlayer(GameConnection* conn, const std::shared_ptr<Room> room) :
+RoomPlayer::RoomPlayer(GameConnection* conn, const std::shared_ptr<Room>& room) :
 	m_team(0),
 	m_isReady(false),
 	m_isPlaying(false),
@@ -88,7 +88,7 @@ void RoomPlayer::setSpectating(const bool isSpectating)
 	m_isSpectating = isSpectating;
 }
 
-void RoomPlayer::setRoomSessionPlayer(const std::shared_ptr<RoomSessionPlayer> player)
+void RoomPlayer::setRoomSessionPlayer(const std::shared_ptr<RoomSessionPlayer>& player)
 {
 	m_roomSessionPlayer = player;
 }
