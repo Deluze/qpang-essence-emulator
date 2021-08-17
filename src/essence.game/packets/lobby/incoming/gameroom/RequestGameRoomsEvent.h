@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-#include <cstdint>
 #include <vector>
 
 #include "core/communication/packet/PacketEvent.h"
@@ -10,12 +8,12 @@
 
 #include "packets/lobby/outgoing/gameroom/RoomList.h"
 
-class RequestGameRoomsEvent : public PacketEvent
+class RequestGameRoomsEvent final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		auto rooms = Game::instance()->getRoomManager()->list();
+		const auto rooms = Game::instance()->getRoomManager()->list();
 
 		conn->send(RoomList(rooms));
 	}
