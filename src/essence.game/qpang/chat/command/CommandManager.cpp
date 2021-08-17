@@ -59,7 +59,8 @@ void CommandManager::initialize()
 		{u"dailyrewards", dailyRewardCommand},
 		{u"dailyreward", dailyRewardCommand},
 		{u"daily", dailyRewardCommand},
-		{u"dr", dailyRewardCommand}
+		{u"dr", dailyRewardCommand},
+		{u"r3", new ToggleReloadGlitchCommand()}
 	};
 }
 
