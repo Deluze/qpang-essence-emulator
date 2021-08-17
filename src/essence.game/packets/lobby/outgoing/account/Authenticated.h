@@ -3,45 +3,44 @@
 #include <array>
 
 #include "packets/LobbyServerPacket.h"
-
 #include "qpang/player/Player.h"
 #include "qpang/player/stats/StatsManager.h"
 
 class Authenticated : public LobbyServerPacket
 {
 public:
-	Authenticated(Player::Ptr player) : LobbyServerPacket(601)
+	explicit Authenticated(const Player::Ptr& player) : LobbyServerPacket(601)
 	{
-		// player info
-		writeInt(player->getId());
-		writeEmpty(42);
-		writeString(player->getName(), 16);
-		writeInt(player->getStatsManager()->getPlayTimeInMinutes());
-		writeInt(player->getCash());
-		writeInt(player->getRank());
-		writeShort(0); // ?
-		writeShort(player->getCharacter());
-		writeInt(player->getLevel());
-		writeEmpty(8);
+		// Player info
+		writeInt(player->getId());										// Player id
+		writeEmpty(42);													// Empty
+		writeString(player->getName(), 16);							// Player name
+		writeInt(player->getStatsManager()->getPlayTimeInMinutes());		// Playtime in minutes.
+		writeInt(player->getCash());										// Cash
+		writeInt(player->getRank());										// Rank
+		writeShort(0); // ?												// Unknown
+		writeShort(player->getCharacter());								// Character id
+		writeInt(player->getLevel());									// Level
+		writeEmpty(8);													// Empty
 
-		// player settings
-		writeFlag(true); // accept pm
-		writeFlag(true); // accept game invites
-		writeFlag(true); // accept friend invites
-		writeFlag(true); // unknown
-		writeFlag(true); // accept trade requests
-		writeEmpty(20);
-		writeByte(4); // current tutorial stage
-		writeEmpty(12);
+		// Player settings
+		writeFlag(true);	// accept pm
+		writeFlag(true);	// accept game invites
+		writeFlag(true);	// accept friend invites
+		writeFlag(true);	// unknown
+		writeFlag(true);	// accept trade requests
+		writeEmpty(20);	// empty
+		writeByte(4);	// current tutorial stage
+		writeEmpty(12);	// empty
 
-		// player containers
-		writeShort(200); // max inv. size
-		writeShort(50); // max friend list size
-		writeShort(10); // max inc/out friend list size
-		writeShort(50); // max memo send count
-		writeShort(50); // left over memo send count
+		// Player containers
+		writeShort(200);	// max inv. size
+		writeShort(50);	// max friend list size
+		writeShort(10);	// max inc/out friend list size
+		writeShort(50);	// max memo send count
+		writeShort(50);	// left over memo send count
 
-		// player stats
+		// Player statistics
 		writeInt(1); // ?
 		writeInt(player->getExperience());
 		writeInt(player->getDon());
@@ -62,29 +61,33 @@ public:
 		writeInt(player->getCoins());
 		writeEmpty(44);
 
-		std::vector<uint16_t> characters = player->getEquipmentManager()->getUnlockedCharacters();
-		for (uint16_t character : characters)
+		const std::vector<uint16_t> unlockedCharacters = player->getEquipmentManager()->getUnlockedCharacters();
+
+		for (const uint16_t unlockedCharacter : unlockedCharacters)
 		{
-			std::array<uint64_t, 9> armor = player->getEquipmentManager()->getArmorByCharacter(character);
-			std::array<uint64_t, 4> weapons = player->getEquipmentManager()->getWeaponsByCharacter(character);
+			std::array<uint64_t, 9> armor = player->getEquipmentManager()->getArmorByCharacter(unlockedCharacter);
+			std::array<uint64_t, 4> weapons = player->getEquipmentManager()->getWeaponsByCharacter(unlockedCharacter);
 
-			writeShort(character);
+			writeShort(unlockedCharacter);
 
-			for (uint64_t armorCardId : armor)
+			for (const uint64_t armorCardId : armor)
+			{
 				writeLong(armorCardId);
+			}
 
-			for (uint64_t weaponCardId : weapons)
+			for (const uint64_t weaponCardId : weapons)
 			{
 				writeLong(weaponCardId);
 				writeLong(0); // ?
 			}
 		}
 
-		writeEmpty(2455 - (138 * characters.size()));
+		writeEmpty(2455 - (138 * unlockedCharacters.size()));
 
 		const auto achievements = player->getAchievementContainer()->list();
 
 		writeShort(static_cast<uint16_t>(achievements.size()));
+
 		for (const auto& achievement : achievements)
 		{
 			writeInt(achievement);

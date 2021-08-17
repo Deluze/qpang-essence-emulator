@@ -10,7 +10,8 @@
 class UpdateAccount : public LobbyServerPacket
 {
 public:
-	UpdateAccount(const Player::Ptr& player) : LobbyServerPacket(662)
+	// TODO: Duplicate code in Authenticated.h
+	explicit UpdateAccount(const Player::Ptr& player) : LobbyServerPacket(662)
 	{
 		// player info
 		writeInt(player->getId());
@@ -64,25 +65,28 @@ public:
 		writeInt(player->getCoins());
 		writeEmpty(44);
 
-		std::vector<uint16_t> characters = player->getEquipmentManager()->getUnlockedCharacters();
-		for (uint16_t character : characters)
+		const std::vector<uint16_t> unlockedCharacters = player->getEquipmentManager()->getUnlockedCharacters();
+
+		for (const uint16_t unlockedCharacter : unlockedCharacters)
 		{
-			std::array<uint64_t, 9> armor = player->getEquipmentManager()->getArmorByCharacter(character);
-			std::array<uint64_t, 4> weapons = player->getEquipmentManager()->getWeaponsByCharacter(character);
+			std::array<uint64_t, 9> armor = player->getEquipmentManager()->getArmorByCharacter(unlockedCharacter);
+			std::array<uint64_t, 4> weapons = player->getEquipmentManager()->getWeaponsByCharacter(unlockedCharacter);
 
-			writeShort(character);
+			writeShort(unlockedCharacter);
 
-			for (uint64_t armorCardId : armor)
+			for (const uint64_t armorCardId : armor)
+			{
 				writeLong(armorCardId);
+			}
 
-			for (uint64_t weaponCardId : weapons)
+			for (const uint64_t weaponCardId : weapons)
 			{
 				writeLong(weaponCardId);
 				writeLong(0); // ?
 			}
 		}
 
-		writeEmpty(2455 - (138 * characters.size()));
+		writeEmpty(2455 - (138 * unlockedCharacters.size()));
 
 		const auto achievements = player->getAchievementContainer()->list();
 
