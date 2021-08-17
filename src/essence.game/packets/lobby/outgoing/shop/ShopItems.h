@@ -8,14 +8,15 @@
 class ShopItems : public LobbyServerPacket
 {
 public:
-	ShopItems(const std::vector<ShopItem>& items) : LobbyServerPacket(798)
+	explicit ShopItems(const std::vector<ShopItem>& items) : LobbyServerPacket(798)
 	{
-		const uint16_t size = static_cast<uint16_t>(items.size());
+		const auto size = static_cast<uint16_t>(items.size());
 
 		writeShort(size);
 		writeShort(size);
 		writeShort(size);
 
+		// ReSharper disable once CppUseStructuredBinding
 		for (const ShopItem& item : items)
 		{
 			writeInt(item.seqId);
