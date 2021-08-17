@@ -51,17 +51,18 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	}
 	else
 	{
-		const auto earnedCash = rand() % 20 == 0;
+		const auto earnedCash = rand() % 20 == 0; // 20 % kans
 
 		if (earnedCash)
 		{
 			auto player = killer->getPlayer();
 
-			const auto cashCount = (rand() % 10) + 5;
+			const auto cashCount = (rand() % 10) + 5; // maximaal 15 cash, minimaal 5
 			const auto targetName = StringConverter::Utf16ToUtf8(target->getPlayer()->getName());
 
-			char buffer[70];
-			sprintf_s(buffer, "You earned %d cash by killing %s!", cashCount, targetName.c_str());
+			char buffer[80];
+			sprintf_s(buffer, "You have earned %d cash by killing %s!", cashCount, targetName.c_str());
+
 			player->addCash(cashCount);
 			player->broadcast(StringConverter::Utf8ToUtf16(buffer));
 
@@ -70,21 +71,27 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 
 			auto targetPlayer = target->getPlayer();
 
-			const auto cash = (rand() % 5) + 1;
+			const auto cash = (rand() % 5) + 1; // minimaal 1 maximaal 6.
 			const auto name = StringConverter::Utf16ToUtf8(player->getName());
 
-			char buffer2[90];
-			sprintf_s(buffer2, "You earned %d cash because %s got some too!", cash, name.c_str());
+			char buffer2[120];
+			sprintf_s(buffer2, "You have earned %d cash because %s got some too!", cash, name.c_str());
 			targetPlayer->addCash(cash);
 			targetPlayer->broadcast(StringConverter::Utf8ToUtf16(buffer2));
 		}
 
-		const auto earnedCoin = rand() % 150 == 0;
+		const auto killedHasEarnedCoin = rand() % 150 == 0;
+		const auto targetHasEarnedCoin = rand() % 300 == 0;
 
-		if (earnedCoin)
+		if (killedHasEarnedCoin)
 		{
 			killer->getPlayer()->addCoins(100);
-			killer->getPlayer()->broadcast(u"Lucky! You just found a golden coin!");
+			killer->getPlayer()->broadcast(u"It's your lucky today. You have just found a golden coin!");
+		}
+
+		if (targetHasEarnedCoin) {
+			target->getPlayer()->addCoins(100);
+			target->getPlayer()->broadcast(u"It's your lucky day. You died, fell down on the ground and found a golden coin!");
 		}
 		
 		killer->addKill();
