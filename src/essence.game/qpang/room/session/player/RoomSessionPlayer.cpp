@@ -115,10 +115,12 @@ void RoomSessionPlayer::tick()
 	}
 
 	const auto needsToRemoveInvincibility = m_invincibleRemovalTime <= time(NULL) && m_isInvincible;
+
 	if (needsToRemoveInvincibility)
 		removeInvincibility();
 
 	const auto needsToRespawn = m_respawnTime <= time(NULL) && m_isRespawning;
+
 	if (needsToRespawn)
 		respawn();
 }
@@ -185,7 +187,7 @@ void RoomSessionPlayer::togglePermanentInvincibility()
 	}
 }
 
-bool RoomSessionPlayer::isPermanentlyInvincible() 
+bool RoomSessionPlayer::isPermanentlyInvincible()
 {
 	return m_isPermanentlyInvincible;
 }
@@ -258,8 +260,9 @@ void RoomSessionPlayer::setHealth(uint16_t health, bool updateClient)
 {
 	m_health = health;
 
-	if (updateClient)
+	if (updateClient) {
 		post(new GCGameState(getPlayer()->getId(), 16, m_health));
+	}
 }
 
 bool RoomSessionPlayer::isDead()
@@ -317,7 +320,7 @@ uint16_t RoomSessionPlayer::getDefaultHealth()
 
 uint8_t RoomSessionPlayer::getRespawnCooldown()
 {
-	return m_hasQuickRevive ? 5 : 10;
+	return m_hasQuickRevive ? 5 : 7;
 }
 
 std::array<uint32_t, 9> RoomSessionPlayer::getArmor()
