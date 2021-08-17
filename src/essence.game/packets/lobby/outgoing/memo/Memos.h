@@ -8,14 +8,15 @@
 class Memos : public LobbyServerPacket
 {
 public:
-	Memos(const std::vector<Memo>& memos) : LobbyServerPacket(726)
+	explicit Memos(const std::vector<Memo>& memos) : LobbyServerPacket(726)
 	{
-		auto size = static_cast<uint16_t>(memos.size());
+		const auto size = static_cast<uint16_t>(memos.size());
 
 		writeShort(size);
 		writeShort(size);
 		writeShort(size);
 
+		// ReSharper disable once CppUseStructuredBinding
 		for (const auto& memo : memos)
 		{
 			writeLong(memo.id);
