@@ -7,7 +7,7 @@
 class RemoveFriend : public LobbyServerPacket
 {
 public:
-	RemoveFriend(const uint32_t playerId) : LobbyServerPacket(714)
+	explicit RemoveFriend(const uint32_t playerId) : LobbyServerPacket(714)
 	{
 		writeInt(playerId);
 	}

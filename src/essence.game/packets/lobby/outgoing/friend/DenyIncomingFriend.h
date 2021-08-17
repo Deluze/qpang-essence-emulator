@@ -7,7 +7,7 @@
 class DenyIncomingFriend : public LobbyServerPacket
 {
 public:
-	DenyIncomingFriend(const uint32_t playerId) : LobbyServerPacket(706)
+	explicit DenyIncomingFriend(const uint32_t playerId) : LobbyServerPacket(706)
 	{
 		writeInt(playerId);
 	}

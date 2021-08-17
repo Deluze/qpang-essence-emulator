@@ -8,7 +8,7 @@
 class AcceptIncomingFriend : public LobbyServerPacket
 {
 public:
-	AcceptIncomingFriend(const Friend& fr) : LobbyServerPacket(702)
+	explicit AcceptIncomingFriend(const Friend& fr) : LobbyServerPacket(702)
 	{
 		FriendWriter::write(this, fr);
 	}

@@ -7,7 +7,7 @@
 class AddOutgoingFriend : public LobbyServerPacket
 {
 public:
-	AddOutgoingFriend(const Friend& fr) : LobbyServerPacket(698)
+	explicit AddOutgoingFriend(const Friend& fr) : LobbyServerPacket(698)
 	{
 		FriendWriter::write(this, fr);
 	}

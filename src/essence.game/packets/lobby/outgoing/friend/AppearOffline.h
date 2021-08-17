@@ -9,7 +9,7 @@
 class AppearOffline : public LobbyServerPacket
 {
 public:
-	AppearOffline(uint32_t playerId) : LobbyServerPacket(607)
+	explicit AppearOffline(const uint32_t playerId) : LobbyServerPacket(607)
 	{
 		writeInt(playerId);
 	}

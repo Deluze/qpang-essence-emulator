@@ -6,7 +6,7 @@
 class IncomingFriendCancelled : public LobbyServerPacket
 {
 public:
-	IncomingFriendCancelled(const Player::Ptr player) : LobbyServerPacket(712)
+	explicit IncomingFriendCancelled(const Player::Ptr player) : LobbyServerPacket(712)
 	{
 		writeInt(player->getId());
 		writeEmpty(8);

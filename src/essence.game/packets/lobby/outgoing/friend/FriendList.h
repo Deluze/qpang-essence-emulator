@@ -9,7 +9,7 @@
 class FriendList : public LobbyServerPacket
 {
 public:
-	FriendList(const std::vector<Friend>& friends) : LobbyServerPacket(695)
+	explicit FriendList(const std::vector<Friend>& friends) : LobbyServerPacket(695)
 	{
 		const uint16_t size = static_cast<uint16_t>(friends.size());
 
@@ -18,6 +18,8 @@ public:
 		writeShort(size);
 
 		for (const auto& fr : friends)
+		{
 			FriendWriter::write(this, fr);
+		}
 	}
 };
