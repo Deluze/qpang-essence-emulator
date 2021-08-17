@@ -13,7 +13,7 @@ void ShopManager::initialize()
 {
 	m_items.clear();
 	m_orderedItems.clear();
-	
+
 	const auto stmt = DATABASE->prepare("SELECT * FROM `items`");
 	const auto res = stmt->fetch();
 
@@ -37,7 +37,7 @@ void ShopManager::initialize()
 
 		m_items[item.seqId] = item;
 		m_orderedItems.push_back(item);
-		
+
 		res->next();
 	}
 
@@ -57,7 +57,7 @@ std::vector<ShopItem> ShopManager::list()
 ShopItem ShopManager::get(uint32_t seqId)
 {
 	auto it = m_items.find(seqId);
-	
+
 	return it != m_items.cend() ? (*it).second : ShopItem{};
 }
 
@@ -66,31 +66,38 @@ bool ShopManager::exists(uint32_t seqId)
 	return m_items.find(seqId) != m_items.cend();
 }
 
-void ShopManager::buy(std::shared_ptr<Player> player, uint32_t seqId)
+InventoryCard ShopManager::buy(const std::shared_ptr<Player>& player, const uint32_t seqId, const bool updateShopItems)
 {
 	// TODO; packages
 	assert(player != nullptr);
 
 	if (!exists(seqId))
-		return;
+	{
+		return InventoryCard{};
+	}
 
 	if (!player->getInventoryManager()->hasSpace())
-		return;
+	{
+		return InventoryCard{};
+	}
 
-	auto& shopItem = get(seqId);
+	const auto& shopItem = get(seqId);
 
 	if (shopItem.soldCount >= shopItem.stock && shopItem.stock != 9999)
-		return;
+	{
+		return InventoryCard{};
+	}
 
 	const auto money = shopItem.isCash ? player->getCash() : player->getDon();
-	const auto hasEnough = money >= shopItem.price;
 
-	if (!hasEnough)
-		return;
+	if (const auto hasEnough = money >= shopItem.price; !hasEnough)
+	{
+		return InventoryCard{};
+	}
 
 	auto card = InventoryCard::fromShopItem(shopItem);
 
-	auto stmt = DATABASE->prepare(
+	const auto stmt = DATABASE->prepare(
 		"INSERT INTO player_items (player_id, item_id, period, period_type, type, active, opened, giftable, boosted, boost_level, time)" \
 		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -104,20 +111,21 @@ void ShopManager::buy(std::shared_ptr<Player> player, uint32_t seqId)
 	stmt->bindInteger(card.isGiftable);
 	stmt->bindInteger(card.boostLevel > 0);
 	stmt->bindInteger(card.boostLevel);
-	stmt->bindLong(time(NULL));
+	stmt->bindLong(time(nullptr));
 
 	stmt->execute();
 
 	ShopItem* itemPtr = &m_items[seqId];
 	itemPtr->soldCount++;
 
-	auto stmt2 = DATABASE->prepare("UPDATE items SET sold_count = ? WHERE seq_id = ?");
+	const auto stmt2 = DATABASE->prepare("UPDATE items SET sold_count = ? WHERE seq_id = ?");
+
 	stmt2->bindInteger(itemPtr->soldCount);
 	stmt2->bindInteger(itemPtr->seqId);
 
 	stmt2->execute();
 
-	auto cardId = stmt->getLastInsertId();
+	const auto cardId = stmt->getLastInsertId();
 
 	card.id = cardId;
 	card.playerOwnerId = player->getId();
@@ -126,6 +134,12 @@ void ShopManager::buy(std::shared_ptr<Player> player, uint32_t seqId)
 
 	player->getInventoryManager()->addCard(card);
 
-	player->send(ShopItems(list()));
-	player->send(CardPurchaseComplete(shopItem, { card }, shopItem.isCash ? player->getCash() : player->getDon()));
+	if (updateShopItems)
+	{
+		player->send(ShopItems(list()));
+		player->send(CardPurchaseComplete(shopItem, { card }, shopItem.isCash ? player->getCash() : player->getDon()));
+	}
+
+
+	return card;
 }

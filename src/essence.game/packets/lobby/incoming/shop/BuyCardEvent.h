@@ -13,7 +13,7 @@ public:
 
 		if (const auto player = conn->getPlayer(); player != nullptr)
 		{
-			Game::instance()->getShopManager()->buy(player, seqId);
+			Game::instance()->getShopManager()->buy(player, seqId, true);
 		}
 	}
 };
