@@ -41,7 +41,9 @@ public:
 					if (!session->getWeaponManager()->hasWeapon(itemId))
 						return;
 
-					session->getWeaponManager()->switchWeapon(itemId);
+					auto isReloadGlitchEnabled = session->getRoomSession()->getRoom()->isReloadGlitchEnabled();
+
+					session->getWeaponManager()->switchWeapon(itemId, isReloadGlitchEnabled);
 				}
 				else if (cmd == CMD::RELOAD)
 				{

@@ -8,6 +8,7 @@
 #include "DailyRewardCommand.h"
 #include "UnlimitedCommand.h"
 #include "DailyRewardCommand.h"
+#include "ToggleReloadGlitchCommand.h"
 #include "qpang/chat/command/Command.h"
 #include "qpang/chat/command/commands/NameChangeCommand.h"
 #include "qpang/chat/command/commands/InvincibleCommand.h"

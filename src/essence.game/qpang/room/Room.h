@@ -95,6 +95,9 @@ public:
 	bool isEventRoom();
 	void setEventRoom(bool isEventRoom = false);
 
+	bool isReloadGlitchEnabled();
+	void setIsReloadGlitchEnabled(bool isReloadGlitchEnabled = false);
+
 	template<typename T, typename... Args>
 	void broadcast(Args... args)
 	{
@@ -115,7 +118,6 @@ public:
 	}
 
 private:
-
 	std::recursive_mutex m_playerMx;
 	std::unordered_map<uint32_t, std::shared_ptr<RoomPlayer>> m_players;
 
@@ -143,6 +145,8 @@ private:
 
 	bool m_isPlaying;
 	bool m_isEventRoom;
+
+	bool m_isReloadGlitchEnabled;
 
 	GameMode* m_modeManager;
 	std::shared_ptr<RoomSession> m_roomSession;

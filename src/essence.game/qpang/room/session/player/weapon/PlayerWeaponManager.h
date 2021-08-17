@@ -26,7 +26,7 @@ public:
 	bool canShoot();
 
 	bool hasWeapon(uint32_t weaponId);
-	void switchWeapon(uint32_t weaponId);
+	void switchWeapon(uint32_t weaponId, bool isReloadGlitchEnabled);
 	bool isHoldingMelee();
 
 	void refillCurrentWeapon();

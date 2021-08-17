@@ -87,14 +87,14 @@ void PlayerWeaponManager::shoot(uint32_t entityId)
 
 bool PlayerWeaponManager::canReload()
 {
- 	return m_weapons[m_selectedWeaponIndex].clipCount > 0;
+	return m_weapons[m_selectedWeaponIndex].clipCount > 0;
 }
 
 bool PlayerWeaponManager::canShoot()
 {
 	if (isHoldingMelee())
 		return true;
-	
+
 	return m_weapons[m_selectedWeaponIndex].clipSize > 0;
 }
 
@@ -108,14 +108,17 @@ bool PlayerWeaponManager::hasWeapon(uint32_t weaponId)
 	) != m_weapons.cend();
 }
 
-void PlayerWeaponManager::switchWeapon(uint32_t weaponId)
+void PlayerWeaponManager::switchWeapon(uint32_t weaponId, bool isReloadGlitchEnabled)
 {
-	if (m_weapons[m_selectedWeaponIndex].itemId == weaponId)
+	if (!isReloadGlitchEnabled)
 	{
-		// already chose this weapon
-		return;
+		if (m_weapons[m_selectedWeaponIndex].itemId == weaponId)
+		{
+			// already chose this weapon
+			return;
+		}
 	}
-	
+
 	for (size_t i = 0; i < m_weapons.size(); i++)
 	{
 		if (m_weapons[i].itemId == weaponId)

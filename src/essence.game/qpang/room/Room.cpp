@@ -37,6 +37,7 @@ Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, cons
 	m_isPlaying(false)
 {
 	m_modeManager = Game::instance()->getRoomManager()->getGameModeManager()->get(mode);
+	m_isReloadGlitchEnabled = false;
 }
 
 void Room::addPlayer(GameConnection* conn)
@@ -533,4 +534,14 @@ bool Room::isEventRoom()
 void Room::setEventRoom(bool isEventRoom)
 {
 	m_isEventRoom = isEventRoom;
+}
+
+bool Room::isReloadGlitchEnabled() 
+{
+	return m_isReloadGlitchEnabled;
+}
+
+void Room::setIsReloadGlitchEnabled(bool isReloadGlitchEnabled) 
+{
+	m_isReloadGlitchEnabled = isReloadGlitchEnabled;
 }
