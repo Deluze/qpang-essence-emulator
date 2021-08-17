@@ -3,10 +3,9 @@
 #include <array>
 
 #include "core/communication/packet/PacketEvent.h"
-
 #include "packets/lobby/outgoing/HandshakeResponse.h"
 
-class Handshake : public PacketEvent
+class Handshake final : public PacketEvent
 {
 public:
 	bool isUnauthorizedPacket() override
@@ -14,9 +13,9 @@ public:
 		return true;
 	}
 
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		std::array<char, 4> keyPart = conn->getKeyPart();
+		const std::array<char, 4> keyPart = conn->getKeyPart();
 
 		conn->send(HandshakeResponse(keyPart));
 	}
