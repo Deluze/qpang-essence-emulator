@@ -2,26 +2,22 @@
 
 #include "core/communication/packet/PacketEvent.h"
 
-#include <vector>
-
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/friend/FriendManager.h"
 
-#include "packets/lobby/outgoing/friend/FriendList.h"
-
-class SendFriendRequestEvent : public PacketEvent
+class SendFriendRequestEvent final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet) override
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		packet.readEmpty(12);
-		auto nickname = packet.readStringTerminated(16);
+		const auto nickname = packet.readStringTerminated(16);
 
 		if (nickname.empty() || nickname.size() < 4 || nickname.size() > 16)
 			return;
 
-		auto player = conn->getPlayer();
+		const auto player = conn->getPlayer();
 
 		if (nickname == player->getName())
 			return; // lol
@@ -29,7 +25,7 @@ public:
 		if (!player->getFriendManager()->hasOutgoingSlotsLeft())
 			return;
 
-		auto target = Game::instance()->getPlayer(nickname);
+		const auto target = Game::instance()->getPlayer(nickname);
 
 		if (target == nullptr)
 			return;

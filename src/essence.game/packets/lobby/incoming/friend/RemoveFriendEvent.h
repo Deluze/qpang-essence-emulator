@@ -7,18 +7,16 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/friend/FriendManager.h"
 
-#include "packets/lobby/outgoing/friend/FriendList.h"
-
-class RemoveFriendEvent : public PacketEvent
+class RemoveFriendEvent final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet) override
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		auto playerId = packet.readInt();
+		const auto playerId = packet.readInt();
 
-		if (auto target = Game::instance()->getPlayer(playerId); target != nullptr)
+		if (const auto target = Game::instance()->getPlayer(playerId); target != nullptr)
 		{
-			auto player = conn->getPlayer();
+			const auto player = conn->getPlayer();
 
 			player->getFriendManager()->remove(target->getId());
 			target->getFriendManager()->onRemoved(player->getId());
