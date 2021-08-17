@@ -2,20 +2,21 @@
 
 #include <vector>
 
-#include "qpang/channel/Channel.h"
 #include "packets/LobbyServerPacket.h"
+#include "qpang/channel/Channel.h"
 
 class ChannelList : public LobbyServerPacket
 {
 public:
-	ChannelList(const std::vector<Channel>& channels) : LobbyServerPacket(763)
+	explicit ChannelList(const std::vector<Channel>& channels) : LobbyServerPacket(763)
 	{
-		uint16_t size = static_cast<uint16_t>(channels.size());
+		const auto size = static_cast<uint16_t>(channels.size());
 
 		writeShort(size);
 		writeShort(size);
 		writeShort(size);
 
+		// ReSharper disable once CppUseStructuredBinding
 		for (const Channel& channel : channels)
 		{
 			writeShort(channel.id);
