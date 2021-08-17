@@ -1,18 +1,16 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-
+#include "packets/lobby/outgoing/shop/ShopItems.h"
 #include "qpang/Game.h"
 #include "qpang/shop/ShopManager.h"
 
-#include "packets/lobby/outgoing/shop/ShopItems.h"
-
-class RequestShopItems : public PacketEvent
+class RequestShopItems final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& pack) override
+	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override
 	{
-		std::vector<ShopItem> items = Game::instance()->getShopManager()->list();
+		const std::vector<ShopItem> items = Game::instance()->getShopManager()->list();
 
 		conn->send(ShopItems(items));
 	}
