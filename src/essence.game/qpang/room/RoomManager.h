@@ -17,10 +17,10 @@ public:
 	void remove(uint32_t id);
 
 	std::vector<std::shared_ptr<Room>> list();
-	std::shared_ptr<Room> create(std::u16string name, uint8_t map, uint8_t mode);
+	std::shared_ptr<Room> create(const std::u16string& name, uint8_t map, uint8_t mode);
 	std::shared_ptr<Room> get(uint32_t id);
 
-	GameModeManager* getGameModeManager();
+	GameModeManager* getGameModeManager() const;
 private:
 	uint32_t getAvailableRoomId();
 
