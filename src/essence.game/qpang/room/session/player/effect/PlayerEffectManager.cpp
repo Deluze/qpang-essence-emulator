@@ -33,9 +33,9 @@ void PlayerEffectManager::tick()
 
 		if (effect.weapon.effectId == 12 || effect.weapon.effectId == 13) // poison || fire
 			takeDamageFromEffect(effect);
-		/*else if (effect.weapon.effectId == 17) {
+		else if (effect.weapon.effectId == 90) {
 		    healFromEffect(effect);
-		}*/
+		}
 	}
 
 	m_effects.erase(std::remove_if(m_effects.begin(), m_effects.end(),
