@@ -29,7 +29,7 @@ public:
 
 		const std::string uuidStr = to_string(uuid);
 
-		uint32_t userId = 0;
+		uint32_t userId;
 
 		{
 			const Statement::Ptr statement = DATABASE->prepare("SELECT id FROM users WHERE session_uuid = ?");
@@ -47,7 +47,7 @@ public:
 			userId = result->getInt("id");
 		}
 
-		if (bool isBanned = Game::instance()->getBanManager()->isBanned(userId))
+		if (Game::instance()->getBanManager()->isBanned(userId))
 		{
 			conn->send(Banned());
 
