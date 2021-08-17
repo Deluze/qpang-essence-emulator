@@ -6,6 +6,9 @@
 #include <string>
 #include <mutex>
 
+#include "GameConnection.h"
+#include "RoomPlayer.h"
+
 class GameMode;
 class RoomPlayer;
 class RoomSession;
