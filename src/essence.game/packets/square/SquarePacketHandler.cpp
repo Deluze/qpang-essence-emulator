@@ -1,19 +1,16 @@
 #include "SquarePacketHandler.h"
 
 #include "core/communication/client/QpangConnection.h"
-
-#include "qpang/player/Player.h"
-
-#include "packets/square/incoming/Handshake.h"
+#include "packets/square/incoming/ChatRequest.h"
 #include "packets/square/incoming/ConnectRequest.h"
+#include "packets/square/incoming/EmoteEvent.h"
+#include "packets/square/incoming/Handshake.h"
 #include "packets/square/incoming/JoinSquare.h"
+#include "packets/square/incoming/LeftInventory.h"
+#include "packets/square/incoming/ReloadSquareEvent.h"
 #include "packets/square/incoming/RequestPlayers.h"
 #include "packets/square/incoming/UpdatePosition.h"
-#include "packets/square/incoming/LeftInventory.h"
-#include "packets/square/incoming/ChatRequest.h"
-#include "packets/square/incoming/EmoteEvent.h"
 #include "packets/square/incoming/UpdateStateEvent.h"
-#include "packets/square/incoming/ReloadSquareEvent.h"
 
 SquarePacketHandler::SquarePacketHandler() : PacketHandler()
 {
@@ -35,7 +32,9 @@ void SquarePacketHandler::handle(QpangConnection::Ptr conn, QpangPacket packet)
 	auto it = m_events.find(packet.getPacketId());//m_events[packet.getPacketId()];
 
 	if (it == m_events.cend())
+	{
 		return;
+	}
 
 	try
 	{
