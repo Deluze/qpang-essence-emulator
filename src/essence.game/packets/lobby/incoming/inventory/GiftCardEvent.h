@@ -2,21 +2,19 @@
 
 #include "core/communication/packet/PacketEvent.h"
 
-#include "qpang/player/Player.h"
 #include "qpang/Game.h"
+#include "qpang/player/Player.h"
 
-#include "packets/lobby/outgoing/inventory/ReceiveGift.h"
-#include "packets/lobby/outgoing/inventory/GiftCardSuccess.h"
-
-class GiftCardEvent : public PacketEvent
+class GiftCardEvent final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet) override
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto player = conn->getPlayer();
 
 		const auto nickname = packet.readStringTerminated(16);
 		const auto cardId = packet.readLong();
+		// ReSharper disable once CppDeclaratorNeverUsed
 		const auto idk = packet.readInt();
 
 		auto card = player->getInventoryManager()->get(cardId);
@@ -32,7 +30,7 @@ public:
 
 		if (targetPlayer == nullptr || !targetPlayer)
 		{
-			player->broadcast(u"This player does not exist.");
+			player->broadcast(u"The target player does not exist.");
 
 			return;
 		}
@@ -45,9 +43,7 @@ public:
 			return;
 		}
 
-		const auto hasEquipped = player->getEquipmentManager()->hasEquipped(cardId);
-
-		if (hasEquipped)
+		if (player->getEquipmentManager()->hasEquipped(cardId))
 		{
 			return;
 		}

@@ -2,15 +2,10 @@
 
 #include "core/communication/packet/PacketEvent.h"
 
-#include "qpang/player/Player.h"
-#include "qpang/player/inventory/InventoryManager.h"
-
-#include "packets/lobby/outgoing/inventory/CardExtended.h"
-
-class ExtendCardEvent : public PacketEvent
+class ExtendCardEvent final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		auto cardId = packet.readLong();
 		auto itemId = packet.readInt();

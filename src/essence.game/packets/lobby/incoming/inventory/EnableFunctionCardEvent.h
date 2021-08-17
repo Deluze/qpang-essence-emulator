@@ -1,31 +1,27 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-
+#include "packets/lobby/outgoing/inventory/EnableFunctionCard.h"
+#include "qpang/ItemID.h"
 #include "qpang/player/Player.h"
-
-#include "qpang/player/equipment/EquipmentManager.h"
 #include "qpang/player/inventory/InventoryManager.h"
 
-#include "qpang/ItemID.h"
-
-#include "packets/lobby/outgoing/inventory/EnableFunctionCard.h"
-
-class EnableFunctionCardEvent : public PacketEvent
+class EnableFunctionCardEvent final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		auto cardId = packet.readLong();
-
-		auto player = conn->getPlayer();
+		const auto cardId = packet.readLong();
+		const auto player = conn->getPlayer();
 
 		if (player == nullptr)
+		{
 			return;
+		}
 
-		auto card = player->getInventoryManager()->get(cardId);
-
-		if (isEquippableFunction(card.itemId))
+		if (const auto card = player->getInventoryManager()->get(cardId); isEquippableFunction(card.itemId))
+		{
 			return player->getInventoryManager()->setCardActive(card.id, true);
+		}
 	}
 };
