@@ -1,18 +1,16 @@
 #pragma once
 
-#include "core/communication/packet/PacketEvent.h"
-
 #include <vector>
 
+#include "core/communication/packet/PacketEvent.h"
+#include "packets/lobby/outgoing/memo/Memos.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/memo/MemoManager.h"
 
-#include "packets/lobby/outgoing/memo/Memos.h"
-
-class RequestMemos : public PacketEvent
+class RequestMemos final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet) override
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		if (const auto player = conn->getPlayer(); player != nullptr)
 		{
