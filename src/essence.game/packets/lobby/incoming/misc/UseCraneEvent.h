@@ -1,21 +1,19 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-
+#include "packets/lobby/outgoing/misc/UseCrainFail.h"
+#include "packets/lobby/outgoing/misc/UseCraneSuccess.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
-#include "packets/lobby/outgoing/misc/UseCrainFail.h"
-#include "packets/lobby/outgoing/misc/UseCraneSuccess.h"
-
-class UseCraneEvent : public PacketEvent
+class UseCraneEvent final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& pack) override
+	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override
 	{
 		const auto times = pack.readShort();
 
-		auto player = conn->getPlayer();
+		const auto player = conn->getPlayer();
 
 		if (player->getInventoryManager()->list().size() >= 200 - times)
 		{
@@ -33,27 +31,31 @@ public:
 			return;
 		}
 
-		uint32_t coinsNeeded = 0;
+		uint32_t requiredCoins;
 
 		switch (times)
 		{
 		case 1:
-			coinsNeeded = 200;
+			requiredCoins = 200;
 			break;
 		case 3:
-			coinsNeeded = 500;
+			requiredCoins = 500;
 			break;
 		case 7:
-			coinsNeeded = 1200;
+			requiredCoins = 1200;
 			break;
 		default:
 			return;
 		}
 
-		if (coinsNeeded > player->getCoins())
-			return;
+		if (requiredCoins > player->getCoins())
+		{
+			player->broadcast(u"You do not have the required amount of coins to use the crane machine.");
 
-		player->removeCoins(coinsNeeded);
+			return;
+		}
+
+		player->removeCoins(requiredCoins);
 
 		std::vector<InventoryCard> cards;
 
