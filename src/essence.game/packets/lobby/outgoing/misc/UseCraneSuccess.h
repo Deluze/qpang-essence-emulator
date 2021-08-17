@@ -1,9 +1,8 @@
 #pragma once
 
 #include "packets/LobbyServerPacket.h"
-#include "qpang/player/inventory/InventoryCard.h"
-
 #include "packets/writers/InventoryCardWriter.h"
+#include "qpang/player/inventory/InventoryCard.h"
 
 class UseCraneSuccess: public LobbyServerPacket
 {
