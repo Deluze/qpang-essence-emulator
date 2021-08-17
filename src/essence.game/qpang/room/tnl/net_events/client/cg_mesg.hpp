@@ -41,10 +41,15 @@ public:
 			message = Game::instance()->getChatManager()->chat(player, message);
 
 			if (player->isMuted() && !message.empty())
-				return player->broadcast(u"You're currently muted. Your message has not been sent");
+				return player->broadcast(u"You are currently restricted from using the chat.");
 
-			if(roomPlayer->isSpectating() && !message.empty())
-				return player->broadcast(u"No! You can't chat as a spectator");
+			if (roomPlayer->isSpectating() && !message.empty()) {
+				auto rank = roomPlayer->getPlayer()->getRank();
+				
+				if (rank == 1) { // player
+					return player->broadcast(u"You may not chat as a spectator.");
+				}
+			}
 
 			if (message.empty())
 				return;
