@@ -5,7 +5,7 @@
 class MovePlayer : public SquareServerPacket
 {
 public:
-	MovePlayer(uint32_t playerId, std::array<float, 3>& newPosition, uint8_t moveType, uint8_t direction) : SquareServerPacket(6513)
+	MovePlayer(const uint32_t playerId, const std::array<float, 3>& newPosition, const uint8_t moveType, const uint8_t direction) : SquareServerPacket(6513)
 	{
 		writeInt(playerId);
 		writeByte(moveType);

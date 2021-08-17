@@ -2,15 +2,14 @@
 
 #include <vector>
 
-#include "qpang/square/Square.h"
-
-#include "packets/writers/SquareEntryWriter.h"
 #include "packets/SquareServerPacket.h"
+#include "packets/writers/SquareEntryWriter.h"
+#include "qpang/square/Square.h"
 
 class SquareList : public SquareServerPacket
 {
 public:
-	SquareList(const std::vector<Square::Ptr>& squares) : SquareServerPacket(6501)
+	explicit SquareList(const std::vector<Square::Ptr>& squares) : SquareServerPacket(6501)
 	{
 		const uint16_t size = static_cast<uint16_t>(squares.size());
 
@@ -19,6 +18,8 @@ public:
 		writeShort(size);
 
 		for (const Square::Ptr& square : squares)
+		{
 			SquareEntryWriter::write(this, square);
+		}
 	}
 };

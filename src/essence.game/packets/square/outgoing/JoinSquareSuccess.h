@@ -3,17 +3,16 @@
 #include <cstdint>
 
 #include "packets/SquareServerPacket.h"
-
 #include "qpang/square/Square.h"
 #include "qpang/square/SquarePlayer.h"
 
 class JoinSquareSuccess : public SquareServerPacket
 {
 public:
-	JoinSquareSuccess(SquarePlayer::Ptr player) : SquareServerPacket(6538)
+	explicit JoinSquareSuccess(const SquarePlayer::Ptr player) : SquareServerPacket(6538)
 	{
 		const auto square = player->getSquare();
-		const auto randomSpawnLocation = Game::instance()->getSpawnManager()->getRandomPlazaSpawnLocation();
+		const auto [x, y, z] = Game::instance()->getSpawnManager()->getRandomPlazaSpawnLocation();
 
 		writeShort(static_cast<uint16_t>(square->getId())); // dont even ask, header text 'square - ID'
 		writeEmpty(7);
@@ -23,7 +22,7 @@ public:
 		writeByte(square->getState());
 		writeString(square->getName(), 16);
 		writeEmpty(33);
-		writeArray<float, 3>({ randomSpawnLocation.x, randomSpawnLocation.y, randomSpawnLocation.z }); // player->getPosition()
+		writeArray<float, 3>({ x, y, z }); // player->getPosition()
 
 	}
 };

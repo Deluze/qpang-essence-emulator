@@ -8,9 +8,9 @@
 class UpdatePlayerEquipment : public SquareServerPacket
 {
 public:
-	UpdatePlayerEquipment(const SquarePlayer::Ptr squarePlayer) : SquareServerPacket(6517)
+	explicit UpdatePlayerEquipment(const SquarePlayer::Ptr squarePlayer) : SquareServerPacket(6517)
 	{
-		auto player = squarePlayer->getPlayer();
+		const auto player = squarePlayer->getPlayer();
 
 		writeInt(player->getId());
 		writeShort(player->getCharacter());

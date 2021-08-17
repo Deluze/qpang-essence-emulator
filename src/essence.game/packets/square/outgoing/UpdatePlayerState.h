@@ -1,10 +1,8 @@
 #pragma once
 
 #include "packets/SquareServerPacket.h"
-
 #include "qpang/player/Player.h"
 #include "qpang/square/SquarePlayer.h"
-
 
 class UpdatePlayerState : public SquareServerPacket
 {
