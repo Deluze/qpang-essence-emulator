@@ -2,13 +2,12 @@
 #define CG_HIT_H
 
 #include "GameNetEvent.h"
-
-
 #include "qpang/Game.h"
-#include "qpang/room/tnl/net_events/server/gc_hit.hpp"
 #include "qpang/room/tnl/net_events/server/gc_card.hpp"
+#include "qpang/room/tnl/net_events/server/gc_hit.hpp"
 
-class CGHit : public GameNetEvent
+// ReSharper disable once CppInconsistentNaming
+class CGHit final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
@@ -35,10 +34,10 @@ public:
 		TRAP_SHIP_PROPELLER = 7
 	};
 
-	CGHit() : GameNetEvent{ CG_HIT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirClientToServer } {};
+	CGHit() : GameNetEvent{ CG_HIT, Guaranteed, DirClientToServer } {};
 
-	void pack(EventConnection* conn, BitStream* bstream) {};
-	void unpack(EventConnection* conn, BitStream* bstream)
+	void pack(EventConnection* conn, BitStream* bstream) override {};
+	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->read(&srcPlayerId);
 		bstream->read(&dstPlayerId);
@@ -60,31 +59,43 @@ public:
 		bstream->read(&unk_18);
 	};
 
-	void handle(GameConnection* conn, Player::Ptr player)
+	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
+		if (const auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 		{
 			if (roomPlayer->isSpectating())
+			{
 				return;
+			}
 
-			if (auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
+			if (const auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
 			{
 				if (!session->getWeaponManager()->hasWeapon(weaponId) && !isTrap(weaponId))
+				{
 					return;
+				}
 
-				if(dstPlayerId == NULL)
+				if (dstPlayerId == NULL)
+				{
 					hitEmpty(weaponId, session);
+				}
 				else if (srcPlayerId == dstPlayerId)
+				{
 					hit(weaponId, session, session, hitType);
+				}
 				else
 				{
-					auto targetSession = session->getRoomSession()->find(dstPlayerId);
+					const auto targetSession = session->getRoomSession()->find(dstPlayerId);
 
 					if (targetSession == nullptr)
+					{
 						return;
+					}
 
 					if (targetSession->isInvincible() || targetSession->isDead())
+					{
 						return;
+					}
 
 					hit(weaponId, session, targetSession, hitType);
 				}
@@ -92,43 +103,55 @@ public:
 		}
 	}
 
-	void hit(uint32_t weaponId, RoomSessionPlayer::Ptr srcPlayer, RoomSessionPlayer::Ptr dstPlayer, uint8_t bodyPart)
+	void hit(const uint32_t weaponId, const RoomSessionPlayer::Ptr& srcPlayer, const RoomSessionPlayer::Ptr& dstPlayer, uint8_t bodyPart) const
 	{
 		if (dstPlayer->isDead())
+		{
 			return;
-		
-		uint16_t damage = 0;
+		}
+
+		uint16_t damage;
 		uint8_t effectId = 0;
 
-		auto roomSession = srcPlayer->getRoomSession();
+		const auto roomSession = srcPlayer->getRoomSession();
 
-		auto isTeamMode = roomSession->getGameMode()->isTeamMode();
-		auto isSameTeam = isTeamMode && srcPlayer->getTeam() == dstPlayer->getTeam();
-		auto weapon = Game::instance()->getWeaponManager()->get(weaponId);
+		const auto isTeamMode = roomSession->getGameMode()->isTeamMode();
+		const auto isSameTeam = (isTeamMode && (srcPlayer->getTeam() == dstPlayer->getTeam()));
 
-		if (weapon.weaponType != WeaponType::BOMB && srcPlayer->isDead())
+		const auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponId);
+
+		if (weaponUsed.weaponType != BOMB && srcPlayer->isDead())
+		{
 			return;
-		
+		}
+
 		if (isTrap(weaponId))
 		{
 			damage = getTrapDamage(weaponId);
-	
+
 			if (weaponId == TRAP_FALL)
+			{
 				if (dstPlayer == roomSession->getEssenceHolder())
+				{
 					roomSession->resetEssence();
+				}
+			}
 
 			dstPlayer->takeHealth(damage);
 		}
 		else
 		{
-			if (weaponId != 1095434246)
+			constexpr auto octoMineItemId = 1095434246;
+
+			if (weaponId != octoMineItemId) // Jump mine
 			{
-				const auto isValidShot = srcPlayer->getEntityManager()->isValidShot(entityId);
-				if (!isValidShot)
+				if (const auto isValidShot = srcPlayer->getEntityManager()->isValidShot(entityId); !isValidShot)
+				{
 					return;
+				}
 			}
-			
-			damage = weapon.damage;
+
+			damage = weaponUsed.damage;
 
 			switch (hitLocation)
 			{
@@ -150,28 +173,33 @@ public:
 			case R_HAND:
 				damage *= 0.6;
 				break;
+			default: damage *= 0.0;
 			}
 
 			if (isSameTeam)
+			{
 				damage = 0; // still apply debuffs
+			}
 
-			if (weaponId == 1095434246) // octo mine
+			if (weaponId == octoMineItemId)
+			{
 				if (srcPlayer == dstPlayer)
+				{
 					damage = 0;
+				}
+			}
 
 			dstPlayer->takeHealth(damage);
 
-			const auto applyEffect = (rand() % 100) <= weapon.effectChance;
-
-			if (applyEffect)
+			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance; applyEffect && !isSameTeam)
 			{
-				effectId = weapon.effectId;
-				dstPlayer->getEffectManager()->addEffect(srcPlayer, weapon, entityId);
+				effectId = weaponUsed.effectId;
+				dstPlayer->getEffectManager()->addEffect(srcPlayer, weaponUsed, entityId);
 			}
 		}
 
-		auto srcId = srcPlayer->getPlayer()->getId();
-		auto dstId = dstPlayer->getPlayer()->getId();
+		const auto srcId = srcPlayer->getPlayer()->getId();
+		const auto dstId = dstPlayer->getPlayer()->getId();
 
 		// Why was it previously so that GCHit was never relayed to everyone else if the src and dst player were the same? Certainly explains why octomines didn't disappear.
 		roomSession->relayPlaying<GCHit>(srcPlayerId, dstPlayerId, unk_03, srcPosX, srcPosY, srcPosZ, dstPosX, dstPosY, dstPosZ, entityId,
@@ -180,21 +208,21 @@ public:
 		if (dstPlayer->isDead())
 		{
 			srcPlayer->getEntityManager()->addKill(entityId);
-			
-			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weapon, hitLocation);
+
+			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);
 			roomSession->relayPlaying<GCGameState>(dstId, hitLocation == 0 ? 28 : 17, weaponId, srcId);
 		}
 	}
 
-	void hitEmpty(uint32_t weaponId, RoomSessionPlayer::Ptr srcPlayer)
+	void hitEmpty(const uint32_t weaponId, const RoomSessionPlayer::Ptr& srcPlayer) const
 	{
-		auto roomSession = srcPlayer->getRoomSession();
+		const auto roomSession = srcPlayer->getRoomSession();
 
 		roomSession->relayPlaying<GCHit>(srcPlayerId, 0, unk_03, srcPosX, srcPosY, srcPosZ, dstPosX, dstPosY, dstPosZ, entityId,
 			hitType, hitLocation, 0, 0, weaponId, rtt, weaponType, unk_16, srcPlayer->getStreak() + 1, unk_18, 0);
 	}
 
-	bool isTrap(uint32_t weaponId)
+	static bool isTrap(const uint32_t weaponId)
 	{
 		return weaponId == TRAP_FLAME
 			|| weaponId == TRAP_POISON_GROUND
@@ -204,7 +232,7 @@ public:
 			|| weaponId == TRAP_DOWN;
 	}
 
-	uint16_t getTrapDamage(uint32_t trapId)
+	[[nodiscard]] uint16_t getTrapDamage(uint32_t trapId) const
 	{
 		switch (weaponId)
 		{
@@ -222,7 +250,7 @@ public:
 		}
 	}
 
-	void process(EventConnection* ps)
+	void process(EventConnection* ps) override
 	{
 		post<CGHit>(ps);
 	};
