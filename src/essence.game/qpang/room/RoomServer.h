@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cstdint>
-#include <memory>
-#include <mutex>
-#include <unordered_map>
 #include <vector>
+#include <memory>
+#include <unordered_map>
+#include <mutex>
 
 #include "qpang/room/tnl/GameNetInterface.h"
 
@@ -21,7 +21,7 @@ public:
 	bool createConnection(uint32_t playerId, GameConnection* connection);
 	void dropConnection(uint32_t playerId);
 private:
-	static void processEvent(GameNetEvent* netEvent);
+	void processEvent(GameNetEvent* netEvent);
 
 	bool m_isRunning = false;
 
