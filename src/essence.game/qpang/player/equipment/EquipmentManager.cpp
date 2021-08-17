@@ -414,6 +414,8 @@ uint16_t EquipmentManager::getBonusHealth()
 		case 1429412098:
 		case 1429412099:
 		case 1429412100:
+		// Squirtle shield
+		case 1429410049:
 			return 20;
 		case 1429415424: // novice back
 			return 30;
