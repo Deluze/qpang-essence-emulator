@@ -3,16 +3,15 @@
 #include <cstdint>
 
 #include "core/communication/packet/PacketEvent.h"
-
-#include "qpang/player/Player.h"
 #include "packets/lobby/outgoing/player/UpdateCashBalance.h"
+#include "qpang/player/Player.h"
 
-class RequestCashBalance : public PacketEvent
+class RequestCashBalance final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet) override
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		uint32_t cash = conn->getPlayer()->getCash();
+		const uint32_t cash = conn->getPlayer()->getCash();
 
 		conn->send(UpdateCashBalance(cash));
 	}
