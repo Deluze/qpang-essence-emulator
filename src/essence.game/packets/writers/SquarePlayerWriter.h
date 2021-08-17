@@ -3,11 +3,8 @@
 #include <memory>
 
 #include "core/communication/packet/ServerPacket.h"
-
 #include "qpang/player/Player.h"
 #include "qpang/square/SquarePlayer.h"
-#include "qpang/room/Room.h"
-#include "qpang/room/RoomPlayer.h"
 
 class SquarePlayerWriter
 {
@@ -25,8 +22,10 @@ public:
 		packet->writeShort(player->getCharacter()); // 46
 		packet->writeInt(squarePlayer->getSelectedWeapon()); // 50
 
-		auto armor = player->getEquipmentManager()->getArmorItemIdsByCharacter(player->getCharacter());
+		const auto armor = player->getEquipmentManager()->getArmorItemIdsByCharacter(player->getCharacter());
+
 		packet->writeArray<uint32_t, 9>(armor); // 86
+
 		packet->writeEmpty(2, 0); // 88
 		packet->writeArray<float, 3>(squarePlayer->getPosition()); // 100
 	}
