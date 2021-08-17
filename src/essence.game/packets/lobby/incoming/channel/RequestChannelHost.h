@@ -7,14 +7,14 @@
 
 #include "packets/lobby/outgoing/channel/ChannelHost.h"
 
-class RequestChannelHost : public PacketEvent
+class RequestChannelHost final : public PacketEvent
 {
 public:
-	void handle(QpangConnection::Ptr conn, QpangPacket& packet)
+	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		uint32_t channelId = packet.readInt();
+		const uint32_t channelId = packet.readInt();
 
-		Channel ch = Game::instance()->getChannelManager()->getChannel(channelId);
+		const Channel ch = Game::instance()->getChannelManager()->getChannel(channelId);
 
 		conn->send(ChannelHost(ch));
 	}
