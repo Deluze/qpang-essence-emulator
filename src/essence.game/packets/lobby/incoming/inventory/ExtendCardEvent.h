@@ -31,9 +31,7 @@ public:
 			return;
 		}
 
-		const auto squarePlayer = player->getSquarePlayer();
-
-		if (squarePlayer == nullptr)
+		if (const auto squarePlayer = player->getSquarePlayer(); squarePlayer == nullptr)
 		{
 			player->broadcast(u"You may only renew items from the park.");
 
