@@ -153,6 +153,7 @@ public:
 
 			damage = weaponUsed.damage;
 
+			// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 			switch (hitLocation)
 			{
 			case HEAD:
@@ -173,7 +174,6 @@ public:
 			case R_HAND:
 				damage *= 0.6;
 				break;
-			default: damage *= 0.0;
 			}
 
 			if (isSameTeam)
