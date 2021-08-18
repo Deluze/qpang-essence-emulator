@@ -44,11 +44,6 @@ public:
 		const auto cardIsExpired = player->getInventoryManager()->isExpired(cardId);
 		const auto cardIsEquipped = player->getEquipmentManager()->hasEquipped(cardId);
 
-		std::cout << "Has card: " << playerHasCard << "\n";
-		std::cout << "Is expired: " << cardIsExpired << "\n";
-		std::cout << "Is equipped: " << cardIsEquipped << "\n";
-		std::cout << "\n";
-
 		if (!playerHasCard || !cardIsExpired || cardIsEquipped)
 		{
 			return;
@@ -80,17 +75,8 @@ public:
 			? player->getCash() >= shopItem.price
 			: player->getDon() >= shopItem.price; !hasSufficientFunds)
 		{
-			std::cout << "Player does not have sufficient funds" << "\n";
-			std::cout << "Cash: " << player->getCash() << "Don: " << player->getDon() << "\n";
-			std::cout << "Price: " << shopItem.price << "\n";
-
 			return;
 		}
-
-		std::cout << "Player has sufficient funds" << "\n";
-		std::cout << "Cash: " << player->getCash() << "Don: " << player->getDon() << "\n";
-		std::cout << "Price: " << shopItem.price << "\n";
-
 
 		player->getInventoryManager()->deleteCard(cardId);
 
