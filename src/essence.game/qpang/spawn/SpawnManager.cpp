@@ -13,7 +13,7 @@ void SpawnManager::initialize()
 	srand(time(NULL));
 
 	auto res = DATABASE->prepare(
-		"SELECT * FROM map_spawns INNER JOIN positions ON positions.id = map_spawns.position_id INNER JOIN maps ON maps.id = map_spawns.map_id INNER JOIN game_modes ON game_modes.id = map_spawns.game_mode_id"
+		"SELECT * FROM map_spawns INNER JOIN positions ON positions.id = map_spawns.position_id INNER JOIN maps ON maps.id = map_spawns.map_id INNER JOIN game_modes ON game_modes.id = map_spawns.game_mode_id WHERE map_spawns.is_active = 1"
 	)->fetch();
 
 	std::cout << "Loading player spawns.\n";
@@ -40,7 +40,7 @@ void SpawnManager::initialize()
 	std::cout << "Loading game item spawns.\n";
 
 	res = DATABASE->prepare(
-		"SELECT game_item_spawns.id, maps.map_id, positions.x, positions.y, positions.z FROM game_item_spawns INNER JOIN positions ON positions.id = game_item_spawns.position_id INNER JOIN maps ON maps.id = game_item_spawns.map_id"
+		"SELECT game_item_spawns.id, maps.map_id, positions.x, positions.y, positions.z FROM game_item_spawns INNER JOIN positions ON positions.id = game_item_spawns.position_id INNER JOIN maps ON maps.id = game_item_spawns.map_id where is_active = 1"
 	)->fetch();
 
 	while (res->hasNext())
