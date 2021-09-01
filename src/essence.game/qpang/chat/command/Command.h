@@ -17,6 +17,7 @@
 class Command
 {
 public:
+	virtual ~Command() = default;
 
 	enum Validation : uint8_t
 	{

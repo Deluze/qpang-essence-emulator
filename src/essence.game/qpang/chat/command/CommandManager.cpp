@@ -2,6 +2,7 @@
 
 #include <boost/format.hpp>
 
+#include "AddSpawnCommand.h"
 #include "BanCommand.h"
 #include "DatabaseCommand.h"
 #include "ReloadCommand.h"
@@ -61,6 +62,7 @@ void CommandManager::initialize()
 		{u"daily", dailyRewardCommand},
 		{u"dr", dailyRewardCommand},
 		{u"r3", new ToggleReloadGlitchCommand()}
+		//{u"addspawn", new AddSpawnCommand()}
 	};
 }
 
