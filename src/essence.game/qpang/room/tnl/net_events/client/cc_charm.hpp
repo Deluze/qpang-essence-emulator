@@ -26,10 +26,6 @@ public:
 		bstream->read(&unk_03);
 		bstream->read(&unk_04);
 		bstream->read(&unk_05);
-
-		std::cout << "[CC_CHARM] Unpacking..\n";
-
-		std::cout << "[CC_CHARM] unk_01: " << unk_01 << ", unk_02: " << unk_02 << ", unk_03: " << unk_03 << ", unk_04: " << unk_04 << ", unk_05: " << unk_05 << "\n";
 	};
 
 	void process(EventConnection* ps)
