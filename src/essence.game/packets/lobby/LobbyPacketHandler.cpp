@@ -35,6 +35,7 @@
 #include "packets/lobby/incoming/shop/BuyCardEvent.h"
 #include "packets/lobby/incoming/shop/RequestShopItems.h"
 #include "packets/lobby/incoming/shop/RequestShopPackages.h"
+#include "packets/lobby/incoming/misc/RequestDailyBonus.h"
 
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 {
@@ -73,4 +74,5 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(844, new ResetKillDeathEvent());
 	add(861, new DisableFunctionCardEvent());
 	add(897, new UseCraneEvent());
+	add(901, new RequestDailyBonus());
 }

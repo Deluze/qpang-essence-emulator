@@ -85,22 +85,22 @@ public:
 			}
 		}
 
-		if (!Authenticator::verify(username, password))
-		{
-			const auto attempts = failInfo.first + 1;
-			auto timestamp = failInfo.second == NULL ? time(NULL) : failInfo.second;
+		//if (!Authenticator::verify(username, password))
+		//{
+		//	const auto attempts = failInfo.first + 1;
+		//	auto timestamp = failInfo.second == NULL ? time(NULL) : failInfo.second;
 
-			if (attempts == maxFailedLogins)
-			{
-				std::cout << "Timed out " << ipAddress << " - Too many failed login attempts.\n";
-				timestamp = time(NULL);
-			}
+		//	if (attempts == maxFailedLogins)
+		//	{
+		//		std::cout << "Timed out " << ipAddress << " - Too many failed login attempts.\n";
+		//		timestamp = time(NULL);
+		//	}
 
-			m_failedLoginAttempts[ipAddress] = std::make_pair(attempts, timestamp);
+		//	m_failedLoginAttempts[ipAddress] = std::make_pair(attempts, timestamp);
 
-			invalidUsername(conn);
-			return;
-		} // ban check happens on lobby server
+		//	invalidUsername(conn);
+		//	return;
+		//} // ban check happens on lobby server
 
 		auto needsWhitelist = CONFIG_MANAGER->getString("GAME_WHITELIST") == "1";
 

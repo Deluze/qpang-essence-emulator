@@ -14,6 +14,8 @@ GameNetEvent::GameNetEvent(GameNetId gameNetId, NetEvent::GuaranteeType guarante
 	TNL::NetEvent(guaranteeType, eventDirection),
 	id(gameNetId)
 {
+
+	std::cout << "[" << gameNetIdMapping[gameNetId] << "] GuaranteeType: " << guaranteeTypeMapping[guaranteeType] << ", Direction: " << eventDirectionMapping[eventDirection] << "\n";
 }
 
 std::u16string GameNetEvent::byteBufferToString(ByteBuffer* buffer, uint32_t length)

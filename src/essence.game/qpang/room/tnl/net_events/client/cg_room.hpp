@@ -58,13 +58,13 @@ public:
 			if (cmd == Command::CREATE_EVENT_ROOM && player->getRank() != 3)
 				return conn->disconnect("Cannot create event room");
 
-			const auto isValidMode =
+			const auto isValidMode = true ||
 				mode == GameMode::Mode::DM ||
 				mode == GameMode::Mode::TDM ||
 				mode == GameMode::Mode::PTE ||
 				mode == GameMode::Mode::VIP;
 			
-			if (!isValidMode || map > 12)
+			if (!isValidMode/* || map > 12*/)
 			{
 				conn->disconnect("Invalid gamemode");
 				return player->broadcast(u"Sorry, but this game mode has not been implemented yet");
@@ -122,7 +122,7 @@ public:
 			break;
 			case Command::MODE_ROOM:
 			{
-				const auto isValidMode =
+				const auto isValidMode = true ||
 					mode == GameMode::Mode::DM ||
 					mode == GameMode::Mode::TDM ||
 					mode == GameMode::Mode::PTE ||
