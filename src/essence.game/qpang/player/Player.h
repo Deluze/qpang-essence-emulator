@@ -96,7 +96,7 @@ public:
 	void unmute();
 	bool isMuted();
 
-	bool hasIncreasedDailyReward();
+	bool isPatreon();
 
 	bool exists();
 
@@ -126,7 +126,7 @@ private:
 	uint32_t m_slackerPoints = 0;
 
 	// new
-	bool m_hasIncreasedDailyReward = false;
+	bool m_isPatreon = false;
 
 	bool m_isMuted = false;
 	bool m_exists = true;

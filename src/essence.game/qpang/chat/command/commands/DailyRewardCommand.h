@@ -127,7 +127,7 @@ public:
 	/// <param name="lastActivated">The last time the player has claimed their reward.</param>
 	void claimDailyReward(std::shared_ptr<Player> player, uint32_t loginStreak, long lastActivated)
 	{
-		auto playerHasIncreasedReward = player->hasIncreasedDailyReward();
+		auto playerHasIncreasedReward = player->isPatreon();
 
 		auto baseAmountOfCash = 50;
 		auto baseAmountOfDon = 1000;

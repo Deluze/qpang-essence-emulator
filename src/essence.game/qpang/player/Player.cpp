@@ -48,7 +48,7 @@ void Player::initialize()
 		m_coins = res->getInt("coins");
 		m_experience = res->getInt("experience");
 		m_isMuted = res->getTiny("is_muted") == 1;
-		m_hasIncreasedDailyReward = res->getTiny("has_increased_daily_reward") == 1;
+		m_isPatreon = res->getTiny("is_patreon") == 1;
 	}
 
 	m_inventoryManager.initialize(shared_from_this(), m_playerId);
@@ -397,9 +397,9 @@ bool Player::isMuted()
 	return m_isMuted;
 }
 
-bool Player::hasIncreasedDailyReward() 
+bool Player::isPatreon() 
 {
-	return m_hasIncreasedDailyReward;
+	return m_isPatreon;
 }
 
 bool Player::exists()
