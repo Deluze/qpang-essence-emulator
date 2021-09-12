@@ -28,7 +28,10 @@ public:
 		if (roomPlayer->getRoom()->isReloadGlitchEnabled()) {
 			roomPlayer->getRoom()->setIsReloadGlitchEnabled(false);
 
-			player->broadcast(u"You have DISABLED the reload glitch for this room.");
+			for (const auto& [id, player] : roomPlayer->getRoom()->getPlayers())
+			{
+				player->getPlayer()->broadcast(u"The reload glitch has been DISABLED for this room.");
+			}
 
 			return;
 		}
@@ -36,7 +39,10 @@ public:
 		{
 			roomPlayer->getRoom()->setIsReloadGlitchEnabled(true);
 
-			player->broadcast(u"You have ENABLED the reload glitch for this room.");
+			for (const auto& [id, player] : roomPlayer->getRoom()->getPlayers())
+			{
+				player->getPlayer()->broadcast(u"The reload glitch has been ENABLED for this room.");
+			}
 
 			return;
 		}
