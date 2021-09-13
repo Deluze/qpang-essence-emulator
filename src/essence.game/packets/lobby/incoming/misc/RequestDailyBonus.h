@@ -12,17 +12,17 @@ public:
 		
 		const auto playerDailyBonusRedeemedAtTime = (time_t) GetPlayerDailyBonusRedeemedAtTime(player->getId());
 
-		if (playerDailyBonusRedeemedAtTime == -1) 
+		if (playerDailyBonusRedeemedAtTime == -1)
 		{
 			player->broadcast(u"Something went wrong whilst attempting to retrieve your daily bonus. Please contact one of the game masters.");
 
 			return;
 		}
 
-		const auto redeemedAtTimeInUtc = *gmtime(&playerDailyBonusRedeemedAtTime);
+		const auto redeemedAtTimeInUtc = *localtime(&playerDailyBonusRedeemedAtTime);
 
 		const auto now = time(nullptr);
-		const auto nowInUtc = *gmtime(&now);
+		const auto nowInUtc = *localtime(&now);
 
 		const auto nowYear = (nowInUtc.tm_year + 1900);
 		const auto nowMonth = (nowInUtc.tm_mon + 1);
@@ -37,6 +37,8 @@ public:
 		if (isEligibleForDailyBonus)
 		{
 			SetPlayerDailyBonusRedeemedAtTime(player->getId(), now);
+			
+			std::cout << "[" << nowDay << "/" << nowMonth << "/" << nowYear << "] [DAILY_BONUS]: Player with id \"" << player->getId() << "\" has received their daily bonus.\n";
 		}
 
 		player->send(DailyBonusResponse(player, isEligibleForDailyBonus));
