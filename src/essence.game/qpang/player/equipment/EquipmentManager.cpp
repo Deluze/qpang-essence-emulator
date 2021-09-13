@@ -366,7 +366,7 @@ uint16_t EquipmentManager::getBaseHealth()
 		case 850: // sai
 			return 130;
 		case 851: // uru
-			return 160;
+			return 140;
 		case 578: // kuma
 			return 200;
 		case 579: // miu miu
