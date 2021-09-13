@@ -59,12 +59,6 @@ private:
 		writeInt(updatedCoinBalance);
 		// Send "true" indicating the player gets extra rewards on top of the bonus, send "false" indicating the player does not get extra rewards.
 		writeFlag(hasExtraRewards);
-
-		const auto rewardMessage = hasExtraRewards
-			? u"You have received 90 CASH and 1800 DON as your daily bonus."
-			: u"You have received 60 CASH and 1200 DON as your daily bonus.";
-
-		player->broadcast(rewardMessage);
 	}
 
 	void DailyBonusResponse::SendDailyBonusFailure(const Player::Ptr& player)
