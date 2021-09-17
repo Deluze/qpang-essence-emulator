@@ -84,6 +84,8 @@ public:
 	void healTeam(uint16_t healing);
 
 	uint16_t getScore();
+	uint16_t getPublicEnemyScore();
+
 	uint16_t getKills();
 	uint16_t getDeaths();
 	uint32_t getPlaytime();
@@ -93,6 +95,7 @@ public:
 
 	void addKill();
 	void addDeath();
+	void addPublicEnemyScore(uint16_t publicEnemyScore);
 	void addScore(uint16_t score = 1);
 
 	std::shared_ptr<Player> getPlayer();
@@ -154,6 +157,7 @@ private:
 	uint16_t m_kills;
 	uint16_t m_deaths;
 	uint16_t m_score;
+	uint16_t m_publicEnemyScore;
 	uint32_t m_playTime;
 	uint32_t m_highestMultiKill;
 	uint32_t m_eventItemPickUps;

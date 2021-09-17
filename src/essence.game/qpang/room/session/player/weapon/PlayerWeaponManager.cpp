@@ -53,6 +53,37 @@ Weapon PlayerWeaponManager::getSelectedWeapon()
 	return m_weapons[m_selectedWeaponIndex];
 }
 
+void PlayerWeaponManager::setPublicEnemyWeapon()
+{
+	const auto gunIndex = 0;
+
+	m_previousSelectedWeaponIndex = m_selectedWeaponIndex;
+
+	m_selectedWeaponIndex = gunIndex;
+	m_currentGunWeapon = m_weapons[m_selectedWeaponIndex];
+
+	const auto chainLightWeapon = Game::instance()->getWeaponManager()->get(1095368720);
+
+	m_weapons[gunIndex] = chainLightWeapon;
+
+	auto& defaultAmmo = m_defaultAmmo[chainLightWeapon.itemId];
+
+	defaultAmmo.first = chainLightWeapon.clipCount;
+	defaultAmmo.second = chainLightWeapon.clipSize;
+
+	refillCurrentWeapon();
+}
+
+void PlayerWeaponManager::unsetPublicEnemyWeapon()
+{
+	const auto gunIndex = 0;
+
+	m_weapons[gunIndex] = m_currentGunWeapon;
+	m_selectedWeaponIndex = m_previousSelectedWeaponIndex;
+
+	reset();
+}
+
 void PlayerWeaponManager::reset()
 {
 	const auto player = m_player.lock();
@@ -93,7 +124,9 @@ bool PlayerWeaponManager::canReload()
 bool PlayerWeaponManager::canShoot()
 {
 	if (isHoldingMelee())
+	{
 		return true;
+	}
 
 	return m_weapons[m_selectedWeaponIndex].clipSize > 0;
 }
@@ -135,10 +168,9 @@ void PlayerWeaponManager::switchWeapon(uint32_t weaponId, bool isReloadGlitchEna
 	}
 }
 
-void PlayerWeaponManager::refillCurrentWeapon()
+void PlayerWeaponManager::refillWeapon(uint32_t weaponId)
 {
-	const auto itemId = getSelectedWeapon().itemId;
-	const auto pair = m_defaultAmmo[itemId];
+	const auto pair = m_defaultAmmo[weaponId];
 
 	m_weapons[m_selectedWeaponIndex].clipCount = pair.first;
 	m_weapons[m_selectedWeaponIndex].clipSize = pair.second;
@@ -148,9 +180,16 @@ void PlayerWeaponManager::refillCurrentWeapon()
 		player->post(new GCGameItem(
 			14,
 			std::vector<GCGameItem::Item>({ GCGameItem::Item{1191182337, 0x01, 0x00, 0x00, 0x00} }),
-			itemId
+			weaponId
 		));
 	}
+}
+
+void PlayerWeaponManager::refillCurrentWeapon()
+{
+	const auto itemId = getSelectedWeapon().itemId;
+
+	refillWeapon(itemId);
 }
 
 std::array<uint32_t, 4> PlayerWeaponManager::getWeaponIds()

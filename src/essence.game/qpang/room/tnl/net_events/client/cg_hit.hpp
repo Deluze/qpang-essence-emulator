@@ -115,8 +115,34 @@ public:
 
 		const auto roomSession = srcPlayer->getRoomSession();
 
-		const auto isTeamMode = roomSession->getGameMode()->isTeamMode();
-		const auto isSameTeam = (isTeamMode && (srcPlayer->getTeam() == dstPlayer->getTeam()));
+		auto isTeamMode = roomSession->getGameMode()->isTeamMode();
+		auto isSameTeam = (isTeamMode && (srcPlayer->getTeam() == dstPlayer->getTeam()));
+
+		const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
+
+		if (isPublicEnemyMode)
+		{
+			const auto srcPlayerIsPublicEnemy = (roomSession->getPublicEnemyPlayerId() == srcPlayer->getPlayer()->getId());
+
+			if (srcPlayerIsPublicEnemy)
+			{
+				isSameTeam = false;
+			}
+			else
+			{
+				const auto publicEnemyIsTransforming = roomSession->getPublicEnemyIsTransforming();
+				const auto dstPlayerIsPublicEnemy = (roomSession->getPublicEnemyPlayerId() == dstPlayer->getPlayer()->getId());
+
+				if (dstPlayerIsPublicEnemy && !publicEnemyIsTransforming)
+				{
+					isSameTeam = false;
+				} 
+				else
+				{
+					isSameTeam = true;
+				}
+			}
+		}
 
 		const auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponId);
 

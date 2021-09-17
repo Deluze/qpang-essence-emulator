@@ -26,6 +26,7 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_kills(0),
 	m_deaths(0),
 	m_score(0),
+	m_publicEnemyScore(0),
 	m_exp(0),
 	m_expRate(0),
 	m_don(0),
@@ -403,6 +404,11 @@ uint16_t RoomSessionPlayer::getScore()
 	return m_score;
 }
 
+uint16_t RoomSessionPlayer::getPublicEnemyScore()
+{
+	return m_publicEnemyScore;
+}
+
 uint16_t RoomSessionPlayer::getKills()
 {
 	return m_kills;
@@ -462,6 +468,11 @@ void RoomSessionPlayer::addKill()
 void RoomSessionPlayer::addDeath()
 {
 	m_deaths++;
+}
+
+void RoomSessionPlayer::addPublicEnemyScore(uint16_t publicEnemyScore)
+{
+	m_publicEnemyScore += publicEnemyScore;
 }
 
 void RoomSessionPlayer::addScore(uint16_t score)

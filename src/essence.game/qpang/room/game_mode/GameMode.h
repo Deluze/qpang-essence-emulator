@@ -24,6 +24,7 @@ public:
 
 	virtual bool isTeamMode();
 	virtual bool isMissionMode();
+	virtual bool isPublicEnemyMode();
 
 	virtual void tick(std::shared_ptr<RoomSession> roomSession);
 

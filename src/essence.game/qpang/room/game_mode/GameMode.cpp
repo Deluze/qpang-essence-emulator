@@ -18,6 +18,11 @@ bool GameMode::isMissionMode()
 	return false;
 }
 
+bool GameMode::isPublicEnemyMode()
+{
+	return false;
+}
+
 void GameMode::tick(std::shared_ptr<RoomSession> roomSession)
 {
 }
@@ -93,7 +98,7 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 			target->getPlayer()->addCoins(100);
 			target->getPlayer()->broadcast(u"It's your lucky day. You died, fell down on the ground and found a golden coin!");
 		}
-		
+
 		killer->addKill();
 		target->addDeath();
 

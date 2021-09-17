@@ -83,7 +83,7 @@ public:
 			bstream->write(player->getTeam());
 
 			writeByteBuffer(bstream, actPlayer->getName(), 16);
-			bstream->write((U32)3);
+			bstream->write((U32)player->getPublicEnemyScore()); // Prey kill count
 			
 			playerIndex++;
 			if (playerIndex >= 16)

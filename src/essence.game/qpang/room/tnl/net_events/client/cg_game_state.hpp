@@ -31,6 +31,9 @@ public:
 		INV_OUT = 25,
 		KILLFEED_ADD_HEAD = 28,
 		START_RESPAWN_TIMER = 29,
+
+		PREY_UNK_STATE = 35,
+		PREY_TRANSFORMATION_FINISHED = 37,
 	};
 	CGGameState() : GameNetEvent{ CG_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirClientToServer } {};
 
@@ -65,7 +68,7 @@ public:
 				}
 				else
 					conn->postNetEvent(new GCGameState(player->getId(), 15));
-				
+
 				roomPlayer->setPlaying(false);
 				roomPlayer->setSpectating(false);
 				roomPlayer->setReady(false);
@@ -73,8 +76,26 @@ public:
 				roomPlayer->getRoom()->syncPlayers(roomPlayer);
 				break;
 			case State::GAME_WAITING_PLAYERS:
-				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr)
+				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) {
 					roomSession->addPlayer(conn, roomPlayer->getTeam());
+				}
+
+				break;
+			case State::PREY_UNK_STATE:
+				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) 
+				{
+					roomSession->relayPlaying<GCGameState>(player->getId(), 34);
+				}
+
+				break;
+			case State::PREY_TRANSFORMATION_FINISHED:
+				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) 
+				{
+					roomSession->setPublicEnemyIsTransforming(false);
+
+					roomSession->relayPlaying<GCGameState>(player->getId(), 33);
+				}
+				break;
 			default:
 				break;
 			}

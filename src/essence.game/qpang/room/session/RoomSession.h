@@ -10,6 +10,8 @@
 #include "qpang/room/session/game_item/GameItemManager.h"
 #include "qpang/room/session/skill/RoomSkillManager.h"
 
+constexpr auto PUBLIC_ENEMY_INITIAL_WAIT_TIME = 36000;
+
 class Room;
 class GameMode;
 
@@ -59,9 +61,12 @@ public:
 
 	std::vector<RoomSessionPlayer::Ptr> getPlayers();
 	std::vector<RoomSessionPlayer::Ptr> getPlayingPlayers();
+	std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersForPublicEnemy();
 	std::vector<RoomSessionPlayer::Ptr> getPlayersForTeam(uint8_t team);
 	uint32_t getPointsForTeam(uint8_t team);
 	uint32_t getTopScore();
+
+#pragma region Essence
 
 	void resetEssence();
 	void setEssenceHolder(RoomSessionPlayer::Ptr player);
@@ -71,6 +76,10 @@ public:
 	bool isEssenceDropped();
 	bool isEssenceReset();
 	uint32_t getElapsedEssenceDropTime();
+
+#pragma endregion
+
+#pragma region Vip
 
 	void findNextBlueVip();
 	bool isNextBlueVipEligible();
@@ -85,6 +94,35 @@ public:
 	RoomSessionPlayer::Ptr getYellowVip();
 
 	bool isVip(RoomSessionPlayer::Ptr player);
+
+#pragma endregion
+
+#pragma region PublicEnemy
+
+	void pickRandomPublicEnemy();
+
+	void setPublicEnemyIsTransforming(bool isTransforming);
+	bool getPublicEnemyIsTransforming();
+
+	void resetPublicEnemy();
+	void setPublicEnemyPlayerId(uint32_t playerId);
+
+	uint32_t getLastPickedPublicEnemyPlayerId();
+	uint32_t getPublicEnemyPlayerId();
+
+	uint32_t getPublicEnemyCountdownTime();
+
+	void setPublicEnemyCountdownTime(uint32_t countdownTime);
+	void decreasePublicEnemyCountdownTime(uint32_t countdownTime);
+	
+	void decreasePublicEnemyInitialCountdownWaitTime(uint32_t countdownWaitTime);
+	void clearPublicEnemyInitialCountdownWaitTime();
+	uint32_t getPublicEnemyInitialCountdownWaitTime();
+
+	bool isSearchingForPublicEnemy();
+	void setIsSearchingForPublicEnemy(bool isSearchingForPublicEnemy);
+
+#pragma endregion
 
 	template<typename T, typename... Args>
 	void relay(Args... args)
@@ -181,4 +219,14 @@ private:
 	RoomSessionPlayer::Ptr m_yellowVip;
 	RoomSessionPlayer::Ptr m_nextYellowVip;
 	time_t m_yellowVipSetTime;
+
+
+	uint32_t m_publicEnemyPlayerId;
+	uint32_t m_lastPickedPublicEnemyPlayerId;
+
+	bool m_publicEnemyIsTransforming;
+	bool m_isSearchingForPublicEnemy;
+
+	uint32_t m_publicEnemyCountdownTime;
+	uint32_t m_publicEnemyInitialCountdownWaitTime = PUBLIC_ENEMY_INITIAL_WAIT_TIME;
 };

@@ -18,6 +18,9 @@ public:
 
 	Weapon getSelectedWeapon();
 
+	void setPublicEnemyWeapon();
+	void unsetPublicEnemyWeapon();
+
 	void reset();
 	void reload(uint32_t seqId = 0);
 	void shoot(uint32_t entityId);
@@ -29,6 +32,7 @@ public:
 	void switchWeapon(uint32_t weaponId, bool isReloadGlitchEnabled);
 	bool isHoldingMelee();
 
+	void refillWeapon(uint32_t weaponId);
 	void refillCurrentWeapon();
 
 	std::array<uint32_t, 4> getWeaponIds();
@@ -41,4 +45,7 @@ private:
 	std::unordered_map<uint32_t, std::pair<uint16_t, uint16_t>> m_defaultAmmo;
 
 	std::weak_ptr<RoomSessionPlayer> m_player;
+
+	Weapon m_currentGunWeapon;
+	uint32_t m_previousSelectedWeaponIndex;
 };

@@ -12,6 +12,8 @@
 #include "qpang/room/tnl/net_events/server/gc_weapon.hpp"
 #include "qpang/room/tnl/net_events/server/gc_hit_essence.hpp"
 
+constexpr auto PUBLIC_ENEMY_BASE_HEALTH = 500;
+
 RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_room(room),
 	m_gameMode(mode),
@@ -27,7 +29,11 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_blueVipSetTime(NULL),
 	m_yellowVip(nullptr),
 	m_nextYellowVip(nullptr),
-	m_yellowVipSetTime(NULL)
+	m_yellowVipSetTime(NULL),
+	m_publicEnemyPlayerId(0),
+	m_publicEnemyCountdownTime(0),
+	m_isSearchingForPublicEnemy(false),
+	m_publicEnemyIsTransforming(false)
 {
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
@@ -129,6 +135,11 @@ bool RoomSession::removePlayer(uint32_t playerId)
 	{
 		relayPlaying<GCGameState>(playerId, 15);
 		player->post(new GCGameState(playerId, 15));
+	}
+
+	if (player->getPlayer()->getId() == m_publicEnemyPlayerId) 
+	{
+		resetPublicEnemy();
 	}
 
 	m_players.erase(it);
@@ -328,6 +339,10 @@ void RoomSession::finish()
 	m_blueVip.reset();
 	m_nextYellowVip.reset();
 	m_yellowVip.reset();
+
+	// TODO: Reset function.
+	m_publicEnemyPlayerId = 0;
+	m_publicEnemyInitialCountdownWaitTime = PUBLIC_ENEMY_INITIAL_WAIT_TIME;
 
 	m_leaverMx.lock();
 	for (const auto& player : m_leavers)
@@ -616,8 +631,125 @@ bool RoomSession::isVip(RoomSessionPlayer::Ptr player)
 	return (player->getTeam() == 1 && player == m_blueVip) || (player->getTeam() == 2 && player == m_yellowVip);
 }
 
+void RoomSession::pickRandomPublicEnemy()
+{
+	std::cout << "[MODE::PUBLIC_ENEMY] Attemping to pick random public enemy.\n";
+
+	const auto eligiblePlayers = getEligiblePlayersForPublicEnemy();
+
+	if (eligiblePlayers.size() == 0) 
+	{
+		setIsSearchingForPublicEnemy(false);
+
+		return;
+	}
+
+	m_playerMx.lock();
+
+	const auto index = rand() % eligiblePlayers.size();
+	const auto &randomEligiblePlayer = eligiblePlayers[index];
+
+	const auto randomEligiblePlayerId = randomEligiblePlayer->getPlayer()->getId();
+
+	setPublicEnemyPlayerId(randomEligiblePlayerId);
+
+	m_playerMx.unlock();
+}
+
+void RoomSession::setPublicEnemyIsTransforming(bool isTransforming)
+{
+	m_publicEnemyIsTransforming = isTransforming;
+}
+
+bool RoomSession::getPublicEnemyIsTransforming()
+{
+	return m_publicEnemyIsTransforming;
+}
+
+void RoomSession::resetPublicEnemy()
+{
+	const auto publicEnemy = find(m_publicEnemyPlayerId);
+
+	publicEnemy->getWeaponManager()->unsetPublicEnemyWeapon();
+
+	m_lastPickedPublicEnemyPlayerId = m_publicEnemyPlayerId;
+
+	m_publicEnemyPlayerId = 0;
+	m_publicEnemyIsTransforming = false;
+}
+
+void RoomSession::setPublicEnemyPlayerId(uint32_t playerId)
+{
+	clearPublicEnemyInitialCountdownWaitTime();
+
+	const auto player = find(playerId);
+
+	m_publicEnemyPlayerId = playerId;
+	m_publicEnemyIsTransforming = true;
+
+	const auto playingPlayers = getPlayingPlayers().size();
+	const auto publicEnemyTotalHealth = PUBLIC_ENEMY_BASE_HEALTH + ((playingPlayers - 1) * 150);
+
+	player->setHealth(publicEnemyTotalHealth);
+	player->getWeaponManager()->setPublicEnemyWeapon();
+
+	relayPlaying<GCGameState>(playerId, 36, publicEnemyTotalHealth);
+}
+
+uint32_t RoomSession::getLastPickedPublicEnemyPlayerId()
+{
+	return m_lastPickedPublicEnemyPlayerId;
+}
+
+uint32_t RoomSession::getPublicEnemyPlayerId()
+{
+	return m_publicEnemyPlayerId;
+}
+
+uint32_t RoomSession::getPublicEnemyCountdownTime()
+{
+	return m_publicEnemyCountdownTime;
+}
+
+void RoomSession::setPublicEnemyCountdownTime(uint32_t countdownTime)
+{
+	m_publicEnemyCountdownTime = countdownTime;
+}
+
+void RoomSession::decreasePublicEnemyCountdownTime(uint32_t countdownTime)
+{
+	m_publicEnemyCountdownTime -= countdownTime;
+}
+
+uint32_t RoomSession::getPublicEnemyInitialCountdownWaitTime()
+{
+	return m_publicEnemyInitialCountdownWaitTime;
+}
+
+void RoomSession::decreasePublicEnemyInitialCountdownWaitTime(uint32_t countdownWaitTime)
+{
+	m_publicEnemyInitialCountdownWaitTime -= countdownWaitTime;
+}
+
+void RoomSession::clearPublicEnemyInitialCountdownWaitTime()
+{
+	m_publicEnemyInitialCountdownWaitTime = 0;
+}
+
+bool RoomSession::isSearchingForPublicEnemy()
+{
+	return m_isSearchingForPublicEnemy;
+}
+
+void RoomSession::setIsSearchingForPublicEnemy(bool isSearchingForPublicEnemy)
+{
+	m_isSearchingForPublicEnemy = isSearchingForPublicEnemy;
+}
+
 void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 {
+	std::cout << "Respawning player " << player->getPlayer()->getId() << "\n";
+
 	player->makeInvincible();
 	player->setHealth(player->getDefaultHealth());
 	player->getWeaponManager()->reset();
@@ -726,6 +858,24 @@ std::vector<RoomSessionPlayer::Ptr> RoomSession::getPlayingPlayers()
 	for (const auto& [id, session] : m_players)
 		if (session->isPlaying() && !session->isSpectating())
 			players.push_back(session);
+
+	return players;
+}
+
+std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersForPublicEnemy()
+{
+	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+
+	std::vector<RoomSessionPlayer::Ptr> players;
+
+	for (const auto& [id, session] : m_players) 
+	{
+		if (session->isPlaying() && !session->isSpectating() && !session->isDead() && ~session->getRoomSession()->getLastPickedPublicEnemyPlayerId() != id)
+		{
+			players.push_back(session);
+		}
+	}
+
 
 	return players;
 }
