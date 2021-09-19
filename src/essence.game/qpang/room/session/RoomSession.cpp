@@ -38,7 +38,7 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 {
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
-	m_startTime = time(NULL)/* + 30*/ + 5; // 30 (waiting for players) + countdown start
+	m_startTime = time(NULL) + 5; // 30 (waiting for players) + countdown start
 	m_endTime = room->isPointsGame() ? NULL : m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
 }
 

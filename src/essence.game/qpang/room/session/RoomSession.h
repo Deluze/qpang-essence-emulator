@@ -10,7 +10,7 @@
 #include "qpang/room/session/game_item/GameItemManager.h"
 #include "qpang/room/session/skill/RoomSkillManager.h"
 
-constexpr auto PUBLIC_ENEMY_INITIAL_WAIT_TIME = 36000;
+constexpr auto PUBLIC_ENEMY_INITIAL_WAIT_TIME = 6000;
 
 class Room;
 class GameMode;
