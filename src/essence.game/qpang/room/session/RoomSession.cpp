@@ -3,6 +3,8 @@
 #include <numeric>
 #include <chrono>
 
+#include "ConfigManager.h"
+
 #include "qpang/room/RoomPlayer.h"
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 
@@ -36,9 +38,11 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_isFindingNextTag(false),
 	m_isNextTagTransforming(false)
 {
+	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
+
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
-	m_startTime = time(NULL) + 5; // 30 (waiting for players) + countdown start
+	m_startTime = time(NULL) + waitingForPlayersTime + 5; // 30 (waiting for players) + countdown start
 	m_endTime = room->isPointsGame() ? NULL : m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
 }
 

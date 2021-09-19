@@ -50,6 +50,15 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 
 	if (currentlySelectedTag != 0)
 	{
+		const auto currentlySelectedTagPlayer = roomSession->find(currentlySelectedTag);
+
+		if (currentlySelectedTagPlayer == nullptr)
+		{
+			return;
+		}
+
+		currentlySelectedTagPlayer->takeHealth(10);
+
 		return;
 	}
 

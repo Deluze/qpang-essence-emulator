@@ -43,8 +43,10 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 
 	auto player = conn->getPlayer();
 
+	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
+
 	m_joinTime = time(NULL);
-	m_startTime = m_joinTime; // have to wait 30 seconds for waiting for players to last
+	m_startTime = m_joinTime + waitingForPlayersTime;
 	m_character = player->getCharacter();
 
 	m_isPermanentlyInvincible = false;

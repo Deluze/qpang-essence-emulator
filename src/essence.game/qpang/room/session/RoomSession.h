@@ -6,11 +6,13 @@
 #include <mutex>
 #include <array>
 
+#include "ConfigManager.h"
+
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 #include "qpang/room/session/game_item/GameItemManager.h"
 #include "qpang/room/session/skill/RoomSkillManager.h"
 
-constexpr auto PUBLIC_ENEMY_INITIAL_WAIT_TIME = 6000;
+auto PUBLIC_ENEMY_INITIAL_WAIT_TIME = (CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000;
 
 class Room;
 class GameMode;
