@@ -6,9 +6,8 @@
 #include "BanCommand.h"
 #include "DatabaseCommand.h"
 #include "ReloadCommand.h"
-#include "DailyRewardCommand.h"
 #include "UnlimitedCommand.h"
-#include "DailyRewardCommand.h"
+#include "ExecGameStateCommand.h"
 #include "ToggleReloadGlitchCommand.h"
 #include "qpang/chat/command/Command.h"
 #include "qpang/chat/command/commands/NameChangeCommand.h"
@@ -32,8 +31,6 @@
 
 void CommandManager::initialize()
 {
-	auto dailyRewardCommand = new DailyRewardCommand();
-
 	m_commands = {
 		{u"dc", new DisconnectCommand() },
 		{u"dcid", new DisconnectIDCommand() },
@@ -58,10 +55,7 @@ void CommandManager::initialize()
 		{u"nc", new NameChangeCommand()},
 		{u"invincible", new InvincibleCommand()},
 		{u"r3", new ToggleReloadGlitchCommand()},
-		{u"dr", dailyRewardCommand},
-		{u"daily", dailyRewardCommand},
-		{u"reward", dailyRewardCommand},
-		{u"dailyreward", dailyRewardCommand},
+		{u"gs", new ExecGameStateCommand()},
 	};
 }
 

@@ -18,6 +18,7 @@ public:
 		SEND_GAME_STATE_PLAY = 4,
 		DISCONNECT_P2P = 7,
 		REMOVE_INVINCIBILITY = 8,
+		BROADCAST_GC_GAME_STATE = 9,
 		SYNC_TIME = 11,
 		GAME_START = 12,
 		GAME_START_PVE = GAME_START,
@@ -31,9 +32,14 @@ public:
 		INV_OUT = 25,
 		KILLFEED_ADD_HEAD = 28,
 		START_RESPAWN_TIMER = 29,
-
-		PREY_UNK_STATE = 35,
-		PREY_TRANSFORMATION_FINISHED = 37,
+		ESSENCE_DOUBLE_POINTS = 30,
+		PUBLIC_ENEMY_SHOW_COUNTDOWN = 31,
+		PUBLIC_ENEMY_START_COUNTDOWN = 32,
+		PUBLIC_ENEMY_UNK_01 = 33,
+		PUBLIC_ENEMY_UNK_02 = 34,
+		PUBLIC_ENEMY_IS_POSSIBLE = 35,
+		PUBLIC_ENEMY_START_TRANSFORMATION = 36,
+		PUBLIC_ENEMY_TRANSFORMATION_FINISHED = 37,
 	};
 	CGGameState() : GameNetEvent{ CG_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirClientToServer } {};
 
@@ -63,11 +69,11 @@ public:
 				{
 					if (!roomSession->removePlayer(player->getId()))
 					{
-						conn->postNetEvent(new GCGameState(player->getId(), 15));
+						conn->postNetEvent(new GCGameState(player->getId(), LEAVE_GAME));
 					}
 				}
 				else
-					conn->postNetEvent(new GCGameState(player->getId(), 15));
+					conn->postNetEvent(new GCGameState(player->getId(), LEAVE_GAME));
 
 				roomPlayer->setPlaying(false);
 				roomPlayer->setSpectating(false);
@@ -81,19 +87,18 @@ public:
 				}
 
 				break;
-			case State::PREY_UNK_STATE:
+			case State::PUBLIC_ENEMY_IS_POSSIBLE:
 				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) 
 				{
-					roomSession->relayPlaying<GCGameState>(player->getId(), 34);
+					roomSession->relayPlaying<GCGameState>(player->getId(), PUBLIC_ENEMY_UNK_02);
 				}
 
 				break;
-			case State::PREY_TRANSFORMATION_FINISHED:
+			case State::PUBLIC_ENEMY_TRANSFORMATION_FINISHED:
 				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) 
 				{
 					roomSession->setPublicEnemyIsTransforming(false);
-
-					roomSession->relayPlaying<GCGameState>(player->getId(), 33);
+					//roomSession->relayPlaying<GCGameState>(player->getId(), PUBLIC_ENEMY_UNK_01);
 				}
 				break;
 			default:

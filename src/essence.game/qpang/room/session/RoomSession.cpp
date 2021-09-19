@@ -11,6 +11,7 @@
 #include "qpang/room/tnl/net_events/server/gc_score_result.hpp"
 #include "qpang/room/tnl/net_events/server/gc_weapon.hpp"
 #include "qpang/room/tnl/net_events/server/gc_hit_essence.hpp"
+#include <utils/StringConverter.h>
 
 constexpr auto PUBLIC_ENEMY_BASE_HEALTH = 500;
 
@@ -65,10 +66,10 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 
 	for (const auto& [id, session] : m_players)
 	{
-		if(!session->isSpectating())
+		if (!session->isSpectating())
 			player->addPlayer(session);
 
-		if(!player->isSpectating())
+		if (!player->isSpectating())
 			session->addPlayer(player);
 
 		if (session->isPlaying())
@@ -80,7 +81,7 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 	m_playerMx.unlock();
 
 	auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), team);
-	
+
 	player->post(new GCGameState(player->getPlayer()->getId(), 11, 0)); // Necessary to initiate spectator mode in "waiting for players" state
 	player->post(new GCRespawn(player->getPlayer()->getId(), player->getCharacter(), 1, spawn.x, spawn.y, spawn.z));
 
@@ -89,9 +90,9 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 		m_leaverMx.lock();
 		auto it = std::find_if(m_leavers.cbegin(), m_leavers.cend(),
 			[player](const RoomSessionPlayer::Ptr x)
-		{
-			return player->getPlayer()->getId() == x->getPlayer()->getId();
-		}
+			{
+				return player->getPlayer()->getId() == x->getPlayer()->getId();
+			}
 		);
 
 		if (it != m_leavers.cend())
@@ -123,7 +124,7 @@ bool RoomSession::removePlayer(uint32_t playerId)
 		for (const auto& [id, session] : m_players)
 			session->post(new GCHitEssence(session->getPlayer()->getId(), player->getPlayer()->getId(), 3, pos.x, pos.y, pos.z, 0, 6));
 	}
-	
+
 	if (player == m_blueVip)
 		setBlueVip(nullptr);
 	else if (player == m_yellowVip)
@@ -137,7 +138,7 @@ bool RoomSession::removePlayer(uint32_t playerId)
 		player->post(new GCGameState(playerId, 15));
 	}
 
-	if (player->getPlayer()->getId() == m_publicEnemyPlayerId) 
+	if (player->getPlayer()->getId() == m_publicEnemyPlayerId)
 	{
 		resetPublicEnemy();
 	}
@@ -203,7 +204,7 @@ RoomSessionPlayer::Ptr RoomSession::findEligibleVip(uint8_t team, bool noConditi
 	std::vector<RoomSessionPlayer::Ptr> players;
 
 	uint32_t playerCount = 0;
-	for (const auto&[id, player] : m_players)
+	for (const auto& [id, player] : m_players)
 	{
 		if (player->isSpectating() || (player->getPlayer()->getRank() == 3 && this->getRoom()->isEventRoom()))
 			continue;
@@ -296,11 +297,11 @@ void RoomSession::handlePlayerFinish(RoomSessionPlayer::Ptr player)
 }
 
 void RoomSession::tick()
-{	
+{
 	if (!m_isFinished)
 	{
 		std::unique_lock<std::recursive_mutex> lg(m_playerMx);
-		
+
 		m_itemManager.tick();
 		m_gameMode->tick(shared_from_this());
 
@@ -378,7 +379,7 @@ void RoomSession::finish()
 			return lhs->getScore() > rhs->getScore();
 		}
 	);
-	
+
 	for (const auto& player : players)
 	{
 		const auto actPlayer = player->getPlayer();
@@ -633,11 +634,9 @@ bool RoomSession::isVip(RoomSessionPlayer::Ptr player)
 
 void RoomSession::pickRandomPublicEnemy()
 {
-	std::cout << "[MODE::PUBLIC_ENEMY] Attemping to pick random public enemy.\n";
-
 	const auto eligiblePlayers = getEligiblePlayersForPublicEnemy();
 
-	if (eligiblePlayers.size() == 0) 
+	if (eligiblePlayers.size() == 0)
 	{
 		setIsSearchingForPublicEnemy(false);
 
@@ -647,7 +646,7 @@ void RoomSession::pickRandomPublicEnemy()
 	m_playerMx.lock();
 
 	const auto index = rand() % eligiblePlayers.size();
-	const auto &randomEligiblePlayer = eligiblePlayers[index];
+	const auto& randomEligiblePlayer = eligiblePlayers[index];
 
 	const auto randomEligiblePlayerId = randomEligiblePlayer->getPlayer()->getId();
 
@@ -678,22 +677,42 @@ void RoomSession::resetPublicEnemy()
 	m_publicEnemyIsTransforming = false;
 }
 
-void RoomSession::setPublicEnemyPlayerId(uint32_t playerId)
+void RoomSession::setPublicEnemyPlayerId(uint32_t publicEnemyPlayerId)
 {
 	clearPublicEnemyInitialCountdownWaitTime();
 
-	const auto player = find(playerId);
+	const auto publicEnemyPlayer = find(publicEnemyPlayerId);
 
-	m_publicEnemyPlayerId = playerId;
+	m_publicEnemyPlayerId = publicEnemyPlayerId;
 	m_publicEnemyIsTransforming = true;
 
 	const auto playingPlayers = getPlayingPlayers().size();
 	const auto publicEnemyTotalHealth = PUBLIC_ENEMY_BASE_HEALTH + ((playingPlayers - 1) * 150);
 
-	player->setHealth(publicEnemyTotalHealth);
-	player->getWeaponManager()->setPublicEnemyWeapon();
+	char buffer[70];
 
-	relayPlaying<GCGameState>(playerId, 36, publicEnemyTotalHealth);
+	sprintf_s(buffer, "%ls has been selected as the new public enemy.", publicEnemyPlayer->getPlayer()->getName().c_str());
+
+	const auto players = getPlayers();
+
+	for (const auto& roomSessionPlayer : players)
+	{
+		const auto player = roomSessionPlayer->getPlayer();
+
+		if (player->getId() == publicEnemyPlayerId)
+		{
+			player->broadcast(u"You have been selected as the new public enemy.");
+		}
+		else
+		{
+			player->broadcast(StringConverter::Utf8ToUtf16(buffer));
+		}
+	}
+
+	publicEnemyPlayer->setHealth(publicEnemyTotalHealth);
+	publicEnemyPlayer->getWeaponManager()->setPublicEnemyWeapon();
+
+	relayPlaying<GCGameState>(publicEnemyPlayerId, 36, publicEnemyTotalHealth);
 }
 
 uint32_t RoomSession::getLastPickedPublicEnemyPlayerId()
@@ -748,8 +767,6 @@ void RoomSession::setIsSearchingForPublicEnemy(bool isSearchingForPublicEnemy)
 
 void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 {
-	std::cout << "Respawning player " << player->getPlayer()->getId() << "\n";
-
 	player->makeInvincible();
 	player->setHealth(player->getDefaultHealth());
 	player->getWeaponManager()->reset();
@@ -777,7 +794,7 @@ void RoomSession::syncPlayer(RoomSessionPlayer::Ptr player)
 		if (session == player)
 			continue;
 
-		player->post(new GCRespawn(id, session->getCharacter(), 0, 255.0F, 255.0F , 255.0F, isVip(player)));
+		player->post(new GCRespawn(id, session->getCharacter(), 0, 255.0F, 255.0F, 255.0F, isVip(player)));
 		player->post(new GCGameState(id, 8));
 		auto weapon = session->getWeaponManager()->getSelectedWeapon();
 		player->post(new GCWeapon(id, 0, weapon.itemId, 0));
@@ -868,7 +885,7 @@ std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersForPublicEnem
 
 	std::vector<RoomSessionPlayer::Ptr> players;
 
-	for (const auto& [id, session] : m_players) 
+	for (const auto& [id, session] : m_players)
 	{
 		if (session->isPlaying() && !session->isSpectating() && !session->isDead() && ~session->getRoomSession()->getLastPickedPublicEnemyPlayerId() != id)
 		{

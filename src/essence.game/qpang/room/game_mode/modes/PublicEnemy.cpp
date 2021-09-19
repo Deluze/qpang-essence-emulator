@@ -7,13 +7,18 @@
 
 #include "qpang/room/tnl/net_events/server/gc_respawn.hpp"
 #include "qpang/room/tnl/net_events/server/gc_game_state.hpp"
+#include <utils/StringConverter.h>
 
 constexpr auto PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS = 5000; // Time in milliseconds.
 
 enum CMD : uint32_t {
 	PUBLIC_ENEMY_SHOW_COUNTDOWN = 31,
-	PUBLIC_ENEMY_SEND_TIME = 32,
-	PUBLIC_ENEMY_SEND_TRANSFORM = 36
+	PUBLIC_ENEMY_START_COUNTDOWN = 32,
+	PUBLIC_ENEMY_UNK_01 = 33,
+	PUBLIC_ENEMY_UNK_02 = 34,
+	PUBLIC_ENEMY_IS_POSSIBLE = 35,
+	PUBLIC_ENEMY_START_TRANSFORMATION = 36,
+	PUBLIC_ENEMY_TRANSFORMATION_FINISHED = 37,
 };
 
 bool PublicEnemy::isMissionMode()
@@ -33,6 +38,9 @@ bool PublicEnemy::isPublicEnemyMode()
 
 void PublicEnemy::onApply(std::shared_ptr<Room> room)
 {
+	room->setIsPointsGame(false);
+	room->setScoreTime(10);
+
 	GameMode::onApply(room);
 }
 
@@ -49,6 +57,14 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 	// There is no public enemy.
 	if (roomSession->isSearchingForPublicEnemy())
 	{
+		if (roomSession->getPublicEnemyCountdownTime() == PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS)
+		{
+			for (const auto& player : roomSession->getPlayers())
+			{
+				player->getPlayer()->broadcast(u"Looking for the next public enemy...");
+			}
+		}
+
 		roomSession->decreasePublicEnemyCountdownTime(1000);
 
 		if (roomSession->getPublicEnemyCountdownTime() == 0)
@@ -70,7 +86,7 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 		}
 
 		// Public enemy is not being found, lets initiate it.
-		for (const auto& player : roomSession->getPlayers())
+		for (const auto& player : roomSession->getPlayingPlayers())
 		{
 			const auto playerId = player->getPlayer()->getId();
 			
@@ -79,7 +95,7 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 			roomSession->setPublicEnemyCountdownTime(PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS);
 			roomSession->setIsSearchingForPublicEnemy(true);
 
-			player->send<GCGameState>(playerId, PUBLIC_ENEMY_SEND_TIME, PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS);
+			player->send<GCGameState>(playerId, PUBLIC_ENEMY_START_COUNTDOWN, PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS);
 			player->send<GCGameState>(playerId, PUBLIC_ENEMY_SHOW_COUNTDOWN);
 		}
 	}
@@ -87,8 +103,6 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 
 void PublicEnemy::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessionPlayer)
 {
-	std::cout << "Synchronizing player " << sessionPlayer->getPlayer()->getId() << ".\n";
-
 	const auto roomSession = sessionPlayer->getRoomSession();
 
 	if (roomSession == nullptr)
@@ -110,7 +124,10 @@ void PublicEnemy::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessionPlayer)
 		return;
 	}
 
-	sessionPlayer->send<GCGameState>(publicEnemyId, PUBLIC_ENEMY_SEND_TRANSFORM, publicEnemyPlayer->getHealth());
+	const auto position = publicEnemyPlayer->getPosition();
+
+	sessionPlayer->post(new GCRespawn(publicEnemyId, publicEnemyPlayer->getCharacter(), 0, position.x, position.y, position.z, false));
+	sessionPlayer->post(new GCGameState(publicEnemyId, PUBLIC_ENEMY_START_TRANSFORMATION, publicEnemyPlayer->getHealth()));
 }
 
 void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)
@@ -125,9 +142,33 @@ void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::s
 	// Basically, if the target player is the public enemy.
 	if (targetPlayerId == publicEnemyPlayerId)
 	{
+		char buffer[70];
+
+		sprintf_s(buffer, "%ls has killed the public enemy.", killer->getPlayer()->getName().c_str());
+
+		const auto players = roomSession->getPlayers();
+
+		for (const auto& roomSessionPlayer : players)
+		{
+			const auto player = roomSessionPlayer->getPlayer();
+
+			if (player->getId() == killerPlayerId && killerPlayerId != targetPlayerId)
+			{
+				player->broadcast(u"You have killed the public enemy.");
+			}
+			else if (killerPlayerId != targetPlayerId)
+			{
+				player->broadcast(StringConverter::Utf8ToUtf16(buffer));
+			}
+			else 
+			{
+				player->broadcast(u"The public enemy has died by suicide.");
+			}
+		}
+
+
 		target->getRoomSession()->resetPublicEnemy();
 		killer->addPublicEnemyScore(1);
-
 	}
 
 	GameMode::onPlayerKill(killer, target, weapon, hitLocation);
