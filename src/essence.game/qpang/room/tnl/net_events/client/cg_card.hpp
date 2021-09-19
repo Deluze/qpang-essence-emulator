@@ -44,9 +44,6 @@ public:
 
 	void handle(GameConnection* conn, Player::Ptr player)
 	{
-		std::cout << "CGCard::Handle >> Handling Cmd " << cmd << " for UID " << uid << " and TargetUID " << targetUid << " and ItemId " << itemId << " and SeqId " << seqId << "\n";
-
-
 		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 		{
 			if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr)
@@ -59,7 +56,7 @@ public:
 
 					if ((itemId == FAKE_DEATH) && (character == 850 || character == 851)) 
 					{
-						player->broadcast(u"Sorry, you may not use fake death in Public Enemy Mode.");
+						player->broadcast(u"Sorry, you may not use fake death in the public enemy gamemode.");
 
 						return;
 					}
@@ -68,7 +65,7 @@ public:
 
 					if (isSearchingForPublicEnemy && (cmd == 4)) 
 					{
-						player->broadcast(u"Sorry, you may not perform this action whilst a new public enemy is being selected.");
+						player->broadcast(u"Sorry, you may not perform this action whilst the next public enemy is being selected.");
 
 						return;
 					}
