@@ -120,10 +120,11 @@ public:
 
 		const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
 
+		const auto srcPlayerIsPublicEnemy = (roomSession->getPublicEnemyPlayerId() == srcPlayer->getPlayer()->getId());
+		const auto dstPlayerIsPublicEnemy = (roomSession->getPublicEnemyPlayerId() == dstPlayer->getPlayer()->getId());
+
 		if (isPublicEnemyMode)
 		{
-			const auto srcPlayerIsPublicEnemy = (roomSession->getPublicEnemyPlayerId() == srcPlayer->getPlayer()->getId());
-
 			if (srcPlayerIsPublicEnemy)
 			{
 				isSameTeam = false;
@@ -131,12 +132,11 @@ public:
 			else
 			{
 				const auto publicEnemyIsTransforming = roomSession->getPublicEnemyIsTransforming();
-				const auto dstPlayerIsPublicEnemy = (roomSession->getPublicEnemyPlayerId() == dstPlayer->getPlayer()->getId());
 
 				if (dstPlayerIsPublicEnemy && !publicEnemyIsTransforming)
 				{
 					isSameTeam = false;
-				} 
+				}
 				else
 				{
 					isSameTeam = true;
@@ -144,7 +144,7 @@ public:
 			}
 		}
 
-		const auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponId);
+		auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponId);
 
 		if (weaponUsed.weaponType != BOMB && srcPlayer->isDead())
 		{
@@ -219,6 +219,11 @@ public:
 
 			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance; applyEffect && !isSameTeam)
 			{
+				if (dstPlayerIsPublicEnemy && weaponUsed.effectDuration > 2)
+				{
+					weaponUsed.effectDuration = 2;
+				}
+
 				effectId = weaponUsed.effectId;
 				dstPlayer->getEffectManager()->addEffect(srcPlayer, weaponUsed, entityId);
 			}
