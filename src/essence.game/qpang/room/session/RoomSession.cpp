@@ -36,7 +36,8 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_currentlySelectedTag(0),
 	m_selectTagCountdownTime(0),
 	m_isFindingNextTag(false),
-	m_isNextTagTransforming(false)
+	m_isNextTagTransforming(false),
+	m_selectTagInitialWaitTime((CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000)
 {
 	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
 
@@ -360,7 +361,7 @@ void RoomSession::finish()
 
 	// TODO: Reset function.
 	m_currentlySelectedTag = 0;
-	m_selectTagInitialWaitTime = PUBLIC_ENEMY_INITIAL_WAIT_TIME;
+	m_selectTagInitialWaitTime = ((CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000);
 
 	m_leaverMx.lock();
 	for (const auto& player : m_leavers)

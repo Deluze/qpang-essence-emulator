@@ -12,8 +12,6 @@
 #include "qpang/room/session/game_item/GameItemManager.h"
 #include "qpang/room/session/skill/RoomSkillManager.h"
 
-auto PUBLIC_ENEMY_INITIAL_WAIT_TIME = (CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000;
-
 class Room;
 class GameMode;
 
@@ -231,5 +229,5 @@ private:
 	bool m_isFindingNextTag;
 
 	uint32_t m_selectTagCountdownTime;
-	uint32_t m_selectTagInitialWaitTime = PUBLIC_ENEMY_INITIAL_WAIT_TIME;
+	uint32_t m_selectTagInitialWaitTime;
 };
