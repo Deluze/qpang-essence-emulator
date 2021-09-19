@@ -19,6 +19,7 @@ public:
 	GCScore(const std::vector<RoomSessionPlayer::Ptr>& players, std::shared_ptr<RoomSession> roomSession, const U8& cmd) : GameNetEvent{ GC_SCORE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny }
 	{
 		this->players = players;
+
 		this->cmd = cmd;
 		this->unk_04 = roomSession->getElapsedTime();
 
@@ -59,7 +60,7 @@ public:
 		U8 playerCount = players.size();
 		if (players.size() > 16)
 			playerCount = 16;
-		
+
 		bstream->write(playerCount);
 
 		uint8_t team0Spot{ 1 };
@@ -67,24 +68,38 @@ public:
 		uint8_t team2Spot{ 1 };
 
 		U8 playerIndex = 0;
-		
+
+
 		for (const auto& player : players)
-		{	
+		{
 			auto actPlayer = player->getPlayer();
+
+			auto roomSession = player->getRoomSession();
+			auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
 
 			bstream->write(actPlayer->getId());
 			bstream->write((U16)actPlayer->getLevel());
 			bstream->write((U8)4);
 
-			bstream->write((U16)player->getScore()); // essence
-			bstream->write((U16)player->getKills());
+			bstream->write((U16)player->getScore()); /// essence
+			//bstream->write((U16)player->getKills());
+			// Tag kills as player or player kills.
+			bstream->write((U16)(isPublicEnemyMode)
+				? player->getTagKillsAsPlayer()
+				: player->getKills());
 			bstream->write((U16)player->getDeaths());
-			bstream->write((U16)player->getScore());
+			//bstream->write((U16)player->getScore());
+
+			//// Player kills as tag or player score.
+			bstream->write((U16)(isPublicEnemyMode)
+				? player->getPlayerKillsAsTag()
+				: player->getScore());
+
 			bstream->write(player->getTeam());
 
 			writeByteBuffer(bstream, actPlayer->getName(), 16);
-			bstream->write((U32)player->getPublicEnemyScore()); // Prey kill count
-			
+			bstream->write((U32)(isPublicEnemyMode) ? player->getTagPoints() : 0); // Tag points
+
 			playerIndex++;
 			if (playerIndex >= 16)
 				break;
@@ -94,6 +109,7 @@ public:
 	void process(EventConnection* ps) {};
 
 	std::vector<RoomSessionPlayer::Ptr> players;
+
 	U8 cmd = -56;
 	U16 unk_02 = 0;
 	U16 blueTotalKill = 0;

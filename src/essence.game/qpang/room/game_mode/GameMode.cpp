@@ -45,16 +45,20 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	assert(killer != nullptr);
 	assert(target != nullptr);
 
-	auto roomSession = killer->getRoomSession();
-	const auto isTeamMode = killer->getRoomSession()->getGameMode()->isTeamMode();
-	const auto isSuicide = killer == target;
-	const auto isSameTeam = killer->getTeam() == target->getTeam();
+	const auto roomSession = killer->getRoomSession();
 
-	if (isSuicide)
+	const auto isTeamMode = roomSession->getGameMode()->isTeamMode();
+
+	const auto isSuicide = (killer == target);
+	const auto isSameTeam = (killer->getTeam() == target->getTeam());
+
+	const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
+
+	if (isSuicide && !isPublicEnemyMode)
 	{
 		killer->addDeath();
 	}
-	else
+	else if (!isPublicEnemyMode)
 	{
 		const auto earnedCash = rand() % 20 == 0; // 20 % kans
 
@@ -109,7 +113,10 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 			else if (!isTeamMode)
 				killer->addScore();
 		}
+	}
 
+	if (!isSuicide)
+	{
 		killer->addStreak();
 	}
 
@@ -117,10 +124,14 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	target->getEffectManager()->clear();
 	target->startRespawnCooldown();
 
+	// TODO: Add public enemy / tag stats.
+
 	auto* killerStats = killer->getPlayer()->getStatsManager();
 	auto* targetStats = target->getPlayer()->getStatsManager();
 
-	if (hitLocation == 0)
+	const auto isHeadshot = (hitLocation == 0);
+
+	if (isHeadshot && !isPublicEnemyMode)
 	{
 		killerStats->addHeadshotKills();
 		targetStats->addHeadshotDeaths();

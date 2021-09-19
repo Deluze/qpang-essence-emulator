@@ -26,7 +26,6 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_kills(0),
 	m_deaths(0),
 	m_score(0),
-	m_publicEnemyScore(0),
 	m_exp(0),
 	m_expRate(0),
 	m_don(0),
@@ -34,14 +33,18 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_playTime(0),
 	m_highestStreak(0),
 	m_highestMultiKill(0),
-	m_eventItemPickUps(0)
+	m_eventItemPickUps(0),
+	m_tagKillsAsPlayer(0),
+	m_playerKillsAsTag(0),
+	m_deathsAsTag(0),
+	m_deathsByTag(0)
 {
 	conn->incRef();
 
 	auto player = conn->getPlayer();
 
 	m_joinTime = time(NULL);
-	m_startTime = m_joinTime + 30; // have to wait 30 seconds for waiting for players to last
+	m_startTime = m_joinTime/* + 30*/; // have to wait 30 seconds for waiting for players to last
 	m_character = player->getCharacter();
 
 	m_isPermanentlyInvincible = false;
@@ -351,6 +354,9 @@ uint32_t RoomSessionPlayer::getDon()
 	don += 18 * m_kills;
 	don += 7 * m_deaths;
 	don += 10 * m_eventItemPickUps;
+
+	don += 20 * getTagPoints();
+
 	don += playtimeDon;
 
 	if (m_roomSession->getGameMode()->isMissionMode())
@@ -404,11 +410,6 @@ uint16_t RoomSessionPlayer::getScore()
 	return m_score;
 }
 
-uint16_t RoomSessionPlayer::getPublicEnemyScore()
-{
-	return m_publicEnemyScore;
-}
-
 uint16_t RoomSessionPlayer::getKills()
 {
 	return m_kills;
@@ -450,6 +451,9 @@ uint32_t RoomSessionPlayer::getExperience()
 	experience += 35 * m_kills;
 	experience += 10 * m_deaths;
 	experience += 10 * m_eventItemPickUps;
+	
+	experience += 25 * getTagPoints();
+
 	experience += playTimeExperience;
 
 	if (m_roomSession->getGameMode()->isMissionMode())
@@ -470,16 +474,56 @@ void RoomSessionPlayer::addDeath()
 	m_deaths++;
 }
 
-void RoomSessionPlayer::addPublicEnemyScore(uint16_t publicEnemyScore)
-{
-	m_publicEnemyScore += publicEnemyScore;
-}
-
 void RoomSessionPlayer::addScore(uint16_t score)
 {
 	m_score += score;
 
 	m_roomSession->addPointsForTeam(m_team, score);
+}
+
+uint16_t RoomSessionPlayer::getTagKillsAsPlayer()
+{
+	return m_tagKillsAsPlayer;
+}
+
+void RoomSessionPlayer::addTagKillAsPlayer()
+{
+	m_tagKillsAsPlayer += 1;
+}
+
+uint16_t RoomSessionPlayer::getPlayerKillsAsTag()
+{
+	return m_playerKillsAsTag;
+}
+
+void RoomSessionPlayer::addPlayerKillAsTag()
+{
+	m_playerKillsAsTag += 1;
+}
+
+uint16_t RoomSessionPlayer::getDeathsAsTag()
+{
+	return m_deathsAsTag;
+}
+
+void RoomSessionPlayer::addDeathAsTag()
+{
+	m_deathsAsTag += 1;
+}
+
+uint16_t RoomSessionPlayer::getDeathsByTag()
+{
+	return m_deathsByTag;
+}
+
+void RoomSessionPlayer::addDeathByTag()
+{
+	m_deathsByTag += 1;
+}
+
+uint16_t RoomSessionPlayer::getTagPoints()
+{
+	return ((m_tagKillsAsPlayer * 5) + (m_playerKillsAsTag * 1));
 }
 
 std::shared_ptr<Player> RoomSessionPlayer::getPlayer()

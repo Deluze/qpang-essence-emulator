@@ -220,7 +220,6 @@ private:
 	RoomSessionPlayer::Ptr m_nextYellowVip;
 	time_t m_yellowVipSetTime;
 
-
 	uint32_t m_publicEnemyPlayerId;
 	uint32_t m_lastPickedPublicEnemyPlayerId;
 

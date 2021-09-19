@@ -50,15 +50,27 @@ public:
 		for (const auto& player : players)
 		{
 			U8 playerIndex = 0;
+
+			auto roomSession = player->getRoomSession();
+			auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
 			
 			bstream->write(U32(player->getPlayer()->getId()));
 			bstream->write(U16(0)); // unk_02
 			bstream->write(U8(0)); // unk_03
 			bstream->write(U8(player->getTeam()));
-			bstream->write(U16(player->getScore()));
-			bstream->write(U16(player->getKills()));
-			bstream->write(U16(player->getDeaths()));
-			bstream->write(U16(player->getScore())); // Shouldn't matter if we did this, right?
+			bstream->write((U16)player->getScore()); /// essence
+			//bstream->write((U16)player->getKills());
+			// Tag kills as player or player kills.
+			bstream->write((U16)(isPublicEnemyMode)
+				? player->getTagKillsAsPlayer()
+				: player->getKills());
+			bstream->write((U16)player->getDeaths());
+			//bstream->write((U16)player->getScore());
+
+			//// Player kills as tag or player score.
+			bstream->write((U16)(isPublicEnemyMode)
+				? player->getPlayerKillsAsTag()
+				: player->getScore());
 			bstream->write(U32(player->getDon())); // don earned
 			bstream->write(U32(player->getExperience())); // xp earned
 			bstream->write(U32(0)); // shows weird (B) icon
@@ -74,7 +86,7 @@ public:
 			bstream->write(U16(player->getDonRate()));
 			bstream->write(U16(player->getExpRate()));
 			writeByteBuffer(bstream, player->getPlayer()->getName(), 16);
-			bstream->write(U32(0)); // unk_19
+			bstream->write(U32((isPublicEnemyMode) ? player->getTagPoints() : 0)); // Tag points
 
 			playerIndex++;
 			if (playerIndex >= 16)

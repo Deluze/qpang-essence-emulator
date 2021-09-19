@@ -38,7 +38,7 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 {
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
-	m_startTime = time(NULL) + 30 + 5; // 30 (waiting for players) + countdown start
+	m_startTime = time(NULL)/* + 30*/ + 5; // 30 (waiting for players) + countdown start
 	m_endTime = room->isPointsGame() ? NULL : m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
 }
 
@@ -267,14 +267,27 @@ void RoomSession::handlePlayerFinish(RoomSessionPlayer::Ptr player)
 	{
 		auto players = getPlayers();
 
-		auto winningPlayers = players.size() % 2 == 0 ? players.size() / 2 : (players.size() - 1) / 2;
+		const auto isPublicEnemyMode = getGameMode()->isPublicEnemyMode();
+		auto winningPlayers = players.size() == 2 ? 1 : 0;
 
-		std::sort(players.begin(), players.end(),
-			[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
-			{
-				return lhs->getScore() > rhs->getScore();
-			}
-		);
+		if (getGameMode()->isPublicEnemyMode())
+		{
+			std::sort(players.begin(), players.end(),
+				[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+				{
+					return lhs->getTagPoints() > rhs->getTagPoints();
+				}
+			);
+		}
+		else
+		{
+			std::sort(players.begin(), players.end(),
+				[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+				{
+					return lhs->getScore() > rhs->getScore();
+				}
+			);
+		}
 
 		for (size_t i = 0; i < winningPlayers % players.size(); i++)
 		{
@@ -372,13 +385,27 @@ void RoomSession::finish()
 	}
 
 	auto playingPlayers = getPlayingPlayers();
+	const auto isPublicEnemyMode = getGameMode()->isPublicEnemyMode();
 
-	std::sort(playingPlayers.begin(), playingPlayers.end(),
-		[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
-		{
-			return lhs->getScore() > rhs->getScore();
-		}
-	);
+	if (isPublicEnemyMode)
+	{
+		std::sort(playingPlayers.begin(), playingPlayers.end(),
+			[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+			{
+				return lhs->getTagPoints() > rhs->getTagPoints();
+			}
+		);
+	}
+	else
+	{
+		std::sort(playingPlayers.begin(), playingPlayers.end(),
+			[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+			{
+				return lhs->getScore() > rhs->getScore();
+			}
+		);
+	}
+
 
 	for (const auto& player : players)
 	{

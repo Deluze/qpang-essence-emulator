@@ -134,17 +134,29 @@ void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::s
 {
 	const auto roomSession = killer->getRoomSession();
 
-	const auto killerPlayerId = killer->getPlayer()->getId();
-	const auto targetPlayerId = target->getPlayer()->getId();
+	const auto killerPlayer = killer->getPlayer();
+	const auto targetPlayer = target->getPlayer();
 
-	const auto publicEnemyPlayerId = roomSession->getPublicEnemyPlayerId();
+	const auto tagPlayerId = roomSession->getPublicEnemyPlayerId();
 
-	// Basically, if the target player is the public enemy.
-	if (targetPlayerId == publicEnemyPlayerId)
+	const auto isSuicide = (killerPlayer->getId() == targetPlayer->getId());
+
+	const auto killerIsPublicEnemy = (killerPlayer->getId() == tagPlayerId);
+	const auto targetIsPublicEnemy = (targetPlayer->getId() == tagPlayerId);
+
+	if (killerIsPublicEnemy)
 	{
+		killer->addPlayerKillAsTag();
+		target->addDeathByTag();
+	}
+	else if (targetIsPublicEnemy)
+	{
+		killer->addTagKillAsPlayer();
+		target->addDeathAsTag();
+
 		char buffer[70];
 
-		sprintf_s(buffer, "%ls has killed the public enemy.", killer->getPlayer()->getName().c_str());
+		sprintf_s(buffer, "%ls has killed the public enemy.", killerPlayer->getName().c_str());
 
 		const auto players = roomSession->getPlayers();
 
@@ -152,23 +164,26 @@ void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::s
 		{
 			const auto player = roomSessionPlayer->getPlayer();
 
-			if (player->getId() == killerPlayerId && killerPlayerId != targetPlayerId)
+			if ((player->getId() == killerPlayer->getId()) && !isSuicide)
 			{
 				player->broadcast(u"You have killed the public enemy.");
 			}
-			else if (killerPlayerId != targetPlayerId)
+			else if (!isSuicide)
 			{
 				player->broadcast(StringConverter::Utf8ToUtf16(buffer));
 			}
-			else 
+			else
 			{
 				player->broadcast(u"The public enemy has died by suicide.");
 			}
 		}
 
-
 		target->getRoomSession()->resetPublicEnemy();
-		killer->addPublicEnemyScore(1);
+	}
+	else if (isSuicide)
+	{
+		target->addDeathAsTag();
+		target->getRoomSession()->resetPublicEnemy();
 	}
 
 	GameMode::onPlayerKill(killer, target, weapon, hitLocation);

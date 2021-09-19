@@ -84,7 +84,6 @@ public:
 	void healTeam(uint16_t healing);
 
 	uint16_t getScore();
-	uint16_t getPublicEnemyScore();
 
 	uint16_t getKills();
 	uint16_t getDeaths();
@@ -95,8 +94,21 @@ public:
 
 	void addKill();
 	void addDeath();
-	void addPublicEnemyScore(uint16_t publicEnemyScore);
 	void addScore(uint16_t score = 1);
+
+	uint16_t getTagKillsAsPlayer();
+	void addTagKillAsPlayer();
+
+	uint16_t getPlayerKillsAsTag();
+	void addPlayerKillAsTag();
+
+	uint16_t getDeathsAsTag();
+	void addDeathAsTag();
+
+	uint16_t getDeathsByTag();
+	void addDeathByTag();
+
+	uint16_t getTagPoints();
 
 	std::shared_ptr<Player> getPlayer();
 	GameConnection* getGameConnection();
@@ -157,10 +169,15 @@ private:
 	uint16_t m_kills;
 	uint16_t m_deaths;
 	uint16_t m_score;
-	uint16_t m_publicEnemyScore;
 	uint32_t m_playTime;
 	uint32_t m_highestMultiKill;
 	uint32_t m_eventItemPickUps;
+
+	uint16_t m_deathsAsTag;
+	uint16_t m_deathsByTag;
+
+	uint16_t m_tagKillsAsPlayer;
+	uint16_t m_playerKillsAsTag;
 	
 	GameConnection* m_conn;
 	std::shared_ptr<RoomSession> m_roomSession;
