@@ -28,6 +28,8 @@
 #include "qpang/chat/command/commands/ConfigCommand.h"
 #include "qpang/chat/command/commands/CloseCommand.h"
 #include "qpang/chat/command/commands/SpectateCommand.h"
+#include "qpang/chat/command/commands/FakeDeathCommand.h"
+#include "qpang/chat/command/commands/FakeDeathAllCommand.h"
 
 void CommandManager::initialize()
 {
@@ -56,6 +58,8 @@ void CommandManager::initialize()
 		{u"invincible", new InvincibleCommand()},
 		{u"r3", new ToggleReloadGlitchCommand()},
 		{u"gs", new ExecGameStateCommand()},
+		{u"fakedeath", new FakeDeathCommand()},
+		{u"fakedeathall", new FakeDeathAllCommand()},
 	};
 }
 
