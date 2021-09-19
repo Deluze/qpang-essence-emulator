@@ -136,7 +136,7 @@ void GameItemManager::onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32
 	if (item.itemId == RED_MEDKIT || item.itemId == GREEN_MEDKIT || item.itemId == AMMO_CLIP)
 	{
 		const auto isPublicEnemyMode = player->getRoomSession()->getGameMode()->isPublicEnemyMode();
-		const auto playerIsPublicEnemy = player->getRoomSession()->getPublicEnemyPlayerId() == player->getPlayer()->getId();
+		const auto playerIsPublicEnemy = player->getRoomSession()->getCurrentlySelectedTag() == player->getPlayer()->getId();
 
 		if ((isPublicEnemyMode && playerIsPublicEnemy) && (item.itemId == RED_MEDKIT || item.itemId == GREEN_MEDKIT))
 		{

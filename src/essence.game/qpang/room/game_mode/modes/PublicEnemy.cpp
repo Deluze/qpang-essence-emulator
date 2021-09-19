@@ -9,7 +9,7 @@
 #include "qpang/room/tnl/net_events/server/gc_game_state.hpp"
 #include <utils/StringConverter.h>
 
-constexpr auto PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS = 5000; // Time in milliseconds.
+constexpr auto PUBLIC_ENEMY_COUNTDOWN_TIME = 5000;
 
 enum CMD : uint32_t {
 	PUBLIC_ENEMY_SHOW_COUNTDOWN = 31,
@@ -46,18 +46,16 @@ void PublicEnemy::onApply(std::shared_ptr<Room> room)
 
 void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 {
-	const auto currentPublicEnemy = roomSession->getPublicEnemyPlayerId();
+	const auto currentlySelectedTag = roomSession->getCurrentlySelectedTag();
 
-	// There is a public enemy, ignore the rest.
-	if (currentPublicEnemy != 0)
+	if (currentlySelectedTag != 0)
 	{
 		return;
 	}
 
-	// There is no public enemy.
-	if (roomSession->isSearchingForPublicEnemy())
+	if (roomSession->isFindingNextTag())
 	{
-		if (roomSession->getPublicEnemyCountdownTime() == PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS)
+		if (roomSession->getSelectTagCountdownTime() == PUBLIC_ENEMY_COUNTDOWN_TIME)
 		{
 			for (const auto& player : roomSession->getPlayers())
 			{
@@ -65,37 +63,37 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 			}
 		}
 
-		roomSession->decreasePublicEnemyCountdownTime(1000);
+		roomSession->decreaseSelectTagCountdownTime(1000);
 
-		if (roomSession->getPublicEnemyCountdownTime() == 0)
+		if (roomSession->getSelectTagCountdownTime() == 0)
 		{
-			roomSession->pickRandomPublicEnemy();
+			roomSession->findNextTag();
 			// Countdown time is over, we can now set the public enemy.
-			roomSession->setIsSearchingForPublicEnemy(false);
+			roomSession->setIsFindingNextTag(false);
 		}
 	}
 	else
 	{
-		const auto initialCountdownWaitTime = roomSession->getPublicEnemyInitialCountdownWaitTime();
+		const auto initialWaitTime = roomSession->getSelectTagInitialWaitTime();
 
-		if (initialCountdownWaitTime != 0) 
+		if (initialWaitTime != 0)
 		{
-			roomSession->decreasePublicEnemyInitialCountdownWaitTime(1000);
+			roomSession->decreaseSelectTagInitialWaitTime(1000);
 
 			return;
 		}
 
+		const auto allPlayers = roomSession->getPlayers();
+
 		// Public enemy is not being found, lets initiate it.
-		for (const auto& player : roomSession->getPlayingPlayers())
+		for (const auto& player : allPlayers)
 		{
 			const auto playerId = player->getPlayer()->getId();
-			
-			const auto initialCountdownWaitTime = roomSession->getPublicEnemyInitialCountdownWaitTime();
 
-			roomSession->setPublicEnemyCountdownTime(PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS);
-			roomSession->setIsSearchingForPublicEnemy(true);
+			roomSession->setSelectTagCountdownTime(PUBLIC_ENEMY_COUNTDOWN_TIME);
+			roomSession->setIsFindingNextTag(true);
 
-			player->send<GCGameState>(playerId, PUBLIC_ENEMY_START_COUNTDOWN, PUBLIC_ENEMY_COUNTDOWN_TIME_IN_MILLIS);
+			player->send<GCGameState>(playerId, PUBLIC_ENEMY_START_COUNTDOWN, PUBLIC_ENEMY_COUNTDOWN_TIME);
 			player->send<GCGameState>(playerId, PUBLIC_ENEMY_SHOW_COUNTDOWN);
 		}
 	}
@@ -110,24 +108,24 @@ void PublicEnemy::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessionPlayer)
 		return;
 	}
 
-	const auto publicEnemyId = roomSession->getPublicEnemyPlayerId();
+	const auto currentlySelectedTag = roomSession->getCurrentlySelectedTag();
 
-	if (publicEnemyId == 0) 
+	if (currentlySelectedTag == 0)
 	{
 		return;
 	}
 
-	const auto publicEnemyPlayer = roomSession->find(publicEnemyId);
+	const auto currentlySelectedTagPlayer = roomSession->find(currentlySelectedTag);
 
-	if (publicEnemyPlayer == nullptr) 
+	if (currentlySelectedTagPlayer == nullptr)
 	{
 		return;
 	}
 
-	const auto position = publicEnemyPlayer->getPosition();
+	const auto position = currentlySelectedTagPlayer->getPosition();
 
-	sessionPlayer->post(new GCRespawn(publicEnemyId, publicEnemyPlayer->getCharacter(), 0, position.x, position.y, position.z, false));
-	sessionPlayer->post(new GCGameState(publicEnemyId, PUBLIC_ENEMY_START_TRANSFORMATION, publicEnemyPlayer->getHealth()));
+	sessionPlayer->post(new GCRespawn(currentlySelectedTag, currentlySelectedTagPlayer->getCharacter(), 0, position.x, position.y, position.z, false));
+	sessionPlayer->post(new GCGameState(currentlySelectedTag, PUBLIC_ENEMY_START_TRANSFORMATION, currentlySelectedTagPlayer->getHealth()));
 }
 
 void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)
@@ -137,54 +135,59 @@ void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::s
 	const auto killerPlayer = killer->getPlayer();
 	const auto targetPlayer = target->getPlayer();
 
-	const auto tagPlayerId = roomSession->getPublicEnemyPlayerId();
+	const auto tagPlayerId = roomSession->getCurrentlySelectedTag();
 
 	const auto isSuicide = (killerPlayer->getId() == targetPlayer->getId());
 
-	const auto killerIsPublicEnemy = (killerPlayer->getId() == tagPlayerId);
-	const auto targetIsPublicEnemy = (targetPlayer->getId() == tagPlayerId);
+	const auto killerIsTagged = (killerPlayer->getId() == tagPlayerId);
+	const auto targetIsTagged = (targetPlayer->getId() == tagPlayerId);
 
-	if (killerIsPublicEnemy)
+	if (killerIsTagged)
 	{
 		killer->addPlayerKillAsTag();
 		target->addDeathByTag();
 	}
-	else if (targetIsPublicEnemy)
+	else if (targetIsTagged)
 	{
 		killer->addTagKillAsPlayer();
 		target->addDeathAsTag();
 
-		char buffer[70];
+		broadcastTagKill(roomSession, killerPlayer, isSuicide);
 
-		sprintf_s(buffer, "%ls has killed the public enemy.", killerPlayer->getName().c_str());
-
-		const auto players = roomSession->getPlayers();
-
-		for (const auto& roomSessionPlayer : players)
-		{
-			const auto player = roomSessionPlayer->getPlayer();
-
-			if ((player->getId() == killerPlayer->getId()) && !isSuicide)
-			{
-				player->broadcast(u"You have killed the public enemy.");
-			}
-			else if (!isSuicide)
-			{
-				player->broadcast(StringConverter::Utf8ToUtf16(buffer));
-			}
-			else
-			{
-				player->broadcast(u"The public enemy has died by suicide.");
-			}
-		}
-
-		target->getRoomSession()->resetPublicEnemy();
+		target->getRoomSession()->clearCurrentTag();
 	}
 	else if (isSuicide)
 	{
 		target->addDeathAsTag();
-		target->getRoomSession()->resetPublicEnemy();
+		target->getRoomSession()->clearCurrentTag();
 	}
 
 	GameMode::onPlayerKill(killer, target, weapon, hitLocation);
+}
+
+void PublicEnemy::broadcastTagKill(RoomSession::Ptr roomSession, Player::Ptr killer, bool isSuicide)
+{
+	char buffer[70];
+
+	sprintf_s(buffer, "%ls has killed the public enemy.", killer->getName().c_str());
+
+	const auto players = roomSession->getPlayers();
+
+	for (const auto& roomSessionPlayer : players)
+	{
+		const auto player = roomSessionPlayer->getPlayer();
+
+		if ((player->getId() == killer->getId()) && !isSuicide)
+		{
+			player->broadcast(u"You have killed the public enemy.");
+		}
+		else if (!isSuicide)
+		{
+			player->broadcast(StringConverter::Utf8ToUtf16(buffer));
+		}
+		else
+		{
+			player->broadcast(u"The public enemy has died by suicide.");
+		}
+	}
 }

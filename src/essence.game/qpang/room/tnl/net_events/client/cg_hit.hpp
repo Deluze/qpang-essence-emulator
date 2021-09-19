@@ -120,20 +120,20 @@ public:
 
 		const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
 
-		const auto srcPlayerIsPublicEnemy = (roomSession->getPublicEnemyPlayerId() == srcPlayer->getPlayer()->getId());
-		const auto dstPlayerIsPublicEnemy = (roomSession->getPublicEnemyPlayerId() == dstPlayer->getPlayer()->getId());
+		const auto srcPlayerIsTagged = (roomSession->getCurrentlySelectedTag() == srcPlayer->getPlayer()->getId());
+		const auto dstPlayerIsTagged = (roomSession->getCurrentlySelectedTag() == dstPlayer->getPlayer()->getId());
 
 		if (isPublicEnemyMode)
 		{
-			if (srcPlayerIsPublicEnemy)
+			if (srcPlayerIsTagged)
 			{
 				isSameTeam = false;
 			}
 			else
 			{
-				const auto publicEnemyIsTransforming = roomSession->getPublicEnemyIsTransforming();
+				const auto isNextTagTransforming = roomSession->getIsNextTagTransforming();
 
-				if (dstPlayerIsPublicEnemy && !publicEnemyIsTransforming)
+				if (dstPlayerIsTagged && !isNextTagTransforming)
 				{
 					isSameTeam = false;
 				}
@@ -219,7 +219,7 @@ public:
 
 			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance; applyEffect && !isSameTeam)
 			{
-				if (dstPlayerIsPublicEnemy && weaponUsed.effectDuration > 2)
+				if (dstPlayerIsTagged && weaponUsed.effectDuration > 2)
 				{
 					weaponUsed.effectDuration = 2;
 				}

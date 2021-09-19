@@ -61,7 +61,7 @@ public:
 
 	std::vector<RoomSessionPlayer::Ptr> getPlayers();
 	std::vector<RoomSessionPlayer::Ptr> getPlayingPlayers();
-	std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersForPublicEnemy();
+	std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligibleTagPlayers();
 	std::vector<RoomSessionPlayer::Ptr> getPlayersForTeam(uint8_t team);
 	uint32_t getPointsForTeam(uint8_t team);
 	uint32_t getTopScore();
@@ -99,28 +99,30 @@ public:
 
 #pragma region PublicEnemy
 
-	void pickRandomPublicEnemy();
+	void findNextTag();
 
-	void setPublicEnemyIsTransforming(bool isTransforming);
-	bool getPublicEnemyIsTransforming();
+	void setIsNextTagTransforming(bool isTransforming);
+	bool getIsNextTagTransforming();
 
-	void resetPublicEnemy();
-	void setPublicEnemyPlayerId(uint32_t playerId);
+	void clearCurrentTag();
+	void selectNextTag(uint32_t playerId);
 
-	uint32_t getLastPickedPublicEnemyPlayerId();
-	uint32_t getPublicEnemyPlayerId();
+	void broadcastNextTagHasBeenSelected();
 
-	uint32_t getPublicEnemyCountdownTime();
+	uint32_t getLastSelectedTag();
+	uint32_t getCurrentlySelectedTag();
 
-	void setPublicEnemyCountdownTime(uint32_t countdownTime);
-	void decreasePublicEnemyCountdownTime(uint32_t countdownTime);
+	uint32_t getSelectTagCountdownTime();
+
+	void setSelectTagCountdownTime(uint32_t countdownTime);
+	void decreaseSelectTagCountdownTime(uint32_t countdownTime);
 	
-	void decreasePublicEnemyInitialCountdownWaitTime(uint32_t countdownWaitTime);
-	void clearPublicEnemyInitialCountdownWaitTime();
-	uint32_t getPublicEnemyInitialCountdownWaitTime();
+	void decreaseSelectTagInitialWaitTime(uint32_t waitTime);
+	void clearSelectTagInitialWaitTime();
+	uint32_t getSelectTagInitialWaitTime();
 
-	bool isSearchingForPublicEnemy();
-	void setIsSearchingForPublicEnemy(bool isSearchingForPublicEnemy);
+	bool isFindingNextTag();
+	void setIsFindingNextTag(bool isFindingNextTag);
 
 #pragma endregion
 
@@ -220,12 +222,12 @@ private:
 	RoomSessionPlayer::Ptr m_nextYellowVip;
 	time_t m_yellowVipSetTime;
 
-	uint32_t m_publicEnemyPlayerId;
-	uint32_t m_lastPickedPublicEnemyPlayerId;
+	uint32_t m_currentlySelectedTag;
+	uint32_t m_lastSelectedTag;
 
-	bool m_publicEnemyIsTransforming;
-	bool m_isSearchingForPublicEnemy;
+	bool m_isNextTagTransforming;
+	bool m_isFindingNextTag;
 
-	uint32_t m_publicEnemyCountdownTime;
-	uint32_t m_publicEnemyInitialCountdownWaitTime = PUBLIC_ENEMY_INITIAL_WAIT_TIME;
+	uint32_t m_selectTagCountdownTime;
+	uint32_t m_selectTagInitialWaitTime = PUBLIC_ENEMY_INITIAL_WAIT_TIME;
 };

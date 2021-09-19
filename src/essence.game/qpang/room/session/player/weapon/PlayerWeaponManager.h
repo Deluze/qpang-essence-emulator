@@ -18,8 +18,8 @@ public:
 
 	Weapon getSelectedWeapon();
 
-	void setPublicEnemyWeapon();
-	void unsetPublicEnemyWeapon();
+	void selectTagWeapon();
+	void deselectTagWeapon();
 
 	void reset();
 	void reload(uint32_t seqId = 0);

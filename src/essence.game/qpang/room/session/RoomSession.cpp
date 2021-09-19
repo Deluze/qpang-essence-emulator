@@ -13,7 +13,7 @@
 #include "qpang/room/tnl/net_events/server/gc_hit_essence.hpp"
 #include <utils/StringConverter.h>
 
-constexpr auto PUBLIC_ENEMY_BASE_HEALTH = 500;
+constexpr auto TAG_BASE_HEALTH = 500;
 
 RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_room(room),
@@ -31,10 +31,10 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_yellowVip(nullptr),
 	m_nextYellowVip(nullptr),
 	m_yellowVipSetTime(NULL),
-	m_publicEnemyPlayerId(0),
-	m_publicEnemyCountdownTime(0),
-	m_isSearchingForPublicEnemy(false),
-	m_publicEnemyIsTransforming(false)
+	m_currentlySelectedTag(0),
+	m_selectTagCountdownTime(0),
+	m_isFindingNextTag(false),
+	m_isNextTagTransforming(false)
 {
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
@@ -138,9 +138,9 @@ bool RoomSession::removePlayer(uint32_t playerId)
 		player->post(new GCGameState(playerId, 15));
 	}
 
-	if (player->getPlayer()->getId() == m_publicEnemyPlayerId)
+	if (player->getPlayer()->getId() == m_currentlySelectedTag)
 	{
-		resetPublicEnemy();
+		clearCurrentTag();
 	}
 
 	m_players.erase(it);
@@ -355,8 +355,8 @@ void RoomSession::finish()
 	m_yellowVip.reset();
 
 	// TODO: Reset function.
-	m_publicEnemyPlayerId = 0;
-	m_publicEnemyInitialCountdownWaitTime = PUBLIC_ENEMY_INITIAL_WAIT_TIME;
+	m_currentlySelectedTag = 0;
+	m_selectTagInitialWaitTime = PUBLIC_ENEMY_INITIAL_WAIT_TIME;
 
 	m_leaverMx.lock();
 	for (const auto& player : m_leavers)
@@ -659,74 +659,85 @@ bool RoomSession::isVip(RoomSessionPlayer::Ptr player)
 	return (player->getTeam() == 1 && player == m_blueVip) || (player->getTeam() == 2 && player == m_yellowVip);
 }
 
-void RoomSession::pickRandomPublicEnemy()
+void RoomSession::findNextTag()
 {
-	const auto eligiblePlayers = getEligiblePlayersForPublicEnemy();
+	const auto eligibleTagPlayers = getEligibleTagPlayers();
 
-	if (eligiblePlayers.size() == 0)
+	if (eligibleTagPlayers.size() == 0)
 	{
-		setIsSearchingForPublicEnemy(false);
+		setIsFindingNextTag(false);
 
 		return;
 	}
 
 	m_playerMx.lock();
 
-	const auto index = rand() % eligiblePlayers.size();
-	const auto& randomEligiblePlayer = eligiblePlayers[index];
+	const auto index = rand() % eligibleTagPlayers.size();
+	const auto& nextTagPlayer = eligibleTagPlayers[index];
 
-	const auto randomEligiblePlayerId = randomEligiblePlayer->getPlayer()->getId();
-
-	setPublicEnemyPlayerId(randomEligiblePlayerId);
+	selectNextTag(nextTagPlayer->getPlayer()->getId());
 
 	m_playerMx.unlock();
 }
 
-void RoomSession::setPublicEnemyIsTransforming(bool isTransforming)
+void RoomSession::setIsNextTagTransforming(bool isTransforming)
 {
-	m_publicEnemyIsTransforming = isTransforming;
+	m_isNextTagTransforming = isTransforming;
 }
 
-bool RoomSession::getPublicEnemyIsTransforming()
+bool RoomSession::getIsNextTagTransforming()
 {
-	return m_publicEnemyIsTransforming;
+	return m_isNextTagTransforming;
 }
 
-void RoomSession::resetPublicEnemy()
+void RoomSession::clearCurrentTag()
 {
-	const auto publicEnemy = find(m_publicEnemyPlayerId);
+	const auto currentlySelectedTag = find(m_currentlySelectedTag);
 
-	publicEnemy->getWeaponManager()->unsetPublicEnemyWeapon();
+	currentlySelectedTag->getWeaponManager()->deselectTagWeapon();
 
-	m_lastPickedPublicEnemyPlayerId = m_publicEnemyPlayerId;
-
-	m_publicEnemyPlayerId = 0;
-	m_publicEnemyIsTransforming = false;
+	m_lastSelectedTag = m_currentlySelectedTag;
+	m_currentlySelectedTag = 0;
+	
+	setIsNextTagTransforming(false);
 }
 
-void RoomSession::setPublicEnemyPlayerId(uint32_t publicEnemyPlayerId)
+void RoomSession::selectNextTag(uint32_t tagId)
 {
-	clearPublicEnemyInitialCountdownWaitTime();
+	clearSelectTagInitialWaitTime();
 
-	const auto publicEnemyPlayer = find(publicEnemyPlayerId);
+	const auto nextTagPlayer = find(tagId);
 
-	m_publicEnemyPlayerId = publicEnemyPlayerId;
-	m_publicEnemyIsTransforming = true;
+	m_currentlySelectedTag = tagId;
+	setIsNextTagTransforming(true);
 
-	const auto playingPlayers = getPlayingPlayers().size();
-	const auto publicEnemyTotalHealth = PUBLIC_ENEMY_BASE_HEALTH + ((playingPlayers - 1) * 150);
+	const auto totalPlayers = getPlayingPlayers().size();
+	const auto nextTagTotalHealth = (TAG_BASE_HEALTH + ((totalPlayers - 1) * 100));
+
+	nextTagPlayer->setHealth(nextTagTotalHealth);
+	nextTagPlayer->getWeaponManager()->selectTagWeapon();
+
+	relayPlaying<GCGameState>(tagId, 36, nextTagTotalHealth);
+
+	broadcastNextTagHasBeenSelected();
+}
+
+void RoomSession::broadcastNextTagHasBeenSelected()
+{
+	const auto currentlySelectedTag = getCurrentlySelectedTag();
+	const auto nextTagPlayer = find(currentlySelectedTag);
 
 	char buffer[70];
 
-	sprintf_s(buffer, "%ls has been selected as the new public enemy.", publicEnemyPlayer->getPlayer()->getName().c_str());
+	sprintf_s(buffer, "%ls has been selected as the new public enemy.", nextTagPlayer->getPlayer()->getName().c_str());
 
-	const auto players = getPlayers();
+	const auto allPlayers = getPlayers();
 
-	for (const auto& roomSessionPlayer : players)
+	for (const auto& roomSessionPlayer : allPlayers)
 	{
 		const auto player = roomSessionPlayer->getPlayer();
 
-		if (player->getId() == publicEnemyPlayerId)
+		if (player->getId() == currentlySelectedTag)
 		{
 			player->broadcast(u"You have been selected as the new public enemy.");
 		}
@@ -735,61 +746,56 @@ void RoomSession::setPublicEnemyPlayerId(uint32_t publicEnemyPlayerId)
 			player->broadcast(StringConverter::Utf8ToUtf16(buffer));
 		}
 	}
-
-	publicEnemyPlayer->setHealth(publicEnemyTotalHealth);
-	publicEnemyPlayer->getWeaponManager()->setPublicEnemyWeapon();
-
-	relayPlaying<GCGameState>(publicEnemyPlayerId, 36, publicEnemyTotalHealth);
 }
 
-uint32_t RoomSession::getLastPickedPublicEnemyPlayerId()
+uint32_t RoomSession::getLastSelectedTag()
 {
-	return m_lastPickedPublicEnemyPlayerId;
+	return m_lastSelectedTag;
 }
 
-uint32_t RoomSession::getPublicEnemyPlayerId()
+uint32_t RoomSession::getCurrentlySelectedTag()
 {
-	return m_publicEnemyPlayerId;
+	return m_currentlySelectedTag;
 }
 
-uint32_t RoomSession::getPublicEnemyCountdownTime()
+uint32_t RoomSession::getSelectTagCountdownTime()
 {
-	return m_publicEnemyCountdownTime;
+	return m_selectTagCountdownTime;
 }
 
-void RoomSession::setPublicEnemyCountdownTime(uint32_t countdownTime)
+void RoomSession::setSelectTagCountdownTime(uint32_t countdownTime)
 {
-	m_publicEnemyCountdownTime = countdownTime;
+	m_selectTagCountdownTime = countdownTime;
 }
 
-void RoomSession::decreasePublicEnemyCountdownTime(uint32_t countdownTime)
+void RoomSession::decreaseSelectTagCountdownTime(uint32_t countdownTime)
 {
-	m_publicEnemyCountdownTime -= countdownTime;
+	m_selectTagCountdownTime -= countdownTime;
 }
 
-uint32_t RoomSession::getPublicEnemyInitialCountdownWaitTime()
+uint32_t RoomSession::getSelectTagInitialWaitTime()
 {
-	return m_publicEnemyInitialCountdownWaitTime;
+	return m_selectTagInitialWaitTime;
 }
 
-void RoomSession::decreasePublicEnemyInitialCountdownWaitTime(uint32_t countdownWaitTime)
+void RoomSession::decreaseSelectTagInitialWaitTime(uint32_t countdownWaitTime)
 {
-	m_publicEnemyInitialCountdownWaitTime -= countdownWaitTime;
+	m_selectTagInitialWaitTime -= countdownWaitTime;
 }
 
-void RoomSession::clearPublicEnemyInitialCountdownWaitTime()
+void RoomSession::clearSelectTagInitialWaitTime()
 {
-	m_publicEnemyInitialCountdownWaitTime = 0;
+	m_selectTagInitialWaitTime = 0;
 }
 
-bool RoomSession::isSearchingForPublicEnemy()
+bool RoomSession::isFindingNextTag()
 {
-	return m_isSearchingForPublicEnemy;
+	return m_isFindingNextTag;
 }
 
-void RoomSession::setIsSearchingForPublicEnemy(bool isSearchingForPublicEnemy)
+void RoomSession::setIsFindingNextTag(bool isFindingNextTag)
 {
-	m_isSearchingForPublicEnemy = isSearchingForPublicEnemy;
+	m_isFindingNextTag = isFindingNextTag;
 }
 
 void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
@@ -798,6 +804,7 @@ void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 
 	player->makeInvincible();
 	player->setHealth(player->getDefaultHealth());
+
 	if (!isPublicEnemyMode)
 	{
 		player->getWeaponManager()->reset();
@@ -916,7 +923,7 @@ std::vector<RoomSessionPlayer::Ptr> RoomSession::getPlayingPlayers()
 	return players;
 }
 
-std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersForPublicEnemy()
+std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligibleTagPlayers()
 {
 	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
 
@@ -924,7 +931,7 @@ std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersForPublicEnem
 
 	for (const auto& [id, session] : m_players)
 	{
-		if (session->isPlaying() && !session->isSpectating() && !session->isDead() && ~session->getRoomSession()->getLastPickedPublicEnemyPlayerId() != id)
+		if (session->isPlaying() && !session->isSpectating() && !session->isDead() && ~session->getRoomSession()->getLastSelectedTag() != id)
 		{
 			players.push_back(session);
 		}

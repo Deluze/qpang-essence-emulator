@@ -53,7 +53,7 @@ Weapon PlayerWeaponManager::getSelectedWeapon()
 	return m_weapons[m_selectedWeaponIndex];
 }
 
-void PlayerWeaponManager::setPublicEnemyWeapon()
+void PlayerWeaponManager::selectTagWeapon()
 {
 	const auto gunIndex = 0;
 
@@ -74,7 +74,7 @@ void PlayerWeaponManager::setPublicEnemyWeapon()
 	refillCurrentWeapon();
 }
 
-void PlayerWeaponManager::unsetPublicEnemyWeapon()
+void PlayerWeaponManager::deselectTagWeapon()
 {
 	const auto gunIndex = 0;
 
