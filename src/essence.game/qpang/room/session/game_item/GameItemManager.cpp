@@ -135,6 +135,16 @@ void GameItemManager::onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32
 
 	if (item.itemId == RED_MEDKIT || item.itemId == GREEN_MEDKIT || item.itemId == AMMO_CLIP)
 	{
+		const auto isPublicEnemyMode = player->getRoomSession()->getGameMode()->isPublicEnemyMode();
+		const auto playerIsPublicEnemy = player->getRoomSession()->getPublicEnemyPlayerId() == player->getPlayer()->getId();
+
+		if ((isPublicEnemyMode && playerIsPublicEnemy) && (item.itemId == RED_MEDKIT || item.itemId == GREEN_MEDKIT))
+		{
+			// Cancel pickup.
+
+			return;
+		}
+
 		const auto identifier = mappedItems[item.itemId]->onPickUp(player);
 
 		m_roomSession->relayPlaying<GCGameItem>(1, player->getPlayer()->getId(), item.itemId, item.spawnId, identifier);
