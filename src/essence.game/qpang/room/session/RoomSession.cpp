@@ -767,9 +767,14 @@ void RoomSession::setIsSearchingForPublicEnemy(bool isSearchingForPublicEnemy)
 
 void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 {
+	const auto isPublicEnemyMode = getGameMode()->isPublicEnemyMode();
+
 	player->makeInvincible();
 	player->setHealth(player->getDefaultHealth());
-	player->getWeaponManager()->reset();
+	if (!isPublicEnemyMode)
+	{
+		player->getWeaponManager()->reset();
+	}
 
 	auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), player->getTeam());
 
@@ -783,6 +788,11 @@ void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 	}
 
 	relayPlaying<GCRespawn>(player->getPlayer()->getId(), player->getCharacter(), 0, spawn.x, spawn.y, spawn.z, isVip(player));
+
+	if (isPublicEnemyMode)
+	{
+		player->getWeaponManager()->reset();
+	}
 }
 
 void RoomSession::syncPlayer(RoomSessionPlayer::Ptr player)
