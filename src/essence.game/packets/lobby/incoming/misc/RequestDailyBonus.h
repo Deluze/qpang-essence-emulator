@@ -36,9 +36,7 @@ public:
 
 		if (isEligibleForDailyBonus)
 		{
-			SetPlayerDailyBonusRedeemedAtTime(player->getId(), now);
-			
-			std::cout << "[" << nowDay << "/" << nowMonth << "/" << nowYear << "] [DAILY_BONUS]: Player with id \"" << player->getId() << "\" has received their daily bonus.\n";
+			SetPlayerDailyBonusRedeemedAtTime(player->getId(), now);	
 		}
 
 		player->send(DailyBonusResponse(player, isEligibleForDailyBonus));

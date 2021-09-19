@@ -5,5 +5,5 @@
 class DeathMatch : public GameMode
 {
 public:
-	
+	virtual void onApply(std::shared_ptr<Room> room) override;
 };

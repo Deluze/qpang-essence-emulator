@@ -61,7 +61,7 @@ public:
 
 	std::vector<RoomSessionPlayer::Ptr> getPlayers();
 	std::vector<RoomSessionPlayer::Ptr> getPlayingPlayers();
-	std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligibleTagPlayers();
+	std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersToBeSelectedAsTag();
 	std::vector<RoomSessionPlayer::Ptr> getPlayersForTeam(uint8_t team);
 	uint32_t getPointsForTeam(uint8_t team);
 	uint32_t getTopScore();
@@ -99,30 +99,32 @@ public:
 
 #pragma region PublicEnemy
 
-	void findNextTag();
+	bool attemptToFindNextTag();
 
-	void setIsNextTagTransforming(bool isTransforming);
-	bool getIsNextTagTransforming();
-
-	void clearCurrentTag();
+	void resetCurrentlySelectedTag();
 	void selectNextTag(uint32_t playerId);
 
 	void broadcastNextTagHasBeenSelected();
 
+	bool isTagSelected();
 	uint32_t getLastSelectedTag();
 	uint32_t getCurrentlySelectedTag();
 
-	uint32_t getSelectTagCountdownTime();
+	uint32_t getTagCountdown();
 
-	void setSelectTagCountdownTime(uint32_t countdownTime);
-	void decreaseSelectTagCountdownTime(uint32_t countdownTime);
+	bool hasTagCountdownEnded();
+	void initiateTagCountdown(uint32_t countdownTime = 5000);
+	void decreaseTagCountdown(uint32_t countdownTime = 1000);
 	
-	void decreaseSelectTagInitialWaitTime(uint32_t waitTime);
-	void clearSelectTagInitialWaitTime();
-	uint32_t getSelectTagInitialWaitTime();
+	uint32_t getInitialWaitTime();
 
-	bool isFindingNextTag();
-	void setIsFindingNextTag(bool isFindingNextTag);
+	bool hasInitialWaitTimeElapsed();
+	void decreaseInitialWaitTime(uint32_t time = 1000);
+	void clearInitialWaitTime();
+
+	void initiateSearchForNextTag();
+	bool isSearchingForNextTag();
+	void stopSearchingForNextTag();
 
 #pragma endregion
 
@@ -225,9 +227,10 @@ private:
 	uint32_t m_currentlySelectedTag;
 	uint32_t m_lastSelectedTag;
 
-	bool m_isNextTagTransforming;
-	bool m_isFindingNextTag;
+	bool m_isSearchingForNextTag;
 
-	uint32_t m_selectTagCountdownTime;
-	uint32_t m_selectTagInitialWaitTime;
+	uint32_t m_tagCountdown;
+	uint32_t m_initialWaitTime;
+
+	std::vector<uint32_t> m_previouslySelectedTagPlayers = {};
 };

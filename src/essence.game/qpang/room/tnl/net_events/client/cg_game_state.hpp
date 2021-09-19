@@ -97,8 +97,7 @@ public:
 			case State::PUBLIC_ENEMY_TRANSFORMATION_FINISHED:
 				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) 
 				{
-					roomSession->setIsNextTagTransforming(false);
-					//roomSession->relayPlaying<GCGameState>(player->getId(), PUBLIC_ENEMY_UNK_01);
+					// TODO: Remove invincibility?
 				}
 				break;
 			default:

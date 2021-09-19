@@ -198,10 +198,10 @@ bool RoomSessionPlayer::isPermanentlyInvincible()
 	return m_isPermanentlyInvincible;
 }
 
-void RoomSessionPlayer::makeInvincible()
+void RoomSessionPlayer::makeInvincible(uint32_t invincibleRemovalTime)
 {
 	m_isInvincible = true;
-	m_invincibleRemovalTime = time(NULL) + 5;
+	m_invincibleRemovalTime = time(NULL) + invincibleRemovalTime;
 }
 
 void RoomSessionPlayer::removeInvincibility()

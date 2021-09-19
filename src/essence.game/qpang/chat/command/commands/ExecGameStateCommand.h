@@ -24,7 +24,6 @@ public:
 	{
 		return {
 			Command::argTypes[Command::Validation::INTEGER],
-			Command::argTypes[Command::Validation::INTEGER],
 		};
 	}
 
@@ -57,20 +56,17 @@ public:
 			return;
 		}
 
-		const auto cmd = convertToInteger(args.at(0));
+		const auto cmd = 4;
 
 		const auto uid = player->getId();
 		const auto targetUid = uid;
 
 		const auto cardType = 7;
 
-		const auto itemId = convertToInteger(args.at(1));
+		const auto itemId = convertToInteger(args.at(0));
 		const auto seqId = itemId;
 
 		roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
 		//roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
-
-
-		std::cout << "ExecGameStateCommand::Handle >> Sending GCCard.\n";
 	}
 };

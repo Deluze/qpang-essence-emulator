@@ -34,16 +34,15 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_nextYellowVip(nullptr),
 	m_yellowVipSetTime(NULL),
 	m_currentlySelectedTag(0),
-	m_selectTagCountdownTime(0),
-	m_isFindingNextTag(false),
-	m_isNextTagTransforming(false),
-	m_selectTagInitialWaitTime((CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000)
+	m_tagCountdown(0),
+	m_isSearchingForNextTag(false),
+	m_initialWaitTime((CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000)
 {
 	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
 
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
-	m_startTime = time(NULL) + waitingForPlayersTime + 5; // 30 (waiting for players) + countdown start
+	m_startTime = time(NULL) + waitingForPlayersTime + 5;
 	m_endTime = room->isPointsGame() ? NULL : m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
 }
 
@@ -80,7 +79,6 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 		if (session->isPlaying())
 			player->post(new GCGameState(id, 3));
 	}
-
 
 	m_players[player->getPlayer()->getId()] = player;
 	m_playerMx.unlock();
@@ -145,7 +143,7 @@ bool RoomSession::removePlayer(uint32_t playerId)
 
 	if (player->getPlayer()->getId() == m_currentlySelectedTag)
 	{
-		clearCurrentTag();
+		resetCurrentlySelectedTag();
 	}
 
 	m_players.erase(it);
@@ -361,7 +359,6 @@ void RoomSession::finish()
 
 	// TODO: Reset function.
 	m_currentlySelectedTag = 0;
-	m_selectTagInitialWaitTime = ((CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000);
 
 	m_leaverMx.lock();
 	for (const auto& player : m_leavers)
@@ -664,65 +661,68 @@ bool RoomSession::isVip(RoomSessionPlayer::Ptr player)
 	return (player->getTeam() == 1 && player == m_blueVip) || (player->getTeam() == 2 && player == m_yellowVip);
 }
 
-void RoomSession::findNextTag()
+bool RoomSession::attemptToFindNextTag()
 {
-	const auto eligibleTagPlayers = getEligibleTagPlayers();
-
-	if (eligibleTagPlayers.size() == 0)
+	// Once there are x selected tag players in history, remove the "oldest" one from the array.
+	if (!m_previouslySelectedTagPlayers.empty() && m_previouslySelectedTagPlayers.size() == 4)
 	{
-		setIsFindingNextTag(false);
+		// Remove "oldest" tag player from the array.
+		m_previouslySelectedTagPlayers.erase(m_previouslySelectedTagPlayers.begin());
+	}
 
-		return;
+	const auto eligiblePlayers = getEligiblePlayersToBeSelectedAsTag();
+
+	if (eligiblePlayers.empty())
+	{
+		// This means a tag could not be selected.
+		m_previouslySelectedTagPlayers.erase(m_previouslySelectedTagPlayers.begin());
+
+		return false;
 	}
 
 	m_playerMx.lock();
 
-	const auto index = rand() % eligibleTagPlayers.size();
-	const auto& nextTagPlayer = eligibleTagPlayers[index];
+	const auto randomIndex = rand() % eligiblePlayers.size();
+	const auto& nextTagPlayer = eligiblePlayers[randomIndex];
 
 	selectNextTag(nextTagPlayer->getPlayer()->getId());
 
 	m_playerMx.unlock();
+
+	return true;
 }
 
-void RoomSession::setIsNextTagTransforming(bool isTransforming)
-{
-	m_isNextTagTransforming = isTransforming;
-}
-
-bool RoomSession::getIsNextTagTransforming()
-{
-	return m_isNextTagTransforming;
-}
-
-void RoomSession::clearCurrentTag()
+void RoomSession::resetCurrentlySelectedTag()
 {
 	const auto currentlySelectedTag = find(m_currentlySelectedTag);
 
+	if (currentlySelectedTag == nullptr)
+	{
+		return;
+	}
+
 	currentlySelectedTag->getWeaponManager()->deselectTagWeapon();
 
-	m_lastSelectedTag = m_currentlySelectedTag;
 	m_currentlySelectedTag = 0;
-	
-	setIsNextTagTransforming(false);
 }
 
 void RoomSession::selectNextTag(uint32_t tagId)
 {
-	clearSelectTagInitialWaitTime();
+	m_previouslySelectedTagPlayers.push_back(tagId);
 
 	const auto nextTagPlayer = find(tagId);
 
+	// Set the next tag player.
 	m_currentlySelectedTag = tagId;
-	setIsNextTagTransforming(true);
 
 	const auto totalPlayers = getPlayingPlayers().size();
-	const auto nextTagTotalHealth = (TAG_BASE_HEALTH + ((totalPlayers - 1) * 100));
+	const auto totalHealth = TAG_BASE_HEALTH + ((totalPlayers - 1) * 100);
 
-	nextTagPlayer->setHealth(nextTagTotalHealth);
+	nextTagPlayer->makeInvincible(3);
+	nextTagPlayer->setHealth(totalHealth);
 	nextTagPlayer->getWeaponManager()->selectTagWeapon();
 
-	relayPlaying<GCGameState>(tagId, 36, nextTagTotalHealth);
+	relayPlaying<GCGameState>(tagId, 36, nextTagPlayer->getHealth());
 
 	broadcastNextTagHasBeenSelected();
 }
@@ -753,6 +753,25 @@ void RoomSession::broadcastNextTagHasBeenSelected()
 	}
 }
 
+bool RoomSession::isTagSelected()
+{
+	const auto currentlySelectedTagPlayer = find(m_currentlySelectedTag);
+
+	if (currentlySelectedTagPlayer == nullptr)
+	{
+		m_currentlySelectedTag = 0;
+
+		return false;
+	}
+
+	if (currentlySelectedTagPlayer->isDead())
+	{
+		m_currentlySelectedTag = 0;
+	}
+
+	return (m_currentlySelectedTag != 0);
+}
+
 uint32_t RoomSession::getLastSelectedTag()
 {
 	return m_lastSelectedTag;
@@ -763,44 +782,59 @@ uint32_t RoomSession::getCurrentlySelectedTag()
 	return m_currentlySelectedTag;
 }
 
-uint32_t RoomSession::getSelectTagCountdownTime()
+uint32_t RoomSession::getTagCountdown()
 {
-	return m_selectTagCountdownTime;
+	return m_tagCountdown;
 }
 
-void RoomSession::setSelectTagCountdownTime(uint32_t countdownTime)
+bool RoomSession::hasTagCountdownEnded()
 {
-	m_selectTagCountdownTime = countdownTime;
+	return (m_tagCountdown == 0);
 }
 
-void RoomSession::decreaseSelectTagCountdownTime(uint32_t countdownTime)
+void RoomSession::initiateTagCountdown(uint32_t countdownTime)
 {
-	m_selectTagCountdownTime -= countdownTime;
+	m_tagCountdown = countdownTime;
 }
 
-uint32_t RoomSession::getSelectTagInitialWaitTime()
+void RoomSession::decreaseTagCountdown(uint32_t countdownTime)
 {
-	return m_selectTagInitialWaitTime;
+	m_tagCountdown -= countdownTime;
 }
 
-void RoomSession::decreaseSelectTagInitialWaitTime(uint32_t countdownWaitTime)
+bool RoomSession::hasInitialWaitTimeElapsed()
 {
-	m_selectTagInitialWaitTime -= countdownWaitTime;
+	return (m_initialWaitTime == 0);
 }
 
-void RoomSession::clearSelectTagInitialWaitTime()
+uint32_t RoomSession::getInitialWaitTime()
 {
-	m_selectTagInitialWaitTime = 0;
+	return m_initialWaitTime;
 }
 
-bool RoomSession::isFindingNextTag()
+void RoomSession::decreaseInitialWaitTime(uint32_t time)
 {
-	return m_isFindingNextTag;
+	m_initialWaitTime -= time;
 }
 
-void RoomSession::setIsFindingNextTag(bool isFindingNextTag)
+void RoomSession::clearInitialWaitTime()
 {
-	m_isFindingNextTag = isFindingNextTag;
+	m_initialWaitTime = 0;
+}
+
+void RoomSession::initiateSearchForNextTag()
+{
+	m_isSearchingForNextTag = true;
+}
+
+bool RoomSession::isSearchingForNextTag()
+{
+	return m_isSearchingForNextTag;
+}
+
+void RoomSession::stopSearchingForNextTag()
+{
+	m_isSearchingForNextTag = false;
 }
 
 void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
@@ -928,7 +962,7 @@ std::vector<RoomSessionPlayer::Ptr> RoomSession::getPlayingPlayers()
 	return players;
 }
 
-std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligibleTagPlayers()
+std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersToBeSelectedAsTag()
 {
 	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
 
@@ -936,12 +970,14 @@ std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligibleTagPlayers()
 
 	for (const auto& [id, session] : m_players)
 	{
-		if (session->isPlaying() && !session->isSpectating() && !session->isDead() && ~session->getRoomSession()->getLastSelectedTag() != id)
+		const auto hasBeenTagBefore = (std::find(m_previouslySelectedTagPlayers.begin(), m_previouslySelectedTagPlayers.end(), id) != m_previouslySelectedTagPlayers.end());
+		const auto isEligible = (!session->isSpectating() && session->isPlaying() && !session->isDead() && !hasBeenTagBefore);
+
+		if (isEligible)
 		{
 			players.push_back(session);
 		}
 	}
-
 
 	return players;
 }

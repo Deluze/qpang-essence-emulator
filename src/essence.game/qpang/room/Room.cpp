@@ -244,6 +244,8 @@ void Room::balancePlayers()
 				continue;
 			}
 
+			const auto availableTeam = getAvailableTeam();
+
 			roomPlayer->setTeam(getAvailableTeam());
 		}
 	}

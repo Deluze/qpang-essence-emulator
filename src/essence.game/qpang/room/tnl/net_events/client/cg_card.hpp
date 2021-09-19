@@ -61,7 +61,7 @@ public:
 						return;
 					}
 
-					const auto isSearchingForPublicEnemy = roomSession->isFindingNextTag();
+					const auto isSearchingForPublicEnemy = roomSession->isSearchingForNextTag();
 
 					if (isSearchingForPublicEnemy && (cmd == 4)) 
 					{

@@ -125,22 +125,17 @@ public:
 
 		if (isPublicEnemyMode)
 		{
-			if (srcPlayerIsTagged)
+			if (srcPlayerIsTagged && !dstPlayerIsTagged)
 			{
 				isSameTeam = false;
 			}
-			else
+			else if (!srcPlayerIsTagged && dstPlayerIsTagged)
 			{
-				const auto isNextTagTransforming = roomSession->getIsNextTagTransforming();
-
-				if (dstPlayerIsTagged && !isNextTagTransforming)
-				{
-					isSameTeam = false;
-				}
-				else
-				{
-					isSameTeam = true;
-				}
+				isSameTeam = false;
+			}
+			else if (!srcPlayerIsTagged && !dstPlayerIsTagged)
+			{
+				isSameTeam = true;
 			}
 		}
 

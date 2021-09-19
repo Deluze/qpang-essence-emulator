@@ -41,7 +41,7 @@ public:
 
 	void togglePermanentInvincibility();
 
-	void makeInvincible();
+	void makeInvincible(uint32_t invincibleRemovalTime = 5);
 	void removeInvincibility();
 	void addPlayer(RoomSessionPlayer::Ptr player);
 

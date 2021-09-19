@@ -9,8 +9,6 @@
 #include "qpang/room/tnl/net_events/server/gc_game_state.hpp"
 #include <utils/StringConverter.h>
 
-constexpr auto PUBLIC_ENEMY_COUNTDOWN_TIME = 5000;
-
 enum CMD : uint32_t {
 	PUBLIC_ENEMY_SHOW_COUNTDOWN = 31,
 	PUBLIC_ENEMY_START_COUNTDOWN = 32,
@@ -38,6 +36,11 @@ bool PublicEnemy::isPublicEnemyMode()
 
 void PublicEnemy::onApply(std::shared_ptr<Room> room)
 {
+	for (const auto& player : room->getPlayers())
+	{
+		player.second->setTeam(0);
+	}
+
 	room->setIsPointsGame(false);
 	room->setScoreTime(10);
 
@@ -46,64 +49,80 @@ void PublicEnemy::onApply(std::shared_ptr<Room> room)
 
 void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 {
-	const auto currentlySelectedTag = roomSession->getCurrentlySelectedTag();
-
-	if (currentlySelectedTag != 0)
+	if (roomSession->isTagSelected())
 	{
+		const auto currentlySelectedTag = roomSession->getCurrentlySelectedTag();
 		const auto currentlySelectedTagPlayer = roomSession->find(currentlySelectedTag);
 
+		// Check if the player is nullptr.
 		if (currentlySelectedTagPlayer == nullptr)
 		{
 			return;
 		}
 
-		currentlySelectedTagPlayer->takeHealth(10);
-
 		return;
 	}
 
-	if (roomSession->isFindingNextTag())
+	// If we get here, no tag is currently selected.
+	if (roomSession->isSearchingForNextTag())
 	{
-		if (roomSession->getSelectTagCountdownTime() == PUBLIC_ENEMY_COUNTDOWN_TIME)
+		// In here we know the server is searching for the next tag, lets check the countdown.
+		if (roomSession->hasTagCountdownEnded())
 		{
-			for (const auto& player : roomSession->getPlayers())
+			// Countdown has ended, lets select a new tag player.
+			const auto hasFoundNextTag = roomSession->attemptToFindNextTag();
+
+			if (hasFoundNextTag)
 			{
-				player->getPlayer()->broadcast(u"Looking for the next public enemy...");
+				// A tag was found, we can stop the search.
+				roomSession->stopSearchingForNextTag();
+				
+				// TODO: Announce a new tag was found.
+			}
+			else
+			{
+				// A tag was not found, reset the tag countdown.
+				/*roomSession->initiateTagCountdown();
+				roomSession->stopSearchingForNextTag();*/
 			}
 		}
-
-		roomSession->decreaseSelectTagCountdownTime(1000);
-
-		if (roomSession->getSelectTagCountdownTime() == 0)
+		else
 		{
-			roomSession->findNextTag();
-			// Countdown time is over, we can now set the public enemy.
-			roomSession->setIsFindingNextTag(false);
+			// Decrease tag countdown time.
+			roomSession->decreaseTagCountdown();
+			
+			return;
 		}
 	}
 	else
 	{
-		const auto initialWaitTime = roomSession->getSelectTagInitialWaitTime();
+		// Start finding next tag and initiate countdown.
+		const auto canStartSearchingForNextTag = roomSession->hasInitialWaitTimeElapsed();
 
-		if (initialWaitTime != 0)
+		if (canStartSearchingForNextTag)
 		{
-			roomSession->decreaseSelectTagInitialWaitTime(1000);
+			const auto allPlayers = roomSession->getPlayers();
+
+			// Iterate over all players and notify them of the selection process.
+			for (const auto& player : allPlayers)
+			{
+				const auto playerId = player->getPlayer()->getId();
+
+				roomSession->initiateTagCountdown();
+				roomSession->initiateSearchForNextTag();
+
+				// Send the countdown time gamestate to the player.
+				player->send<GCGameState>(playerId, PUBLIC_ENEMY_START_COUNTDOWN, roomSession->getTagCountdown());
+				// Initiate countdown on player screen.
+				player->send<GCGameState>(playerId, PUBLIC_ENEMY_SHOW_COUNTDOWN);
+			}
+		}
+		else
+		{
+			// Decrease initial wait time.
+			roomSession->decreaseInitialWaitTime();
 
 			return;
-		}
-
-		const auto allPlayers = roomSession->getPlayers();
-
-		// Public enemy is not being found, lets initiate it.
-		for (const auto& player : allPlayers)
-		{
-			const auto playerId = player->getPlayer()->getId();
-
-			roomSession->setSelectTagCountdownTime(PUBLIC_ENEMY_COUNTDOWN_TIME);
-			roomSession->setIsFindingNextTag(true);
-
-			player->send<GCGameState>(playerId, PUBLIC_ENEMY_START_COUNTDOWN, PUBLIC_ENEMY_COUNTDOWN_TIME);
-			player->send<GCGameState>(playerId, PUBLIC_ENEMY_SHOW_COUNTDOWN);
 		}
 	}
 }
@@ -163,12 +182,12 @@ void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::s
 
 		broadcastTagKill(roomSession, killerPlayer, isSuicide);
 
-		target->getRoomSession()->clearCurrentTag();
+		target->getRoomSession()->resetCurrentlySelectedTag();
 	}
 	else if (isSuicide)
 	{
 		target->addDeathAsTag();
-		target->getRoomSession()->clearCurrentTag();
+		target->getRoomSession()->resetCurrentlySelectedTag();
 	}
 
 	GameMode::onPlayerKill(killer, target, weapon, hitLocation);
