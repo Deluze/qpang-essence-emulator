@@ -21,7 +21,7 @@ It conists out of:
 - **Chat, Whispers & In-Game Announcements**
 - **Bans & Mutes**
 - **Gamerooms**
-  - **TDM, DM, Essence & VIP game modes**
+  - **TDM, DM, Essence, VIP and TagPlay game modes**
   - **Melee only**
   - **Power-ups**
   - **Team balancing**
@@ -33,19 +33,20 @@ It conists out of:
 - **Custom in-game commands**
 - **Configurable crane machine**
 - **Configurable shop**
+- **Extending cards in inventory**
 - **In-game leaderboards**
+- **Daily login bonus**
 - **Automatic square generation so they don't get overcrowded** (50 players max, configurable)
 
 Missing features:
 
 - PvE gamemode
 - Memos
-- Game invites
+- Game invites [WIP]
 - Trading
 - Registration in-game
-- Skill cards
+- Skill cards  [WIP]
 - Card boosting/enhancing (purposefully unimplemented, design choice)
-- Daily login bonus
 - In-game quests
 
 ## Installation
