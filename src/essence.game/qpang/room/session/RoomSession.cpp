@@ -772,11 +772,6 @@ bool RoomSession::isTagSelected()
 	return (m_currentlySelectedTag != 0);
 }
 
-uint32_t RoomSession::getLastSelectedTag()
-{
-	return m_lastSelectedTag;
-}
-
 uint32_t RoomSession::getCurrentlySelectedTag()
 {
 	return m_currentlySelectedTag;
@@ -849,14 +844,17 @@ void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 		player->getWeaponManager()->reset();
 	}
 
-	auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), player->getTeam());
+	const auto isTeamMode = getGameMode()->isTeamMode();
+	const auto team = (isTeamMode ? player->getTeam() : 0);
+
+	const auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), team);
 
 	// Whether someone becomes VIP or not *has* to be decided during respawn.
 	if (this->getRoom()->getMode() == GameMode::Mode::VIP)
 	{
-		if ((m_blueVip == nullptr && player->getTeam() == 1) || (player == m_nextBlueVip && (getElapsedBlueVipTime() > 100 || m_blueVip->isDead())))
+		if ((m_blueVip == nullptr && team == 1) || (player == m_nextBlueVip && (getElapsedBlueVipTime() > 100 || m_blueVip->isDead())))
 			setBlueVip(player);
-		else if ((m_yellowVip == nullptr && player->getTeam() == 2) || (player == m_nextYellowVip && (getElapsedYellowVipTime() > 100 || m_yellowVip->isDead())))
+		else if ((m_yellowVip == nullptr && team == 2) || (player == m_nextYellowVip && (getElapsedYellowVipTime() > 100 || m_yellowVip->isDead())))
 			setYellowVip(player);
 	}
 

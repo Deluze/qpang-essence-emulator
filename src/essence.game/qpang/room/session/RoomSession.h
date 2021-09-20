@@ -107,7 +107,6 @@ public:
 	void broadcastNextTagHasBeenSelected();
 
 	bool isTagSelected();
-	uint32_t getLastSelectedTag();
 	uint32_t getCurrentlySelectedTag();
 
 	uint32_t getTagCountdown();
@@ -225,7 +224,6 @@ private:
 	time_t m_yellowVipSetTime;
 
 	uint32_t m_currentlySelectedTag;
-	uint32_t m_lastSelectedTag;
 
 	bool m_isSearchingForNextTag;
 

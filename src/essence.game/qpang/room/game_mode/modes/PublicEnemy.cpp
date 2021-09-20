@@ -60,6 +60,15 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 			return;
 		}
 
+		// Every tick where the tag is selected, increase its tag time.
+		currentlySelectedTagPlayer->addTimeAliveAsTag();
+
+		// Every 4th tick, take 10 health from the tag as long as they're above 100 health.
+		if ((currentlySelectedTagPlayer->getTimeAliveAsTag() % 4 == 0) && (currentlySelectedTagPlayer->getHealth() > 100))
+		{
+			currentlySelectedTagPlayer->takeHealth(10, true);
+		}
+
 		return;
 	}
 
@@ -76,7 +85,7 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 			{
 				// A tag was found, we can stop the search.
 				roomSession->stopSearchingForNextTag();
-				
+
 				// TODO: Announce a new tag was found.
 			}
 			else
@@ -90,7 +99,7 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 		{
 			// Decrease tag countdown time.
 			roomSession->decreaseTagCountdown();
-			
+
 			return;
 		}
 	}
@@ -154,6 +163,8 @@ void PublicEnemy::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessionPlayer)
 
 	sessionPlayer->post(new GCRespawn(currentlySelectedTag, currentlySelectedTagPlayer->getCharacter(), 0, position.x, position.y, position.z, false));
 	sessionPlayer->post(new GCGameState(currentlySelectedTag, PUBLIC_ENEMY_START_TRANSFORMATION, currentlySelectedTagPlayer->getHealth()));
+
+	roomSession->relayPlayingExcept<GCGameState>(currentlySelectedTag, currentlySelectedTag, PUBLIC_ENEMY_START_TRANSFORMATION, currentlySelectedTagPlayer->getHealth());
 }
 
 void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)

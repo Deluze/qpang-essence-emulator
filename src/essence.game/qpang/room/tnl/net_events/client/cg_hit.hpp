@@ -118,27 +118,6 @@ public:
 		auto isTeamMode = roomSession->getGameMode()->isTeamMode();
 		auto isSameTeam = (isTeamMode && (srcPlayer->getTeam() == dstPlayer->getTeam()));
 
-		const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
-
-		const auto srcPlayerIsTagged = (roomSession->getCurrentlySelectedTag() == srcPlayer->getPlayer()->getId());
-		const auto dstPlayerIsTagged = (roomSession->getCurrentlySelectedTag() == dstPlayer->getPlayer()->getId());
-
-		if (isPublicEnemyMode)
-		{
-			if (srcPlayerIsTagged && !dstPlayerIsTagged)
-			{
-				isSameTeam = false;
-			}
-			else if (!srcPlayerIsTagged && dstPlayerIsTagged)
-			{
-				isSameTeam = false;
-			}
-			else if (!srcPlayerIsTagged && !dstPlayerIsTagged)
-			{
-				isSameTeam = true;
-			}
-		}
-
 		auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponId);
 
 		if (weaponUsed.weaponType != BOMB && srcPlayer->isDead())
@@ -197,6 +176,24 @@ public:
 				break;
 			}
 
+			const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
+
+			const auto srcPlayerIsTagged = (isPublicEnemyMode) && (roomSession->getCurrentlySelectedTag() == srcPlayer->getPlayer()->getId());
+			const auto dstPlayerIsTagged = (isPublicEnemyMode) && (roomSession->getCurrentlySelectedTag() == dstPlayer->getPlayer()->getId());
+
+			if (srcPlayerIsTagged && !dstPlayerIsTagged) // Shooter is tag, target is player.
+			{
+				isSameTeam = false;
+			}
+			else if (!srcPlayerIsTagged && dstPlayerIsTagged)
+			{
+				isSameTeam = false;
+			}
+			else if (!srcPlayerIsTagged && !dstPlayerIsTagged)
+			{
+				isSameTeam = true;
+			}
+
 			if (isSameTeam)
 			{
 				damage = 0; // still apply debuffs
@@ -208,6 +205,16 @@ public:
 				{
 					damage = 0;
 				}
+			}
+
+			if (srcPlayerIsTagged)
+			{
+				srcPlayer->addDamageDealtAsTag(damage);
+			}
+
+			if (dstPlayerIsTagged)
+			{
+				srcPlayer->addDamageDealtToTag(damage);
 			}
 
 			dstPlayer->takeHealth(damage);

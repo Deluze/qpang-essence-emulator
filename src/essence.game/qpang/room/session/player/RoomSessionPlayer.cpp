@@ -37,7 +37,10 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_tagKillsAsPlayer(0),
 	m_playerKillsAsTag(0),
 	m_deathsAsTag(0),
-	m_deathsByTag(0)
+	m_deathsByTag(0),
+	m_timeAliveAsTag(0),
+	m_damageDealtAsTag(0),
+	m_damageDealtToTag(0)
 {
 	conn->incRef();
 
@@ -526,6 +529,36 @@ void RoomSessionPlayer::addDeathByTag()
 uint16_t RoomSessionPlayer::getTagPoints()
 {
 	return ((m_tagKillsAsPlayer * 5) + (m_playerKillsAsTag * 1));
+}
+
+uint32_t RoomSessionPlayer::getTimeAliveAsTag()
+{
+	return m_timeAliveAsTag;
+}
+
+void RoomSessionPlayer::addTimeAliveAsTag(uint32_t time)
+{
+	m_timeAliveAsTag += time;
+}
+
+uint32_t RoomSessionPlayer::getDamageDealtToTag()
+{
+	return m_damageDealtToTag;
+}
+
+void RoomSessionPlayer::addDamageDealtToTag(uint32_t damage)
+{
+	m_damageDealtToTag += damage;
+}
+
+uint32_t RoomSessionPlayer::getDamageDealtAsTag()
+{
+	return m_damageDealtAsTag;
+}
+
+void RoomSessionPlayer::addDamageDealtAsTag(uint32_t damage)
+{
+	m_damageDealtAsTag += damage;
 }
 
 std::shared_ptr<Player> RoomSessionPlayer::getPlayer()

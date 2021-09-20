@@ -278,7 +278,7 @@ bool Room::canStartInTeam(const uint8_t team) const
 			return false;
 		}
 	}
-	else // yellow
+	else if (team == 2)// yellow
 	{
 		if (yellowPlayers.empty())
 		{
@@ -289,6 +289,10 @@ bool Room::canStartInTeam(const uint8_t team) const
 		{
 			return false;
 		}
+	}
+	else
+	{
+		return false;
 	}
 
 	return true;

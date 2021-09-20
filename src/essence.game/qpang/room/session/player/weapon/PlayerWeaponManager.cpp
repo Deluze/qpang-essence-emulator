@@ -72,6 +72,8 @@ void PlayerWeaponManager::selectTagWeapon()
 	defaultAmmo.second = chainLightWeapon.clipSize;
 
 	refillCurrentWeapon();
+
+	switchWeapon(m_weapons[m_selectedWeaponIndex].itemId, false);
 }
 
 void PlayerWeaponManager::deselectTagWeapon()
@@ -80,6 +82,8 @@ void PlayerWeaponManager::deselectTagWeapon()
 
 	m_weapons[gunIndex] = m_currentGunWeapon;
 	m_selectedWeaponIndex = m_previousSelectedWeaponIndex;
+
+	switchWeapon(m_weapons[m_selectedWeaponIndex].itemId, false);
 
 	reset();
 }

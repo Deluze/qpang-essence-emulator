@@ -110,6 +110,15 @@ public:
 
 	uint16_t getTagPoints();
 
+	uint32_t getTimeAliveAsTag();
+	void addTimeAliveAsTag(uint32_t time = 1);
+
+	uint32_t getDamageDealtToTag();
+	void addDamageDealtToTag(uint32_t damage);
+
+	uint32_t getDamageDealtAsTag();
+	void addDamageDealtAsTag(uint32_t damage);
+
 	std::shared_ptr<Player> getPlayer();
 	GameConnection* getGameConnection();
 	std::shared_ptr<RoomSession> getRoomSession();
@@ -178,6 +187,10 @@ private:
 
 	uint16_t m_tagKillsAsPlayer;
 	uint16_t m_playerKillsAsTag;
+
+	uint32_t m_timeAliveAsTag;
+	uint32_t m_damageDealtToTag;
+	uint32_t m_damageDealtAsTag;
 	
 	GameConnection* m_conn;
 	std::shared_ptr<RoomSession> m_roomSession;
