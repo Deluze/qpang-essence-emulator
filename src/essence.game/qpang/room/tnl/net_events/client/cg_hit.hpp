@@ -181,17 +181,20 @@ public:
 			const auto srcPlayerIsTagged = (isPublicEnemyMode) && (roomSession->getCurrentlySelectedTag() == srcPlayer->getPlayer()->getId());
 			const auto dstPlayerIsTagged = (isPublicEnemyMode) && (roomSession->getCurrentlySelectedTag() == dstPlayer->getPlayer()->getId());
 
-			if (srcPlayerIsTagged && !dstPlayerIsTagged) // Shooter is tag, target is player.
+			if (isPublicEnemyMode)
 			{
-				isSameTeam = false;
-			}
-			else if (!srcPlayerIsTagged && dstPlayerIsTagged)
-			{
-				isSameTeam = false;
-			}
-			else if (!srcPlayerIsTagged && !dstPlayerIsTagged)
-			{
-				isSameTeam = true;
+				if (srcPlayerIsTagged && !dstPlayerIsTagged) // Shooter is tag, target is player.
+				{
+					isSameTeam = false;
+				}
+				else if (!srcPlayerIsTagged && dstPlayerIsTagged)
+				{
+					isSameTeam = false;
+				}
+				else if (!srcPlayerIsTagged && !dstPlayerIsTagged)
+				{
+					isSameTeam = true;
+				}
 			}
 
 			if (isSameTeam)
