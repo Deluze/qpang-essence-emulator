@@ -170,12 +170,12 @@ void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::s
 	const auto killerIsTagged = (killerPlayer->getId() == tagPlayerId);
 	const auto targetIsTagged = (targetPlayer->getId() == tagPlayerId);
 
-	if (killerIsTagged)
+	if (killerIsTagged && !targetIsTagged)
 	{
 		killer->addPlayerKillAsTag();
 		target->addDeathByTag();
 	}
-	else if (targetIsTagged)
+	else if (targetIsTagged && !killerIsTagged)
 	{
 		killer->addTagKillAsPlayer();
 		target->addDeathAsTag();
@@ -186,6 +186,8 @@ void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::s
 	}
 	else if (isSuicide)
 	{
+		broadcastTagKill(roomSession, killerPlayer, isSuicide);
+
 		target->addDeathAsTag();
 		target->getRoomSession()->resetCurrentlySelectedTag();
 	}

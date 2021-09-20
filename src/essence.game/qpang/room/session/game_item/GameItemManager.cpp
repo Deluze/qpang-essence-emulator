@@ -141,7 +141,6 @@ void GameItemManager::onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32
 		if ((isPublicEnemyMode && playerIsPublicEnemy) && (item.itemId == RED_MEDKIT || item.itemId == GREEN_MEDKIT))
 		{
 			// Cancel pickup.
-
 			return;
 		}
 
