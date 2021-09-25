@@ -63,7 +63,8 @@ public:
 				mode == GameMode::Mode::TDM ||
 				mode == GameMode::Mode::PTE ||
 				mode == GameMode::Mode::VIP ||
-				mode == GameMode::Mode::PREY;
+				mode == GameMode::Mode::PREY/* ||
+				mode == GameMode::Mode::PRACTICE*/;
 			
 			if (!isValidMode || map > 12)
 			{
@@ -129,7 +130,8 @@ public:
 					mode == GameMode::Mode::TDM ||
 					mode == GameMode::Mode::PTE ||
 					mode == GameMode::Mode::VIP ||
-					mode == GameMode::Mode::PREY;
+					mode == GameMode::Mode::PREY/* ||
+					mode == GameMode::Mode::PRACTICE*/;
 
 				if (!isValidMode)
 				{

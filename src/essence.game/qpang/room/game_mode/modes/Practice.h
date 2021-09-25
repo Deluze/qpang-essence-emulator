@@ -5,4 +5,6 @@
 class Practice : public GameMode
 {
 public:
+	bool isMissionMode() override;
+	bool isTeamMode() override;
 };
