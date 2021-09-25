@@ -29,13 +29,11 @@ public:
 		bstream->read(&playerId);
 		bstream->read(&cmd);
 		bstream->read(&itemId);
-		bstream->read(&seqId); // can be omitted
+		bstream->read(&seqId);
 	};
 
 	void handle(GameConnection* conn, Player::Ptr player)
 	{
-		std::cout << "CGWeapon::handle >> PlayerId: " << playerId << ", Cmd: " << cmd << ", ItemId: " << itemId << ", SequenceId: " << seqId << std::endl;
-
 		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 		{
 			if (auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
