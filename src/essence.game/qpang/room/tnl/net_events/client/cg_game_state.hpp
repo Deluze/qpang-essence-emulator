@@ -19,6 +19,7 @@ public:
 		DISCONNECT_P2P = 7,
 		REMOVE_INVINCIBILITY = 8,
 		BROADCAST_GC_GAME_STATE = 9,
+		// 10, kicks you out of the room pretty much, where you can't do anything.
 		SYNC_TIME = 11,
 		GAME_START = 12,
 		GAME_START_PVE = GAME_START,
@@ -26,10 +27,14 @@ public:
 		LEAVE_GAME = 15,
 		UPDATE_HEALTH = 16,
 		KILLFEED_ADD = 17,
+		// Missing 18
+		KILLFEED_ADD_SUICIDE = 19, // cmds: 1 = burned by flames or by fire effect?, 2 = crushed by walls (ossyria), 3 = fall in void
+		// Missing 20 and 21
 		PLAYER_STATE_HACK = 22,
 		GAME_OVER = 23,
 		INV_IN = 24,
 		INV_OUT = 25,
+		// Missing 26 and 27
 		KILLFEED_ADD_HEAD = 28,
 		START_RESPAWN_TIMER = 29,
 		ESSENCE_DOUBLE_POINTS = 30,
@@ -40,6 +45,7 @@ public:
 		PUBLIC_ENEMY_IS_POSSIBLE = 35,
 		PUBLIC_ENEMY_START_TRANSFORMATION = 36,
 		PUBLIC_ENEMY_TRANSFORMATION_FINISHED = 37,
+		// Are there more gamestates after 37?
 	};
 	CGGameState() : GameNetEvent{ CG_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirClientToServer } {};
 
