@@ -8,6 +8,7 @@
 #include "qpang/room/game_mode/modes/ProtectTheEssence.h"
 #include "qpang/room/game_mode/modes/PublicEnemy.h"
 #include "qpang/room/game_mode/modes/Vip.h"
+#include "qpang/room/game_mode/modes/Practice.h"
 
 class GameMode;
 
@@ -29,6 +30,7 @@ private:
 		{2, new TeamDeathMatch()},
 		{3, new ProtectTheEssence()},
 		{4, new Vip()},
+		{5, new Practice()},
 		{8, new PublicEnemy()},
 	};
 };
