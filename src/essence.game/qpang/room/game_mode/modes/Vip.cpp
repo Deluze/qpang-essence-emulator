@@ -55,6 +55,8 @@ void Vip::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessionPlayer)
 		sessionPlayer->post(new GCRespawn(yellowVip->getPlayer()->getId(), yellowVip->getCharacter(), 0, pos.x, pos.y, pos.z, true));
 		sessionPlayer->post(new GCGameState(yellowVip->getPlayer()->getId(), 8));
 	}
+
+	GameMode::onPlayerSync(sessionPlayer);
 }
 
 void Vip::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)

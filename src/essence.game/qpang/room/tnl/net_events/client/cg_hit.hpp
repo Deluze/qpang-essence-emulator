@@ -243,6 +243,11 @@ public:
 
 		if (dstPlayer->isDead())
 		{
+			if (dstPlayer->getWeaponManager()->getHasEquippedMachineGun())
+			{
+				dstPlayer->getWeaponManager()->unequipMachineGun();
+			}
+
 			srcPlayer->getEntityManager()->addKill(entityId);
 
 			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);

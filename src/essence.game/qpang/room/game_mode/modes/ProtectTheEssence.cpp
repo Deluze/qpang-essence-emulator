@@ -65,6 +65,8 @@ void ProtectTheEssence::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessionP
 		sessionPlayer->post(new GCRespawn(0, 3, 5, pos.x, pos.y, pos.z));
 		sessionPlayer->post(new GCHitEssence(sessionPlayer->getPlayer()->getId(), sessionPlayer->getPlayer()->getId(), 3, pos.x, pos.y, pos.z, 0, 6));
 	}
+
+	GameMode::onPlayerSync(sessionPlayer);
 }
 
 void ProtectTheEssence::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)

@@ -128,6 +128,11 @@ bool RoomSession::removePlayer(uint32_t playerId)
 			session->post(new GCHitEssence(session->getPlayer()->getId(), player->getPlayer()->getId(), 3, pos.x, pos.y, pos.z, 0, 6));
 	}
 
+	if (player->getWeaponManager()->getHasEquippedMachineGun())
+	{
+		player->getWeaponManager()->unequipMachineGun();
+	}
+
 	if (player == m_blueVip)
 		setBlueVip(nullptr);
 	else if (player == m_yellowVip)
@@ -359,6 +364,14 @@ void RoomSession::finish()
 
 	// TODO: Reset function.
 	m_currentlySelectedTag = 0;
+
+	for (const auto& player : getPlayingPlayers())
+	{
+		if (player->getWeaponManager()->getHasEquippedMachineGun())
+		{
+			player->getWeaponManager()->unequipMachineGun();
+		}
+	}
 
 	m_leaverMx.lock();
 	for (const auto& player : m_leavers)

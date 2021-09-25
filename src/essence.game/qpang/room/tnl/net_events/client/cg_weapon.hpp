@@ -57,17 +57,22 @@ public:
 
 					session->getWeaponManager()->reload(seqId);
 				}
-				//else if (cmd == CMD::UNEQUIP_MACHINE_GUN)
-				//{
-				//	session->post(new GCWeapon(session->getPlayer()->getId(), CMD::UNEQUIP_MACHINE_GUN, itemId, seqId));
-				//}
-				//else if (cmd == CMD::EQUIP_MACHINE_GUN)
-				//{
-				//	// Let client know the player is shooting with ground zero gun.
-				//	session->post(new GCWeapon(session->getPlayer()->getId(), CMD::EQUIP_MACHINE_GUN, itemId, seqId));
-				//	// Allow client to shoot.
-				//	session->post(new GCWeapon(session->getPlayer()->getId(), CMD::ENABLE_SHOOTING, itemId, seqId));
-				//}
+				else if (cmd == CMD::UNEQUIP_MACHINE_GUN)
+				{
+					// Check for the ground zero map.
+					if (roomPlayer->getRoom()->getMap() == 8)
+					{
+						session->getWeaponManager()->unequipMachineGun();
+					}
+				}
+				else if (cmd == CMD::EQUIP_MACHINE_GUN)
+				{
+					// Check for the ground zero map.
+					if (roomPlayer->getRoom()->getMap() == 8)
+					{
+						session->getWeaponManager()->equipMachineGun(seqId);
+					}
+				}
 			}
 		}
 	}

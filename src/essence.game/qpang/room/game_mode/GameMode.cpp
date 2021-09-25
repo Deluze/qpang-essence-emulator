@@ -7,6 +7,10 @@
 #include "qpang/Game.h"
 #include "qpang/room/session/RoomSession.h"
 #include "qpang/room/session/player/RoomSessionPlayer.h"
+#include "qpang/room/tnl/net_events/client/cg_weapon.hpp"
+#include "qpang/room/tnl/net_events/server/gc_weapon.hpp"
+
+constexpr auto MACHINE_GUN_ITEM_ID = 1095303174;
 
 bool GameMode::isTeamMode()
 {
@@ -38,6 +42,15 @@ void GameMode::onStart(std::shared_ptr<RoomSession> roomSession)
 
 void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 {
+	for (const auto &player : session->getRoomSession()->getPlayingPlayers())
+	{
+		if (player->getWeaponManager()->getHasEquippedMachineGun())
+		{
+			const auto seqId = player->getWeaponManager()->getEquippedMachineGunSeqId();
+
+			session->post(new GCWeapon(player->getPlayer()->getId(), CGWeapon::CMD::EQUIP_MACHINE_GUN, MACHINE_GUN_ITEM_ID, seqId));
+		}
+	}
 }
 
 void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)

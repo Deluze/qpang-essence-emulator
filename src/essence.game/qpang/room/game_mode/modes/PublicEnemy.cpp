@@ -165,6 +165,8 @@ void PublicEnemy::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessionPlayer)
 	sessionPlayer->post(new GCGameState(currentlySelectedTag, PUBLIC_ENEMY_START_TRANSFORMATION, currentlySelectedTagPlayer->getHealth()));
 
 	roomSession->relayPlayingExcept<GCGameState>(currentlySelectedTag, currentlySelectedTag, PUBLIC_ENEMY_START_TRANSFORMATION, currentlySelectedTagPlayer->getHealth());
+
+	GameMode::onPlayerSync(sessionPlayer);
 }
 
 void PublicEnemy::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)
