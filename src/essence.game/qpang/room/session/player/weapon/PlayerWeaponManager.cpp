@@ -3,14 +3,22 @@
 #include "qpang/Game.h"
 #include "qpang/room/session/RoomSession.h"
 
+#include "qpang/room/tnl/net_events/client/cg_weapon.hpp"
+
 #include "qpang/room/tnl/net_events/server/gc_weapon.hpp"
 #include "qpang/room/tnl/net_events/server/gc_respawn.hpp"
 #include "qpang/room/tnl/net_events/server/gc_shoot.hpp"
 #include "qpang/room/tnl/net_events/server/gc_game_item.hpp"
 #include "qpang/room/tnl/net_events/server/gc_essence.hpp"
+#include "qpang/room/tnl/net_events/server/gc_weapon.hpp"
+
+constexpr auto MACHINE_GUN_ITEM_ID = 1095303174;
 
 PlayerWeaponManager::PlayerWeaponManager() :
-	m_selectedWeaponIndex(0)
+	m_selectedWeaponIndex(0),
+	m_hasEquippedMachineGun(false),
+	m_equippedMachineGunSeqId(0),
+	m_previousSelectedWeaponIndex(0)
 {
 }
 
@@ -209,6 +217,109 @@ std::array<uint32_t, 4> PlayerWeaponManager::getWeaponIds()
 std::array<Weapon, 4> PlayerWeaponManager::getWeapons()
 {
 	return m_weapons;
+}
+
+bool PlayerWeaponManager::getHasEquippedMachineGun()
+{
+	return m_hasEquippedMachineGun;
+}
+
+uint64_t PlayerWeaponManager::getEquippedMachineGunSeqId()
+{
+	return m_equippedMachineGunSeqId;
+}
+
+void PlayerWeaponManager::equipMachineGun(uint64_t seqId)
+{
+	// If the player attempts to equip the machine gun whilst already equipping a machine gun, disallow it.
+	if (m_hasEquippedMachineGun)
+	{
+		return;
+	}
+
+	// Check if the seqId is a valid sequence id.
+	if (seqId < 1 || seqId > 4)
+	{
+		return;
+	}
+
+	// TODO: Check if the machine gun with the seq id is already taken by another player.
+
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		// Disallow the machine gun in public enemy mode for now.
+		if (player->getRoomSession()->getGameMode()->isPublicEnemyMode())
+		{
+			player->getPlayer()->broadcast(u"The machine gun is disabled in the public enemy gamemode.");
+
+			return;
+		}
+
+		// Let client know the player is shooting with ground zero gun.
+		player->getRoomSession()->relayPlaying<GCWeapon>(player->getPlayer()->getId(), CGWeapon::CMD::EQUIP_MACHINE_GUN, MACHINE_GUN_ITEM_ID, seqId);
+		// Allow client to shoot.
+		player->getRoomSession()->relayPlaying<GCWeapon>(player->getPlayer()->getId(), CGWeapon::CMD::ENABLE_SHOOTING, MACHINE_GUN_ITEM_ID, seqId);
+
+		// Save the currently selected weapon index.
+		m_previousSelectedWeaponIndex = m_selectedWeaponIndex;
+		// Set the currently selected weapon index to gun.
+		m_selectedWeaponIndex = 0;
+		// Set the current gun weapon to the current weapon.
+		m_currentGunWeapon = m_weapons[m_selectedWeaponIndex];
+
+		const auto machineGunWeapon = Game::instance()->getWeaponManager()->get(MACHINE_GUN_ITEM_ID);
+
+		m_weapons[0] = machineGunWeapon;
+
+		auto& defaultAmmo = m_defaultAmmo[machineGunWeapon.itemId];
+
+		defaultAmmo.first = machineGunWeapon.clipCount;
+		defaultAmmo.second = machineGunWeapon.clipSize;
+
+		refillCurrentWeapon();
+		switchWeapon(machineGunWeapon.itemId, false);
+
+		m_hasEquippedMachineGun = true;
+		m_equippedMachineGunSeqId = seqId;
+	}
+}
+
+void PlayerWeaponManager::unequipMachineGun()
+{
+	// If the player does not have a machine gun equipped, do not allow them to unequip one.
+	if (!m_hasEquippedMachineGun)
+	{
+		return;
+	}
+
+	// Can only unequip machine gun if it's the same seq id.
+	if (m_equippedMachineGunSeqId != m_equippedMachineGunSeqId)
+	{
+		return;
+	}
+
+	// TODO: Set weapon back to what it was before.
+
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		// Disallow the machine gun in public enemy mode for now.
+		if (player->getRoomSession()->getGameMode()->isPublicEnemyMode())
+		{
+			player->getPlayer()->broadcast(u"The machine gun is disabled in the public enemy gamemode.");
+
+			return;
+		}
+
+		player->getRoomSession()->relayPlaying<GCWeapon>(player->getPlayer()->getId(), CGWeapon::CMD::UNEQUIP_MACHINE_GUN, MACHINE_GUN_ITEM_ID, m_equippedMachineGunSeqId);
+
+		m_weapons[0] = m_currentGunWeapon;
+		m_selectedWeaponIndex = m_previousSelectedWeaponIndex;
+
+		switchWeapon(m_weapons[m_selectedWeaponIndex].itemId, false);
+
+		m_hasEquippedMachineGun = false;
+		m_equippedMachineGunSeqId = 0;
+	}
 }
 
 bool PlayerWeaponManager::isHoldingMelee()

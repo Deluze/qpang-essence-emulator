@@ -38,6 +38,12 @@ public:
 	std::array<uint32_t, 4> getWeaponIds();
 	std::array<Weapon, 4> getWeapons();
 
+	bool getHasEquippedMachineGun();
+
+	uint64_t getEquippedMachineGunSeqId();
+
+	void equipMachineGun(uint64_t seqId);
+	void unequipMachineGun();
 private:
 	std::array<Weapon, 4> m_weapons;
 	uint8_t m_selectedWeaponIndex;
@@ -48,4 +54,8 @@ private:
 
 	Weapon m_currentGunWeapon;
 	uint32_t m_previousSelectedWeaponIndex;
+
+	// Ground zero machine gun
+	bool m_hasEquippedMachineGun;
+	uint64_t m_equippedMachineGunSeqId;
 };
