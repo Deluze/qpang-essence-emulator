@@ -37,6 +37,7 @@ It conists out of:
 - **In-game leaderboards**
 - **Daily login bonus**
 - **Automatic square generation so they don't get overcrowded** (50 players max, configurable)
+- **Full working machine guns in the bunker/ground zero map**
 
 Missing features:
 
@@ -44,8 +45,8 @@ Missing features:
 - Memos
 - Game invites [WIP]
 - Trading
-- Registration in-game
-- Skill cards  [WIP]
+- Registration in-game (will not be implemented, registration goes via website)
+- Skill cards [WIP]
 - Card boosting/enhancing (purposefully unimplemented, design choice)
 - In-game quests
 
