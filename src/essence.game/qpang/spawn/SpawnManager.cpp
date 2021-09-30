@@ -71,6 +71,9 @@ Spawn SpawnManager::getRandomPlazaSpawnLocation()
 	return m_plazaSpawns[index];
 }
 
+// TODO: Create a method for grabbing a random spawn for deathmatch specifically that's calculated
+// based on the amount of players near a spawn so the less populated spawn is always picked.
+
 Spawn SpawnManager::getRandomSpawn(uint8_t map, uint8_t team)
 {
 	std::lock_guard<std::mutex> lg(m_mx);
