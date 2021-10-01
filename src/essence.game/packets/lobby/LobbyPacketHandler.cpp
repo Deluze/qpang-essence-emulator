@@ -17,6 +17,7 @@
 #include "packets/lobby/incoming/friend/SendFriendRequestEvent.h"
 #include "packets/lobby/incoming/gameroom/RequestGameRoomsEvent.h"
 #include "packets/lobby/incoming/gameroom/RequestGameSettingsEvent.h"
+#include "packets/lobby/incoming/gameroom/GameRoomInviteRequest.h"
 #include "packets/lobby/incoming/inventory/DeleteCard.h"
 #include "packets/lobby/incoming/inventory/DisableFunctionCardEvent.h"
 #include "packets/lobby/incoming/inventory/EnableFunctionCardEvent.h"
@@ -53,6 +54,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(705, new DenyIncomingFriendRequestEvent());
 	add(709, new CancelOutgoingFriendRequestEvent());
 	add(713, new RemoveFriendEvent());
+	add(721, new GameRoomInviteRequest());
 	add(725, new RequestMemos());
 	add(738, new WhisperEvent());
 	add(742, new OpenGift());
