@@ -57,6 +57,8 @@ public:
 
 	std::shared_ptr<Player> getOnlinePlayer(uint32_t playerId);
 	std::shared_ptr<Player> getOnlinePlayer(const std::u16string& nickname);
+	
+	std::unordered_map<uint32_t, std::shared_ptr<Player>> getPlayers();
 
 	void broadcast(const std::u16string& message);
 	void send(LobbyServerPacket& pack);

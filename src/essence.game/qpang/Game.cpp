@@ -169,6 +169,11 @@ Player::Ptr Game::getOnlinePlayer(const std::u16string& nickname)
 	return it != m_playersByNickname.cend() ? it->second : nullptr;
 }
 
+std::unordered_map<uint32_t, std::shared_ptr<Player>> Game::getPlayers()
+{
+	return m_players;
+}
+
 void Game::broadcast(const std::u16string& message)
 {
 	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
