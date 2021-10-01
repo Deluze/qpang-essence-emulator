@@ -59,15 +59,13 @@ public:
 			bstream->write(U8(0)); // unk_03
 			bstream->write(U8(player->getTeam()));
 			bstream->write((U16)player->getScore()); /// essence
-			//bstream->write((U16)player->getKills());
 			// Tag kills as player or player kills.
 			bstream->write((U16)(isPublicEnemyMode)
 				? player->getTagKillsAsPlayer()
 				: player->getKills());
 			bstream->write((U16)player->getDeaths());
-			//bstream->write((U16)player->getScore());
 
-			//// Player kills as tag or player score.
+			// Player kills as tag or player score.
 			bstream->write((U16)(isPublicEnemyMode)
 				? player->getPlayerKillsAsTag()
 				: player->getScore());
