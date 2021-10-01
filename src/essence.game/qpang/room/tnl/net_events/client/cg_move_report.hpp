@@ -28,7 +28,7 @@ public:
 		bstream->read(&unk_05);
 		bstream->read(&unk_06);
 	};
-	void process(EventConnection* ps) \
+	void process(EventConnection* ps)
 	{
 	};
 

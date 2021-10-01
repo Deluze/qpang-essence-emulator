@@ -47,6 +47,25 @@ public:
 		bstream->read(&unk_15);
 		bstream->read(&unk_16);
 		bstream->read(&unk_17);
+
+		// Does not trigger?
+		//std::cout << "CCUserInfo::unpack >> unk_01: " << (&unk_01) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_02: " << (&unk_02) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_03: " << (&unk_03) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_04: " << (&unk_04) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_05: " << (&unk_05) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_06: " << (&unk_06) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_07: " << (&unk_07) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_08: " << (&unk_08) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_09: " << (&unk_09) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_10: " << (&unk_10) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_11: " << (&unk_11) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_12: " << (&unk_12) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_13: " << (&unk_13) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_14: " << (&unk_14) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_15: " << (&unk_15) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_16: " << (&unk_16) << std::endl;
+		//std::cout << "CCUserInfo::unpack >> unk_17: " << (&unk_17) << std::endl;
 	};
 
 	void process(EventConnection* conn)
