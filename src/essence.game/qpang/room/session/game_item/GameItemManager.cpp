@@ -11,7 +11,9 @@ void GameItemManager::initialize(std::shared_ptr<RoomSession> roomSession)
 	m_mapBounds = mapBounds[roomSession->getRoom()->getMap()];
 	m_roomSession = roomSession;
 	m_areSkillsEnabled = roomSession->getRoom()->isSkillsEnabled();
-	m_isEventEligible = roomSession->getRoom()->getPassword().empty() && CONFIG_MANAGER->getInt("EVENT_ACTIVE") == 1 && mapBounds.find(roomSession->getRoom()->getMap()) != mapBounds.cend();
+	m_isEventEligible = (CONFIG_MANAGER->getInt("EVENT_ACTIVE") == 1) 
+		&& mapBounds.find(roomSession->getRoom()->getMap()) != mapBounds.cend() 
+		&& roomSession->getRoom()->getPassword().empty();
 
 	const auto spawns = Game::instance()->getSpawnManager()->getItemSpawns(roomSession->getRoom()->getMap());
 
@@ -59,7 +61,7 @@ void GameItemManager::tick()
 		}
 	}
 
-	if(((!m_eventItemsSpawned && m_initTime + 60 < currTime) || (m_eventItemsSpawned && m_timeSinceEventItemSpawn + EVENT_ITEM_BATCH_INTERVAL < currTime)) && m_isEventEligible)
+	if(((!m_eventItemsSpawned && m_initTime + 30 < currTime) || (m_eventItemsSpawned && m_timeSinceEventItemSpawn + EVENT_ITEM_BATCH_INTERVAL < currTime)) && m_isEventEligible)
 	{
 		m_eventItemsSpawned = true;
 		m_timeSinceEventItemSpawn = currTime;
