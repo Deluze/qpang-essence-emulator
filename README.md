@@ -30,6 +30,7 @@ It conists out of:
   - **Points & Time based matches**
   - **Cash & Coin drops**
   - **Weapon effects**
+  - **Game Invites (new)**
 - **Custom in-game commands**
 - **Configurable crane machine**
 - **Configurable shop**
@@ -43,7 +44,6 @@ Missing features:
 
 - PvE gamemode
 - Memos
-- Game invites [WIP]
 - Trading
 - Registration in-game (will not be implemented, registration goes via website)
 - Skill cards [WIP]
