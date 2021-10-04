@@ -243,6 +243,7 @@ void PlayerWeaponManager::equipMachineGun(uint64_t seqId)
 		return;
 	}
 
+	// TODO: Perhaps check if the player is "in range" of the machine gun (by seq id).
 	// TODO: Check if the machine gun with the seq id is already taken by another player.
 
 	if (const auto player = m_player.lock(); player != nullptr)
@@ -297,8 +298,6 @@ void PlayerWeaponManager::unequipMachineGun()
 	{
 		return;
 	}
-
-	// TODO: Set weapon back to what it was before.
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{

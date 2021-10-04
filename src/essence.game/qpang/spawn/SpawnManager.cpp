@@ -57,20 +57,6 @@ void SpawnManager::initialize()
 	}
 }
 
-Spawn SpawnManager::getRandomPlazaSpawnLocation()
-{
-	std::lock_guard<std::mutex> lg(m_mx);
-
-	if (m_plazaSpawns.empty()) {
-		// TODO: Fallback location.
-		return {};
-	}
-
-	auto index = rand() % m_plazaSpawns.size();
-
-	return m_plazaSpawns[index];
-}
-
 // TODO: Create a method for grabbing a random spawn for deathmatch specifically that's calculated
 // based on the amount of players near a spawn so the less populated spawn is always picked.
 

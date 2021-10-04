@@ -68,7 +68,7 @@ bool ShopManager::exists(uint32_t seqId)
 
 InventoryCard ShopManager::buy(const std::shared_ptr<Player>& player, const uint32_t seqId, const bool updateShopItems)
 {
-	// TODO: Allow players to buy packages.
+	// TODO: Allow players to buy shop packages.
 	assert(player != nullptr);
 
 	if (!exists(seqId))

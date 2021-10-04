@@ -85,8 +85,6 @@ void PublicEnemy::tick(std::shared_ptr<RoomSession> roomSession)
 			{
 				// A tag was found, we can stop the search.
 				roomSession->stopSearchingForNextTag();
-
-				// TODO: Announce a new tag was found.
 			}
 			else
 			{

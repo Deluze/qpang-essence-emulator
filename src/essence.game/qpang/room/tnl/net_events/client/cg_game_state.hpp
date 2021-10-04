@@ -103,7 +103,13 @@ public:
 			case State::PUBLIC_ENEMY_TRANSFORMATION_FINISHED:
 				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) 
 				{
-					// TODO: Remove invincibility?
+					//const auto tagId = roomSession->getCurrentlySelectedTag();
+					//const auto tagPlayer = roomSession->find(tagId);
+
+					//if (tagPlayer != nullptr)
+					//{
+					//	tagPlayer->removeInvincibility();
+					//}
 				}
 				break;
 			default:

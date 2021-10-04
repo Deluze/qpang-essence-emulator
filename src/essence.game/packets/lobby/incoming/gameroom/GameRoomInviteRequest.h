@@ -19,7 +19,7 @@ public:
 		// 38 empty bytes.
 		packet.readEmpty(38);
 
-		// TODO: Compare the given host and port from the clien to the actual host and port.
+		// TODO: Compare the given host and port from the client to the actual host and port.
 		const auto clientHost = inet_addr(readHost(packet).c_str());
 		const auto clientPort = packet.readShort();
 

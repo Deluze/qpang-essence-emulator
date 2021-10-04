@@ -137,8 +137,6 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	target->getEffectManager()->clear();
 	target->startRespawnCooldown();
 
-	// TODO: Add public enemy / tag stats.
-
 	auto* killerStats = killer->getPlayer()->getStatsManager();
 	auto* targetStats = target->getPlayer()->getStatsManager();
 

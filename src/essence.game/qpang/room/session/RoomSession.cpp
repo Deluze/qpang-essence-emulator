@@ -362,7 +362,6 @@ void RoomSession::finish()
 	m_nextYellowVip.reset();
 	m_yellowVip.reset();
 
-	// TODO: Reset function.
 	m_currentlySelectedTag = 0;
 
 	for (const auto& player : getPlayingPlayers())
