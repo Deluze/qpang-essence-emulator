@@ -53,8 +53,11 @@ uint32_t PlayerSkillManager::drawSkill()
 	if (player == nullptr)
 		return 0;
 
-	m_drawnSkillCard = player->getRoomSession()->getSkillManager()->generateRandomSkill();
-	m_drawnSkillCard->bind(player);
 
-	return m_drawnSkillCard->getId();
+	// TODO: Draw skill, return item id of skill.
+	//m_drawnSkillCard = player->getRoomSession()->getSkillManager()->generateRandomSkill();
+	//m_drawnSkillCard->bind(player);
+
+	//return m_drawnSkillCard->getId();
+	return 0;
 }
