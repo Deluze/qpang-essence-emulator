@@ -26,6 +26,7 @@ enum ItemID : uint32_t
 	SKILL_HAWK_EYE = 1258356737,
 	SKILL_SHOT_MOVE = 1258356738,
 	SKILL_CAMO = 1258356753,
+	SKILL_POCKET_SIZE = 1258356764,
 };
 
 static bool isEquippableFunction(uint32_t id)
