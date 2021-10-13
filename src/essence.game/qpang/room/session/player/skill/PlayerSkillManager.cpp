@@ -11,8 +11,6 @@
 void PlayerSkillManager::initialize(std::shared_ptr<RoomSessionPlayer> player)
 {
 	m_player = player;
-
-	m_equippedCards = player->getPlayer()->getEquipmentManager()->getSkillCards();
 }
 
 void PlayerSkillManager::tick()
