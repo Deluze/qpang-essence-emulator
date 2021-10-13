@@ -83,10 +83,7 @@ public:
 	void onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32_t spawnId);
 	void onPickUpEventItem(std::shared_ptr<RoomSessionPlayer> player, uint32_t id);
 private:
-
-	void spawnItem(const GameItemManager::GameItemSpawn& item);
-
-	std::unordered_map<uint32_t, GameItemSpawn> m_items;
+	std::vector<GameItemSpawn> m_items;
 	std::unordered_map<uint32_t, bool> m_eventItems;
 	bool m_areSkillsEnabled = false;
 	bool m_isReady = false;
