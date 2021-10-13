@@ -17,15 +17,15 @@ void GameItemManager::initialize(std::shared_ptr<RoomSession> roomSession)
 		&& mapBounds.find(m_roomSession->getRoom()->getMap()) != mapBounds.cend()
 		&& m_roomSession->getRoom()->getPassword().empty();
 
-	const auto spawns = Game::instance()->getSpawnManager()->getItemSpawns(m_roomSession->getRoom()->getMap());
+	const auto itemSpawns = Game::instance()->getSpawnManager()->getItemSpawns(m_roomSession->getRoom()->getMap());
 
-	for (size_t i = 0; i < spawns.size(); i++)
+	for (size_t i = 0; i < itemSpawns.size(); i++)
 	{
 		m_items[i] = GameItemSpawn{
 			i,
 			getRandomItem(),
 			NULL,
-			spawns[i],
+			itemSpawns[i],
 		};
 	}
 
