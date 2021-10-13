@@ -65,7 +65,7 @@ public:
 				mode == GameMode::Mode::VIP ||
 				mode == GameMode::Mode::PREY/* ||
 				mode == GameMode::Mode::PRACTICE*/;
-			
+
 			if (!isValidMode || map > 12)
 			{
 				conn->disconnect("Invalid gamemode");
@@ -178,8 +178,7 @@ public:
 			break;
 			case Command::TOGGLE_SKILL:
 			{
-				// room->setSkillsEnabled(!room->isSkillsEnabled());
-				// disabled
+				room->setSkillsEnabled(!room->isSkillsEnabled());
 			}
 			break;
 			case Command::TEAM_ROOM:
