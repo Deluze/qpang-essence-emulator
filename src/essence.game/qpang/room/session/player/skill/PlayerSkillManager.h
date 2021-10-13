@@ -26,6 +26,8 @@ public:
 
 	uint32_t drawSkill();
 
+	std::shared_ptr<Skill> getActiveSkillCard();
+
 	bool isSkillCardActive();
 	bool isDrawnSkillCard(uint32_t itemId);
 private:

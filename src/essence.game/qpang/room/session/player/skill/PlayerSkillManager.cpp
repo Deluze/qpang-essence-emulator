@@ -133,6 +133,11 @@ uint32_t PlayerSkillManager::drawSkill()
 	return 0;
 }
 
+std::shared_ptr<Skill> PlayerSkillManager::getActiveSkillCard()
+{
+	return m_activeSkillCard;
+}
+
 bool PlayerSkillManager::isSkillCardActive()
 {
 	return (m_activeSkillCard != nullptr);

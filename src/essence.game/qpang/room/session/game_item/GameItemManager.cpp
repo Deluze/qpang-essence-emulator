@@ -211,6 +211,16 @@ void GameItemManager::onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32
 		gameItemSpawn->spawnId = (uint32_t)(rand() * std::numeric_limits<uint32_t>::max());
 		gameItemSpawn->lastPickUpTime = time(NULL);
 	}
+
+	if (player->getSkillManager()->isSkillCardActive())
+	{
+		const auto shouldDisableOnGameItemPickup = player->getSkillManager()->getActiveSkillCard()->shouldDisableOnGameItemPickup();
+
+		if (shouldDisableOnGameItemPickup)
+		{
+			player->getSkillManager()->deactivateSkillCard();
+		}
+	}
 }
 
 void GameItemManager::onPickUpEventItem(std::shared_ptr<RoomSessionPlayer> player, uint32_t id)
@@ -232,4 +242,14 @@ void GameItemManager::onPickUpEventItem(std::shared_ptr<RoomSessionPlayer> playe
 	m_roomSession->relayPlaying<GCGameItem>(1, player->getPlayer()->getId(), EVENT_ITEM, id, identifier);
 
 	m_eventItems[id] = true;
+
+	if (player->getSkillManager()->isSkillCardActive())
+	{
+		const auto shouldDisableOnGameItemPickup = player->getSkillManager()->getActiveSkillCard()->shouldDisableOnGameItemPickup();
+
+		if (shouldDisableOnGameItemPickup)
+		{
+			player->getSkillManager()->deactivateSkillCard();
+		}
+	}
 }

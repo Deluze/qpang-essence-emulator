@@ -25,6 +25,21 @@ public:
 		return ItemID::SKILL_NONE;
 	}
 
+	virtual bool shouldDisableOnBeingAttacked()
+	{
+		return false;
+	}
+
+	virtual bool shouldDisableOnGameItemPickup()
+	{
+		return false;
+	}
+
+	virtual bool shouldDisableOnUseOfActionCard()
+	{
+		return false;
+	}
+
 	bool hasDuration()
 	{
 		return m_hasDuration;

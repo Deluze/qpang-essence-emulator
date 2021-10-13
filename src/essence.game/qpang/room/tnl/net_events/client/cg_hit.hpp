@@ -241,6 +241,16 @@ public:
 		roomSession->relayPlaying<GCHit>(srcPlayerId, dstPlayerId, unk_03, srcPosX, srcPosY, srcPosZ, dstPosX, dstPosY, dstPosZ, entityId,
 			hitType, hitLocation, dstPlayer->getHealth(), damage, weaponId, rtt, weaponType, unk_16, srcPlayer->getStreak() + 1, unk_18, effectId);
 
+		if (dstPlayer->getSkillManager()->isSkillCardActive())
+		{
+			const auto disableOnBeingAttacked = dstPlayer->getSkillManager()->getActiveSkillCard()->disableOnBeingAttacked();
+
+			if (disableOnBeingAttacked)
+			{
+				dstPlayer->getSkillManager()->deactivateSkillCard();
+			}
+		}
+
 		if (dstPlayer->isDead())
 		{
 			if (dstPlayer->getWeaponManager()->getHasEquippedMachineGun())

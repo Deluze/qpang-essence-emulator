@@ -14,7 +14,7 @@
 #include "qpang/room/session/game_item/items/SkillBook.h"
 #include "qpang/room/session/game_item/items/EventItem.h"
 
-#define RESPAWN_INTERVAL 15
+#define RESPAWN_INTERVAL 0
 #define EVENT_ITEM_BATCH_INTERVAL 200
 
 class GameItem;
@@ -34,9 +34,9 @@ enum ID : uint32_t
 };
 
 static std::vector<uint32_t> possibleItems = {
-	ID::AMMO_CLIP,
-	ID::RED_MEDKIT,
-	ID::GREEN_MEDKIT,
+	//ID::AMMO_CLIP,
+	//ID::RED_MEDKIT,
+	//ID::GREEN_MEDKIT,
 	ID::SKILL_CARD,
 };
 
