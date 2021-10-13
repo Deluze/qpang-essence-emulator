@@ -37,7 +37,7 @@ static std::vector<uint32_t> possibleItems = {
 	ID::AMMO_CLIP,
 	ID::RED_MEDKIT,
 	ID::GREEN_MEDKIT,
-	//ID::SKILL_CARD,
+	ID::SKILL_CARD,
 };
 
 static std::unordered_map<uint32_t, GameItem*> mappedItems = {

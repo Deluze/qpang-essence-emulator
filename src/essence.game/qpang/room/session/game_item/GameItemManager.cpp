@@ -132,23 +132,25 @@ void GameItemManager::onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32
 
 	auto& item = it->second;
 
-	if (item.itemId == NULL)
+	auto itemId = item.itemId;
+
+	if (itemId == NULL)
 		return;
 
-	if (item.itemId == RED_MEDKIT || item.itemId == GREEN_MEDKIT || item.itemId == AMMO_CLIP)
+	if (itemId == RED_MEDKIT || itemId == GREEN_MEDKIT || itemId == AMMO_CLIP || itemId == SKILL_CARD)
 	{
 		const auto isPublicEnemyMode = player->getRoomSession()->getGameMode()->isPublicEnemyMode();
 		const auto playerIsPublicEnemy = player->getRoomSession()->getCurrentlySelectedTag() == player->getPlayer()->getId();
 
-		if ((isPublicEnemyMode && playerIsPublicEnemy) && (item.itemId == RED_MEDKIT || item.itemId == GREEN_MEDKIT))
+		if ((isPublicEnemyMode && playerIsPublicEnemy) && (itemId == RED_MEDKIT || itemId == GREEN_MEDKIT) || itemId == SKILL_CARD)
 		{
-			// Cancel pickup.
+			// Cancel pickup for public enemy.
 			return;
 		}
 
 		const auto identifier = mappedItems[item.itemId]->onPickUp(player);
 
-		m_roomSession->relayPlaying<GCGameItem>(1, player->getPlayer()->getId(), item.itemId, item.spawnId, identifier);
+		m_roomSession->relayPlaying<GCGameItem>(1, player->getPlayer()->getId(), itemId, item.spawnId, identifier);
 
 		item.itemId = NULL;
 		item.lastPickUpTime = time(NULL);
