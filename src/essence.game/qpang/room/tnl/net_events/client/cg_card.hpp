@@ -2,8 +2,11 @@
 #define CG_CARD_HPP
 
 #include "GameNetEvent.h"
+
 #include "qpang/room/session/RoomSession.h"
 #include "qpang/room/RoomPlayer.h"
+
+#include <qpang/skill/SkillManager.h>
 
 class GCCard;
 
@@ -11,14 +14,19 @@ class CGCard : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-
 	enum CMD : U32
 	{
-		ABILITY = 0x07,
-		USE_CARD = 0x09,
+		CARD_BEGIN = 4,
+		CARD_END = 9
 	};
 
-	enum CODENAME : U32 
+	enum CardType : U32
+	{
+		ACTION_CARD = 7,
+		SKILL_CARD = 9,
+	};
+
+	enum ActionCardId : U32
 	{
 		MERONG = 1409286145,
 		FAKE_DEATH = 1409286146,
@@ -44,38 +52,98 @@ public:
 
 	void handle(GameConnection* conn, Player::Ptr player)
 	{
-		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
+		const auto roomPlayer = player->getRoomPlayer();
+
+		if (roomPlayer == nullptr)
 		{
-			if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr)
+			return;
+		}
+
+		const auto roomSession = roomPlayer->getRoom()->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		if (cardType == CardType::ACTION_CARD)
+		{
+			handleActionCard(player, roomPlayer, roomSession);
+
+			return;
+		}
+
+		if (cardType == CardType::SKILL_CARD)
+		{
+			handleSkillCard(player, roomPlayer, roomSession);
+
+			return;
+		}
+	}
+
+	void handleSkillCard(Player::Ptr player, const std::shared_ptr<RoomPlayer> roomPlayer, const std::shared_ptr<RoomSession> roomSession)
+	{
+		std::cout << "CGCard::handleSkillCard >> Handling skillcard for player " << player->getId() << "." << std::endl;
+		std::cout << "CGCard::handleSkillCard >> Information PlayerId " << player->getId() << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << "." << std::endl;
+
+		const auto areSkillsEnabled = roomPlayer->getRoom()->isSkillsEnabled();
+		const auto isValidSkillCard = roomSession->getSkillManager()->isValidSkillCard(itemId);
+
+		if (!areSkillsEnabled || !isValidSkillCard)
+		{
+			return;
+		}
+
+		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
+
+		if (roomSessionPlayer == nullptr)
+		{
+			return;
+		}
+
+		if (cmd == CMD::CARD_BEGIN)
+		{
+
+			// In other words, is the skill the player wants to activate also the skill that they have drawn.
+			// If a player attempts to activate their skillcard whilst they already have a skillcard active, something isn't right.
+			if (!roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId) || roomSessionPlayer->getSkillManager()->isSkillCardActive())
 			{
-				const auto isPublicEnemyGamemode = roomSession->getGameMode()->isPublicEnemyMode();
+				return;
+			}
 
-				if (isPublicEnemyGamemode) 
-				{
-					const auto character = player->getCharacter();
+			roomSessionPlayer->getSkillManager()->activateSkillCard(targetUid, seqId);
 
-					if ((itemId == FAKE_DEATH) && (character == 850 || character == 851)) 
-					{
-						player->broadcast(u"Sorry, you may not use fake death in the public enemy gamemode.");
+			return;
+		}
+	}
 
-						return;
-					}
+	void handleActionCard(Player::Ptr player, const std::shared_ptr<RoomPlayer> roomPlayer, const std::shared_ptr<RoomSession> roomSession)
+	{
+		const auto isPublicEnemyGamemode = roomSession->getGameMode()->isPublicEnemyMode();
 
-					const auto isSearchingForPublicEnemy = roomSession->isSearchingForNextTag();
+		if (isPublicEnemyGamemode)
+		{
+			const auto character = player->getCharacter();
 
-					if (isSearchingForPublicEnemy && (cmd == 4)) 
-					{
-						player->broadcast(u"Sorry, you may not perform this action whilst the next public enemy is being selected.");
+			if ((itemId == ActionCardId::FAKE_DEATH) && (character == 850 || character == 851))
+			{
+				player->broadcast(u"Sorry, you may not use fake death in the public enemy gamemode.");
 
-						return;
-					}
-				}
+				return;
+			}
 
-				// TODO: Check if the player's character can actually perform the card action.
+			const auto isSearchingForPublicEnemy = roomSession->isSearchingForNextTag();
 
-				roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
+			if (isSearchingForPublicEnemy && (cmd == CMD::CARD_BEGIN))
+			{
+				player->broadcast(u"Sorry, you may not perform this action whilst the next public enemy is being selected.");
+
+				return;
 			}
 		}
+
+		// TODO: Check if the player's character can actually perform the card action.
+		roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
 	}
 
 	void process(EventConnection* ps)
