@@ -6,22 +6,21 @@
 void RoomSkillManager::initialize(std::shared_ptr<RoomSession> room)
 {
 	m_room = room;
-
-	//m_skills = Game::instance()->getSkillManager()->getSkillsForMode(room->getRoom()->getMode());
+	m_skillsForMode = Game::instance()->getSkillManager()->getSkillsForGameMode(room->getRoom()->getMode());
 }
 
-//std::shared_ptr<Skill> RoomSkillManager::generateRandomSkill()
-//{
-//	//auto it = m_skills.begin();
-//	//
-//	//auto val = std::next(m_skills.begin(), rand() % m_skills.size());
-//	//
-//	//return (*val).second();
-//
-//	return std::make_shared<Skill>();
-//}
-//
-//bool RoomSkillManager::isSkillValid(uint32_t itemId)
-//{
-//	return m_skills.find(itemId) != m_skills.cend();
-//}
+std::shared_ptr<Skill> RoomSkillManager::generateRandomSkill()
+{
+	// If there are no skills for this mode, then we can not generate a skill.
+	if (m_skillsForMode.empty())
+	{
+		return nullptr;
+	}
+
+	// TODO: Better way to get a random skill.
+
+	const auto randomIndex = rand() % m_skillsForMode.size();
+	const auto &randomSkillCard = m_skillsForMode[randomIndex];
+
+	return m_skillsForMode[randomIndex];
+}
