@@ -4,4 +4,4 @@ class Skill
 {
 public:
 private:
-}
+};
