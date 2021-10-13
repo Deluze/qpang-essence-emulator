@@ -133,6 +133,11 @@ bool RoomSession::removePlayer(uint32_t playerId)
 		player->getWeaponManager()->unequipMachineGun();
 	}
 
+	if (player->getSkillManager()->isSkillCardActive())
+	{
+		player->getSkillManager()->deactivateSkillCard();
+	}
+
 	if (player == m_blueVip)
 		setBlueVip(nullptr);
 	else if (player == m_yellowVip)

@@ -67,6 +67,11 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 
 	const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
 
+	if (target->getSkillManager()->isSkillCardActive())
+	{
+		target->getSkillManager()->deactivateSkillCard();
+	}
+
 	if (isSuicide && !isPublicEnemyMode)
 	{
 		killer->addDeath();
@@ -131,6 +136,7 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	if (!isSuicide)
 	{
 		killer->addStreak();
+		killer->getSkillManager()->addSkillPoints(65);
 	}
 
 	target->resetStreak();
