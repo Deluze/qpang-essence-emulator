@@ -49,7 +49,7 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 void RoomSession::initialize()
 {
 	m_itemManager.initialize(shared_from_this());
-	//m_skillManager.initialize(shared_from_this());
+	m_skillManager.initialize(shared_from_this());
 
 	m_gameMode->onStart(shared_from_this());
 
