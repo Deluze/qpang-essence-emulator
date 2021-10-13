@@ -243,9 +243,9 @@ public:
 
 		if (dstPlayer->getSkillManager()->isSkillCardActive())
 		{
-			const auto disableOnBeingAttacked = dstPlayer->getSkillManager()->getActiveSkillCard()->disableOnBeingAttacked();
+			const auto shouldDisableOnBeingAttacked = dstPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnBeingAttacked();
 
-			if (disableOnBeingAttacked)
+			if (shouldDisableOnBeingAttacked)
 			{
 				dstPlayer->getSkillManager()->deactivateSkillCard();
 			}
