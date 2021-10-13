@@ -4,7 +4,7 @@
 #include <memory>
 #include <cstdint>
 
-#include "qpang/player/inventory/InventoryCard.h"
+#include "Skill.h"
 
 class RoomSessionPlayer;
 
@@ -15,18 +15,27 @@ public:
 
 	void tick();
 
-	void removeSkillPoints(uint32_t amount = 100);
-	void addSkillPoints(uint32_t amount = 100);
-	void resetPoints();
+	void activateSkillCard(uint32_t targetId, uint32_t seqId);
+	void deactivateSkillCard();
+
+	void updateSkillPointsForPlayer();
+
+	void addSkillPoints(uint32_t skillPoints);
+	void removeSkillPoints(uint32_t skillPoints);
+	void resetSkillPoints();
 
 	uint32_t drawSkill();
+
+	bool isSkillCardActive();
+	bool isDrawnSkillCard(uint32_t itemId);
 private:
 	std::weak_ptr<RoomSessionPlayer> m_player;
 
-	//std::shared_ptr<Skill> m_drawnSkillCard;
-	//std::array<InventoryCard, 3> m_equippedCards;
+	std::shared_ptr<Skill> m_drawnSkillCard;
+	std::shared_ptr<Skill> m_activeSkillCard;
 
-	//std::shared_ptr<Skill> m_activeSkillCard;
-	
 	uint32_t m_skillPoints;
+
+	uint32_t m_activeSkillCardTargetPlayerId;
+	uint32_t m_activeSkillCardSeqId;
 };

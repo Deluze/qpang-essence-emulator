@@ -11,51 +11,134 @@
 void PlayerSkillManager::initialize(std::shared_ptr<RoomSessionPlayer> player)
 {
 	m_player = player;
+
+	resetSkillPoints();
 }
 
 void PlayerSkillManager::tick()
 {
+	if (isSkillCardActive() && m_activeSkillCard->hasDuration())
+	{
+		if (m_activeSkillCard->getDurationInSeconds() > 0)
+		{
+			m_activeSkillCard->tick();
+		}
+
+		if (m_activeSkillCard->getDurationInSeconds() == 0)
+		{
+			deactivateSkillCard();
+		}
+	}
 }
 
-void PlayerSkillManager::removeSkillPoints(uint32_t amount)
+void PlayerSkillManager::activateSkillCard(uint32_t targetPlayerId, uint32_t seqId)
 {
-	if (m_skillPoints <= amount)
+	m_activeSkillCard = m_drawnSkillCard;
+
+	m_activeSkillCardTargetPlayerId = targetPlayerId;
+	m_activeSkillCardSeqId = seqId;
+
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		const auto roomSession = player->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+		
+		const auto playerId = player->getPlayer()->getId();
+		const auto itemId = m_activeSkillCard->getItemId();
+
+		roomSession->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::CARD_BEGIN, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
+
+		const auto requiredSkillPoints = m_activeSkillCard->getRequiredSkillPoints();
+
+		removeSkillPoints(requiredSkillPoints * 100);
+	}
+}
+
+void PlayerSkillManager::deactivateSkillCard()
+{
+	if (m_activeSkillCard == nullptr)
+	{
+		return;
+	}
+
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		const auto playerId = player->getPlayer()->getId();
+		const auto itemId = m_activeSkillCard->getItemId();
+
+		player->getRoomSession()->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::CARD_END, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
+	}
+
+	m_drawnSkillCard = nullptr;
+	m_activeSkillCard = nullptr;
+
+	m_activeSkillCardTargetPlayerId = 0;
+	m_activeSkillCardSeqId = 0;
+
+	updateSkillPointsForPlayer();
+}
+
+void PlayerSkillManager::updateSkillPointsForPlayer()
+{
+	const auto guagePercentage = m_skillPoints % 100;
+	const auto guagePoints = m_skillPoints / 100;
+
+	if (auto player = m_player.lock(); player != nullptr)
+	{
+		player->post(new GCCard(player->getPlayer()->getId(), guagePercentage, guagePoints));
+	}
+}
+
+void PlayerSkillManager::addSkillPoints(uint32_t skillPoints)
+{
+	m_skillPoints += skillPoints;
+
+	updateSkillPointsForPlayer();
+}
+
+void PlayerSkillManager::removeSkillPoints(uint32_t skillPoints)
+{
+	if (m_skillPoints <= skillPoints)
+	{
 		m_skillPoints = 0;
+	}
 	else
-		m_skillPoints = amount;
+	{
+		m_skillPoints -= skillPoints;
+	}
 
-	if (auto player = m_player.lock(); player != nullptr)
-		player->post(new GCCard(player->getPlayer()->getId(), m_skillPoints % 100, m_skillPoints / 100));
+	updateSkillPointsForPlayer();
 }
 
-void PlayerSkillManager::addSkillPoints(uint32_t amount)
-{
-	m_skillPoints += amount;
-
-	if (auto player = m_player.lock(); player != nullptr)
-		player->post(new GCCard(player->getPlayer()->getId(), m_skillPoints % 100, m_skillPoints / 100));
-}
-
-void PlayerSkillManager::resetPoints()
+void PlayerSkillManager::resetSkillPoints()
 {
 	m_skillPoints = 0;
 
-	if (auto player = m_player.lock(); player != nullptr)
-		player->post(new GCCard(player->getPlayer()->getId(), 0, 0));
+	updateSkillPointsForPlayer();
 }
 
 uint32_t PlayerSkillManager::drawSkill()
 {
-	auto player = m_player.lock();
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		m_drawnSkillCard = player->getRoomSession()->getSkillManager()->generateRandomSkill();
 
-	if (player == nullptr)
-		return 0;
+		return m_drawnSkillCard->getItemId();
+	}
 
-
-	// TODO: Draw skill, return item id of skill.
-	//m_drawnSkillCard = player->getRoomSession()->getSkillManager()->generateRandomSkill();
-	//m_drawnSkillCard->bind(player);
-
-	//return m_drawnSkillCard->getId();
 	return 0;
+}
+
+bool PlayerSkillManager::isSkillCardActive()
+{
+	return (m_activeSkillCard != nullptr);
+}
+
+bool PlayerSkillManager::isDrawnSkillCard(uint32_t itemId)
+{
+	return (m_drawnSkillCard->getItemId() == itemId);
 }

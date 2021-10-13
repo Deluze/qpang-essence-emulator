@@ -1,26 +1,41 @@
 #include "RoomSkillManager.h"
 
+#include "Skill.h"
+
 #include "qpang/Game.h"
 #include "qpang/room/session/RoomSession.h"
 
 void RoomSkillManager::initialize(std::shared_ptr<RoomSession> room)
 {
 	m_room = room;
-	m_skillsForMode = Game::instance()->getSkillManager()->getSkillsForGameMode(room->getRoom()->getMode());
+	m_skills = Game::instance()->getSkillManager()->getSkillsForGameMode(room->getRoom()->getMode());
 }
 
 std::shared_ptr<Skill> RoomSkillManager::generateRandomSkill()
 {
 	// If there are no skills for this mode, then we can not generate a skill.
-	if (m_skillsForMode.empty())
+	if (m_skills.size() == 0)
 	{
 		return nullptr;
 	}
 
-	// TODO: Better way to get a random skill.
+	auto it = m_skills.begin();
+	auto val = std::next(m_skills.begin(), rand() % m_skills.size());
 
-	const auto randomIndex = rand() % m_skillsForMode.size();
-	const auto &randomSkillCard = m_skillsForMode[randomIndex];
+	return (*val).second();
+}
 
-	return m_skillsForMode[randomIndex];
+std::shared_ptr<Skill> RoomSkillManager::getSkillByItemId(uint32_t skillItemId)
+{
+	if (isValidSkillCard(skillItemId))
+	{
+		return (*m_skills.find(skillItemId)).second();
+	}
+
+	return nullptr;
+}
+
+bool RoomSkillManager::isValidSkillCard(uint32_t skillItemId)
+{
+	return m_skills.find(skillItemId) != m_skills.cend();
 }
