@@ -16,7 +16,6 @@ class GameNetEvent;
 class RoomSession;
 class GameConnection;
 class Player;
-class Skill;
 
 class RoomSessionPlayer : public std::enable_shared_from_this<RoomSessionPlayer>
 {
