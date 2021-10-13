@@ -288,7 +288,6 @@ void RoomSessionPlayer::respawn()
 void RoomSessionPlayer::startRespawnCooldown()
 {
 	m_isRespawning = true;
-	m_skillManager.resetPoints();
 
 	auto cooldown = getRespawnCooldown();
 
