@@ -8,14 +8,16 @@
 
 void GameItemManager::initialize(std::shared_ptr<RoomSession> roomSession)
 {
-	m_mapBounds = mapBounds[roomSession->getRoom()->getMap()];
 	m_roomSession = roomSession;
-	m_areSkillsEnabled = roomSession->getRoom()->isSkillsEnabled();
-	m_isEventEligible = (CONFIG_MANAGER->getInt("EVENT_ACTIVE") == 1) 
-		&& mapBounds.find(roomSession->getRoom()->getMap()) != mapBounds.cend() 
-		&& roomSession->getRoom()->getPassword().empty();
 
-	const auto spawns = Game::instance()->getSpawnManager()->getItemSpawns(roomSession->getRoom()->getMap());
+	m_mapBounds = mapBounds[m_roomSession->getRoom()->getMap()];
+	m_areSkillsEnabled = m_roomSession->getRoom()->isSkillsEnabled();
+
+	m_isEventEligible = (CONFIG_MANAGER->getInt("EVENT_ACTIVE") == 1) 
+		&& mapBounds.find(m_roomSession->getRoom()->getMap()) != mapBounds.cend()
+		&& m_roomSession->getRoom()->getPassword().empty();
+
+	const auto spawns = Game::instance()->getSpawnManager()->getItemSpawns(m_roomSession->getRoom()->getMap());
 
 	for (size_t i = 0; i < spawns.size(); i++)
 	{
