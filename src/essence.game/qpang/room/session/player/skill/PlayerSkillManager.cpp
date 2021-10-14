@@ -154,7 +154,7 @@ uint32_t PlayerSkillManager::drawSkill()
 		std::unordered_map<uint32_t, uint32_t> skills;
 
 		m_drawnSkillCard = player->getRoomSession()->getSkillManager()->generateRandomSkill();
-		//m_drawnSkillCard->bind(player);
+		m_drawnSkillCard->bind(player);
 
 		return m_drawnSkillCard->getItemId();
 	}

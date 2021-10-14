@@ -1,7 +1,14 @@
 #pragma once
 
 #include "ItemID.h"
-#include <qpang/skill/SkillTarget.h>
+#include "SkillTarget.h"
+//#include "RoomSessionPlayer.h"
+
+#include <array>
+#include <memory>
+#include <cstdint>
+
+class RoomSessionPlayer;
 
 class Skill
 {
@@ -22,10 +29,10 @@ public:
 		}
 	}
 	
-	//void bind(RoomSessionPlayer::Ptr roomSessionPlayer)
-	//{
-	//	m_player = roomSessionPlayer;
-	//}
+	void bind(std::shared_ptr<RoomSessionPlayer> player)
+	{
+		m_player = player;
+	}
 
 	virtual void apply()
 	{
@@ -72,14 +79,12 @@ public:
 		return m_requiredSkillPoints;
 	}
 protected:
-	//RoomSessionPlayer::Ptr m_player;
-
 	SkillTarget m_skillTarget;
 
 	bool m_hasDuration;
 
 	uint32_t m_durationInSeconds;
 	uint32_t m_requiredSkillPoints;
-
 private:
+	std::shared_ptr<RoomSessionPlayer> m_player;
 };
