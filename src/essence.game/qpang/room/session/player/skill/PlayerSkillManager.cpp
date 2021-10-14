@@ -50,6 +50,16 @@ void PlayerSkillManager::activateSkillCard(uint32_t targetPlayerId, uint32_t seq
 		const auto playerId = player->getPlayer()->getId();
 		const auto itemId = m_activeSkillCard->getItemId();
 
+		const auto roomSessionPlayer = player->getPlayer()->getRoomPlayer()->getRoomSessionPlayer();
+
+		if (roomSessionPlayer == nullptr)
+		{
+			return;
+		}
+
+		player->getSkillManager()->getActiveSkillCard()->bind(roomSessionPlayer);
+		player->getSkillManager()->getActiveSkillCard()->apply();
+
 		roomSession->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::CARD_BEGIN, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
 
 		const auto requiredSkillPoints = m_activeSkillCard->getRequiredSkillPoints();

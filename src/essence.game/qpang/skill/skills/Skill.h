@@ -19,6 +19,16 @@ public:
 			m_durationInSeconds--;
 		}
 	}
+	
+	void bind(std::shared_ptr<RoomSessionPlayer> roomSessionPlayer)
+	{
+		m_roomSessionPlayer = m_roomSessionPlayer;
+	}
+
+	virtual void apply()
+	{
+
+	}
 
 	virtual uint32_t getItemId()
 	{
@@ -55,6 +65,8 @@ public:
 		return m_requiredSkillPoints;
 	}
 protected:
+	std::shared_ptr<RoomSessionPlayer> m_roomSessionPlayer;
+
 	bool m_hasDuration;
 	uint32_t m_durationInSeconds;
 
