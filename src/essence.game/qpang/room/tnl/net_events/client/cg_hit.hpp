@@ -126,7 +126,9 @@ public:
 			return;
 		}
 
-		if (isTrap(weaponId))
+		const auto isTrapWeapon = isTrap(weaponId);
+
+		if (isTrapWeapon)
 		{
 			damage = getTrapDamage(weaponId);
 
@@ -244,9 +246,15 @@ public:
 
 		if (areSkillsEnabled)
 		{
-			const auto skillPointsToAdd = (hitLocation == HEAD) ? 10 : 5;
+			const auto isValidWeapon = !isTrapWeapon 
+				&& ((weaponUsed.weaponType == WeaponType::MELEE) || (weaponUsed.weaponType == WeaponType::RIFLE));
 
-			dstPlayer->getSkillManager()->addSkillPoints(skillPointsToAdd);
+			if (isValidWeapon)
+			{
+				const auto skillPointsToAdd = (hitLocation == HEAD) ? 10 : 5;
+
+				dstPlayer->getSkillManager()->addSkillPoints(skillPointsToAdd);
+			}
 
 			if (dstPlayer->getSkillManager()->hasActiveSkillCard())
 			{
