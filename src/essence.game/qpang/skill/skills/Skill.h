@@ -21,6 +21,11 @@ public:
 	{
 	}
 
+	void bind(std::shared_ptr<RoomSessionPlayer> player)
+	{
+		m_player = player;
+	}
+
 	virtual void tick()
 	{
 		if (m_hasDuration && m_durationInSeconds > 0)
@@ -28,20 +33,10 @@ public:
 			m_durationInSeconds--;
 		}
 	}
-	
-	void bind(std::shared_ptr<RoomSessionPlayer> player)
-	{
-		m_player = player;
-	}
 
 	virtual void apply()
 	{
 
-	}
-
-	virtual uint32_t getItemId()
-	{
-		return ItemID::SKILL_NONE;
 	}
 
 	virtual bool shouldDisableOnBeingAttacked()
@@ -57,6 +52,11 @@ public:
 	virtual bool shouldDisableOnRollAction()
 	{
 		return false;
+	}
+
+	virtual uint32_t getItemId()
+	{
+		return ItemID::SKILL_NONE;
 	}
 
 	bool hasTargetOtherThanSelf()
@@ -79,6 +79,8 @@ public:
 		return m_requiredSkillPoints;
 	}
 protected:
+	std::shared_ptr<RoomSessionPlayer> m_player;
+	
 	SkillTarget m_skillTarget;
 
 	bool m_hasDuration;
@@ -86,5 +88,4 @@ protected:
 	uint32_t m_durationInSeconds;
 	uint32_t m_requiredSkillPoints;
 private:
-	std::shared_ptr<RoomSessionPlayer> m_player;
 };
