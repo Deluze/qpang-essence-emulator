@@ -247,7 +247,7 @@ public:
 		if (areSkillsEnabled)
 		{
 			const auto isValidWeapon = !isTrapWeapon 
-				&& ((weaponUsed.weaponType == WeaponType::MELEE) || (weaponUsed.weaponType == WeaponType::RIFLE));
+				&& ((weaponUsed.weaponType == WeaponType::MELEE) || (weaponUsed.weaponType == WeaponType::RIFLE) || (weaponUsed.weaponType == WeaponType::LAUNCHER));
 
 			if (isValidWeapon)
 			{

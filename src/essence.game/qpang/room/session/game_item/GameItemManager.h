@@ -35,9 +35,10 @@ enum ID : uint32_t
 
 static std::vector<uint32_t> possibleItems = {
 	ID::AMMO_CLIP,
+	ID::SKILL_CARD,
+	ID::SKILL_CARD,
 	ID::RED_MEDKIT,
 	ID::GREEN_MEDKIT,
-	ID::SKILL_CARD,
 };
 
 static std::unordered_map<uint32_t, GameItem*> mappedItems = {

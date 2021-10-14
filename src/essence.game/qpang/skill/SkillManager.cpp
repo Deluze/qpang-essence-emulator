@@ -22,24 +22,24 @@ void SkillManager::initialize()
 	m_skills.clear();
 
 	m_skills[GameMode::DM][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
+	//m_skills[GameMode::DM][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
 
-	//m_skills[GameMode::TDM][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	//m_skills[GameMode::TDM][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
-	//m_skills[GameMode::TDM][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
-	//m_skills[GameMode::TDM][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
-	//m_skills[GameMode::TDM][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
-	//m_skills[GameMode::TDM][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
-	//m_skills[GameMode::TDM][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
 	m_skills[GameMode::TDM][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
 
 	m_skills[GameMode::PTE][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
+	//m_skills[GameMode::PTE][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
@@ -48,7 +48,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::PTE][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
 
 	m_skills[GameMode::VIP][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
+	//m_skills[GameMode::VIP][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
@@ -57,7 +57,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::VIP][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
 
 	m_skills[GameMode::PREY][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
-	m_skills[GameMode::PREY][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
+	//m_skills[GameMode::PREY][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
 	m_skills[GameMode::PREY][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
 	m_skills[GameMode::PREY][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
 	m_skills[GameMode::PREY][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };

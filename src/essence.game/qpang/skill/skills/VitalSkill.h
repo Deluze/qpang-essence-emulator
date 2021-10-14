@@ -26,7 +26,10 @@ public:
 			// Iterate over all team players that are alive and give them 5 health each tick for the entire duration of the skillcard.
 			for (const auto &teamPlayer : teamPlayers)
 			{
-				if (!teamPlayer->isDead())
+				const auto teamPlayerId = teamPlayer->getPlayer()->getId();
+				const auto playerId = m_player->getPlayer()->getId();
+
+				if (!teamPlayer->isDead() && teamPlayerId != playerId)
 				{
 					teamPlayer->addHealth(5, true);
 				}

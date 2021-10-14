@@ -145,7 +145,6 @@ void GameItemManager::reset()
 uint32_t GameItemManager::getRandomItem()
 {
 	const auto randomPossibleItemIndex = rand() % possibleItems.size();
-
 	auto item = possibleItems[randomPossibleItemIndex];
 
 	if (item == ID::GREEN_MEDKIT && !m_roomSession->getGameMode()->isTeamMode())
