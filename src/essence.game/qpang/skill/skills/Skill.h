@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ItemID.h"
+#include <qpang/skill/SkillTarget.h>
 
 class Skill
 {
@@ -8,11 +9,12 @@ public:
 	Skill() :
 		m_requiredSkillPoints(0),
 		m_hasDuration(false),
-		m_durationInSeconds(0)
+		m_durationInSeconds(0),
+		m_skillTarget(SkillTarget::SELF)
 	{
 	}
 
-	void tick()
+	virtual void tick()
 	{
 		if (m_hasDuration && m_durationInSeconds > 0)
 		{
@@ -20,10 +22,10 @@ public:
 		}
 	}
 	
-	void bind(std::shared_ptr<RoomSessionPlayer> roomSessionPlayer)
-	{
-		m_roomSessionPlayer = m_roomSessionPlayer;
-	}
+	//void bind(RoomSessionPlayer::Ptr roomSessionPlayer)
+	//{
+	//	m_player = roomSessionPlayer;
+	//}
 
 	virtual void apply()
 	{
@@ -50,6 +52,11 @@ public:
 		return false;
 	}
 
+	bool hasTargetOtherThanSelf()
+	{
+		return (m_skillTarget != SkillTarget::SELF);
+	}
+
 	bool hasDuration()
 	{
 		return m_hasDuration;
@@ -65,11 +72,14 @@ public:
 		return m_requiredSkillPoints;
 	}
 protected:
-	std::shared_ptr<RoomSessionPlayer> m_roomSessionPlayer;
+	//RoomSessionPlayer::Ptr m_player;
+
+	SkillTarget m_skillTarget;
 
 	bool m_hasDuration;
-	uint32_t m_durationInSeconds;
 
+	uint32_t m_durationInSeconds;
 	uint32_t m_requiredSkillPoints;
+
 private:
 };

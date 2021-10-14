@@ -33,6 +33,13 @@ void PlayerSkillManager::tick()
 
 void PlayerSkillManager::activateSkillCard(uint32_t targetPlayerId, uint32_t seqId)
 {
+	if (!hasSufficientSkillPoints())
+	{
+		failSkillCard(targetPlayerId, seqId);
+
+		return;
+	}
+
 	m_activeSkillCard = m_drawnSkillCard;
 
 	m_activeSkillCardTargetPlayerId = targetPlayerId;
@@ -46,25 +53,17 @@ void PlayerSkillManager::activateSkillCard(uint32_t targetPlayerId, uint32_t seq
 		{
 			return;
 		}
-		
+
 		const auto playerId = player->getPlayer()->getId();
 		const auto itemId = m_activeSkillCard->getItemId();
 
-		const auto roomSessionPlayer = player->getPlayer()->getRoomPlayer()->getRoomSessionPlayer();
-
-		if (roomSessionPlayer == nullptr)
-		{
-			return;
-		}
-
-		player->getSkillManager()->getActiveSkillCard()->bind(roomSessionPlayer);
 		player->getSkillManager()->getActiveSkillCard()->apply();
 
 		roomSession->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::CARD_BEGIN, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
 
-		const auto requiredSkillPoints = m_activeSkillCard->getRequiredSkillPoints();
+		const auto requiredSkillPoints = getRequiredSkillPoints();
 
-		removeSkillPoints(requiredSkillPoints * 100);
+		removeSkillPoints(requiredSkillPoints);
 	}
 }
 
@@ -90,6 +89,23 @@ void PlayerSkillManager::deactivateSkillCard()
 	m_activeSkillCardSeqId = 0;
 
 	updateSkillPointsForPlayer();
+}
+
+void PlayerSkillManager::failSkillCard(uint32_t targetPlayerId, uint32_t seqId)
+{
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		const auto playerId = player->getPlayer()->getId();
+		const auto itemId = m_drawnSkillCard->getItemId();
+
+		player->getRoomSession()->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::CARD_USE_FAIL, CGCard::SKILL_CARD, itemId, seqId);
+
+		const auto requiredSkillPoints = getRequiredSkillPoints();
+
+		removeSkillPoints(requiredSkillPoints);
+
+		m_drawnSkillCard = nullptr;
+	}
 }
 
 void PlayerSkillManager::updateSkillPointsForPlayer()
@@ -133,9 +149,12 @@ void PlayerSkillManager::resetSkillPoints()
 
 uint32_t PlayerSkillManager::drawSkill()
 {
-	if (const auto player = m_player.lock(); player != nullptr)
+	if (auto player = m_player.lock(); player != nullptr)
 	{
+		std::unordered_map<uint32_t, uint32_t> skills;
+
 		m_drawnSkillCard = player->getRoomSession()->getSkillManager()->generateRandomSkill();
+		//m_drawnSkillCard->bind(player);
 
 		return m_drawnSkillCard->getItemId();
 	}
@@ -146,6 +165,28 @@ uint32_t PlayerSkillManager::drawSkill()
 std::shared_ptr<Skill> PlayerSkillManager::getActiveSkillCard()
 {
 	return m_activeSkillCard;
+}
+
+std::shared_ptr<Skill> PlayerSkillManager::getDrawnSkillCard()
+{
+	return m_drawnSkillCard;
+}
+
+uint32_t PlayerSkillManager::getRequiredSkillPoints()
+{
+	if (m_drawnSkillCard == nullptr)
+	{
+		return std::numeric_limits<unsigned int>::max();
+	}
+
+	return (m_drawnSkillCard->getRequiredSkillPoints() * 100);
+}
+
+bool PlayerSkillManager::hasSufficientSkillPoints()
+{
+	const auto requiredSkillPoints = getRequiredSkillPoints();
+
+	return (m_skillPoints >= requiredSkillPoints);
 }
 
 bool PlayerSkillManager::isSkillCardActive()

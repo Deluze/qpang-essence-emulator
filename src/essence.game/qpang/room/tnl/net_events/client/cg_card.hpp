@@ -16,8 +16,11 @@ class CGCard : public GameNetEvent
 public:
 	enum CMD : U32
 	{
+		CARD_UNK_1 = 3,
 		CARD_BEGIN = 4,
-		CARD_END = 9
+		CARD_END = 9,
+		// 10 and 15 both do the same.
+		CARD_USE_FAIL = 10,
 	};
 
 	enum CardType : U32
@@ -103,12 +106,23 @@ public:
 
 		if (cmd == CMD::CARD_BEGIN)
 		{
-
 			// In other words, is the skill the player wants to activate also the skill that they have drawn.
 			// If a player attempts to activate their skillcard whilst they already have a skillcard active, something isn't right.
 			if (!roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId) || roomSessionPlayer->getSkillManager()->isSkillCardActive())
 			{
 				return;
+			}
+
+			if (roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->hasTargetOtherThanSelf())
+			{
+				if (targetUid == 0)
+				{
+					roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
+
+					return;
+				}
+
+				// TODO: Quality checks to ensure the target player matches the skillcard target type.
 			}
 
 			roomSessionPlayer->getSkillManager()->activateSkillCard(targetUid, seqId);
