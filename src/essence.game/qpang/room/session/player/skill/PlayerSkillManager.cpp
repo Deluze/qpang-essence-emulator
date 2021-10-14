@@ -17,7 +17,7 @@ void PlayerSkillManager::initialize(std::shared_ptr<RoomSessionPlayer> player)
 
 void PlayerSkillManager::tick()
 {
-	if (isSkillCardActive() && m_activeSkillCard->hasDuration())
+	if (hasActiveSkillCard() && m_activeSkillCard->hasDuration())
 	{
 		if (m_activeSkillCard->getDurationInSeconds() > 0)
 		{
@@ -189,9 +189,9 @@ bool PlayerSkillManager::hasSufficientSkillPoints()
 	return (m_skillPoints >= requiredSkillPoints);
 }
 
-bool PlayerSkillManager::isSkillCardActive()
+bool PlayerSkillManager::hasActiveSkillCard()
 {
-	return (m_activeSkillCard != nullptr);
+	return  (m_activeSkillCard != nullptr);
 }
 
 bool PlayerSkillManager::isDrawnSkillCard(uint32_t itemId)

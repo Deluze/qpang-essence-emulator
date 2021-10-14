@@ -114,6 +114,7 @@ public:
 		uint8_t effectId = 0;
 
 		const auto roomSession = srcPlayer->getRoomSession();
+		const auto areSkillsEnabled = roomSession->getRoom()->isSkillsEnabled();
 
 		auto isTeamMode = roomSession->getGameMode()->isTeamMode();
 		auto isSameTeam = (isTeamMode && (srcPlayer->getTeam() == dstPlayer->getTeam()));
@@ -241,13 +242,20 @@ public:
 		roomSession->relayPlaying<GCHit>(srcPlayerId, dstPlayerId, unk_03, srcPosX, srcPosY, srcPosZ, dstPosX, dstPosY, dstPosZ, entityId,
 			hitType, hitLocation, dstPlayer->getHealth(), damage, weaponId, rtt, weaponType, unk_16, srcPlayer->getStreak() + 1, unk_18, effectId);
 
-		if (dstPlayer->getSkillManager()->isSkillCardActive())
+		if (areSkillsEnabled)
 		{
-			const auto shouldDisableOnBeingAttacked = dstPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnBeingAttacked();
+			const auto skillPointsToAdd = (hitLocation == HEAD) ? 10 : 5;
 
-			if (shouldDisableOnBeingAttacked)
+			dstPlayer->getSkillManager()->addSkillPoints(skillPointsToAdd);
+
+			if (dstPlayer->getSkillManager()->hasActiveSkillCard())
 			{
-				dstPlayer->getSkillManager()->deactivateSkillCard();
+				const auto shouldDisableOnBeingAttacked = dstPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnBeingAttacked();
+
+				if (shouldDisableOnBeingAttacked)
+				{
+					dstPlayer->getSkillManager()->deactivateSkillCard();
+				}
 			}
 		}
 

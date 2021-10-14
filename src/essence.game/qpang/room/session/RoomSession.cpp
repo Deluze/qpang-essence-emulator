@@ -133,7 +133,7 @@ bool RoomSession::removePlayer(uint32_t playerId)
 		player->getWeaponManager()->unequipMachineGun();
 	}
 
-	if (player->getSkillManager()->isSkillCardActive())
+	if (player->getSkillManager()->hasActiveSkillCard())
 	{
 		player->getSkillManager()->deactivateSkillCard();
 	}

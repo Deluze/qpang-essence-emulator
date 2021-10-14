@@ -35,7 +35,7 @@ public:
 
 	bool hasSufficientSkillPoints();
 
-	bool isSkillCardActive();
+	bool hasActiveSkillCard();
 	bool isDrawnSkillCard(uint32_t itemId);
 private:
 	std::weak_ptr<RoomSessionPlayer> m_player;

@@ -108,7 +108,7 @@ public:
 		{
 			// In other words, is the skill the player wants to activate also the skill that they have drawn.
 			// If a player attempts to activate their skillcard whilst they already have a skillcard active, something isn't right.
-			if (!roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId) || roomSessionPlayer->getSkillManager()->isSkillCardActive())
+			if (!roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId) || roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
 			{
 				return;
 			}
@@ -166,7 +166,7 @@ public:
 			return;
 		}
 
-		if (roomSessionPlayer->getSkillManager()->isSkillCardActive())
+		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
 		{
 			const auto shouldDisableOnUseOfActionCard = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnUseOfActionCard();
 
