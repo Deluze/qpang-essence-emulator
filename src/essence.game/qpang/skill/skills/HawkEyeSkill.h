@@ -11,6 +11,8 @@ public:
 
 		m_hasDuration = true;
 		m_durationInSeconds = 5;
+
+		m_skillTarget = SkillTarget::SELF;
 	}
 
 	uint32_t getItemId() override
