@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-class ShotMoveSkill : public Skill
+class RapidFireSkill : public Skill
 {
 public:
-	ShotMoveSkill() : Skill()
+	RapidFireSkill() : Skill()
 	{
 		m_requiredSkillPoints = 1;
 
@@ -17,7 +17,7 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_SHOT_MOVE;
+		return ItemID::SKILL_RAPID_FIRE;
 	}
 private:
 };
