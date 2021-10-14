@@ -178,7 +178,14 @@ public:
 			break;
 			case Command::TOGGLE_SKILL:
 			{
-				room->setSkillsEnabled(!room->isSkillsEnabled());
+				if (roomPlayer->getPlayer()->getRank() == 3)
+				{
+					room->setSkillsEnabled(true);
+				}
+				else
+				{
+					room->setSkillsEnabled(false);
+				}
 			}
 			break;
 			case Command::TEAM_ROOM:
