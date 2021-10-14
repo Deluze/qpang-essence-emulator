@@ -54,7 +54,7 @@ public:
 		return false;
 	}
 
-	virtual bool shouldDisableOnUseOfActionCard()
+	virtual bool shouldDisableOnRollAction()
 	{
 		return false;
 	}

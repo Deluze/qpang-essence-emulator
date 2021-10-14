@@ -30,7 +30,7 @@ public:
 		return true;
 	}
 
-	bool shouldDisableOnUseOfActionCard() override
+	bool shouldDisableOnRollAction() override
 	{
 		return true;
 	}

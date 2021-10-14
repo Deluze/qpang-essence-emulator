@@ -168,9 +168,13 @@ public:
 
 		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
 		{
-			const auto shouldDisableOnUseOfActionCard = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnUseOfActionCard();
+			const auto shouldDisableOnRollAction = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnRollAction();
+			const auto isRollAction = (itemId == ActionCardId::ROLL_OVER_LEFT) 
+				|| (itemId == ActionCardId::ROLL_OVER_RIGHT) 
+				|| (itemId == ActionCardId::DASH) 
+				|| (itemId == ActionCardId::TUMBLE);
 
-			if (shouldDisableOnUseOfActionCard)
+			if (shouldDisableOnRollAction && isRollAction)
 			{
 				roomSessionPlayer->getSkillManager()->deactivateSkillCard();
 			}
