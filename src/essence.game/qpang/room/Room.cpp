@@ -28,7 +28,7 @@ Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, cons
 	m_masterPlayerId(0),
 	m_isLevelLimited(false),
 	m_isTeamSorting(false),
-	m_isSkillsEnabled(false),
+	m_isSkillsEnabled(true),
 	m_isMeleeOnly(false),
 	m_scorePoints(40),
 	m_scoreTime(10),
@@ -39,14 +39,7 @@ Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, cons
 	m_modeManager = Game::instance()->getRoomManager()->getGameModeManager()->get(mode);
 	m_isReloadGlitchEnabled = false;
 
-	if (m_modeManager->isPublicEnemyMode())
-	{
-		setSkillsEnabled(false);
-	}
-	/*else
-	{
-		setSkillsEnabled(true);
-	}*/
+	setSkillsEnabled(!m_modeManager->isPublicEnemyMode());
 }
 
 void Room::addPlayer(GameConnection* conn)

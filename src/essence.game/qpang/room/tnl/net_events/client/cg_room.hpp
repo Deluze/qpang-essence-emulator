@@ -185,14 +185,9 @@ public:
 					break;
 				}
 
-				if (roomPlayer->getPlayer()->getRank() == 3)
-				{
-					room->setSkillsEnabled(!room->isSkillsEnabled());
-				}
-				else
-				{
-					room->setSkillsEnabled(false);
-				}
+				room->setSkillsEnabled(!room->isSkillsEnabled());
+
+				break;
 			}
 			break;
 			case Command::TEAM_ROOM:
