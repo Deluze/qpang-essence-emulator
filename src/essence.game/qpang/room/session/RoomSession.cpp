@@ -128,7 +128,7 @@ bool RoomSession::removePlayer(uint32_t playerId)
 			session->post(new GCHitEssence(session->getPlayer()->getId(), player->getPlayer()->getId(), 3, pos.x, pos.y, pos.z, 0, 6));
 	}
 
-	if (player->getWeaponManager()->getHasEquippedMachineGun())
+	if (player->getWeaponManager()->hasEquippedMachineGun())
 	{
 		player->getWeaponManager()->unequipMachineGun();
 	}
@@ -371,7 +371,7 @@ void RoomSession::finish()
 
 	for (const auto& player : getPlayingPlayers())
 	{
-		if (player->getWeaponManager()->getHasEquippedMachineGun())
+		if (player->getWeaponManager()->hasEquippedMachineGun())
 		{
 			player->getWeaponManager()->unequipMachineGun();
 		}
