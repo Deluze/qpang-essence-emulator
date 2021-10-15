@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-class GiantBeastSkill : public Skill
+class LastWeaponSkill : public Skill
 {
 public:
-	GiantBeastSkill() : Skill()
+	LastWeaponSkill() : Skill()
 	{
 		m_requiredSkillPoints = 4;
 
@@ -19,10 +19,10 @@ public:
 	{
 		Skill::onApply();
 
-		m_player->setHealth(m_giantBeastBaseHealth, true);
+		m_player->setHealth(m_lastWeaponBaseHealth, true);
 		m_player->makeInvincible(m_transformationTime);
 
-		m_player->getWeaponManager()->equipRainbowSkillCardWeapon(m_giantBeastWeaponItemId);
+		m_player->getWeaponManager()->equipRainbowSkillCardWeapon(m_lastWeaponWeaponItemId);
 	}
 
 	void onWearOff() override
@@ -33,10 +33,11 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_GIANT_BEAST;
+		return ItemID::SKILL_LAST_WEAPON;
 	}
 private:
-	uint32_t m_transformationTime = 9;
-	uint32_t m_giantBeastBaseHealth = 600;
-	uint32_t m_giantBeastWeaponItemId = 1095368707;
+	uint32_t m_transformationTime = 6;
+
+	uint32_t m_lastWeaponBaseHealth = 2000;
+	uint32_t m_lastWeaponWeaponItemId = 1095434243;
 };

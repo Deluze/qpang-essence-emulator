@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-class GiantBeastSkill : public Skill
+class TranseSkill : public Skill
 {
 public:
-	GiantBeastSkill() : Skill()
+	TranseSkill() : Skill()
 	{
 		m_requiredSkillPoints = 4;
 
@@ -19,10 +19,10 @@ public:
 	{
 		Skill::onApply();
 
-		m_player->setHealth(m_giantBeastBaseHealth, true);
+		m_player->setHealth(m_transeBaseHealth, true);
 		m_player->makeInvincible(m_transformationTime);
 
-		m_player->getWeaponManager()->equipRainbowSkillCardWeapon(m_giantBeastWeaponItemId);
+		m_player->getWeaponManager()->equipRainbowSkillCardWeapon(m_transeWeaponItemId);
 	}
 
 	void onWearOff() override
@@ -33,10 +33,10 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_GIANT_BEAST;
+		return ItemID::SKILL_TRANSE;
 	}
 private:
-	uint32_t m_transformationTime = 9;
-	uint32_t m_giantBeastBaseHealth = 600;
-	uint32_t m_giantBeastWeaponItemId = 1095368707;
+	uint32_t m_transformationTime = 6;
+	uint32_t m_transeBaseHealth = 500;
+	uint32_t m_transeWeaponItemId = 1095303170;
 };
