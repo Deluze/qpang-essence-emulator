@@ -178,9 +178,16 @@ public:
 			break;
 			case Command::TOGGLE_SKILL:
 			{
+				if (room->getMode() == GameMode::PREY)
+				{
+					room->setSkillsEnabled(false);
+
+					break;
+				}
+
 				if (roomPlayer->getPlayer()->getRank() == 3)
 				{
-					room->setSkillsEnabled(true);
+					room->setSkillsEnabled(!room->isSkillsEnabled());
 				}
 				else
 				{

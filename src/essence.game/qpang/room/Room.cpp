@@ -38,6 +38,15 @@ Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, cons
 {
 	m_modeManager = Game::instance()->getRoomManager()->getGameModeManager()->get(mode);
 	m_isReloadGlitchEnabled = false;
+
+	if (m_modeManager->isPublicEnemyMode())
+	{
+		setSkillsEnabled(false);
+	}
+	/*else
+	{
+		setSkillsEnabled(true);
+	}*/
 }
 
 void Room::addPlayer(GameConnection* conn)
