@@ -375,6 +375,11 @@ void RoomSession::finish()
 		{
 			player->getWeaponManager()->unequipMachineGun();
 		}
+
+		if (player->getSkillManager()->hasActiveSkillCard())
+		{
+			player->getSkillManager()->deactivateSkillCard();
+		}
 	}
 
 	m_leaverMx.lock();
