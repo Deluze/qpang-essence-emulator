@@ -311,11 +311,6 @@ public:
 				}
 			}
 		}
-
-		if (areSkillsEnabled && dstPlayer->getSkillManager()->hasActiveSkillCard())
-		{
-			dstPlayer->getSkillManager()->deactivateSkillCard();
-		}
 	}
 
 	void hitEmpty(const uint32_t weaponId, const RoomSessionPlayer::Ptr& srcPlayer) const
