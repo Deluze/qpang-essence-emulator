@@ -276,6 +276,11 @@ public:
 
 			srcPlayer->getEntityManager()->addKill(entityId);
 
+			if (areSkillsEnabled && dstPlayer->getSkillManager()->hasActiveSkillCard())
+			{
+				dstPlayer->getSkillManager()->deactivateSkillCard();
+			}
+
 			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);
 			roomSession->relayPlaying<GCGameState>(dstId, hitLocation == 0 ? 28 : 17, weaponId, srcId);
 		}

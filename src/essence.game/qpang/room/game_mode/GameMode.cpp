@@ -87,11 +87,6 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
 	const auto areSkillCardsEnabled = roomSession->getRoom()->isSkillsEnabled();
 
-	if (areSkillCardsEnabled && target->getSkillManager()->hasActiveSkillCard())
-	{
-		target->getSkillManager()->deactivateSkillCard();
-	}
-
 	if (isSuicide && !isPublicEnemyMode)
 	{
 		killer->addDeath();
