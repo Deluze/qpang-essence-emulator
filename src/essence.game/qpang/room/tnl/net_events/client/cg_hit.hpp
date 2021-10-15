@@ -282,10 +282,25 @@ public:
 			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);
 			roomSession->relayPlaying<GCGameState>(dstId, hitLocation == 0 ? 28 : 17, weaponId, srcId);
 
-			if (areSkillsEnabled && dstPlayer->getSkillManager()->hasActiveSkillCard())
+			for (const auto& playingPlayer : roomSession->getPlayingPlayers())
 			{
-				dstPlayer->getSkillManager()->deactivateSkillCard();
+				if (playingPlayer->getSkillManager()->hasActiveSkillCard())
+				{
+					const auto skillTarget = playingPlayer->getSkillManager()->getActiveSkillCard()->getSkillTarget();
+					const auto skillCardTargetPlayerId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
+
+					// NOTE: Added the check for skill target since the Vital skill shouldnt disable if the playng player dies.
+					if ((skillTarget != SkillTarget::ALL_TEAM_PLAYERS) && (skillCardTargetPlayerId == dstPlayer->getPlayer()->getId()))
+					{
+						playingPlayer->getSkillManager()->deactivateSkillCard();
+					}
+				}
 			}
+		}
+
+		if (areSkillsEnabled && dstPlayer->getSkillManager()->hasActiveSkillCard())
+		{
+			dstPlayer->getSkillManager()->deactivateSkillCard();
 		}
 	}
 

@@ -113,7 +113,7 @@ public:
 				return;
 			}
 
-			if (roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->hasTargetOtherThanSelf())
+			if (roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTarget() != SkillTarget::SELF)
 			{
 				const auto targetPlayer = roomSession->find(targetUid);
 

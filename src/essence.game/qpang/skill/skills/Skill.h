@@ -64,11 +64,6 @@ public:
 		return ItemID::SKILL_NONE;
 	}
 
-	bool hasTargetOtherThanSelf()
-	{
-		return (m_skillTarget != SkillTarget::SELF);
-	}
-
 	bool hasDuration()
 	{
 		return m_hasDuration;
@@ -87,6 +82,11 @@ public:
 	uint32_t getRequiredSkillPoints()
 	{
 		return m_requiredSkillPoints;
+	}
+
+	SkillTarget getSkillTarget()
+	{
+		return m_skillTarget;
 	}
 protected:
 	std::shared_ptr<RoomSessionPlayer> m_player;
