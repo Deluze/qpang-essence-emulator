@@ -31,7 +31,7 @@ public:
 
 				if (!teamPlayer->isDead() && teamPlayerId != playerId)
 				{
-					teamPlayer->addHealth(5, true);
+					teamPlayer->addHealth(m_vitalSkillTeamHealthPerTick, true);
 				}
 			}
 
@@ -42,8 +42,7 @@ public:
 	{
 		Skill::onApply();
 
-		// Set the health of the player to 1.
-		m_player->setHealth(1);
+		m_player->setHealth(m_vitalSkillSacrificeHealth);
 	}
 
 	uint32_t getItemId() override
@@ -51,4 +50,6 @@ public:
 		return ItemID::SKILL_VITAL;
 	}
 private:
+	uint32_t m_vitalSkillSacrificeHealth = 1;
+	uint32_t m_vitalSkillTeamHealthPerTick = 5;
 };
