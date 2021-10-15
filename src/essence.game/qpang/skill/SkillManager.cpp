@@ -4,7 +4,7 @@
 
 #include <qpang/Game.h>
 
-#include <qpang/skill/skills/ShotMoveSkill.h>
+#include <qpang/skill/skills/RapidFireSkill.h>
 #include <qpang/skill/skills/HawkEyeSkill.h>
 #include <qpang/skill/skills/CamoSkill.h>
 #include <qpang/skill/skills/PocketSizeSkill.h>
