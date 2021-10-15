@@ -33,7 +33,12 @@ public:
 		}
 	}
 
-	virtual void apply()
+	virtual void onApply()
+	{
+
+	}
+
+	virtual void onWearOff()
 	{
 
 	}

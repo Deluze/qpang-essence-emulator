@@ -15,12 +15,17 @@ public:
 		m_skillTarget = SkillTarget::SELF;
 	}
 
-	void apply() override
+	void onApply() override
 	{
-		Skill::apply();
+		Skill::onApply();
 
 		// Set the health of the player to 600.
 		m_player->setHealth(600);
+	}
+
+	void onWearOff() override
+	{
+
 	}
 
 	uint32_t getItemId() override

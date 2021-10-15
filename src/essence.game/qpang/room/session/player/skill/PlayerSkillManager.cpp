@@ -57,7 +57,7 @@ void PlayerSkillManager::activateSkillCard(uint32_t targetPlayerId, uint32_t seq
 		const auto playerId = player->getPlayer()->getId();
 		const auto itemId = m_activeSkillCard->getItemId();
 
-		player->getSkillManager()->getActiveSkillCard()->apply();
+		player->getSkillManager()->getActiveSkillCard()->onApply();
 
 		roomSession->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::CARD_BEGIN, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
 
@@ -80,6 +80,8 @@ void PlayerSkillManager::deactivateSkillCard()
 		const auto itemId = m_activeSkillCard->getItemId();
 
 		player->getRoomSession()->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::CARD_END, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
+
+		player->getSkillManager()->getActiveSkillCard()->onWearOff();
 	}
 
 	m_drawnSkillCard = nullptr;

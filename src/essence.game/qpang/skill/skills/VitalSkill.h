@@ -38,9 +38,9 @@ public:
 		}
 	}
 
-	void apply() override
+	void onApply() override
 	{
-		Skill::apply();
+		Skill::onApply();
 
 		// Set the health of the player to 1.
 		m_player->setHealth(1);
