@@ -246,10 +246,13 @@ public:
 
 		if (areSkillsEnabled)
 		{
+			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
+			const auto dstPlayerHasRainbowSkillCard = dstPlayerHasActiveSkill && dstPlayer->getSkillManager()->getActiveSkillCard()->isRainbowSkillCard();
+
 			const auto isValidWeapon = !isTrapWeapon 
 				&& ((weaponUsed.weaponType == WeaponType::MELEE) || (weaponUsed.weaponType == WeaponType::RIFLE) || (weaponUsed.weaponType == WeaponType::LAUNCHER));
 
-			if (isValidWeapon)
+			if (!dstPlayerHasRainbowSkillCard && isValidWeapon)
 			{
 				const auto skillPointsToAdd = (hitLocation == HEAD) ? 10 : 5;
 
@@ -276,13 +279,13 @@ public:
 
 			srcPlayer->getEntityManager()->addKill(entityId);
 
+			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);
+			roomSession->relayPlaying<GCGameState>(dstId, hitLocation == 0 ? 28 : 17, weaponId, srcId);
+
 			if (areSkillsEnabled && dstPlayer->getSkillManager()->hasActiveSkillCard())
 			{
 				dstPlayer->getSkillManager()->deactivateSkillCard();
 			}
-
-			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);
-			roomSession->relayPlaying<GCGameState>(dstId, hitLocation == 0 ? 28 : 17, weaponId, srcId);
 		}
 	}
 
