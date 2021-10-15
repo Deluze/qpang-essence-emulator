@@ -12,6 +12,26 @@ void PlayerSkillManager::initialize(std::shared_ptr<RoomSessionPlayer> player)
 {
 	m_player = player;
 
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		const auto equippedBoosterItemId = player->getPlayer()->getEquipmentManager()->getEquippedBooster();
+
+		switch (equippedBoosterItemId)
+		{
+			 // Cboost
+		case 1426522368:
+			m_skillGaugeBoostPercentage = 0.10;
+			break;
+			 // Cboost2
+		case 1426522624:
+			m_skillGaugeBoostPercentage = 0.50;
+			break;
+		default: 
+			m_skillGaugeBoostPercentage = 0.00;
+			break;
+		}
+	}
+
 	resetSkillPoints();
 }
 
@@ -193,6 +213,12 @@ uint32_t PlayerSkillManager::getRequiredSkillPoints()
 	}
 
 	return (m_drawnSkillCard->getRequiredSkillPoints() * 100);
+}
+
+
+double PlayerSkillManager::getSkillGaugeBoostPercentage()
+{
+	return m_skillGaugeBoostPercentage;
 }
 
 bool PlayerSkillManager::hasSufficientSkillPoints()

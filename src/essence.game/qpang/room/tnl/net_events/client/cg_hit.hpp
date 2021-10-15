@@ -269,8 +269,9 @@ public:
 			if (!dstPlayerHasRainbowSkillCard && isValidWeapon)
 			{
 				const auto skillPointsToAdd = (hitLocation == HEAD) ? 10 : 5;
+				const auto skillGaugeBoostPercentage = dstPlayer->getSkillManager()->getSkillGaugeBoostPercentage();
 
-				dstPlayer->getSkillManager()->addSkillPoints(skillPointsToAdd);
+				dstPlayer->getSkillManager()->addSkillPoints((uint32_t)(skillPointsToAdd + (skillPointsToAdd * skillGaugeBoostPercentage)));
 			}
 
 			if (dstPlayer->getSkillManager()->hasActiveSkillCard())

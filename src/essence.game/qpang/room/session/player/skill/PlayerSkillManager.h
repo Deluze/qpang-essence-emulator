@@ -36,6 +36,8 @@ public:
 
 	uint32_t getRequiredSkillPoints();
 
+	double getSkillGaugeBoostPercentage();
+
 	bool hasSufficientSkillPoints();
 
 	bool hasActiveSkillCard();
@@ -50,4 +52,6 @@ private:
 
 	uint32_t m_activeSkillCardTargetPlayerId;
 	uint32_t m_activeSkillCardSeqId;
+
+	double m_skillGaugeBoostPercentage;
 };
