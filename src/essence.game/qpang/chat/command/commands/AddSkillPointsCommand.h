@@ -12,10 +12,10 @@
 #include <qpang/room/tnl/net_events/server/gc_game_state.hpp>
 #include <qpang/room/tnl/net_events/server/gc_card.hpp>
 
-class ExecGameStateCommand : public Command
+class AddSkillPointsCommand : public Command
 {
 public:
-	ExecGameStateCommand() : Command(3)
+	AddSkillPointsCommand() : Command(4)
 	{
 
 	}
@@ -33,7 +33,7 @@ public:
 
 		if (roomPlayer == nullptr)
 		{
-			player->broadcast(u"");
+			player->broadcast(u"Enter a game room to execute this command.");
 
 			return;
 		}
@@ -42,7 +42,7 @@ public:
 
 		if (roomSessionPlayer == nullptr)
 		{
-			player->broadcast(u"Go in a game.");
+			player->broadcast(u"Start playing a game to execute this command.");
 
 			return;
 		}
@@ -51,22 +51,15 @@ public:
 
 		if (roomSession == nullptr)
 		{
-			player->broadcast(u"Go in a game.");
+			player->broadcast(u"The room is not in session. Start playing to execute this command.");
 
 			return;
 		}
 
-		const auto cmd = 4;
+		const auto points = convertToInteger(args.at(0));
 
-		const auto uid = player->getId();
-		const auto targetUid = uid;
+		roomSessionPlayer->getSkillManager()->addSkillPoints(points);
 
-		const auto cardType = 7;
-
-		const auto itemId = convertToInteger(args.at(0));
-		const auto seqId = itemId;
-
-		roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
-		//roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
+		player->broadcast(u"[Server]: Successfully added skillpoints.");
 	}
 };

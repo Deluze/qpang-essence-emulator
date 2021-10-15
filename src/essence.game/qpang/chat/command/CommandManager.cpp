@@ -7,7 +7,7 @@
 #include "DatabaseCommand.h"
 #include "ReloadCommand.h"
 #include "UnlimitedCommand.h"
-#include "ExecGameStateCommand.h"
+#include "AddSkillPointsCommand.h"
 #include "ToggleReloadGlitchCommand.h"
 #include "qpang/chat/command/Command.h"
 #include "qpang/chat/command/commands/NameChangeCommand.h"
@@ -57,7 +57,8 @@ void CommandManager::initialize()
 		{u"nc", new NameChangeCommand()},
 		{u"invincible", new InvincibleCommand()},
 		{u"r3", new ToggleReloadGlitchCommand()},
-		{u"gs", new ExecGameStateCommand()},
+		{u"addskillpoints", new AddSkillPointsCommand()},
+		{u"asp", new AddSkillPointsCommand()},
 		{u"fakedeath", new FakeDeathCommand()},
 		{u"fakedeathall", new FakeDeathAllCommand()},
 	};
