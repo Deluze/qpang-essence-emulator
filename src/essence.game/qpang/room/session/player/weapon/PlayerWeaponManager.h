@@ -38,12 +38,15 @@ public:
 	std::array<uint32_t, 4> getWeaponIds();
 	std::array<Weapon, 4> getWeapons();
 
-	bool getHasEquippedMachineGun();
+	bool hasEquippedMachineGun();
 
 	uint64_t getEquippedMachineGunSeqId();
 
 	void equipMachineGun(uint64_t seqId);
 	void unequipMachineGun();
+
+	void equipRainbowSkillCardWeapon(uint32_t weaponId);
+	void unequipRainbowSkillCardWeapon();
 private:
 	std::array<Weapon, 4> m_weapons;
 	uint8_t m_selectedWeaponIndex;
@@ -52,7 +55,7 @@ private:
 
 	std::weak_ptr<RoomSessionPlayer> m_player;
 
-	Weapon m_currentGunWeapon;
+	Weapon m_currentRifleWeapon;
 	uint32_t m_previousSelectedWeaponIndex;
 
 	// Ground zero machine gun

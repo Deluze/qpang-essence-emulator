@@ -25,6 +25,7 @@ PlayerWeaponManager::PlayerWeaponManager() :
 void PlayerWeaponManager::initialize(std::shared_ptr<RoomSessionPlayer> player)
 {
 	m_player = player;
+
 	auto* equipmentManager = player->getPlayer()->getEquipmentManager();
 
 	auto itemIds = equipmentManager->getWeaponItemIdsByCharacter(player->getCharacter());
@@ -63,16 +64,16 @@ Weapon PlayerWeaponManager::getSelectedWeapon()
 
 void PlayerWeaponManager::selectTagWeapon()
 {
-	const auto gunIndex = 0;
+	const auto rifleIndex = 0;
 
 	m_previousSelectedWeaponIndex = m_selectedWeaponIndex;
 
-	m_selectedWeaponIndex = gunIndex;
-	m_currentGunWeapon = m_weapons[m_selectedWeaponIndex];
+	m_selectedWeaponIndex = rifleIndex;
+	m_currentRifleWeapon = m_weapons[m_selectedWeaponIndex];
 
 	const auto chainLightWeapon = Game::instance()->getWeaponManager()->get(1095368720);
 
-	m_weapons[gunIndex] = chainLightWeapon;
+	m_weapons[rifleIndex] = chainLightWeapon;
 
 	auto& defaultAmmo = m_defaultAmmo[chainLightWeapon.itemId];
 
@@ -88,7 +89,7 @@ void PlayerWeaponManager::deselectTagWeapon()
 {
 	const auto gunIndex = 0;
 
-	m_weapons[gunIndex] = m_currentGunWeapon;
+	m_weapons[gunIndex] = m_currentRifleWeapon;
 	m_selectedWeaponIndex = m_previousSelectedWeaponIndex;
 
 	switchWeapon(m_weapons[m_selectedWeaponIndex].itemId, false);
@@ -206,7 +207,7 @@ void PlayerWeaponManager::refillCurrentWeapon()
 
 std::array<uint32_t, 4> PlayerWeaponManager::getWeaponIds()
 {
-	std::array<uint32_t, 4> weaponIds;
+	std::array<uint32_t, 4> weaponIds{};
 
 	for (size_t i = 0; i < m_weapons.size(); i++)
 		weaponIds[i] = m_weapons[i].itemId;
@@ -219,7 +220,7 @@ std::array<Weapon, 4> PlayerWeaponManager::getWeapons()
 	return m_weapons;
 }
 
-bool PlayerWeaponManager::getHasEquippedMachineGun()
+bool PlayerWeaponManager::hasEquippedMachineGun()
 {
 	return m_hasEquippedMachineGun;
 }
@@ -248,6 +249,11 @@ void PlayerWeaponManager::equipMachineGun(uint64_t seqId)
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
+		if (player->getSkillManager()->hasActiveSkillCard())
+		{
+			return;
+		}
+
 		// Disallow the machine gun in public enemy mode for now.
 		if (player->getRoomSession()->getGameMode()->isPublicEnemyMode())
 		{
@@ -266,7 +272,7 @@ void PlayerWeaponManager::equipMachineGun(uint64_t seqId)
 		// Set the currently selected weapon index to gun.
 		m_selectedWeaponIndex = 0;
 		// Set the current gun weapon to the current weapon.
-		m_currentGunWeapon = m_weapons[m_selectedWeaponIndex];
+		m_currentRifleWeapon = m_weapons[m_selectedWeaponIndex];
 
 		const auto machineGunWeapon = Game::instance()->getWeaponManager()->get(MACHINE_GUN_ITEM_ID);
 
@@ -311,7 +317,7 @@ void PlayerWeaponManager::unequipMachineGun()
 
 		player->getRoomSession()->relayPlaying<GCWeapon>(player->getPlayer()->getId(), CGWeapon::CMD::UNEQUIP_MACHINE_GUN, MACHINE_GUN_ITEM_ID, m_equippedMachineGunSeqId);
 
-		m_weapons[0] = m_currentGunWeapon;
+		m_weapons[0] = m_currentRifleWeapon;
 		m_selectedWeaponIndex = m_previousSelectedWeaponIndex;
 
 		switchWeapon(m_weapons[m_selectedWeaponIndex].itemId, false);
@@ -319,6 +325,41 @@ void PlayerWeaponManager::unequipMachineGun()
 		m_hasEquippedMachineGun = false;
 		m_equippedMachineGunSeqId = 0;
 	}
+}
+
+void PlayerWeaponManager::equipRainbowSkillCardWeapon(uint32_t weaponId)
+{
+	const auto rifleIndex = 0;
+
+	m_previousSelectedWeaponIndex = m_selectedWeaponIndex;
+
+	m_selectedWeaponIndex = rifleIndex;
+	m_currentRifleWeapon = m_weapons[m_selectedWeaponIndex];
+
+	const auto weapon = Game::instance()->getWeaponManager()->get(weaponId);
+
+	m_weapons[rifleIndex] = weapon;
+
+	auto& defaultAmmo = m_defaultAmmo[weapon.itemId];
+
+	defaultAmmo.first = weapon.clipCount;
+	defaultAmmo.second = weapon.clipSize;
+
+	refillCurrentWeapon();
+
+	switchWeapon(m_weapons[m_selectedWeaponIndex].itemId, false);
+}
+
+void PlayerWeaponManager::unequipRainbowSkillCardWeapon()
+{
+	const auto rifleIndex = 0;
+
+	m_weapons[rifleIndex] = m_currentRifleWeapon;
+	m_selectedWeaponIndex = m_previousSelectedWeaponIndex;
+
+	switchWeapon(m_weapons[m_selectedWeaponIndex].itemId, false);
+
+	reset();
 }
 
 bool PlayerWeaponManager::isHoldingMelee()

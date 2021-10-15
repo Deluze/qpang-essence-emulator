@@ -47,7 +47,7 @@ void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 
 	for (const auto &playingPlayer : session->getRoomSession()->getPlayingPlayers())
 	{
-		const auto playingPlayerHasEquippedMachineGun = playingPlayer->getWeaponManager()->getHasEquippedMachineGun();
+		const auto playingPlayerHasEquippedMachineGun = playingPlayer->getWeaponManager()->hasEquippedMachineGun();
 
 		if (playingPlayerHasEquippedMachineGun)
 		{
