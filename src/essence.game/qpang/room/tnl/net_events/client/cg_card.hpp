@@ -175,15 +175,20 @@ public:
 			}
 		}
 
-		// TODO: Check if the player's character can actually perform the card action.
-		roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
-
 		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
 
 		if (roomSessionPlayer == nullptr)
 		{
 			return;
 		}
+
+		if (roomSessionPlayer->isDead())
+		{
+			return;
+		}
+
+		// TODO: Check if the player's character can actually perform the card action.
+		roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
 
 		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
 		{
