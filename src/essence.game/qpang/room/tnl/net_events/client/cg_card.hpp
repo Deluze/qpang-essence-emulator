@@ -115,7 +115,19 @@ public:
 
 			if (roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->hasTargetOtherThanSelf())
 			{
-				if (targetUid == 0)
+				const auto targetPlayer = roomSession->find(targetUid);
+
+				if (targetPlayer == nullptr)
+				{
+					roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
+
+					return;
+				}
+
+				const auto targetPlayerHasActiveSkillCard = targetPlayer->getSkillManager()->hasActiveSkillCard();
+				const auto targetPlayerActiveSkillCardIsRainbowCard = targetPlayerHasActiveSkillCard && targetPlayer->getSkillManager()->getActiveSkillCard()->isRainbowSkillCard();
+
+				if (targetPlayerActiveSkillCardIsRainbowCard)
 				{
 					roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
 
