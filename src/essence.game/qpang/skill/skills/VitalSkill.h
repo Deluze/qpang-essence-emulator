@@ -13,6 +13,7 @@ public:
 		m_durationInSeconds = 10;
 
 		m_skillTarget = SkillTarget::ALL_TEAM_PLAYERS;
+		m_isReflectableSkillCard = false;
 	}
 
 	void tick() override

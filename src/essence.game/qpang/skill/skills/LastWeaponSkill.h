@@ -15,6 +15,7 @@ public:
 		m_skillTarget = SkillTarget::SELF;
 
 		m_isRainbowSkillCard = true;
+		m_isReflectableSkillCard = false;
 	}
 
 	void onApply() override

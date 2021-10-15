@@ -108,12 +108,20 @@ public:
 		{
 			// In other words, is the skill the player wants to activate also the skill that they have drawn.
 			// If a player attempts to activate their skillcard whilst they already have a skillcard active, something isn't right.
-			if (!roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId) || roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
+			const auto isDrawnSkillCard = roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId);
+
+			const auto playerHasActiveSkillCard = roomSessionPlayer->getSkillManager()->hasActiveSkillCard();
+
+			if (!isDrawnSkillCard || playerHasActiveSkillCard)
 			{
 				return;
 			}
 
-			if (roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTarget() != SkillTarget::SELF)
+			const auto drawnSkillCard = roomSessionPlayer->getSkillManager()->getDrawnSkillCard();
+
+			const auto skillTarget = roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTarget();
+
+			if (skillTarget != SkillTarget::SELF)
 			{
 				const auto targetPlayer = roomSession->find(targetUid);
 
@@ -124,12 +132,32 @@ public:
 					return;
 				}
 
+				if (targetPlayer->getWeaponManager()->hasEquippedMachineGun())
+				{
+					roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
+
+					return;
+				}
+
 				const auto targetPlayerHasActiveSkillCard = targetPlayer->getSkillManager()->hasActiveSkillCard();
-				const auto targetPlayerActiveSkillCardIsRainbowCard = targetPlayerHasActiveSkillCard && targetPlayer->getSkillManager()->getActiveSkillCard()->isRainbowSkillCard();
+				const auto targetPlayerActiveSkillCard = targetPlayer->getSkillManager()->getActiveSkillCard();
+
+				const auto targetPlayerActiveSkillCardIsRainbowCard = targetPlayerHasActiveSkillCard && targetPlayerActiveSkillCard->isRainbowSkillCard();
 
 				if (targetPlayerActiveSkillCardIsRainbowCard)
 				{
 					roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
+
+					return;
+				}
+
+				const auto targetPlayershouldReflectSkillCard = targetPlayerHasActiveSkillCard && targetPlayerActiveSkillCard->shouldReflectSkillCard();
+
+				if (targetPlayershouldReflectSkillCard && (skillTarget == SkillTarget::ENEMY_PLAYER) && drawnSkillCard->isReflectableSkillCard())
+				{
+					roomSessionPlayer->getSkillManager()->activateSkillCard(roomSessionPlayer->getPlayer()->getId(), seqId);
+					
+					//targetPlayer->getSkillManager()->deactivateSkillCard();
 
 					return;
 				}
@@ -193,9 +221,9 @@ public:
 		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
 		{
 			const auto shouldDisableOnRollAction = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnRollAction();
-			const auto isRollAction = (itemId == ActionCardId::ROLL_OVER_LEFT) 
-				|| (itemId == ActionCardId::ROLL_OVER_RIGHT) 
-				|| (itemId == ActionCardId::DASH) 
+			const auto isRollAction = (itemId == ActionCardId::ROLL_OVER_LEFT)
+				|| (itemId == ActionCardId::ROLL_OVER_RIGHT)
+				|| (itemId == ActionCardId::DASH)
 				|| (itemId == ActionCardId::TUMBLE);
 
 			if (shouldDisableOnRollAction && isRollAction)

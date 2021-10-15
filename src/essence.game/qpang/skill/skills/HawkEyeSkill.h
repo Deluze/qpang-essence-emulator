@@ -13,6 +13,7 @@ public:
 		m_durationInSeconds = 5;
 
 		m_skillTarget = SkillTarget::SELF;
+		m_isReflectableSkillCard = false;
 	}
 
 	uint32_t getItemId() override

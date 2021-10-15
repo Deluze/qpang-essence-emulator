@@ -14,6 +14,7 @@ public:
 
 		m_skillTarget = SkillTarget::ENEMY_PLAYER;
 
+		m_isReflectableSkillCard = true;
 		// NOTE: Since the client does not send an actioncard event to the server whilst the target player is "shackled",
 		// we won't have to check in CGCard if the player is shackled at that point in time (all clientside behavior).
 	}

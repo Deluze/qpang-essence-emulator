@@ -17,6 +17,7 @@ public:
 		m_hasDuration(false),
 		m_durationInSeconds(0),
 		m_isRainbowSkillCard(false),
+		m_isReflectableSkillCard(false),
 		m_skillTarget(SkillTarget::SELF)
 	{
 	}
@@ -59,6 +60,11 @@ public:
 		return false;
 	}
 
+	virtual bool shouldReflectSkillCard()
+	{
+		return false;
+	}
+
 	virtual uint32_t getItemId()
 	{
 		return ItemID::SKILL_NONE;
@@ -72,6 +78,11 @@ public:
 	bool isRainbowSkillCard()
 	{
 		return m_isRainbowSkillCard;
+	}
+
+	bool isReflectableSkillCard()
+	{
+		return m_isReflectableSkillCard;
 	}
 
 	uint32_t getDurationInSeconds()
@@ -97,6 +108,8 @@ protected:
 
 	uint32_t m_durationInSeconds;
 	uint32_t m_requiredSkillPoints;
+
+	bool m_isReflectableSkillCard;
 
 	bool m_isRainbowSkillCard;
 private:

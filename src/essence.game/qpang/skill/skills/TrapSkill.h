@@ -13,6 +13,7 @@ public:
 		m_durationInSeconds = 15;
 
 		m_skillTarget = SkillTarget::ENEMY_PLAYER;
+		m_isReflectableSkillCard = false;
 	}
 
 	uint32_t getItemId() override

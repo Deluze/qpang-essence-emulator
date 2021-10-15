@@ -10,9 +10,10 @@ public:
 		m_requiredSkillPoints = 1;
 
 		m_hasDuration = true;
-		m_durationInSeconds = 5;
+		m_durationInSeconds = 15;
 
 		m_skillTarget = SkillTarget::ENEMY_PLAYER;
+		m_isReflectableSkillCard = true;
 	}
 
 	uint32_t getItemId() override
