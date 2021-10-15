@@ -165,7 +165,7 @@ uint32_t GameItemManager::getRandomItem()
 	{
 		item = ID::RED_MEDKIT;
 	}
-	else if (item == ID::SKILL_CARD && !m_roomSession->getRoom()->isSkillsEnabled())
+	else if (item == ID::SKILL_CARD && !isSkillsEnabled)
 	{
 		item = ID::AMMO_CLIP;
 	}
