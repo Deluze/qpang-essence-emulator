@@ -172,6 +172,17 @@ std::shared_ptr<Skill> PlayerSkillManager::getDrawnSkillCard()
 	return m_drawnSkillCard;
 }
 
+
+uint32_t PlayerSkillManager::getActiveSkillCardTargetPlayerId()
+{
+	return m_activeSkillCardTargetPlayerId;
+}
+
+uint32_t PlayerSkillManager::getActiveSkillCardSeqId()
+{
+	return m_activeSkillCardSeqId;
+}
+
 uint32_t PlayerSkillManager::getRequiredSkillPoints()
 {
 	if (m_drawnSkillCard == nullptr)

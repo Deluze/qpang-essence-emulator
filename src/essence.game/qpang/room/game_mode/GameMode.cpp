@@ -9,6 +9,7 @@
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 #include "qpang/room/tnl/net_events/client/cg_weapon.hpp"
 #include "qpang/room/tnl/net_events/server/gc_weapon.hpp"
+#include "qpang/room/tnl/net_events/server/gc_card.hpp"
 
 constexpr auto MACHINE_GUN_ITEM_ID = 1095303174;
 
@@ -42,13 +43,31 @@ void GameMode::onStart(std::shared_ptr<RoomSession> roomSession)
 
 void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 {
-	for (const auto &player : session->getRoomSession()->getPlayingPlayers())
-	{
-		if (player->getWeaponManager()->getHasEquippedMachineGun())
-		{
-			const auto seqId = player->getWeaponManager()->getEquippedMachineGunSeqId();
+	const auto areSkillsEnabled = session->getRoomSession()->getRoom()->isSkillsEnabled();
 
-			session->post(new GCWeapon(player->getPlayer()->getId(), CGWeapon::CMD::EQUIP_MACHINE_GUN, MACHINE_GUN_ITEM_ID, seqId));
+	for (const auto &playingPlayer : session->getRoomSession()->getPlayingPlayers())
+	{
+		const auto playingPlayerHasEquippedMachineGun = playingPlayer->getWeaponManager()->getHasEquippedMachineGun();
+
+		if (playingPlayerHasEquippedMachineGun)
+		{
+			const auto seqId = playingPlayer->getWeaponManager()->getEquippedMachineGunSeqId();
+
+			session->post(new GCWeapon(playingPlayer->getPlayer()->getId(), CGWeapon::CMD::EQUIP_MACHINE_GUN, MACHINE_GUN_ITEM_ID, seqId));
+		}
+
+		const auto playingPlayerHasActiveSkillCard = playingPlayer->getSkillManager()->hasActiveSkillCard();
+
+		if (areSkillsEnabled && playingPlayerHasActiveSkillCard)
+		{
+			const auto activeSkillCard = playingPlayer->getSkillManager()->getActiveSkillCard();
+
+			const auto targetPlayerId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
+
+			const auto itemId = activeSkillCard->getItemId();
+			const auto seqId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
+
+			session->post(new GCCard(playingPlayer->getPlayer()->getId(), targetPlayerId, CGCard::CMD::CARD_BEGIN, CGCard::CardType::SKILL_CARD, itemId, seqId));
 		}
 	}
 }

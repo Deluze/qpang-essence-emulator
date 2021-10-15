@@ -31,6 +31,9 @@ public:
 	std::shared_ptr<Skill> getActiveSkillCard();
 	std::shared_ptr<Skill> getDrawnSkillCard();
 
+	uint32_t getActiveSkillCardTargetPlayerId();
+	uint32_t getActiveSkillCardSeqId();
+
 	uint32_t getRequiredSkillPoints();
 
 	bool hasSufficientSkillPoints();
