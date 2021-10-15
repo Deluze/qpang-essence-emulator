@@ -125,6 +125,13 @@ public:
 				// TODO: Quality checks to ensure the target player matches the skillcard target type.
 			}
 
+			if (roomSessionPlayer->getWeaponManager()->hasEquippedMachineGun())
+			{
+				roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
+
+				return;
+			}
+
 			roomSessionPlayer->getSkillManager()->activateSkillCard(targetUid, seqId);
 
 			return;

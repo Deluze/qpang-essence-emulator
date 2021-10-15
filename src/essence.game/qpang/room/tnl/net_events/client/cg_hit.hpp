@@ -269,7 +269,7 @@ public:
 
 		if (dstPlayer->isDead())
 		{
-			if (dstPlayer->getWeaponManager()->getHasEquippedMachineGun())
+			if (dstPlayer->getWeaponManager()->hasEquippedMachineGun())
 			{
 				dstPlayer->getWeaponManager()->unequipMachineGun();
 			}
