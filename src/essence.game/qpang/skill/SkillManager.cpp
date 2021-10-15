@@ -19,6 +19,8 @@
 #include <qpang/skill/skills/IronWallSkill.h>
 #include <qpang/skill/skills/ReflectSkill.h>
 #include <qpang/skill/skills/AssassinSkill.h>
+#include <qpang/skill/skills/WeaponSealSkill.h>
+#include <qpang/skill/skills/SkillSealSkill.h>
 
 SkillManager::SkillManager()
 {
@@ -40,6 +42,8 @@ void SkillManager::initialize()
 	//m_skills[GameMode::DM][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
+	m_skills[GameMode::DM][ItemID::SKILL_WEAPON_SEAL] = []() { return std::make_unique<WeaponSealSkill>(); };
+	m_skills[GameMode::DM][ItemID::SKILL_SKILL_SEAL] = []() { return std::make_unique<SkillSealSkill>(); };
 
 	m_skills[GameMode::TDM][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	m_skills[GameMode::TDM][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
@@ -55,6 +59,9 @@ void SkillManager::initialize()
 	//m_skills[GameMode::TDM][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
 	m_skills[GameMode::TDM][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
 	m_skills[GameMode::TDM][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_WEAPON_SEAL] = []() { return std::make_unique<WeaponSealSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_SKILL_SEAL] = []() { return std::make_unique<SkillSealSkill>(); };
+
 
 	m_skills[GameMode::PTE][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
@@ -70,6 +77,8 @@ void SkillManager::initialize()
 	//m_skills[GameMode::PTE][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
+	m_skills[GameMode::PTE][ItemID::SKILL_WEAPON_SEAL] = []() { return std::make_unique<WeaponSealSkill>(); };
+	m_skills[GameMode::PTE][ItemID::SKILL_SKILL_SEAL] = []() { return std::make_unique<SkillSealSkill>(); };
 
 	m_skills[GameMode::VIP][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
@@ -85,6 +94,8 @@ void SkillManager::initialize()
 	//m_skills[GameMode::VIP][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
+	m_skills[GameMode::VIP][ItemID::SKILL_WEAPON_SEAL] = []() { return std::make_unique<WeaponSealSkill>(); };
+	m_skills[GameMode::VIP][ItemID::SKILL_SKILL_SEAL] = []() { return std::make_unique<SkillSealSkill>(); };
 }
 
 std::unordered_map<uint32_t, std::function<std::unique_ptr<Skill>()>> SkillManager::getSkillsForGameMode(uint8_t mode)
