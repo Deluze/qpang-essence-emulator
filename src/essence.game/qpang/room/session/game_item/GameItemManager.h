@@ -33,15 +33,26 @@ enum ID : uint32_t
 	BRONZE_COIN = 1191182354
 };
 
-static std::vector<uint32_t> possibleItems = {
+static std::vector<uint32_t> possibleItemsWithSkillsEnabled =
+{
+	ID::SKILL_CARD,
+	//ID::AMMO_CLIP,
+	//ID::GREEN_MEDKIT,
+	//ID::AMMO_CLIP,
+	//ID::RED_MEDKIT,
+	ID::SKILL_CARD,
+};
+
+static std::vector<uint32_t> possibleItems =
+{
 	ID::AMMO_CLIP,
-	ID::SKILL_CARD,
-	ID::SKILL_CARD,
 	ID::RED_MEDKIT,
+	ID::AMMO_CLIP,
 	ID::GREEN_MEDKIT,
 };
 
-static std::unordered_map<uint32_t, GameItem*> mappedItems = {
+static std::unordered_map<uint32_t, GameItem*> mappedItems =
+{
 	{ ID::RED_MEDKIT, new RedMedKit() },
 	{ ID::AMMO_CLIP, new AmmoClip() },
 	{ ID::GREEN_MEDKIT, new GreenMedKit() },
@@ -49,7 +60,8 @@ static std::unordered_map<uint32_t, GameItem*> mappedItems = {
 	{ ID::EVENT_ITEM, new EventItem() },
 };
 
-static std::unordered_map<uint32_t, Spawn> mapBounds = {
+static std::unordered_map<uint32_t, Spawn> mapBounds =
+{
 	{ 0, Spawn({48, 0, 48}) }, // Garden
 	{ 1, Spawn({48, 0, 48}) }, // Diorama
 	{ 2, Spawn({64, 0, 64}) }, // Skycastle

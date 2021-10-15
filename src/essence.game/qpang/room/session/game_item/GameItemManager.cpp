@@ -144,8 +144,22 @@ void GameItemManager::reset()
 
 uint32_t GameItemManager::getRandomItem()
 {
-	const auto randomPossibleItemIndex = rand() % possibleItems.size();
-	auto item = possibleItems[randomPossibleItemIndex];
+	const auto isSkillsEnabled = m_roomSession->getRoom()->isSkillsEnabled();
+
+	uint32_t item = 0;
+
+	if (isSkillsEnabled)
+	{
+		const auto index = rand() % possibleItemsWithSkillsEnabled.size();
+
+		item = possibleItemsWithSkillsEnabled[index];
+	}
+	else
+	{
+		const auto index = rand() % possibleItems.size();
+
+		item = possibleItems[index];
+	}
 
 	if (item == ID::GREEN_MEDKIT && !m_roomSession->getGameMode()->isTeamMode())
 	{
