@@ -31,6 +31,7 @@ enum ItemID : uint32_t
 	SKILL_CHAOS = 1258356756,
 	SKILL_POCKET_SIZE = 1258356764,
 	SKILL_VITAL = 1258356776,
+	SKILL_GIANT_BEAST = 1258356778
 };
 
 static bool isEquippableFunction(uint32_t id)

@@ -12,6 +12,7 @@
 #include <qpang/skill/skills/RageSkill.h>
 #include <qpang/skill/skills/ShacklesSkill.h>
 #include <qpang/skill/skills/VitalSkill.h>
+#include <qpang/skill/skills/GiantBeast.h>
 
 SkillManager::SkillManager()
 {
@@ -28,6 +29,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::DM][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
+	m_skills[GameMode::DM][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
 
 	m_skills[GameMode::TDM][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	//m_skills[GameMode::TDM][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
@@ -37,6 +39,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::TDM][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
 	m_skills[GameMode::TDM][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
 	m_skills[GameMode::TDM][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
 
 	m_skills[GameMode::PTE][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	//m_skills[GameMode::PTE][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
@@ -46,6 +49,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::PTE][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
+	m_skills[GameMode::PTE][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
 
 	m_skills[GameMode::VIP][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	//m_skills[GameMode::VIP][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
@@ -55,6 +59,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::VIP][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
+	m_skills[GameMode::VIP][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
 
 	m_skills[GameMode::PREY][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	//m_skills[GameMode::PREY][ItemID::SKILL_HAWK_EYE] = []() { return std::make_unique<HawkEyeSkill>(); };
@@ -63,6 +68,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::PREY][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
 	m_skills[GameMode::PREY][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
 	m_skills[GameMode::PREY][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
+	m_skills[GameMode::PREY][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
 }
 
 std::unordered_map<uint32_t, std::function<std::unique_ptr<Skill>()>> SkillManager::getSkillsForGameMode(uint8_t mode)
