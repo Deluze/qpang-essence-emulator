@@ -46,6 +46,7 @@ public:
 	bool hasFunctionCard(uint32_t functionId);
 
 	uint8_t getExtraAmmoForWeaponIndex(uint8_t index);
+	uint32_t getEquippedBooster();
 
 	void finishRound(const std::shared_ptr<RoomSessionPlayer>& player);
 	void save();

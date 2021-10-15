@@ -461,6 +461,19 @@ uint8_t EquipmentManager::getExtraAmmoForWeaponIndex(uint8_t index)
 	return 0;
 }
 
+uint32_t EquipmentManager::getEquippedBooster()
+{
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		const auto &equip = m_equips[player->getCharacter()];
+		const auto itemId = player->getInventoryManager()->get(equip[7]).itemId;
+
+		return itemId;
+	}
+
+	return 0;
+}
+
 void EquipmentManager::finishRound(const std::shared_ptr<RoomSessionPlayer>& session)
 {
 	auto player = m_player.lock();
