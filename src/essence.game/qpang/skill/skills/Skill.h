@@ -27,6 +27,11 @@ public:
 		m_player = player;
 	}
 
+	virtual uint32_t getItemId()
+	{
+		return ItemID::SKILL_NONE;
+	}
+
 	virtual void tick()
 	{
 		if (m_hasDuration && m_durationInSeconds > 0)
@@ -37,12 +42,10 @@ public:
 
 	virtual void onApply()
 	{
-
 	}
 
 	virtual void onWearOff()
 	{
-
 	}
 
 	virtual bool shouldDisableOnBeingAttacked()
@@ -65,9 +68,9 @@ public:
 		return false;
 	}
 
-	virtual uint32_t getItemId()
+	virtual bool shouldInstantlyKillEnemyWithMeleeWeapon()
 	{
-		return ItemID::SKILL_NONE;
+		return false;
 	}
 
 	bool hasDuration()

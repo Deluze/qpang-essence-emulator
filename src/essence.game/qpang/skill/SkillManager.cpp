@@ -18,6 +18,7 @@
 #include <qpang/skill/skills/TrapSkill.h>
 #include <qpang/skill/skills/IronWallSkill.h>
 #include <qpang/skill/skills/ReflectSkill.h>
+#include <qpang/skill/skills/AssassinSkill.h>
 
 SkillManager::SkillManager()
 {
@@ -38,6 +39,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::DM][ItemID::SKILL_LAST_WEAPON] = []() { return std::make_unique<LastWeaponSkill>(); };
 	//m_skills[GameMode::DM][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
 	m_skills[GameMode::DM][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
+	m_skills[GameMode::DM][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
 
 	m_skills[GameMode::TDM][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	m_skills[GameMode::TDM][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
@@ -52,6 +54,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::TDM][ItemID::SKILL_TRAP] = []() { return std::make_unique<TrapSkill>(); };
 	//m_skills[GameMode::TDM][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
 	m_skills[GameMode::TDM][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
+	m_skills[GameMode::TDM][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
 
 	m_skills[GameMode::PTE][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
@@ -66,6 +69,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::PTE][ItemID::SKILL_TRAP] = []() { return std::make_unique<TrapSkill>(); };
 	//m_skills[GameMode::PTE][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
 	m_skills[GameMode::PTE][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
+	m_skills[GameMode::PTE][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
 
 	m_skills[GameMode::VIP][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
@@ -80,6 +84,7 @@ void SkillManager::initialize()
 	m_skills[GameMode::VIP][ItemID::SKILL_TRAP] = []() { return std::make_unique<TrapSkill>(); };
 	//m_skills[GameMode::VIP][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
 	m_skills[GameMode::VIP][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
+	m_skills[GameMode::VIP][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
 }
 
 std::unordered_map<uint32_t, std::function<std::unique_ptr<Skill>()>> SkillManager::getSkillsForGameMode(uint8_t mode)

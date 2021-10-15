@@ -223,6 +223,20 @@ public:
 				srcPlayer->addDamageDealtToTag(damage);
 			}
 
+			const auto srcPlayerHasActiveSkillCard = areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkillCard();
+
+			if (srcPlayerHasActiveSkillCard)
+			{
+				const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkillCard()->shouldInstantlyKillEnemyWithMeleeWeapon();
+
+				if (srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == WeaponType::MELEE))
+				{
+					damage = 9999;
+
+					srcPlayer->getSkillManager()->deactivateSkillCard();
+				}
+			}
+
 			dstPlayer->takeHealth(damage);
 
 			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance; applyEffect && !isSameTeam)
