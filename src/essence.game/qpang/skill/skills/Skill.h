@@ -16,6 +16,7 @@ public:
 		m_requiredSkillPoints(0),
 		m_hasDuration(false),
 		m_durationInSeconds(0),
+		m_isRainbowSkillCard(false),
 		m_skillTarget(SkillTarget::SELF)
 	{
 	}
@@ -73,6 +74,11 @@ public:
 		return m_hasDuration;
 	}
 
+	bool isRainbowSkillCard()
+	{
+		return m_isRainbowSkillCard;
+	}
+
 	uint32_t getDurationInSeconds()
 	{
 		return m_durationInSeconds;
@@ -91,5 +97,7 @@ protected:
 
 	uint32_t m_durationInSeconds;
 	uint32_t m_requiredSkillPoints;
+
+	bool m_isRainbowSkillCard;
 private:
 };

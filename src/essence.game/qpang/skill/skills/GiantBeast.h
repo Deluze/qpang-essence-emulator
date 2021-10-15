@@ -13,6 +13,8 @@ public:
 		m_durationInSeconds = 40;
 
 		m_skillTarget = SkillTarget::SELF;
+
+		m_isRainbowSkillCard = true;
 	}
 
 	void onApply() override
@@ -27,7 +29,11 @@ public:
 
 	void onWearOff() override
 	{
-		m_player->setHealth(m_player->getDefaultHealth(), true);
+		if (!m_player->isDead())
+		{
+			m_player->setHealth(m_player->getDefaultHealth(), true);
+		}
+
 		m_player->getWeaponManager()->unequipRainbowSkillCardWeapon();
 	}
 
