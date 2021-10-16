@@ -25,6 +25,7 @@ It conists out of:
   - **Melee only**
   - **Power-ups**
   - **Team balancing**
+  - **Skillcards, based on skillpoints**. Skillpoints can be earned by killing other players or by getting attacked, to find out more about the implemented skillcards and the skillpoint system, visit the wiki.
   - **Ensures "quality" matches**, prevents players from joining late game and losing items
   - **Most achievements are implemented** (We don't know what the requirements of some achievements are)
   - **Points & Time based matches**
@@ -46,7 +47,6 @@ Missing features:
 - Memos
 - Trading
 - Registration in-game (will not be implemented, registration goes via website)
-- Skill cards [WIP]
 - Card boosting/enhancing (purposefully unimplemented, design choice)
 - In-game quests
 
