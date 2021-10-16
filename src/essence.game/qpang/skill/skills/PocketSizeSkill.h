@@ -20,5 +20,19 @@ public:
 	{
 		return ItemID::SKILL_POCKET_SIZE;
 	}
+
+	void onApply() override
+	{
+		Skill::onApply();
+
+		const auto currentHealth = m_player->getHealth();
+		const auto bonusHealth = (uint16_t) currentHealth / 2;
+		
+		m_player->setHealth((currentHealth + bonusHealth), true);
+	}
+
+	void onWearOff() override
+	{
+	}
 private:
 };
