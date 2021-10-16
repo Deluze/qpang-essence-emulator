@@ -30,6 +30,7 @@ It conists out of:
   - **Points & Time based matches**
   - **Cash & Coin drops**
   - **Weapon effects**
+  - **SkillCards** fully implemented (see wiki)
   - **Game Invites (new)**
 - **Custom in-game commands**
 - **Configurable crane machine**
@@ -46,7 +47,6 @@ Missing features:
 - Memos
 - Trading
 - Registration in-game (will not be implemented, registration goes via website)
-- Skill cards [WIP]
 - Card boosting/enhancing (purposefully unimplemented, design choice)
 - In-game quests
 
