@@ -73,6 +73,11 @@ public:
 		return false;
 	}
 
+	virtual bool shouldReceiveReducedDamageFromLaunchers()
+	{
+		return false;
+	}
+
 	bool hasDuration()
 	{
 		return m_hasDuration;

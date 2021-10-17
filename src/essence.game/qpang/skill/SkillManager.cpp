@@ -1,7 +1,6 @@
 #include "SkillManager.h"
 
 #include <qpang/ItemID.h>
-
 #include <qpang/Game.h>
 
 #include <qpang/skill/skills/RapidFireSkill.h>
@@ -21,6 +20,7 @@
 #include <qpang/skill/skills/AssassinSkill.h>
 #include <qpang/skill/skills/WeaponSealSkill.h>
 #include <qpang/skill/skills/SkillSealSkill.h>
+#include <qpang/skill/skills/MentalUpSkill.h>
 
 SkillManager::SkillManager()
 {
@@ -30,6 +30,7 @@ void SkillManager::initialize()
 {
 	m_skills.clear();
 
+	// TODO: Rework this some day cause this is god awful code
 	initializeDeathMatchSkills();
 	initializeTeamDeathMatchSkills();
 	initializeProtectTheEssenceSkills();
@@ -55,6 +56,7 @@ void SkillManager::initializeDeathMatchSkills()
 	for (uint8_t i = 0; i < 3; i++)
 	{
 		m_skills[GameMode::DM].push_back([]() { return std::make_unique<AssassinSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<MentalUpSkill>(); });
 		m_skills[GameMode::DM].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
 		m_skills[GameMode::DM].push_back([]() { return std::make_unique<ReflectSkill>(); });
 		m_skills[GameMode::DM].push_back([]() { return std::make_unique<SkillSealSkill>(); });
@@ -84,6 +86,7 @@ void SkillManager::initializeTeamDeathMatchSkills()
 	for (uint8_t i = 0; i < 3; i++)
 	{
 		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<AssassinSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<MentalUpSkill>(); });
 		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
 		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ReflectSkill>(); });
 		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<SkillSealSkill>(); });
@@ -118,6 +121,7 @@ void SkillManager::initializeProtectTheEssenceSkills()
 	for (uint8_t i = 0; i < 3; i++)
 	{
 		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<AssassinSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<MentalUpSkill>(); });
 		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
 		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<ReflectSkill>(); });
 		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<SkillSealSkill>(); });
@@ -152,6 +156,7 @@ void SkillManager::initializeVipSkills()
 	for (uint8_t i = 0; i < 3; i++)
 	{
 		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<AssassinSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<MentalUpSkill>(); });
 		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
 		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<ReflectSkill>(); });
 		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<SkillSealSkill>(); });

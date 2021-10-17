@@ -105,6 +105,7 @@ public:
 
 	void hit(const uint32_t weaponId, const RoomSessionPlayer::Ptr& srcPlayer, const RoomSessionPlayer::Ptr& dstPlayer, uint8_t bodyPart) const
 	{
+		// TODO: Rework this shit cus its very much unreadable code.
 		if (dstPlayer->isDead())
 		{
 			return;
@@ -156,7 +157,6 @@ public:
 
 			damage = weaponUsed.damage;
 
-			// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 			switch (hitLocation)
 			{
 			case HEAD:
@@ -177,6 +177,19 @@ public:
 			case R_HAND:
 				damage *= 0.6;
 				break;
+			}
+
+			const auto weaponUsedIsLauncher = (weaponUsed.weaponType == WeaponType::LAUNCHER);
+
+			if (areSkillsEnabled && weaponUsedIsLauncher)
+			{
+				const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
+				const auto dstPlayerShouldReceiveReducedDamageFromLaunchers = dstPlayerHasActiveSkill && dstPlayer->getSkillManager()->getActiveSkillCard()->shouldReceiveReducedDamageFromLaunchers();
+
+				if (dstPlayerShouldReceiveReducedDamageFromLaunchers)
+				{
+					damage *= 0.50;
+				}
 			}
 
 			const auto isPublicEnemyMode = roomSession->getGameMode()->isPublicEnemyMode();
