@@ -163,7 +163,7 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 		{
 			if (!killerPlayerHasRainbowSkillCard)
 			{
-				const auto skillPoints = 65;
+				const auto skillPoints = 45;
 				const auto skillGaugeBoostPercentage = killer->getSkillManager()->getSkillGaugeBoostPercentage();
 
 				killer->getSkillManager()->addSkillPoints((uint32_t) (skillPoints + (skillPoints * skillGaugeBoostPercentage)));

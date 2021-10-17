@@ -258,7 +258,7 @@ public:
 		roomSession->relayPlaying<GCHit>(srcPlayerId, dstPlayerId, unk_03, srcPosX, srcPosY, srcPosZ, dstPosX, dstPosY, dstPosZ, entityId,
 			hitType, hitLocation, dstPlayer->getHealth(), damage, weaponId, rtt, weaponType, unk_16, srcPlayer->getStreak() + 1, unk_18, effectId);
 
-		if (areSkillsEnabled)
+		if (areSkillsEnabled && !isSameTeam)
 		{
 			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
 			const auto dstPlayerHasRainbowSkillCard = dstPlayerHasActiveSkill && dstPlayer->getSkillManager()->getActiveSkillCard()->isRainbowSkillCard();
@@ -276,9 +276,9 @@ public:
 
 			if (dstPlayer->getSkillManager()->hasActiveSkillCard())
 			{
-				const auto shouldDisableOnBeingAttacked = dstPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnBeingAttacked();
+				const auto shouldDisableOnDamageReceive = dstPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnDamageReceive();
 
-				if (shouldDisableOnBeingAttacked)
+				if (shouldDisableOnDamageReceive)
 				{
 					dstPlayer->getSkillManager()->deactivateSkillCard();
 				}
