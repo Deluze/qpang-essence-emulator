@@ -45,6 +45,15 @@ public:
 		bstream->read(&unk_20);
 		bstream->read(&unk_21);
 		bstream->read(&unk_22);
+
+		//std::cout
+		//	<< "CGRoom::unpack >> PlayerId: " << playerId << ", Cmd: " << (int)cmd << ", Value: " << (int)value << ", Mode: " << (int)mode
+		//	<< ", MemberCount: " << (int)memberCount << ", Goal: " << (int)goal << ", TimeAmount: " << (int)timeAmount << ", IsRounds: " << (int)isRounds << std::endl;
+
+		//std::cout << "CGRoom::unpack >> Unk11: " << (int)unk_11 << ", Unk12: " << (int)unk_12 << ", Unk13: " << (int)unk_13 << ", Unk14: " << (int)unk_14
+		//	<< ", Unk19: " << (int)unk_19 << ", Unk20: " << (int)unk_20 << ", Unk21: " << (int)unk_21 << ", Unk22: " << (int)unk_22 << std::endl;
+
+		//std::cout << "CGRoom::unpack >> _160: " << (int)_160 << ", _161: " << (int)_161 << ", _162: " << (int)_162 << ", _163: " << (int)_163 << std::endl;
 	};
 
 	void handle(GameConnection* conn, Player::Ptr player)
@@ -56,65 +65,88 @@ public:
 		if (cmd == Command::CREATE_ROOM || cmd == Command::CREATE_EVENT_ROOM)
 		{
 			if (cmd == Command::CREATE_EVENT_ROOM && player->getRank() != 3)
+			{
 				return conn->disconnect("Cannot create event room");
+			}
 
 			const auto isValidMode =
 				mode == GameMode::Mode::DM ||
 				mode == GameMode::Mode::TDM ||
 				mode == GameMode::Mode::PTE ||
 				mode == GameMode::Mode::VIP ||
-				mode == GameMode::Mode::PREY/* ||
-				mode == GameMode::Mode::PRACTICE*/;
+				mode == GameMode::Mode::PREY;
 
 			if (!isValidMode || map > 12)
 			{
 				conn->disconnect("Invalid gamemode");
 
-				return player->broadcast(u"Sorry, but this game mode has not been implemented yet");
+				player->broadcast(u"Sorry, but this game mode has not been implemented yet");
+
+				return;
 			}
 
 			if (Game::instance()->getRoomManager()->list().size() >= CONFIG_MANAGER->getInt("GAME_MAX_ROOMS"))
-				return conn->disconnect("Failed to create room");
+			{
+				conn->disconnect("Failed to create room");
 
-			auto room = Game::instance()->getRoomManager()->create(title, static_cast<uint8_t>(map), mode);
+				return;
+			}
+
+			const auto room = Game::instance()->getRoomManager()->create(title, static_cast<uint8_t>(map), mode);
 
 			room->setEventRoom(cmd == Command::CREATE_EVENT_ROOM);
 			room->addPlayer(conn);
 		}
-
 		else if (cmd == Command::JOIN_ROOM)
 		{
-			auto room = Game::instance()->getRoomManager()->get(roomId);
+			const auto room = Game::instance()->getRoomManager()->get(roomId);
 
 			if (room == nullptr)
-				return conn->disconnect("Couldn't find room ID");
+			{
+				conn->disconnect("Couldn't find room ID");
+
+				return;
+			}
 
 			if (room->getPlayerCount() >= room->getMaxPlayers())
+			{
 				return conn->disconnect("Room is full");
+			}
 
-			auto pass = room->getPassword();
+			const auto password = room->getPassword();
 
-			if (!pass.empty() && player->getRank() < 3)
-				if (pass != password)
+			if (!password.empty() && player->getRank() != 3 || player->getRank() != 4)
+			{
+				if (password != password)
+				{
 					return;
+				}
+			}
 
 			room->addPlayer(conn);
+			room->addPlayer(conn);
+			room->addPlayer(conn);
 		}
-
 		else
 		{
-			auto roomPlayer = player->getRoomPlayer();
+			const auto roomPlayer = player->getRoomPlayer();
 
 			if (roomPlayer == nullptr)
+			{
 				return;
+			}
 
-			auto room = roomPlayer->getRoom();
+			const auto room = roomPlayer->getRoom();
 
 			if (room->getMasterId() != player->getId())
+			{
 				return;
+			}
 
 			if (room->isPlaying())
+			{
 				return;
+			}
 
 			switch (cmd)
 			{
@@ -130,35 +162,55 @@ public:
 					mode == GameMode::Mode::TDM ||
 					mode == GameMode::Mode::PTE ||
 					mode == GameMode::Mode::VIP ||
-					mode == GameMode::Mode::PREY/* ||
-					mode == GameMode::Mode::PRACTICE*/;
+					mode == GameMode::Mode::PREY;
 
 				if (!isValidMode)
 				{
 					conn->postNetEvent(new GCRoom(player->getId(), Command::MODE_ROOM, room));
 
-					return player->broadcast(u"Sorry, but this game mode has not been implemented yet");
+					player->broadcast(u"Sorry, but this game mode has not been implemented yet");
+
+					break;
 				}
 
 				room->setMode(mode);
+
+				if (room->getMode() == GameMode::PREY)
+				{
+					room->setSkillsEnabled(false);
+
+					break;
+				}
+				else
+				{
+					room->setSkillsEnabled(true);
+				}
 			}
 			break;
 			case Command::SET_POINTS:
 			{
-				room->setScorePoints(value);
-				room->setIsPointsGame(true);
+				if (value == 10 || value == 15 || value == 20 || value == 25 || value == 30 || value == 35 || value == 40)
+				{
+					room->setScorePoints(value);
+					room->setIsPointsGame(true);
+				}
 			}
 			break;
 			case Command::SET_TIME:
 			{
-				room->setScoreTime(value);
-				room->setIsPointsGame(false);
+				if (value == 5 || value == 10 || value == 15 || value == 20)
+				{
+					room->setScoreTime(value);
+					room->setIsPointsGame(false);
+				}
 			}
 			break;
 			case Command::PLAYERS_ROOM:
 			{
 				if (value == 4 || value == 8 || value == 12 || value == 16)
+				{
 					room->setMaxPlayers(value);
+				}
 			}
 			break;
 			case Command::PASS_ROOM:
@@ -174,6 +226,7 @@ public:
 			case Command::TOGGLE_MELEE:
 			{
 				room->setMeleeOnly(value);
+				room->setSkillsEnabled(false);
 			}
 			break;
 			case Command::TOGGLE_SKILL:
@@ -196,6 +249,7 @@ public:
 			}
 			break;
 			default:
+				std::cout << "CGRoom::handle >> Unknown cmd: " << cmd << std::endl;
 				break;
 			}
 		}
