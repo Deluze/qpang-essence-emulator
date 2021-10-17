@@ -18,6 +18,7 @@ public:
 		m_durationInSeconds(0),
 		m_isRainbowSkillCard(false),
 		m_isReflectableSkillCard(false),
+		m_isAvailableInMeleeOnlyMode(true),
 		m_skillTarget(SkillTarget::SELF)
 	{
 	}
@@ -48,7 +49,7 @@ public:
 	{
 	}
 
-	virtual bool shouldDisableOnBeingAttacked()
+	virtual bool shouldDisableOnDamageReceive()
 	{
 		return false;
 	}
@@ -71,6 +72,11 @@ public:
 	virtual bool shouldInstantlyKillEnemyWithMeleeWeapon()
 	{
 		return false;
+	}
+
+	bool isAvailableInMeleeOnlyMode()
+	{
+		return m_isAvailableInMeleeOnlyMode;
 	}
 
 	bool hasDuration()
@@ -113,7 +119,8 @@ protected:
 	uint32_t m_requiredSkillPoints;
 
 	bool m_isReflectableSkillCard;
-
 	bool m_isRainbowSkillCard;
+
+	bool m_isAvailableInMeleeOnlyMode;
 private:
 };

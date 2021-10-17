@@ -16,6 +16,8 @@ public:
 
 		m_isRainbowSkillCard = true;
 		m_isReflectableSkillCard = false;
+
+		m_isAvailableInMeleeOnlyMode = true;
 	}
 
 	void onApply() override

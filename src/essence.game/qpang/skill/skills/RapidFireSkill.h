@@ -15,6 +15,8 @@ public:
 		m_skillTarget = SkillTarget::SELF;
 
 		m_isReflectableSkillCard = false;
+		m_isAvailableInMeleeOnlyMode = false;
+
 	}
 
 	uint32_t getItemId() override

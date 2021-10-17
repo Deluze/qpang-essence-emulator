@@ -14,6 +14,8 @@ public:
 
 		m_skillTarget = SkillTarget::ENEMY_PLAYER;
 		m_isReflectableSkillCard = true;
+
+		m_isAvailableInMeleeOnlyMode = false;
 	}
 
 	uint32_t getItemId() override
