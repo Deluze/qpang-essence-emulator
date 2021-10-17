@@ -124,8 +124,6 @@ public:
 			}
 
 			room->addPlayer(conn);
-			room->addPlayer(conn);
-			room->addPlayer(conn);
 		}
 		else
 		{
