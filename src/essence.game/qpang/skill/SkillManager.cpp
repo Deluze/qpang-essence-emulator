@@ -30,75 +30,143 @@ void SkillManager::initialize()
 {
 	m_skills.clear();
 
-	m_skills[GameMode::DM][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_TRANSE] = []() { return std::make_unique<TranseSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_LAST_WEAPON] = []() { return std::make_unique<LastWeaponSkill>(); };
-	//m_skills[GameMode::DM][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_WEAPON_SEAL] = []() { return std::make_unique<WeaponSealSkill>(); };
-	m_skills[GameMode::DM][ItemID::SKILL_SKILL_SEAL] = []() { return std::make_unique<SkillSealSkill>(); };
-
-	m_skills[GameMode::TDM][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_TRANSE] = []() { return std::make_unique<TranseSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_LAST_WEAPON] = []() { return std::make_unique<LastWeaponSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_TRAP] = []() { return std::make_unique<TrapSkill>(); };
-	//m_skills[GameMode::TDM][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_WEAPON_SEAL] = []() { return std::make_unique<WeaponSealSkill>(); };
-	m_skills[GameMode::TDM][ItemID::SKILL_SKILL_SEAL] = []() { return std::make_unique<SkillSealSkill>(); };
-
-
-	m_skills[GameMode::PTE][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_TRANSE] = []() { return std::make_unique<TranseSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_LAST_WEAPON] = []() { return std::make_unique<LastWeaponSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_TRAP] = []() { return std::make_unique<TrapSkill>(); };
-	//m_skills[GameMode::PTE][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_WEAPON_SEAL] = []() { return std::make_unique<WeaponSealSkill>(); };
-	m_skills[GameMode::PTE][ItemID::SKILL_SKILL_SEAL] = []() { return std::make_unique<SkillSealSkill>(); };
-
-	m_skills[GameMode::VIP][ItemID::SKILL_RAPID_FIRE] = []() { return std::make_unique<RapidFireSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_CAMO] = []() { return std::make_unique<CamoSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_POCKET_SIZE] = []() { return std::make_unique<PocketSizeSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_CHAOS] = []() { return std::make_unique<ChaosSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_RAGE] = []() { return std::make_unique<RageSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_SHACKLES] = []() { return std::make_unique<ShacklesSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_VITAL] = []() { return std::make_unique<VitalSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_GIANT_BEAST] = []() { return std::make_unique<GiantBeastSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_TRANSE] = []() { return std::make_unique<TranseSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_LAST_WEAPON] = []() { return std::make_unique<LastWeaponSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_TRAP] = []() { return std::make_unique<TrapSkill>(); };
-	//m_skills[GameMode::VIP][ItemID::SKILL_IRON_WALL] = []() { return std::make_unique<IronWallSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_REFLECT] = []() { return std::make_unique<ReflectSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_ASSASSIN] = []() { return std::make_unique<AssassinSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_WEAPON_SEAL] = []() { return std::make_unique<WeaponSealSkill>(); };
-	m_skills[GameMode::VIP][ItemID::SKILL_SKILL_SEAL] = []() { return std::make_unique<SkillSealSkill>(); };
+	initializeDeathMatchSkills();
+	initializeTeamDeathMatchSkills();
+	initializeProtectTheEssenceSkills();
+	initializeVipSkills();
 }
 
-std::unordered_map<uint32_t, std::function<std::unique_ptr<Skill>()>> SkillManager::getSkillsForGameMode(uint8_t mode)
+std::vector<std::function<std::unique_ptr<Skill>()>> SkillManager::getSkillsForGameMode(uint8_t mode)
 {
 	return m_skills[mode];
+}
+
+void SkillManager::initializeDeathMatchSkills()
+{
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<ChaosSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<CamoSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<RageSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<ShacklesSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<AssassinSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<ReflectSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<SkillSealSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 1; i++)
+	{
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<TranseSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<GiantBeastSkill>(); });
+		m_skills[GameMode::DM].push_back([]() { return std::make_unique<LastWeaponSkill>(); });
+	}
+}
+
+void SkillManager::initializeTeamDeathMatchSkills() 
+{
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ChaosSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<CamoSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RageSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ShacklesSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TrapSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<AssassinSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ReflectSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<SkillSealSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 2; i++)
+	{
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<VitalSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 1; i++)
+	{
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TranseSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<GiantBeastSkill>(); });
+		m_skills[GameMode::TDM].push_back([]() { return std::make_unique<LastWeaponSkill>(); });
+	}
+}
+
+void SkillManager::initializeProtectTheEssenceSkills()
+{
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<ChaosSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<CamoSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<RageSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<RapidFireSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<ShacklesSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<TrapSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<AssassinSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<ReflectSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<SkillSealSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 2; i++)
+	{
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<VitalSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 1; i++)
+	{
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<TranseSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<GiantBeastSkill>(); });
+		m_skills[GameMode::PTE].push_back([]() { return std::make_unique<LastWeaponSkill>(); });
+	}
+}
+
+void SkillManager::initializeVipSkills() 
+{
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<ChaosSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<CamoSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<RageSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<RapidFireSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<ShacklesSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<TrapSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<AssassinSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<ReflectSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<SkillSealSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 2; i++)
+	{
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<VitalSkill>(); });
+	}
+
+	for (uint8_t i = 0; i < 1; i++)
+	{
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<TranseSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<GiantBeastSkill>(); });
+		m_skills[GameMode::VIP].push_back([]() { return std::make_unique<LastWeaponSkill>(); });
+	}
 }

@@ -14,8 +14,6 @@ public:
 
 		m_skillTarget = SkillTarget::ALL_TEAM_PLAYERS;
 		m_isReflectableSkillCard = false;
-
-		m_isAvailableInMeleeOnlyMode = true;
 	}
 
 	void tick() override

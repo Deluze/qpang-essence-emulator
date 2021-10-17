@@ -17,7 +17,12 @@ public:
 
 	void initialize();
 
-	std::unordered_map<uint32_t, std::function<std::unique_ptr<Skill>()>> getSkillsForGameMode(uint8_t mode);
+	std::vector<std::function<std::unique_ptr<Skill>()>> SkillManager::getSkillsForGameMode(uint8_t mode);
 private:
-	std::unordered_map<uint8_t, std::unordered_map<uint32_t, std::function<std::unique_ptr<Skill>()>>> m_skills;
+	void initializeDeathMatchSkills();
+	void initializeTeamDeathMatchSkills();
+	void initializeProtectTheEssenceSkills();
+	void initializeVipSkills();
+
+	std::unordered_map<uint8_t, std::vector<std::function<std::unique_ptr<Skill>()>>> m_skills;
 };
