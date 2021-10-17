@@ -116,22 +116,22 @@ void GameItemManager::syncPlayer(std::shared_ptr<RoomSessionPlayer> player)
 {
 	std::vector<GCGameItem::Item> items;
 
-	for (const auto &item : m_items)
+	for (const auto& item : m_items)
 	{
 		if (item.itemId != NULL)
 		{
 			const auto gameItem = GCGameItem::Item
-			{ 
-				item.itemId, 
-				item.spawnId, 
-				item.spawn.x, 
-				item.spawn.y, 
+			{
+				item.itemId,
+				item.spawnId,
+				item.spawn.x,
+				item.spawn.y,
 				item.spawn.z };
 
 			items.push_back(gameItem);
 		}
 	}
-		
+
 	player->post(new GCGameItem(6, items, 0));
 }
 
@@ -146,42 +146,44 @@ uint32_t GameItemManager::getRandomItem()
 {
 	const auto isSkillsEnabled = m_roomSession->getRoom()->isSkillsEnabled();
 
-	uint32_t item = 0;
+	const auto randomIndex = (isSkillsEnabled)
+		? rand() % possibleItemsWithSkillsEnabled.size()
+		: rand() % possibleItems.size();
 
-	if (isSkillsEnabled)
-	{
-		const auto index = rand() % possibleItemsWithSkillsEnabled.size();
+	auto itemId = (isSkillsEnabled)
+		? possibleItemsWithSkillsEnabled[randomIndex]
+		: possibleItems[randomIndex];
 
-		item = possibleItemsWithSkillsEnabled[index];
-	}
-	else
-	{
-		const auto index = rand() % possibleItems.size();
+	const auto isTeamMode = m_roomSession->getGameMode()->isTeamMode();
+	const auto isMeleeOnly = m_roomSession->getRoom()->isMeleeOnly();
 
-		item = possibleItems[index];
+	switch (itemId)
+	{
+	case ID::GREEN_MEDKIT:
+		if (!isTeamMode)
+		{
+			itemId = ID::RED_MEDKIT;
+		}
+
+		break;
+	case ID::AMMO_CLIP:
+		if (isMeleeOnly)
+		{
+			itemId = ID::RED_MEDKIT;
+		}
+		break;
+	default:
+		break;
 	}
 
-	if (item == ID::GREEN_MEDKIT && !m_roomSession->getGameMode()->isTeamMode())
-	{
-		item = ID::RED_MEDKIT;
-	}
-	else if (item == ID::SKILL_CARD && !isSkillsEnabled)
-	{
-		item = ID::AMMO_CLIP;
-	}
-	else if (item == ID::AMMO_CLIP && m_roomSession->getRoom()->isMeleeOnly())
-	{
-		item = ID::RED_MEDKIT;
-	}
-
-	return item;
+	return itemId;
 }
 
 void GameItemManager::onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32_t spawnId)
 {
 	GameItemSpawn* gameItemSpawn = nullptr;
-	
-	for (auto &item : m_items)
+
+	for (auto& item : m_items)
 	{
 		if (item.spawnId == spawnId)
 		{
