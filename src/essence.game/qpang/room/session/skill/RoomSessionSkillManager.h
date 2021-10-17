@@ -15,6 +15,8 @@ public:
 	void initialize(std::shared_ptr<RoomSession> room);
 
 	std::shared_ptr<Skill> generateRandomSkill();
+
+	bool isValidSkill(uint32_t itemId);
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::vector<std::function<std::unique_ptr<Skill>()>> m_skills;

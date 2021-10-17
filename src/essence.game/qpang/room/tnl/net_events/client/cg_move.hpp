@@ -67,7 +67,8 @@ public:
 
 			if (session != nullptr)
 			{
-				if (session->isDead()) {// if they want to try and revive themselves
+				if (session->isDead()) 
+				{
 					return;
 				}
 

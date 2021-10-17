@@ -90,9 +90,10 @@ public:
 		std::cout << "CGCard::handleSkillCard >> Information PlayerId " << player->getId() << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << "." << std::endl;
 
 		// TODO: Check if chosen skill is valid for the gamemode.
+		const auto isSkillValid = roomSession->getSkillManager()->isValidSkill(itemId);
 		const auto areSkillsEnabled = roomPlayer->getRoom()->isSkillsEnabled();
 
-		if (!areSkillsEnabled)
+		if (!areSkillsEnabled || !isSkillValid)
 		{
 			return;
 		}

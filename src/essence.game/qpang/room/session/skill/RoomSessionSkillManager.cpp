@@ -23,3 +23,22 @@ std::shared_ptr<Skill> RoomSessionSkillManager::generateRandomSkill()
 
 	return m_skills.at(index)();
 }
+
+bool RoomSessionSkillManager::isValidSkill(uint32_t itemId)
+{
+	auto isValid = false;
+
+	for (const auto &skill : m_skills)
+	{
+		const auto skillItemId = skill()->getItemId();
+
+		if (skillItemId == itemId)
+		{
+			isValid = true;
+
+			break;
+		}
+	}
+
+	return isValid;
+}
