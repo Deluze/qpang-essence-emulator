@@ -10,7 +10,7 @@
 
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 #include "qpang/room/session/game_item/GameItemManager.h"
-#include "qpang/room/session/skill/RoomSkillManager.h"
+#include "qpang/room/session/skill/RoomSessionSkillManager.h"
 
 class Room;
 class GameMode;
