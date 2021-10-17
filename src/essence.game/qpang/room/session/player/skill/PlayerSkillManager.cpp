@@ -79,11 +79,10 @@ void PlayerSkillManager::activateSkillCard(uint32_t targetPlayerId, uint32_t seq
 
 		roomSession->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::CARD_BEGIN, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
 
+		removeSkillPoints(getRequiredSkillPoints());
+
 		player->getSkillManager()->getActiveSkillCard()->onApply();
 
-		const auto requiredSkillPoints = getRequiredSkillPoints();
-
-		removeSkillPoints(requiredSkillPoints);
 	}
 }
 

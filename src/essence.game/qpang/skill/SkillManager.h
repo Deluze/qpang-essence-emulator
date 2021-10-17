@@ -21,8 +21,6 @@ public:
 private:
 	void initializeDeathMatchSkills();
 	void initializeTeamDeathMatchSkills();
-	void initializeProtectTheEssenceSkills();
-	void initializeVipSkills();
 
 	std::unordered_map<uint8_t, std::vector<std::function<std::unique_ptr<Skill>()>>> m_skills;
 };
