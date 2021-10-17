@@ -947,7 +947,7 @@ GameItemManager* RoomSession::getItemManager()
 	return &m_itemManager;
 }
 
-RoomSkillManager* RoomSession::getSkillManager()
+RoomSessionSkillManager* RoomSession::getSkillManager()
 {
 	return &m_skillManager;
 }

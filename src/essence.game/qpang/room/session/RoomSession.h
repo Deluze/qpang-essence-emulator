@@ -56,7 +56,7 @@ public:
 
 	GameMode* getGameMode();
 	GameItemManager* getItemManager();
-	RoomSkillManager* getSkillManager();
+	RoomSessionSkillManager* getSkillManager();
 	std::shared_ptr<Room> getRoom();
 
 	std::vector<RoomSessionPlayer::Ptr> getPlayers();
@@ -201,7 +201,7 @@ private:
 
 	GameMode* m_gameMode;
 	GameItemManager m_itemManager;
-	RoomSkillManager m_skillManager;
+	RoomSessionSkillManager m_skillManager;
 
 	std::recursive_mutex m_playerMx;
 	std::unordered_map<uint32_t, RoomSessionPlayer::Ptr> m_players;
