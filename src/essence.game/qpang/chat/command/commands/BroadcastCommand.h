@@ -28,6 +28,6 @@ public:
 			return;
 		}
 
-		Game::instance()->broadcast(message);
+		Game::instance()->broadcast(u"Announcement: " + message);
 	}
 };

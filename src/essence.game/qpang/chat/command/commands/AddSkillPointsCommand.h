@@ -15,7 +15,7 @@
 class AddSkillPointsCommand : public Command
 {
 public:
-	AddSkillPointsCommand() : Command(4)
+	AddSkillPointsCommand() : Command(3)
 	{
 
 	}
@@ -60,6 +60,7 @@ public:
 
 		roomSessionPlayer->getSkillManager()->addSkillPoints(points);
 
-		player->broadcast(u"[Server]: Successfully added skillpoints.");
+		player->broadcast(u"[Server] Added skillpoints.");
+
 	}
 };
