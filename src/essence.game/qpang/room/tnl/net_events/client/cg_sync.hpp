@@ -35,9 +35,12 @@ public:
 	{
 		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 		{
-			if (auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
+			if (auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer(); roomSessionPlayer != nullptr)
 			{
-				//session->getRoomSession()->createEntity(session, entityId);
+				if (const auto roomSession = roomSessionPlayer->getRoomSession(); roomSession != nullptr)
+				{
+					roomSession->relayPlaying<GCSync>(cmd, playerId, entityId, xPos, yPos, zPos, false);
+				}
 			}
 		}
 	}
