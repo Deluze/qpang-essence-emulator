@@ -36,7 +36,16 @@ public:
 			return;
 		}
 
-		roomSession->relayPlaying<GCTarget>(cmd, playerId, targetId);
+		const auto sourcePlayer = roomSession->find(playerId);
+		const auto targetPlayer = roomSession->find(targetId);
+
+		if (sourcePlayer == nullptr || targetPlayer == nullptr)
+		{
+			return;
+		}
+
+		sourcePlayer->post(new GCTarget(cmd, playerId, targetId));
+		targetPlayer->post(new GCTarget(cmd, playerId, targetId));
 	};
 
 	void process(EventConnection* ps)
