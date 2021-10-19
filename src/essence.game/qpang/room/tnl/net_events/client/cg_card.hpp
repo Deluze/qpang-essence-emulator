@@ -87,10 +87,9 @@ public:
 
 	void handleSkillCard(Player::Ptr player, const std::shared_ptr<RoomPlayer> roomPlayer, const std::shared_ptr<RoomSession> roomSession)
 	{
-		std::cout << "CGCard::handleSkillCard >> Handling skillcard for player " << player->getId() << "." << std::endl;
-		std::cout << "CGCard::handleSkillCard >> Information PlayerId " << player->getId() << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << "." << std::endl;
+		//std::cout << "CGCard::handleSkillCard >> Handling skillcard for player " << player->getId() << "." << std::endl;
+		//std::cout << "CGCard::handleSkillCard >> Information PlayerId " << player->getId() << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << "." << std::endl;
 
-		// TODO: Check if chosen skill is valid for the gamemode.
 		const auto isSkillValid = roomSession->getSkillManager()->isValidSkill(itemId);
 		const auto areSkillsEnabled = roomPlayer->getRoom()->isSkillsEnabled();
 
@@ -108,6 +107,11 @@ public:
 
 		if (cmd == CMD::ACTIVATE_CARD)
 		{
+			if (roomSessionPlayer->isDead())
+			{
+				return;
+			}
+
 			// In other words, is the skill the player wants to activate also the skill that they have drawn.
 			// If a player attempts to activate their skillcard whilst they already have a skillcard active, something isn't right.
 			const auto isDrawnSkillCard = roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId);
