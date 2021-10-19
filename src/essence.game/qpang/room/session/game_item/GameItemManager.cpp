@@ -70,7 +70,7 @@ void GameItemManager::tick()
 
 			const auto items = std::vector<GCGameItem::Item>({ gameItem });
 
-			m_roomSession->relayPlaying<GCGameItem>(6, items, 0);
+			m_roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::SPAWN_GAME_ITEM, items, 0);
 		}
 	}
 
@@ -108,7 +108,7 @@ void GameItemManager::tick()
 			m_eventItems[eventItemUid] = false;
 		}
 
-		m_roomSession->relayPlaying<GCGameItem>(6, items, 0);
+		m_roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::SPAWN_GAME_ITEM, items, 0);
 	}
 }
 
@@ -126,13 +126,14 @@ void GameItemManager::syncPlayer(std::shared_ptr<RoomSessionPlayer> player)
 				item.spawnId,
 				item.spawn.x,
 				item.spawn.y,
-				item.spawn.z };
+				item.spawn.z
+			};
 
 			items.push_back(gameItem);
 		}
 	}
 
-	player->post(new GCGameItem(6, items, 0));
+	player->post(new GCGameItem(GCGameItem::CMD::SPAWN_GAME_ITEM, items, 0));
 }
 
 void GameItemManager::reset()
@@ -220,8 +221,7 @@ void GameItemManager::onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32
 
 		const auto identifier = mappedItems[itemId]->onPickUp(player);
 
-		m_roomSession->relayPlaying<GCGameItem>(1, player->getPlayer()->getId(), itemId, gameItemSpawn->spawnId, identifier);
-
+		m_roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, player->getPlayer()->getId(), itemId, gameItemSpawn->spawnId, identifier);
 		gameItemSpawn->itemId = NULL;
 		gameItemSpawn->spawnId = (uint32_t)(rand() * std::numeric_limits<uint32_t>::max());
 		gameItemSpawn->lastPickUpTime = time(NULL);
@@ -254,7 +254,7 @@ void GameItemManager::onPickUpEventItem(std::shared_ptr<RoomSessionPlayer> playe
 
 	const auto identifier = mappedItems[EVENT_ITEM]->onPickUp(player);
 
-	m_roomSession->relayPlaying<GCGameItem>(1, player->getPlayer()->getId(), EVENT_ITEM, id, identifier);
+	m_roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, player->getPlayer()->getId(), EVENT_ITEM, id, identifier);
 
 	m_eventItems[id] = true;
 
