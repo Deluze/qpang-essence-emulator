@@ -17,10 +17,10 @@ public:
 	enum CMD : U32
 	{
 		CARD_UNK_1 = 3,
-		CARD_BEGIN = 4,
-		CARD_END = 9,
+		ACTIVATE_CARD = 4,
+		DEACTIVATE_CARD = 9,
 		// 10 and 15 both do the same.
-		CARD_USE_FAIL = 10,
+		FAIL_CARD_ACTIVATION = 10,
 	};
 
 	enum CardType : U32
@@ -31,6 +31,7 @@ public:
 
 	enum ActionCardId : U32
 	{
+		// TODO: Move these item id's to more generic place for item ids.
 		MERONG = 1409286145,
 		FAKE_DEATH = 1409286146,
 		TUMBLE = 1409286147,
@@ -105,7 +106,7 @@ public:
 			return;
 		}
 
-		if (cmd == CMD::CARD_BEGIN)
+		if (cmd == CMD::ACTIVATE_CARD)
 		{
 			// In other words, is the skill the player wants to activate also the skill that they have drawn.
 			// If a player attempts to activate their skillcard whilst they already have a skillcard active, something isn't right.
@@ -196,7 +197,7 @@ public:
 
 			const auto isSearchingForPublicEnemy = roomSession->isSearchingForNextTag();
 
-			if (isSearchingForPublicEnemy && (cmd == CMD::CARD_BEGIN))
+			if (isSearchingForPublicEnemy && (cmd == CMD::ACTIVATE_CARD))
 			{
 				player->broadcast(u"Sorry, you may not perform this action whilst the next public enemy is being selected.");
 

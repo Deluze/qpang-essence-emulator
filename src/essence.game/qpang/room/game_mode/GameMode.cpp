@@ -67,7 +67,7 @@ void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 			const auto itemId = activeSkillCard->getItemId();
 			const auto seqId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
 
-			session->post(new GCCard(playingPlayer->getPlayer()->getId(), targetPlayerId, CGCard::CMD::CARD_BEGIN, CGCard::CardType::SKILL_CARD, itemId, seqId));
+			session->post(new GCCard(playingPlayer->getPlayer()->getId(), targetPlayerId, CGCard::CMD::ACTIVATE_CARD, CGCard::CardType::SKILL_CARD, itemId, seqId));
 		}
 	}
 }
