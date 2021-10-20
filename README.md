@@ -32,6 +32,7 @@ It conists out of:
   - **Cash & Coin drops**
   - **Weapon effects**
   - **Game Invites (new)**
+  - **Team and All chat**
 - **Custom in-game commands**
 - **Configurable crane machine**
 - **Configurable shop**
