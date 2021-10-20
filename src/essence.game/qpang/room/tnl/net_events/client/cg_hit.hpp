@@ -274,24 +274,23 @@ public:
 		if (areSkillsEnabled && !isSameTeam)
 		{
 			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
-			const auto dstPlayerHasRainbowSkillCard = dstPlayerHasActiveSkill && dstPlayer->getSkillManager()->getActiveSkillCard()->isRainbowSkillCard();
+			const auto dstPlayerHasRainbowSkillCard = dstPlayerHasActiveSkill
+				&& dstPlayer->getSkillManager()->getActiveSkillCard()->getSkillRateType() == SkillRateType::RAINBOW;
 
-			const auto isValidWeapon = !isTrapWeapon 
-				&& ((weaponUsed.weaponType == WeaponType::MELEE) || (weaponUsed.weaponType == WeaponType::RIFLE) || (weaponUsed.weaponType == WeaponType::LAUNCHER));
+			const auto isValidWeapon = !isTrapWeapon
+				&& ((weaponUsed.weaponType == MELEE) || (weaponUsed.weaponType == RIFLE) || (weaponUsed.weaponType == LAUNCHER));
 
 			if (!dstPlayerHasRainbowSkillCard && isValidWeapon)
 			{
 				const auto skillPointsToAdd = (hitLocation == HEAD) ? 10 : 5;
 				const auto skillGaugeBoostPercentage = dstPlayer->getSkillManager()->getSkillGaugeBoostPercentage();
 
-				dstPlayer->getSkillManager()->addSkillPoints((uint32_t)(skillPointsToAdd + (skillPointsToAdd * skillGaugeBoostPercentage)));
+				dstPlayer->getSkillManager()->addSkillPoints(static_cast<uint32_t>(skillPointsToAdd + (skillPointsToAdd * skillGaugeBoostPercentage)));
 			}
 
 			if (dstPlayer->getSkillManager()->hasActiveSkillCard())
 			{
-				const auto shouldDisableOnDamageReceive = dstPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnDamageReceive();
-
-				if (shouldDisableOnDamageReceive)
+				if (dstPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnDamageReceive())
 				{
 					dstPlayer->getSkillManager()->deactivateSkillCard();
 				}

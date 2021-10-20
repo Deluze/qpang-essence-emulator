@@ -6,8 +6,6 @@
 #include "qpang/room/session/RoomSession.h"
 #include "qpang/room/RoomPlayer.h"
 
-#include <qpang/skill/SkillManager.h>
-
 class GCCard;
 
 class CGCard : public GameNetEvent
@@ -148,9 +146,7 @@ public:
 				const auto targetPlayerHasActiveSkillCard = targetPlayer->getSkillManager()->hasActiveSkillCard();
 				const auto targetPlayerActiveSkillCard = targetPlayer->getSkillManager()->getActiveSkillCard();
 
-				const auto targetPlayerActiveSkillCardIsRainbowCard = targetPlayerHasActiveSkillCard && targetPlayerActiveSkillCard->isRainbowSkillCard();
-
-				if (targetPlayerActiveSkillCardIsRainbowCard)
+				if (targetPlayerHasActiveSkillCard && targetPlayerActiveSkillCard->getSkillRateType() == SkillRateType::RAINBOW)
 				{
 					roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
 

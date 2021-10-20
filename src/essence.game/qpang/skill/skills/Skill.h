@@ -56,11 +56,6 @@ public:
 	{
 	}
 
-	virtual bool isRainbowSkillCard()
-	{
-		return false;
-	}
-
 	virtual bool isReflectableSkillCard()
 	{
 		return false;

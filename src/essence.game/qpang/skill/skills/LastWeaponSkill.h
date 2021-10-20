@@ -36,11 +36,6 @@ public:
 		m_player->getWeaponManager()->unequipRainbowSkillCardWeapon();
 	}
 
-	bool isRainbowSkillCard() override
-	{
-		return true;
-	}
-
 	uint32_t getSkillPointCost() override
 	{
 		return 4;

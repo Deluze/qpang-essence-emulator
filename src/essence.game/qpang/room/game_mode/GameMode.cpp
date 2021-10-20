@@ -2,7 +2,6 @@
 
 #include <assert.h>
 
-
 #include "StringConverter.h"
 #include "qpang/Game.h"
 #include "qpang/room/session/RoomSession.h"
@@ -45,7 +44,7 @@ void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 {
 	const auto areSkillsEnabled = session->getRoomSession()->getRoom()->isSkillsEnabled();
 
-	for (const auto &playingPlayer : session->getRoomSession()->getPlayingPlayers())
+	for (const auto& playingPlayer : session->getRoomSession()->getPlayingPlayers())
 	{
 		const auto playingPlayerHasEquippedMachineGun = playingPlayer->getWeaponManager()->hasEquippedMachineGun();
 
@@ -88,11 +87,10 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 
 	const auto areSkillCardsEnabled = roomSession->getRoom()->isSkillsEnabled();
 
-	const auto targetHasActiveSkillCard = target->getSkillManager()->hasActiveSkillCard();
 	const auto killerHasActiveSkillCard = killer->getSkillManager()->hasActiveSkillCard();
 
-	const auto targetPlayerHasRainbowSkillCard = areSkillCardsEnabled && targetHasActiveSkillCard && target->getSkillManager()->getActiveSkillCard()->isRainbowSkillCard();
-	const auto killerPlayerHasRainbowSkillCard = areSkillCardsEnabled && killerHasActiveSkillCard && killer->getSkillManager()->getActiveSkillCard()->isRainbowSkillCard();
+	const auto killerPlayerHasRainbowSkillCard = areSkillCardsEnabled && killerHasActiveSkillCard
+		&& killer->getSkillManager()->getActiveSkillCard()->getSkillRateType() == SkillRateType::RAINBOW;
 
 	if (isSuicide && !isPublicEnemyMode)
 	{
@@ -158,7 +156,7 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	if (!isSuicide)
 	{
 		killer->addStreak();
-		
+
 		if (areSkillCardsEnabled)
 		{
 			if (!killerPlayerHasRainbowSkillCard)
@@ -166,7 +164,7 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 				const auto skillPoints = 45;
 				const auto skillGaugeBoostPercentage = killer->getSkillManager()->getSkillGaugeBoostPercentage();
 
-				killer->getSkillManager()->addSkillPoints((uint32_t) (skillPoints + (skillPoints * skillGaugeBoostPercentage)));
+				killer->getSkillManager()->addSkillPoints((uint32_t)(skillPoints + (skillPoints * skillGaugeBoostPercentage)));
 			}
 		}
 	}
