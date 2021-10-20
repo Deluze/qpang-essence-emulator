@@ -8,14 +8,14 @@ class GCCard : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCCard() : GameNetEvent{ GC_CARD, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {}
-	;
-
+	GCCard() : GameNetEvent{ GC_CARD, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
 
 	GCCard(U32 playerId, U32 targetId, U8 cmd, U32 cardType, U32 itemId, U64 seqId) : GameNetEvent{ GC_CARD, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
 	{
 		this->uid = playerId;
 		this->targetUid = targetId;
+		this->dataSrcUid = playerId;
+		this->dataTrgUid = targetId;
 		this->cmd = cmd;
 		this->cardType = cardType;
 		this->itemId = itemId;
@@ -57,10 +57,10 @@ public:
 	U32 itemId = 0;
 	U64 seqId = 0;
 	U32 cardType = 0;
-	U32 actionType = 0;
+	U32 actionType = 1; // 1 = active, 0 = not active?
 	U32 chargePoint = 0;
-	U32 skillCount = 0;
-	U32 leftCount = 0;
+	U32 skillCount = 0; // The amount of points it costs to use the card.
+	U32 leftCount = 0; // The amount of uses this card has?
 	U32 dataSrcUid = 0;
 	U32 dataTrgUid = 0;
 	U32 unk_01 = 0;
