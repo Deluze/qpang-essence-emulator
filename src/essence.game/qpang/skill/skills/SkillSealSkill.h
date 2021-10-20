@@ -22,7 +22,7 @@ public:
 		return SkillRateType::SILVER;
 	}
 
-	SkillTargetType getSkillTarget() override
+	SkillTargetType getSkillTargetType() override
 	{
 		return SkillTargetType::ENEMY;
 	}

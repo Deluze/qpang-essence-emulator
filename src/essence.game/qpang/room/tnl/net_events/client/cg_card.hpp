@@ -123,7 +123,7 @@ public:
 
 			const auto drawnSkillCard = roomSessionPlayer->getSkillManager()->getDrawnSkillCard();
 
-			const auto skillTarget = roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTarget();
+			const auto skillTarget = roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTargetType();
 
 			if (skillTarget != SkillTargetType::SELF)
 			{

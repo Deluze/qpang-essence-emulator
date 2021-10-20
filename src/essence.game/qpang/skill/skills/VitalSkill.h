@@ -54,7 +54,7 @@ public:
 		return SkillRateType::GOLD;
 	}
 
-	SkillTargetType getSkillTarget() override
+	SkillTargetType getSkillTargetType() override
 	{
 		return SkillTargetType::ALLY_TEAM;
 	}

@@ -20,6 +20,8 @@
 #include <qpang/skill/skills/MentalUpSkill.h>
 #include <qpang/skill/skills/TradeOffSkill.h>
 
+#include "UndercoverSkill.h"
+
 SkillManager::SkillManager()
 = default;
 
@@ -85,6 +87,7 @@ void SkillManager::initializeTeamDeathMatchSkills()
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ShacklesSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TrapSkill>(); });
+			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<UndercoverSkill>(); });
 		}
 
 		if (i < 3)

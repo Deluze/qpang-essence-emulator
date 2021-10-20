@@ -27,7 +27,7 @@ public:
 		return true;
 	}
 
-	SkillTargetType getSkillTarget() override
+	SkillTargetType getSkillTargetType() override
 	{
 		return SkillTargetType::ENEMY;
 	}

@@ -313,7 +313,7 @@ public:
 			{
 				if (playingPlayer->getSkillManager()->hasActiveSkillCard())
 				{
-					const auto skillTarget = playingPlayer->getSkillManager()->getActiveSkillCard()->getSkillTarget();
+					const auto skillTarget = playingPlayer->getSkillManager()->getActiveSkillCard()->getSkillTargetType();
 					const auto skillCardTargetPlayerId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
 
 					// NOTE: Added the check for skill target since the Vital skill shouldnt disable if the playng player dies.

@@ -66,7 +66,7 @@ public:
 		return 0;
 	}
 
-	virtual SkillTargetType getSkillTarget()
+	virtual SkillTargetType getSkillTargetType()
 	{
 		return SkillTargetType::SELF;
 	}
