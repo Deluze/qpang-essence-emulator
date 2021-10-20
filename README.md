@@ -21,7 +21,7 @@ It conists out of:
 - **Chat, Whispers & In-Game Announcements**
 - **Bans & Mutes**
 - **Gamerooms**
-  - **TDM, DM, Essence, VIP and TagPlay game modes**
+  - **DM, TDM, Protect the Essence, VIP and TagPlay/Prey game modes**
   - **Melee only**
   - **Power-ups**
   - **Team balancing**
