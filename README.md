@@ -23,7 +23,7 @@ It conists out of:
 - **Gamerooms**
   - **DM, TDM, Protect the Essence, VIP and TagPlay/Prey game modes**
   - **Melee only**
-  - **Power-ups**
+  - **Power-ups** (medkit, team medkit, ammunition)
   - **Team balancing**
   - **Skillcards, based on skillpoints**. Skillpoints can be earned by killing other players or by getting attacked, to find out more about the implemented skillcards and the skillpoint system, visit the wiki.
   - **Ensures "quality" matches**, prevents players from joining late game and losing items
