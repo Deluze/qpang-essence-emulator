@@ -25,7 +25,7 @@ It conists out of:
   - **Melee only**
   - **Power-ups** (medkit, team medkit, ammunition)
   - **Team balancing**
-  - **Skillcards, based on skillpoints**. Skillpoints can be earned by killing other players or by getting attacked, to find out more about the implemented skillcards and the skillpoint system, visit the wiki.
+  - **Skillcards**. Skillpoints can be earned by killing other players or by taking damage, to find out more about the implemented skillcards and the skillpoint system, visit our [wiki](https://github.com/YestinJarrett/qpang-essence-emulator/wiki#skillcards).
   - **Ensures "quality" matches**, prevents players from joining late game and losing items
   - **Most achievements are implemented** (We don't know what the requirements of some achievements are)
   - **Points & Time based matches**
