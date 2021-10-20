@@ -2,27 +2,28 @@
 
 class GiantBeastSkill final : public Skill
 {
+	static constexpr uint32_t TRANSFORMATION_TIME = 9;
+	static constexpr uint16_t BASE_HEALTH = 600;
+	static constexpr uint32_t WEAPON_ITEM_ID = 1095368707;
+
 public:
-	GiantBeastSkill() : Skill()
+	GiantBeastSkill() : Skill(true, 40)
 	{
-		m_requiredSkillPoints = 4;
+	}
 
-		m_hasDuration = true;
-		m_durationInSeconds = 40;
-
-		m_skillTarget = SkillTarget::SELF;
-
-		m_isRainbowSkillCard = true;
+	uint32_t getItemId() override
+	{
+		return SKILL_GIANT_BEAST;
 	}
 
 	void onApply() override
 	{
 		Skill::onApply();
 
-		m_player->setHealth(m_giantBeastBaseHealth, true);
-		m_player->makeInvincible(m_transformationTime);
+		m_player->setHealth(BASE_HEALTH, true);
+		m_player->makeInvincible(TRANSFORMATION_TIME);
 
-		m_player->getWeaponManager()->equipRainbowSkillCardWeapon(m_giantBeastWeaponItemId);
+		m_player->getWeaponManager()->equipRainbowSkillCardWeapon(WEAPON_ITEM_ID);
 	}
 
 	void onWearOff() override
@@ -35,12 +36,13 @@ public:
 		m_player->getWeaponManager()->unequipRainbowSkillCardWeapon();
 	}
 
-	uint32_t getItemId() override
+	bool isRainbowSkillCard() override
 	{
-		return SKILL_GIANT_BEAST;
+		return true;
 	}
-private:
-	uint32_t m_transformationTime = 9;
-	uint32_t m_giantBeastBaseHealth = 600;
-	uint32_t m_giantBeastWeaponItemId = 1095368707;
+
+	uint32_t getSkillPointCost() override
+	{
+		return 4;
+	}
 };

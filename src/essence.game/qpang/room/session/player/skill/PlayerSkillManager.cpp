@@ -39,12 +39,12 @@ void PlayerSkillManager::tick()
 {
 	if (hasActiveSkillCard() && m_activeSkillCard->hasDuration())
 	{
-		if (m_activeSkillCard->getDurationInSeconds() > 0)
+		if (m_activeSkillCard->getDuration() > 0)
 		{
 			m_activeSkillCard->tick();
 		}
 
-		if (m_activeSkillCard->getDurationInSeconds() == 0)
+		if (m_activeSkillCard->getDuration() == 0)
 		{
 			deactivateSkillCard();
 		}
@@ -217,7 +217,7 @@ uint32_t PlayerSkillManager::getRequiredSkillPoints()
 		return std::numeric_limits<unsigned int>::max();
 	}
 
-	return (m_drawnSkillCard->getRequiredSkillPoints() * 100);
+	return (m_drawnSkillCard->getSkillPointCost() * 100);
 }
 
 

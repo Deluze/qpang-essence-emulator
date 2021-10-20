@@ -1,21 +1,21 @@
 #pragma once
 
+#include "Skill.h"
+
 class HawkEyeSkill final : public Skill
 {
 public:
-	HawkEyeSkill() : Skill()
+	HawkEyeSkill() : Skill(true, 5)
 	{
-		m_requiredSkillPoints = 1;
-
-		m_hasDuration = true;
-		m_durationInSeconds = 5;
-
-		m_skillTarget = SkillTarget::SELF;
-		m_isReflectableSkillCard = false;
 	}
 
 	uint32_t getItemId() override
 	{
 		return SKILL_HAWK_EYE;
+	}
+
+	uint32_t getSkillPointCost() override
+	{
+		return 1;
 	}
 };

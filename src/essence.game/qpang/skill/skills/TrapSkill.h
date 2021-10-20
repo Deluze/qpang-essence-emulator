@@ -3,19 +3,22 @@
 class TrapSkill final : public Skill
 {
 public:
-	TrapSkill() : Skill()
+	TrapSkill() : Skill(true, 15)
 	{
-		m_requiredSkillPoints = 1;
-
-		m_hasDuration = true;
-		m_durationInSeconds = 15;
-
-		m_skillTarget = SkillTarget::ENEMY_PLAYER;
-		m_isReflectableSkillCard = false;
 	}
 
 	uint32_t getItemId() override
 	{
 		return SKILL_TRAP;
+	}
+
+	uint32_t getSkillPointCost() override
+	{
+		return 1;
+	}
+
+	SkillTargetType getSkillTarget() override
+	{
+		return SkillTargetType::ENEMY;
 	}
 };

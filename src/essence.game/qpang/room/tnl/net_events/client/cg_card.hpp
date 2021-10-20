@@ -127,7 +127,7 @@ public:
 
 			const auto skillTarget = roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTarget();
 
-			if (skillTarget != SkillTarget::SELF)
+			if (skillTarget != SkillTargetType::SELF)
 			{
 				const auto targetPlayer = roomSession->find(targetUid);
 
@@ -159,7 +159,7 @@ public:
 
 				const auto targetPlayershouldReflectSkillCard = targetPlayerHasActiveSkillCard && targetPlayerActiveSkillCard->shouldReflectSkillCard();
 
-				if (targetPlayershouldReflectSkillCard && (skillTarget == SkillTarget::ENEMY_PLAYER) && drawnSkillCard->isReflectableSkillCard())
+				if (targetPlayershouldReflectSkillCard && (skillTarget == SkillTargetType::ENEMY) && drawnSkillCard->isReflectableSkillCard())
 				{
 					roomSessionPlayer->getSkillManager()->activateSkillCard(roomSessionPlayer->getPlayer()->getId(), seqId);
 					

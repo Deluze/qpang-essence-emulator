@@ -3,15 +3,8 @@
 class PocketSizeSkill final : public Skill
 {
 public:
-	PocketSizeSkill() : Skill()
+	PocketSizeSkill() : Skill(true, 15)
 	{
-		m_requiredSkillPoints = 2;
-
-		m_hasDuration = true;
-		m_durationInSeconds = 15;
-
-		m_skillTarget = SkillTarget::SELF;
-		m_isReflectableSkillCard = false;
 	}
 
 	uint32_t getItemId() override
@@ -29,7 +22,8 @@ public:
 		m_player->setHealth((currentHealth + bonusHealth), true);
 	}
 
-	void onWearOff() override
+	uint32_t getSkillPointCost() override
 	{
+		return 2;
 	}
 };

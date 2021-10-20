@@ -4,26 +4,34 @@
 #include <memory>
 
 #include "ItemID.h"
-#include "SkillTarget.h"
+#include "SkillTargetType.h"
 
 class RoomSessionPlayer;
 
-class Skill
+class Skill  // NOLINT(cppcoreguidelines-special-member-functions)
 {
 public:
-	Skill() :
-		m_skillTarget(SkillTarget::SELF),
-		m_hasDuration(false),
-		m_durationInSeconds(0),
-		m_requiredSkillPoints(0),
-		m_isReflectableSkillCard(false),
-		m_isRainbowSkillCard(false)
+	explicit Skill(const bool hasDuration = false, const uint32_t duration = 0) :
+		m_hasDuration(hasDuration),
+		m_duration(duration)
 	{
 	}
 
-	void bind(const std::shared_ptr<RoomSessionPlayer> player)
+	virtual ~Skill() = default;
+
+	void bind(const std::shared_ptr<RoomSessionPlayer>& player)
 	{
 		m_player = player;
+	}
+
+	[[nodiscard]] bool hasDuration() const
+	{
+		return m_hasDuration;
+	}
+
+	[[nodiscard]] uint32_t getDuration() const
+	{
+		return m_duration;
 	}
 
 	virtual uint32_t getItemId()
@@ -33,9 +41,9 @@ public:
 
 	virtual void tick()
 	{
-		if (m_hasDuration && m_durationInSeconds > 0)
+		if (m_hasDuration && m_duration > 0)
 		{
-			m_durationInSeconds--;
+			m_duration--;
 		}
 	}
 
@@ -45,6 +53,26 @@ public:
 
 	virtual void onWearOff()
 	{
+	}
+
+	virtual bool isRainbowSkillCard()
+	{
+		return false;
+	}
+
+	virtual bool isReflectableSkillCard()
+	{
+		return false;
+	}
+
+	virtual uint32_t getSkillPointCost()
+	{
+		return 0;
+	}
+
+	virtual SkillTargetType getSkillTarget()
+	{
+		return SkillTargetType::SELF;
 	}
 
 	virtual bool shouldDisableOnDamageReceive()
@@ -76,46 +104,9 @@ public:
 	{
 		return false;
 	}
-
-	[[nodiscard]] bool hasDuration() const
-	{
-		return m_hasDuration;
-	}
-
-	[[nodiscard]] bool isRainbowSkillCard() const
-	{
-		return m_isRainbowSkillCard;
-	}
-
-	[[nodiscard]] bool isReflectableSkillCard() const
-	{
-		return m_isReflectableSkillCard;
-	}
-
-	[[nodiscard]] uint32_t getDurationInSeconds() const
-	{
-		return m_durationInSeconds;
-	}
-
-	[[nodiscard]] uint32_t getRequiredSkillPoints() const
-	{
-		return m_requiredSkillPoints;
-	}
-
-	[[nodiscard]] SkillTarget getSkillTarget() const
-	{
-		return m_skillTarget;
-	}
 protected:
-	std::shared_ptr<RoomSessionPlayer> m_player;
-
-	SkillTarget m_skillTarget;
-
 	bool m_hasDuration;
+	uint32_t m_duration;
 
-	uint32_t m_durationInSeconds;
-	uint32_t m_requiredSkillPoints;
-
-	bool m_isReflectableSkillCard;
-	bool m_isRainbowSkillCard;
+	std::shared_ptr<RoomSessionPlayer> m_player;
 };

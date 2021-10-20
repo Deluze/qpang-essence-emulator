@@ -2,16 +2,17 @@
 
 class VitalSkill final : public Skill
 {
+	static constexpr uint16_t SACRIFICE_HEALTH_VALUE = 1;
+	static constexpr uint16_t TEAM_EXTRA_HEALTH_PER_TICK = 5;
+
 public:
-	VitalSkill() : Skill()
+	VitalSkill() : Skill(true, 10)
 	{
-		m_requiredSkillPoints = 3;
+	}
 
-		m_hasDuration = true;
-		m_durationInSeconds = 10;
-
-		m_skillTarget = SkillTarget::ALL_TEAM_PLAYERS;
-		m_isReflectableSkillCard = false;
+	uint32_t getItemId() override
+	{
+		return SKILL_VITAL;
 	}
 
 	void tick() override
@@ -23,13 +24,13 @@ public:
 			const auto teamPlayers = roomSession->getPlayersForTeam(m_player->getTeam());
 
 			// Iterate over all team players that are alive and give them 5 health each tick for the entire duration of the skillcard.
-			for (const auto &teamPlayer : teamPlayers)
+			for (const auto& teamPlayer : teamPlayers)
 			{
 				const auto teamPlayerId = teamPlayer->getPlayer()->getId();
 
 				if (const auto playerId = m_player->getPlayer()->getId(); !teamPlayer->isDead() && teamPlayerId != playerId)
 				{
-					teamPlayer->addHealth(m_vitalSkillTeamHealthPerTick, true);
+					teamPlayer->addHealth(TEAM_EXTRA_HEALTH_PER_TICK, true);
 				}
 			}
 
@@ -40,14 +41,16 @@ public:
 	{
 		Skill::onApply();
 
-		m_player->setHealth(m_vitalSkillSacrificeHealth);
+		m_player->setHealth(SACRIFICE_HEALTH_VALUE, true);
 	}
 
-	uint32_t getItemId() override
+	uint32_t getSkillPointCost() override
 	{
-		return SKILL_VITAL;
+		return 3;
 	}
-private:
-	uint32_t m_vitalSkillSacrificeHealth = 1;
-	uint32_t m_vitalSkillTeamHealthPerTick = 5;
+
+	SkillTargetType getSkillTarget() override
+	{
+		return SkillTargetType::ALLY_TEAM;
+	}
 };

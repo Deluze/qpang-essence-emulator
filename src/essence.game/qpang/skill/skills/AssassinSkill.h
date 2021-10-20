@@ -3,20 +3,18 @@
 class AssassinSkill final : public Skill
 {
 public:
-	AssassinSkill() : Skill()
+	AssassinSkill() : Skill(false, 99)
 	{
-		m_requiredSkillPoints = 2;
-
-		m_hasDuration = false;
-		m_durationInSeconds = 99;
-
-		m_skillTarget = SkillTarget::SELF;
-		m_isReflectableSkillCard = false;
 	}
 
 	uint32_t getItemId() override
 	{
 		return SKILL_ASSASSIN;
+	}
+
+	uint32_t getSkillPointCost() override
+	{
+		return 2;
 	}
 
 	bool shouldInstantlyKillEnemyWithMeleeWeapon() override

@@ -3,22 +3,27 @@
 class ShacklesSkill final : public Skill
 {
 public:
-	ShacklesSkill() : Skill()
+	ShacklesSkill() : Skill(true, 15)
 	{
-		m_requiredSkillPoints = 1;
-
-		m_hasDuration = true;
-		m_durationInSeconds = 15;
-
-		m_skillTarget = SkillTarget::ENEMY_PLAYER;
-
-		m_isReflectableSkillCard = true;
-		// NOTE: Since the client does not send an actioncard event to the server whilst the target player is "shackled",
-		// we won't have to check in CGCard if the player is shackled at that point in time (all clientside behavior).
 	}
 
 	uint32_t getItemId() override
 	{
 		return SKILL_SHACKLES;
+	}
+
+	uint32_t getSkillPointCost() override
+	{
+		return 1;
+	}
+
+	SkillTargetType getSkillTarget() override
+	{
+		return SkillTargetType::ENEMY;
+	}
+
+	bool isReflectableSkillCard() override
+	{
+		return true;
 	}
 };

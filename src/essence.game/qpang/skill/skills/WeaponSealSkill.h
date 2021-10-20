@@ -3,19 +3,27 @@
 class WeaponSealSkill final : public Skill
 {
 public:
-	WeaponSealSkill() : Skill()
+	WeaponSealSkill() : Skill(true, 10)
 	{
-		m_requiredSkillPoints = 2;
-
-		m_hasDuration = true;
-		m_durationInSeconds = 10;
-
-		m_skillTarget = SkillTarget::ENEMY_PLAYER;
-		m_isReflectableSkillCard = true;
 	}
 
 	uint32_t getItemId() override
 	{
 		return SKILL_WEAPON_SEAL;
+	}
+
+	uint32_t getSkillPointCost() override
+	{
+		return 2;
+	}
+
+	SkillTargetType getSkillTarget() override
+	{
+		return SkillTargetType::ENEMY;
+	}
+
+	bool isReflectableSkillCard() override
+	{
+		return true;
 	}
 };

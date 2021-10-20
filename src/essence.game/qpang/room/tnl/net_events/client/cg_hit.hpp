@@ -318,7 +318,7 @@ public:
 					const auto skillCardTargetPlayerId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
 
 					// NOTE: Added the check for skill target since the Vital skill shouldnt disable if the playng player dies.
-					if ((skillTarget != SkillTarget::ALL_TEAM_PLAYERS) && (skillCardTargetPlayerId == dstPlayer->getPlayer()->getId()))
+					if ((skillTarget != SkillTargetType::ALLY_TEAM) && (skillCardTargetPlayerId == dstPlayer->getPlayer()->getId()))
 					{
 						playingPlayer->getSkillManager()->deactivateSkillCard();
 					}

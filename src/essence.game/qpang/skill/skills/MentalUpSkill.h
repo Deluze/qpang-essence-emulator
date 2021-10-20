@@ -3,20 +3,18 @@
 class MentalUpSkill final : public Skill
 {
 public:
-	MentalUpSkill() : Skill()
+	MentalUpSkill() : Skill(true, 20)
 	{
-		m_requiredSkillPoints = 2;
-
-		m_hasDuration = true;
-		m_durationInSeconds = 20;
-
-		m_skillTarget = SkillTarget::SELF;
-		m_isReflectableSkillCard = false;
 	}
 
 	uint32_t getItemId() override
 	{
 		return SKILL_MENTAL_UP;
+	}
+
+	uint32_t getSkillPointCost() override
+	{
+		return 2;
 	}
 
 	bool shouldReceiveReducedDamageFromLaunchers() override

@@ -3,15 +3,8 @@
 class TradeOffSkill final : public Skill
 {
 public:
-	TradeOffSkill() : Skill()
+	TradeOffSkill() : Skill(false, 0)
 	{
-		m_requiredSkillPoints = 3;
-
-		m_hasDuration = false;
-		m_durationInSeconds = 0;
-
-		m_skillTarget = SkillTarget::ALL_ENEMY_PLAYERS;
-		m_isReflectableSkillCard = false;
 	}
 
 	uint32_t getItemId() override
@@ -43,5 +36,14 @@ public:
 
 		m_player->getSkillManager()->deactivateSkillCard();
 	}
-private:
+
+	uint32_t getSkillPointCost() override
+	{
+		return 3;
+	}
+
+	SkillTargetType getSkillTarget() override
+	{
+		return SkillTargetType::ENEMY_TEAM;
+	}
 };

@@ -3,20 +3,27 @@
 class RageSkill final : public Skill
 {
 public:
-	RageSkill() : Skill()
+	RageSkill() : Skill(true, 15)
 	{
-		m_requiredSkillPoints = 1;
-
-		m_hasDuration = true;
-		m_durationInSeconds = 15;
-
-		m_skillTarget = SkillTarget::ENEMY_PLAYER;
-
-		m_isReflectableSkillCard = true;
 	}
 
 	uint32_t getItemId() override
 	{
 		return SKILL_RAGE;
+	}
+
+	uint32_t getSkillPointCost() override
+	{
+		return 1;
+	}
+
+	SkillTargetType getSkillTarget() override
+	{
+		return SkillTargetType::ENEMY;
+	}
+
+	bool isReflectableSkillCard() override
+	{
+		return true;
 	}
 };

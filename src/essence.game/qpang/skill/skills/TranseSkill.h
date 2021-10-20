@@ -2,28 +2,28 @@
 
 class TranseSkill final : public Skill
 {
+	static constexpr uint32_t TRANSFORMATION_TIME = 6;
+	static constexpr uint16_t BASE_HEALTH = 500;
+	static constexpr uint32_t WEAPON_ITEM_ID = 1095303170;
+
 public:
-	TranseSkill() : Skill()
+	TranseSkill() : Skill(true, 40)
 	{
-		m_requiredSkillPoints = 4;
+	}
 
-		m_hasDuration = true;
-		m_durationInSeconds = 40;
-
-		m_skillTarget = SkillTarget::SELF;
-
-		m_isRainbowSkillCard = true;
-		m_isReflectableSkillCard = false;
+	uint32_t getItemId() override
+	{
+		return SKILL_TRANSE;
 	}
 
 	void onApply() override
 	{
 		Skill::onApply();
 
-		m_player->setHealth(m_transeBaseHealth, true);
-		m_player->makeInvincible(m_transformationTime);
+		m_player->setHealth(BASE_HEALTH, true);
+		m_player->makeInvincible(TRANSFORMATION_TIME);
 
-		m_player->getWeaponManager()->equipRainbowSkillCardWeapon(m_transeWeaponItemId);
+		m_player->getWeaponManager()->equipRainbowSkillCardWeapon(WEAPON_ITEM_ID);
 	}
 
 	void onWearOff() override
@@ -36,12 +36,13 @@ public:
 		m_player->getWeaponManager()->unequipRainbowSkillCardWeapon();
 	}
 
-	uint32_t getItemId() override
+	bool isRainbowSkillCard() override
 	{
-		return SKILL_TRANSE;
+		return true;
 	}
-private:
-	uint32_t m_transformationTime = 6;
-	uint32_t m_transeBaseHealth = 500;
-	uint32_t m_transeWeaponItemId = 1095303170;
+
+	uint32_t getSkillPointCost() override
+	{
+		return 4;
+	}
 };
