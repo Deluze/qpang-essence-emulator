@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class ReflectSkill : public Skill
+class ReflectSkill final : public Skill
 {
 public:
 	ReflectSkill() : Skill()
@@ -18,12 +16,11 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_REFLECT;
+		return SKILL_REFLECT;
 	}
 
 	bool shouldReflectSkillCard() override
 	{
 		return true;
 	}
-private:
 };

@@ -1,11 +1,10 @@
 #pragma once
 
+#include <cstdint>
+#include <memory>
+
 #include "ItemID.h"
 #include "SkillTarget.h"
-
-#include <array>
-#include <memory>
-#include <cstdint>
 
 class RoomSessionPlayer;
 
@@ -13,23 +12,23 @@ class Skill
 {
 public:
 	Skill() :
-		m_requiredSkillPoints(0),
+		m_skillTarget(SkillTarget::SELF),
 		m_hasDuration(false),
 		m_durationInSeconds(0),
-		m_isRainbowSkillCard(false),
+		m_requiredSkillPoints(0),
 		m_isReflectableSkillCard(false),
-		m_skillTarget(SkillTarget::SELF)
+		m_isRainbowSkillCard(false)
 	{
 	}
 
-	void bind(std::shared_ptr<RoomSessionPlayer> player)
+	void bind(const std::shared_ptr<RoomSessionPlayer> player)
 	{
 		m_player = player;
 	}
 
 	virtual uint32_t getItemId()
 	{
-		return ItemID::SKILL_NONE;
+		return SKILL_NONE;
 	}
 
 	virtual void tick()
@@ -78,38 +77,38 @@ public:
 		return false;
 	}
 
-	bool hasDuration()
+	[[nodiscard]] bool hasDuration() const
 	{
 		return m_hasDuration;
 	}
 
-	bool isRainbowSkillCard()
+	[[nodiscard]] bool isRainbowSkillCard() const
 	{
 		return m_isRainbowSkillCard;
 	}
 
-	bool isReflectableSkillCard()
+	[[nodiscard]] bool isReflectableSkillCard() const
 	{
 		return m_isReflectableSkillCard;
 	}
 
-	uint32_t getDurationInSeconds()
+	[[nodiscard]] uint32_t getDurationInSeconds() const
 	{
 		return m_durationInSeconds;
 	}
 
-	uint32_t getRequiredSkillPoints()
+	[[nodiscard]] uint32_t getRequiredSkillPoints() const
 	{
 		return m_requiredSkillPoints;
 	}
 
-	SkillTarget getSkillTarget()
+	[[nodiscard]] SkillTarget getSkillTarget() const
 	{
 		return m_skillTarget;
 	}
 protected:
 	std::shared_ptr<RoomSessionPlayer> m_player;
-	
+
 	SkillTarget m_skillTarget;
 
 	bool m_hasDuration;
@@ -119,5 +118,4 @@ protected:
 
 	bool m_isReflectableSkillCard;
 	bool m_isRainbowSkillCard;
-private:
 };

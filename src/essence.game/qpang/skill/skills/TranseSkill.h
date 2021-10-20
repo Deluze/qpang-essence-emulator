@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class TranseSkill : public Skill
+class TranseSkill final : public Skill
 {
 public:
 	TranseSkill() : Skill()
@@ -40,7 +38,7 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_TRANSE;
+		return SKILL_TRANSE;
 	}
 private:
 	uint32_t m_transformationTime = 6;

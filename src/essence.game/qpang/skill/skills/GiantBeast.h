@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class GiantBeastSkill : public Skill
+class GiantBeastSkill final : public Skill
 {
 public:
 	GiantBeastSkill() : Skill()
@@ -39,7 +37,7 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_GIANT_BEAST;
+		return SKILL_GIANT_BEAST;
 	}
 private:
 	uint32_t m_transformationTime = 9;

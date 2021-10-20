@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class LastWeaponSkill : public Skill
+class LastWeaponSkill final : public Skill
 {
 public:
 	LastWeaponSkill() : Skill()
@@ -40,7 +38,7 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_LAST_WEAPON;
+		return SKILL_LAST_WEAPON;
 	}
 private:
 	uint32_t m_transformationTime = 6;

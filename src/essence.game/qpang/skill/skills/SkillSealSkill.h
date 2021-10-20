@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class SkillSealSkill : public Skill
+class SkillSealSkill final : public Skill
 {
 public:
 	SkillSealSkill() : Skill()
@@ -18,7 +16,6 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_SKILL_SEAL;
+		return SKILL_SKILL_SEAL;
 	}
-private:
 };

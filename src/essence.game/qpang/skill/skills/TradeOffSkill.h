@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class TradeOffSkill : public Skill
+class TradeOffSkill final : public Skill
 {
 public:
 	TradeOffSkill() : Skill()
@@ -18,7 +16,7 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_TRADE_OFF;
+		return SKILL_TRADE_OFF;
 	}
 
 	void onApply() override
@@ -26,7 +24,7 @@ public:
 		m_player->getSkillManager()->resetSkillPoints();
 
 		const auto myTeam = m_player->getTeam();
-		const auto enemyTeam = (myTeam == 1) ? 2 : 1;
+		const auto enemyTeam = static_cast<uint8_t>(myTeam == 1 ? 2 : 1);
 
 		const auto roomSession = m_player->getRoomSession();
 

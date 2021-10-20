@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class VitalSkill : public Skill
+class VitalSkill final : public Skill
 {
 public:
 	VitalSkill() : Skill()
@@ -28,9 +26,8 @@ public:
 			for (const auto &teamPlayer : teamPlayers)
 			{
 				const auto teamPlayerId = teamPlayer->getPlayer()->getId();
-				const auto playerId = m_player->getPlayer()->getId();
 
-				if (!teamPlayer->isDead() && teamPlayerId != playerId)
+				if (const auto playerId = m_player->getPlayer()->getId(); !teamPlayer->isDead() && teamPlayerId != playerId)
 				{
 					teamPlayer->addHealth(m_vitalSkillTeamHealthPerTick, true);
 				}
@@ -48,7 +45,7 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_VITAL;
+		return SKILL_VITAL;
 	}
 private:
 	uint32_t m_vitalSkillSacrificeHealth = 1;

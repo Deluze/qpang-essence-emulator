@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class MentalUpSkill : public Skill
+class MentalUpSkill final : public Skill
 {
 public:
 	MentalUpSkill() : Skill()
@@ -18,12 +16,11 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_MENTAL_UP;
+		return SKILL_MENTAL_UP;
 	}
 
 	bool shouldReceiveReducedDamageFromLaunchers() override
 	{
 		return true;
 	}
-private:
 };

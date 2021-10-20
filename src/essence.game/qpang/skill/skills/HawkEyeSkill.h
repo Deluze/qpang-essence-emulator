@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class HawkEyeSkill : public Skill
+class HawkEyeSkill final : public Skill
 {
 public:
 	HawkEyeSkill() : Skill()
@@ -18,7 +16,6 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_HAWK_EYE;
+		return SKILL_HAWK_EYE;
 	}
-private:
 };

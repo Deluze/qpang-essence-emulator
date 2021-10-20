@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class PocketSizeSkill : public Skill
+class PocketSizeSkill final : public Skill
 {
 public:
 	PocketSizeSkill() : Skill()
@@ -18,7 +16,7 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_POCKET_SIZE;
+		return SKILL_POCKET_SIZE;
 	}
 
 	void onApply() override
@@ -26,7 +24,7 @@ public:
 		Skill::onApply();
 
 		const auto currentHealth = m_player->getHealth();
-		const auto bonusHealth = (uint16_t) currentHealth / 2;
+		const auto bonusHealth = static_cast<uint16_t>(currentHealth / 2);
 		
 		m_player->setHealth((currentHealth + bonusHealth), true);
 	}
@@ -34,5 +32,4 @@ public:
 	void onWearOff() override
 	{
 	}
-private:
 };

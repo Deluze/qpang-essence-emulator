@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class AssassinSkill : public Skill
+class AssassinSkill final : public Skill
 {
 public:
 	AssassinSkill() : Skill()
@@ -18,12 +16,11 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_ASSASSIN;
+		return SKILL_ASSASSIN;
 	}
 
 	bool shouldInstantlyKillEnemyWithMeleeWeapon() override
 	{
 		return true;
 	}
-private:
 };

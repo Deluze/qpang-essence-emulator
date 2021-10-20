@@ -1,10 +1,8 @@
 #include "SkillManager.h"
 
-#include <qpang/ItemID.h>
 #include <qpang/Game.h>
 
 #include <qpang/skill/skills/RapidFireSkill.h>
-#include <qpang/skill/skills/HawkEyeSkill.h>
 #include <qpang/skill/skills/CamoSkill.h>
 #include <qpang/skill/skills/PocketSizeSkill.h>
 #include <qpang/skill/skills/ChaosSkill.h>
@@ -15,7 +13,6 @@
 #include <qpang/skill/skills/LastWeaponSkill.h>
 #include <qpang/skill/skills/TranseSkill.h>
 #include <qpang/skill/skills/TrapSkill.h>
-#include <qpang/skill/skills/IronWallSkill.h>
 #include <qpang/skill/skills/ReflectSkill.h>
 #include <qpang/skill/skills/AssassinSkill.h>
 #include <qpang/skill/skills/WeaponSealSkill.h>
@@ -24,8 +21,7 @@
 #include <qpang/skill/skills/TradeOffSkill.h>
 
 SkillManager::SkillManager()
-{
-}
+= default;
 
 void SkillManager::initialize()
 {

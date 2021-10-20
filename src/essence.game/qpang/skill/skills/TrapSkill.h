@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class TrapSkill : public Skill
+class TrapSkill final : public Skill
 {
 public:
 	TrapSkill() : Skill()
@@ -18,7 +16,6 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_TRAP;
+		return SKILL_TRAP;
 	}
-private:
 };

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-class CamoSkill : public Skill
+class CamoSkill final : public Skill
 {
 public:
 	CamoSkill() : Skill()
@@ -18,7 +16,7 @@ public:
 
 	uint32_t getItemId() override
 	{
-		return ItemID::SKILL_CAMO;
+		return SKILL_CAMO;
 	}
 
 	bool shouldDisableOnDamageReceive() override
@@ -35,5 +33,4 @@ public:
 	{
 		return true;
 	}
-private:
 };
