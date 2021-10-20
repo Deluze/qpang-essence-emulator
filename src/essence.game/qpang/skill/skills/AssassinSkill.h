@@ -17,6 +17,11 @@ public:
 		return 2;
 	}
 
+	SkillRateType getSkillRateType() override
+	{
+		return SkillRateType::SILVER;
+	}
+
 	bool shouldInstantlyKillEnemyWithMeleeWeapon() override
 	{
 		return true;

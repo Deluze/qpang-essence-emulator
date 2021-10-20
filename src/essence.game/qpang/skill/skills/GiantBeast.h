@@ -45,4 +45,9 @@ public:
 	{
 		return 4;
 	}
+
+	SkillRateType getSkillRateType() override
+	{
+		return SkillRateType::RAINBOW;
+	}
 };

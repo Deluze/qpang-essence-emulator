@@ -16,4 +16,9 @@ public:
 	{
 		return 1;
 	}
+
+	SkillRateType getSkillRateType() override
+	{
+		return SkillRateType::BRONZE;
+	}
 };

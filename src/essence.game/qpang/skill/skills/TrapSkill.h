@@ -17,6 +17,11 @@ public:
 		return 1;
 	}
 
+	SkillRateType getSkillRateType() override
+	{
+		return SkillRateType::BRONZE;
+	}
+
 	SkillTargetType getSkillTarget() override
 	{
 		return SkillTargetType::ENEMY;

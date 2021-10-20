@@ -42,6 +42,11 @@ public:
 		return 3;
 	}
 
+	SkillRateType getSkillRateType() override
+	{
+		return SkillRateType::GOLD;
+	}
+
 	SkillTargetType getSkillTarget() override
 	{
 		return SkillTargetType::ENEMY_TEAM;

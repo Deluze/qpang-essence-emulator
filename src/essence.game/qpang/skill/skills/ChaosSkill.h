@@ -17,6 +17,11 @@ public:
 		return 1;
 	}
 
+	SkillRateType getSkillRateType() override
+	{
+		return SkillRateType::BRONZE;
+	}
+
 	bool isReflectableSkillCard() override
 	{
 		return true;

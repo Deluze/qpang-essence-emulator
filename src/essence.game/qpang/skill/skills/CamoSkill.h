@@ -17,6 +17,11 @@ public:
 		return 1;
 	}
 
+	SkillRateType getSkillRateType() override
+	{
+		return SkillRateType::BRONZE;
+	}
+
 	bool shouldDisableOnDamageReceive() override
 	{
 		return true;

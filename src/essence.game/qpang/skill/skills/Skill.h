@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "ItemID.h"
+#include "SkillRateType.h"
 #include "SkillTargetType.h"
 
 class RoomSessionPlayer;
@@ -73,6 +74,11 @@ public:
 	virtual SkillTargetType getSkillTarget()
 	{
 		return SkillTargetType::SELF;
+	}
+
+	virtual SkillRateType getSkillRateType()
+	{
+		return SkillRateType::BRONZE;
 	}
 
 	virtual bool shouldDisableOnDamageReceive()
