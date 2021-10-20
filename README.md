@@ -21,24 +21,25 @@ It conists out of:
 - **Chat, Whispers & In-Game Announcements**
 - **Bans & Mutes**
 - **Gamerooms**
-  - **DM, TDM, Protect the Essence, VIP and TagPlay/Prey game modes**
-  - **Melee only**
-  - **Power-ups** (medkit, team medkit, ammunition)
+  - **Various gamemodes**: DeathMatch, TeamDeathMatch, Protect the Essence, VIP and Tagplay.
+  - **Melee only mode**
+  - **In-game Power-ups** (medkit, team medkit, ammunition)
   - **Team balancing**
-  - **Skillcards**. Skillpoints can be earned by killing other players or by taking damage, to find out more about the implemented skillcards and the skillpoint system, visit our [wiki](https://github.com/YestinJarrett/qpang-essence-emulator/wiki#skillcards).
+  - **In-game skillcards (20 implemented cards)**, by picking up a skillbook in-game you receive a weighted random skillcard based on its class (bronze, silver, gold or rainbow), to activate this skillcard you musth have enough skillpoints. Skillpoints can be earned by fighting with other players, more specificly; by killing other players and getting attacked by other players.                        
+    For more information about skillcards, visit [our wiki](https://github.com/YestinJarrett/qpang-essence-emulator/wiki#skillcards).
   - **Ensures "quality" matches**, prevents players from joining late game and losing items
   - **Most achievements are implemented** (We don't know what the requirements of some achievements are)
-  - **Points & Time based matches**
-  - **Cash & Coin drops**
+  - **Point & Time based matches**
+  - **Cash, coin and event item drops**
   - **Weapon effects**
-  - **Game Invites (new)**
+  - **Game Invites**
   - **Team and All chat**
 - **Custom in-game commands**
 - **Configurable crane machine**
 - **Configurable shop**
 - **Extending cards in inventory**
 - **In-game leaderboards**
-- **Daily login bonus**
+- **Daily login bonus (bunny in park)**
 - **Automatic square generation so they don't get overcrowded** (50 players max, configurable)
 - **Full working machine guns in the bunker/ground zero map**
 
