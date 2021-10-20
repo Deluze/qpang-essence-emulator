@@ -2,6 +2,7 @@
 
 #include <assert.h>
 
+#include "gc_game_state.hpp"
 #include "StringConverter.h"
 #include "qpang/Game.h"
 #include "qpang/room/session/RoomSession.h"
@@ -161,17 +162,28 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 		{
 			if (!killerPlayerHasRainbowSkillCard)
 			{
-				const auto skillPoints = 45;
+				constexpr auto skillPoints = 45;
 				const auto skillGaugeBoostPercentage = killer->getSkillManager()->getSkillGaugeBoostPercentage();
 
-				killer->getSkillManager()->addSkillPoints((uint32_t)(skillPoints + (skillPoints * skillGaugeBoostPercentage)));
+				killer->getSkillManager()->addSkillPoints(static_cast<uint32_t>(skillPoints + (skillPoints * skillGaugeBoostPercentage)));
 			}
 		}
 	}
 
 	target->resetStreak();
 	target->getEffectManager()->clear();
-	target->startRespawnCooldown();
+
+	if (const auto targetHasActiveSkillCard = target->getSkillManager()->hasActiveSkillCard(); 
+		targetHasActiveSkillCard && target->getSkillManager()->getActiveSkillCard()->shouldInstantlyRespawnOnDeath())
+	{
+		// Show respawn cooldown with 0 seconds.
+		target->post(new GCGameState(target->getPlayer()->getId(), 29, 0));
+		target->respawn();
+	}
+	else
+	{
+		target->startRespawnCooldown();
+	}
 
 	auto* killerStats = killer->getPlayer()->getStatsManager();
 	auto* targetStats = target->getPlayer()->getStatsManager();

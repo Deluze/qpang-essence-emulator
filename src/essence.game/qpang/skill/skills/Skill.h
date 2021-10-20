@@ -76,6 +76,11 @@ public:
 		return SkillRateType::BRONZE;
 	}
 
+	virtual bool shouldInstantlyRespawnOnDeath()
+	{
+		return false;
+	}
+
 	virtual bool shouldDisableOnDamageReceive()
 	{
 		return false;
