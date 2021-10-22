@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-enum ItemID : uint32_t
+enum ItemId : uint32_t
 {
 	EXP_MAKER_25 = 1174405140,
 	DON_MAKER_25 = 1174405141,
@@ -51,11 +51,11 @@ enum ItemID : uint32_t
 static bool isEquippableFunction(uint32_t id)
 {
 	return
-		id == ItemID::EXP_MAKER_25 ||
-		id == ItemID::EXP_MAKER_50 ||
-		id == ItemID::DON_MAKER_25 ||
-		id == ItemID::DON_MAKER_50 ||
-		id == ItemID::QUICK_REVIVE ||
-		id == ItemID::PVE_COIN_BOOSTER ||
-		id == ItemID::PVE_PANTH_BLESSING;
+		id == ItemId::EXP_MAKER_25 ||
+		id == ItemId::EXP_MAKER_50 ||
+		id == ItemId::DON_MAKER_25 ||
+		id == ItemId::DON_MAKER_50 ||
+		id == ItemId::QUICK_REVIVE ||
+		id == ItemId::PVE_COIN_BOOSTER ||
+		id == ItemId::PVE_PANTH_BLESSING;
 }

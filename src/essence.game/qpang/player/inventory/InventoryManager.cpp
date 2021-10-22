@@ -12,7 +12,7 @@
 #include "packets/lobby/outgoing/inventory/GiftCardSuccess.h"
 #include "packets/lobby/outgoing/inventory/OpenGiftSuccess.h"
 
-#include "qpang/ItemID.h"
+#include "qpang/ItemId.h"
 
 void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playerId)
 {

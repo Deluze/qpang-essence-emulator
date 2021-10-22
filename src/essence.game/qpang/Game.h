@@ -29,7 +29,7 @@
 #include "packets/lobby/LobbyPacketHandler.h"
 #include "packets/square/SquarePacketHandler.h"
 
-#include "qpang/ItemID.h"
+#include "qpang/ItemId.h"
 
 class Player;
 

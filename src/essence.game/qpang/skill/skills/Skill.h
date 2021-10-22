@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "ItemID.h"
+#include "ItemId.h"
 #include "SkillRateType.h"
 #include "SkillTargetType.h"
 

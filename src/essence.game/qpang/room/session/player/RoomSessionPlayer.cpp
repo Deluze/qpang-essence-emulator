@@ -4,7 +4,7 @@
 
 #include "packets/lobby/outgoing/account/UpdateAccount.h"
 
-#include "qpang/ItemID.h"
+#include "qpang/ItemId.h"
 #include "qpang/Game.h"
 
 #include "qpang/room/tnl/GameConnection.h"
@@ -16,31 +16,31 @@
 #include "qpang/room/tnl/net_events/server/gc_game_item.hpp"
 
 RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomSession> roomSession, uint8_t team) :
-	m_conn(conn),
-	m_roomSession(roomSession),
-	m_team(team),
 	m_isPlaying(false),
-	m_isInvincible(false),
 	m_isSpectating(false),
+	m_team(team),
+	m_isInvincible(false),
+	m_expRate(0),
+	m_donRate(0),
+	m_exp(0),
+	m_don(0),
+	m_highestStreak(0),
 	m_streak(0),
 	m_kills(0),
 	m_deaths(0),
 	m_score(0),
-	m_exp(0),
-	m_expRate(0),
-	m_don(0),
-	m_donRate(0),
 	m_playTime(0),
-	m_highestStreak(0),
 	m_highestMultiKill(0),
 	m_eventItemPickUps(0),
-	m_tagKillsAsPlayer(0),
-	m_playerKillsAsTag(0),
 	m_deathsAsTag(0),
 	m_deathsByTag(0),
+	m_tagKillsAsPlayer(0),
+	m_playerKillsAsTag(0),
 	m_timeAliveAsTag(0),
+	m_damageDealtToTag(0),
 	m_damageDealtAsTag(0),
-	m_damageDealtToTag(0)
+	m_conn(conn),
+	m_roomSession(roomSession)
 {
 	conn->incRef();
 
@@ -62,14 +62,14 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 
 	m_armor = equipManager->getArmorItemIdsByCharacter(m_character);
 
-	m_hasQuickRevive = equipManager->hasFunctionCard(ItemID::QUICK_REVIVE);
+	m_hasQuickRevive = equipManager->hasFunctionCard(QUICK_REVIVE);
 
-	m_expRate += equipManager->hasFunctionCard(ItemID::EXP_MAKER_25) ? 25 : 0;
-	m_expRate += equipManager->hasFunctionCard(ItemID::EXP_MAKER_50) ? 50 : 0;
+	m_expRate += equipManager->hasFunctionCard(EXP_MAKER_25) ? 25 : 0;
+	m_expRate += equipManager->hasFunctionCard(EXP_MAKER_50) ? 50 : 0;
 	m_expRate += CONFIG_MANAGER->getInt("GLOBAL_EXP_RATE");
 
-	m_donRate += equipManager->hasFunctionCard(ItemID::DON_MAKER_25) ? 25 : 0;
-	m_donRate += equipManager->hasFunctionCard(ItemID::DON_MAKER_50) ? 50 : 0;
+	m_donRate += equipManager->hasFunctionCard(DON_MAKER_25) ? 25 : 0;
+	m_donRate += equipManager->hasFunctionCard(DON_MAKER_50) ? 50 : 0;
 	m_donRate += CONFIG_MANAGER->getInt("GLOBAL_DON_RATE");
 
 	auto weaponManager = Game::instance()->getWeaponManager();
@@ -217,7 +217,7 @@ void RoomSessionPlayer::removeInvincibility()
 	m_roomSession->relayPlaying<GCGameState>(getPlayer()->getId(), 8);
 }
 
-void RoomSessionPlayer::addPlayer(RoomSessionPlayer::Ptr player)
+void RoomSessionPlayer::addPlayer(Ptr player)
 {
 	m_conn->addSession(player);
 }
