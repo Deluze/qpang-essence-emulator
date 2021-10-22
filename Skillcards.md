@@ -8,11 +8,10 @@ There are 4 different skill card classes (Bronze, Silver, Gold and Rainbow). The
 __To find out more about all of the different skill cards QPang has to offer, take a look below.__
 
 ## Class: Bronze
+![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0026_s.png)
 ### Chaos (Implemented)
 Confuse the opponent by changing their keyboard controls for a short period of time.       
 **Note:** The opponent must be in in your crosshair to use this skill, otherwise the skill will fail.
-
-![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0026_s.png)
 
 ### Energy Shield (Coming soon)
 Deploy an invisible shield for 8 seconds. Can not shield short range; back and splash damage.
