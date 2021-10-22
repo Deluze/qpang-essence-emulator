@@ -6,8 +6,8 @@ There are 4 different skill card classes (Rainbow, Gold, Silver and Bronze). You
 
 __To find out more about all of the different skill cards QPang has to offer, take a look below.__
 
-### Class: Bronze
-#### Chaos (Implemented)
+## Class: Bronze
+### Chaos (Implemented)
 Confuse the opponent by changing their keyboard controls for a short period of time.       
 **Note:** The opponent must be in in your crosshair to use this skill, otherwise the skill will fail.
 
