@@ -3,7 +3,7 @@
 To use a skill, you have to equip the skill card. You can obtain skill cards in the game or you can purchase them in the card shop (lobby). 
 To use skill cards, you have to raise skill gauge (increase skill gauge) by attacking or by being attacked in the game. 
 
-There are 4 different skill card classes (Rainbow, Gold, Silver and Bronze). You need more skill points to use higher class skill cards.
+There are 4 different skill card classes (Bronze, Silver, Gold and Rainbow). The higher the class, the more skill points you need.
 
 __To find out more about all of the different skill cards QPang has to offer, take a look below.__
 
