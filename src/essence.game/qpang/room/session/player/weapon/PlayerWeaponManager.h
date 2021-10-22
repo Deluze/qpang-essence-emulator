@@ -14,7 +14,7 @@ class PlayerWeaponManager
 public:
 	PlayerWeaponManager();
 
-	void initialize(std::shared_ptr<RoomSessionPlayer> player);
+	void initialize(const std::shared_ptr<RoomSessionPlayer>& player);
 
 	Weapon getSelectedWeapon();
 
@@ -28,19 +28,19 @@ public:
 	bool canReload();
 	bool canShoot();
 
-	bool hasWeapon(uint32_t weaponId);
+	bool hasWeapon(uint32_t weaponId) const;
 	void switchWeapon(uint32_t weaponId, bool isReloadGlitchEnabled);
-	bool isHoldingMelee();
+	bool isHoldingMelee() const;
 
 	void refillWeapon(uint32_t weaponId);
 	void refillCurrentWeapon();
 
 	std::array<uint32_t, 4> getWeaponIds();
-	std::array<Weapon, 4> getWeapons();
+	std::array<Weapon, 4> getWeapons() const;
 
-	bool hasEquippedMachineGun();
+	bool hasEquippedMachineGun() const;
 
-	uint64_t getEquippedMachineGunSeqId();
+	uint64_t getEquippedMachineGunSeqId() const;
 
 	void equipMachineGun(uint64_t seqId);
 	void unequipMachineGun();
@@ -56,7 +56,7 @@ private:
 	std::weak_ptr<RoomSessionPlayer> m_player;
 
 	Weapon m_currentRifleWeapon;
-	uint32_t m_previousSelectedWeaponIndex;
+	uint8_t m_previousSelectedWeaponIndex;
 
 	// Ground zero machine gun
 	bool m_hasEquippedMachineGun;
