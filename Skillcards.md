@@ -55,7 +55,7 @@ Blocks 100 damage for the selected team member for 15 damage.
 
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0005_s.png)
 ### Assassin
-One hit kill with any melee weapon. When done successfully skill will disappear. 
+One hit kill with any melee weapon. When done successfully skill will disappear.      
 This skill allows you to kill batteryman, zilla or the last weapon in one blow.
 
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0012_s.png)
