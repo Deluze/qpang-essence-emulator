@@ -27,18 +27,6 @@ public:
 		SKILL_CARD = 9,
 	};
 
-	enum ActionCardId : U32
-	{
-		// TODO: Move these item id's to more generic place for item ids.
-		MERONG = 1409286145,
-		FAKE_DEATH = 1409286146,
-		TUMBLE = 1409286147,
-		ROLL_OVER_LEFT = 1409286148,
-		ROLL_OVER_RIGHT = 1409286149,
-		DOUBLE_JUMP = 1409286150,
-		DASH = 1409286151
-	};
-
 	CGCard() : GameNetEvent{ CG_CARD, Guaranteed, DirClientToServer } {};
 
 	void pack(EventConnection* conn, BitStream* bstream) {};
@@ -147,8 +135,8 @@ public:
 					return;
 				}
 
-				if (const auto targetPlayershouldReflectSkillCard = targetPlayerHasActiveSkillCard 
-					&& targetPlayerActiveSkillCard->shouldReflectSkillCard(); targetPlayershouldReflectSkillCard 
+				if (const auto targetPlayershouldReflectSkillCard = targetPlayerHasActiveSkillCard
+					&& targetPlayerActiveSkillCard->shouldReflectSkillCard(); targetPlayershouldReflectSkillCard
 					&& (skillTarget == SkillTargetType::ENEMY) && drawnSkillCard->isReflectableSkillCard())
 				{
 					roomSessionPlayer->getSkillManager()->activateSkillCard(roomSessionPlayer->getPlayer()->getId(), seqId);
@@ -175,7 +163,7 @@ public:
 	{
 		if (roomSession->getGameMode()->isPublicEnemyMode())
 		{
-			if (const auto character = player->getCharacter(); (itemId == FAKE_DEATH) && (character == 850 || character == 851))
+			if (const auto character = player->getCharacter(); (itemId == ACTION_CARD_FAKE_DEATH) && (character == 850 || character == 851))
 			{
 				player->broadcast(u"Sorry, you may not use fake death in the public enemy gamemode.");
 
@@ -208,7 +196,10 @@ public:
 		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
 		{
 			const auto shouldDisableOnRollAction = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnRollAction();
-			const auto isRollAction = (itemId == ROLL_OVER_LEFT) || (itemId == ROLL_OVER_RIGHT) || (itemId == DASH) || (itemId == TUMBLE);
+			const auto isRollAction = (itemId == ACTION_CARD_ROLL_OVER_LEFT)
+				|| (itemId == ACTION_CARD_ROLL_OVER_RIGHT)
+				|| (itemId == ACTION_CARD_DASH)
+				|| (itemId == ACTION_CARD_TUMBLE);
 
 			if (shouldDisableOnRollAction && isRollAction)
 			{
