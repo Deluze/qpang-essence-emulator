@@ -1,5 +1,3 @@
-![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/loading-01a.png)
-
 # What skillcards are there?
 There are 4 different classes of skillcards: Bronze, Silver, Gold and Rainbow. The higher the class, the more skillgauge points it costs to activate a card.
 
