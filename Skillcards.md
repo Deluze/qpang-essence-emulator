@@ -1,14 +1,15 @@
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/loading-01a.png)
 
-# How do I use a skillcard?
+# What skillcards are there?
+There are 4 different classes of skillcards: Bronze, Silver, Gold and Rainbow. The higher the class, the more skillgauge points it costs to activate a card.
+
+# How does one use a skillcard?
 To use a skillcard, you will have to raise your skillgauge by either attacking an opponent or by being attacked by an opponent.
 
 Once you have gained enough skillgauge points you will be able to activate a skillcard by right-clicking your mouse.
 
-# What skillcards are there?
-There are 4 different classes of skillcards: Bronze, Silver, Gold and Rainbow. The higher the class, the more skillgauge points the skillcard requires to activate.
-
-## Class: Bronze
+# Skillcards
+## Bronze
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0026_s.png)
 ### Chaos
 Confuse the opponent by changing their keyboard controls for a short period of time.            
@@ -49,7 +50,7 @@ Make the opponents team member look like your team member for 15 seconds.
 ### Undercover
 Go undercover by making a team member look like the opposite team for 15 seconds.      
 
-## Class: Silver
+## Silver
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0005_s.png)
 ### Assassin
 One hit kill with any melee weapon. When done successfully skill will disappear. This skill allows you to kill batteryman, zilla or the last weapon in one blow.
@@ -86,7 +87,7 @@ All allies gain unlimited stamina for 15 seconds. Halves stamina after the durat
 ### Weapon Seal
 Make the opponent unable to change their weapons.      
 
-## Class: Gold
+## Gold
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0022_s.png)
 ### Blessing
 Grants an energy shield to the entire team.
@@ -99,7 +100,7 @@ Use this to sacrifice your HP (reduce your HP to 1) and regenerate all team memb
 ### Trade-off
 Sacrifice all your skill points to reduce the opponents skill points by 1 (applies to the whole enemy team).   
 
-## Class: Rainbow
+## Rainbow
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0008_s.png)
 ### BatteryMan
 Your character will transform into BatteryMan for 40 seconds. Giving you 500 HP and chainlight as a weapon.
