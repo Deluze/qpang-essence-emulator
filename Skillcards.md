@@ -49,6 +49,10 @@ Make the opponents team member look like your team member for 15 seconds.
 Go undercover by making a team member look like the opposite team for 15 seconds.      
 
 ## Silver
+![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0020_s.png)
+### Absorb
+Blocks 100 damage for the selected team member for 15 damage.
+
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0005_s.png)
 ### Assassin
 One hit kill with any melee weapon. When done successfully skill will disappear. This skill allows you to kill batteryman, zilla or the last weapon in one blow.
