@@ -1,5 +1,3 @@
-Welcome to the qpang-essence-emulator wiki!
-
 # Skillcards
 
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/blob/master/wiki/skillcards/images/loading-01a.png)
