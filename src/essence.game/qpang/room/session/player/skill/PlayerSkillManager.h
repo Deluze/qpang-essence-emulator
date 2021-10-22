@@ -15,12 +15,12 @@ public:
 
 	void tick();
 
-	void activateSkillCard(uint32_t targetPlayerId, uint32_t seqId);
+	void activateSkillCard(uint32_t targetPlayerId, uint64_t seqId);
 	void deactivateSkillCard();
 
-	void failSkillCard(uint32_t targetPlayerId, uint32_t seqId);
+	void failSkillCard(uint32_t targetPlayerId, uint64_t seqId);
 
-	void updateSkillPointsForPlayer();
+	void updateSkillPointsForPlayer() const;
 
 	void addSkillPoints(uint32_t skillPoints);
 	void removeSkillPoints(uint32_t skillPoints);
@@ -28,20 +28,20 @@ public:
 
 	uint32_t drawSkill();
 
-	std::shared_ptr<Skill> getActiveSkillCard();
-	std::shared_ptr<Skill> getDrawnSkillCard();
+	std::shared_ptr<Skill> getActiveSkillCard() const;
+	std::shared_ptr<Skill> getDrawnSkillCard() const;
 
-	uint32_t getActiveSkillCardTargetPlayerId();
-	uint32_t getActiveSkillCardSeqId();
+	uint32_t getActiveSkillCardTargetPlayerId() const;
+	uint64_t getActiveSkillCardSeqId() const;
 
-	uint32_t getRequiredSkillPoints();
+	uint32_t getRequiredSkillPoints() const;
 
-	double getSkillGaugeBoostPercentage();
+	double getSkillGaugeBoostPercentage() const;
 
-	bool hasSufficientSkillPoints();
+	bool hasSufficientSkillPoints() const;
 
-	bool hasActiveSkillCard();
-	bool isDrawnSkillCard(uint32_t itemId);
+	bool hasActiveSkillCard() const;
+	bool isDrawnSkillCard(uint32_t itemId) const;
 private:
 	std::weak_ptr<RoomSessionPlayer> m_player;
 
@@ -51,7 +51,7 @@ private:
 	uint32_t m_skillPoints;
 
 	uint32_t m_activeSkillCardTargetPlayerId;
-	uint32_t m_activeSkillCardSeqId;
+	uint64_t m_activeSkillCardSeqId;
 
 	double m_skillGaugeBoostPercentage;
 };

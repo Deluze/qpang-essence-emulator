@@ -14,19 +14,17 @@ void PlayerSkillManager::initialize(std::shared_ptr<RoomSessionPlayer> player)
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
-		const auto equippedBoosterItemId = player->getPlayer()->getEquipmentManager()->getEquippedBooster();
-
-		switch (equippedBoosterItemId)
+		switch (player->getPlayer()->getEquipmentManager()->getEquippedBooster())
 		{
-			 // Cboost
+			// Cboost
 		case 1426522368:
 			m_skillGaugeBoostPercentage = 0.10;
 			break;
-			 // Cboost2
+			// Cboost2
 		case 1426522624:
 			m_skillGaugeBoostPercentage = 0.50;
 			break;
-		default: 
+		default:
 			m_skillGaugeBoostPercentage = 0.00;
 			break;
 		}
@@ -51,7 +49,7 @@ void PlayerSkillManager::tick()
 	}
 }
 
-void PlayerSkillManager::activateSkillCard(uint32_t targetPlayerId, uint32_t seqId)
+void PlayerSkillManager::activateSkillCard(const uint32_t targetPlayerId, const uint64_t seqId)
 {
 	if (!hasSufficientSkillPoints())
 	{
@@ -112,7 +110,7 @@ void PlayerSkillManager::deactivateSkillCard()
 	updateSkillPointsForPlayer();
 }
 
-void PlayerSkillManager::failSkillCard(uint32_t targetPlayerId, uint32_t seqId)
+void PlayerSkillManager::failSkillCard(const uint32_t targetPlayerId, const uint64_t seqId)
 {
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
@@ -129,25 +127,25 @@ void PlayerSkillManager::failSkillCard(uint32_t targetPlayerId, uint32_t seqId)
 	}
 }
 
-void PlayerSkillManager::updateSkillPointsForPlayer()
+void PlayerSkillManager::updateSkillPointsForPlayer() const
 {
 	const auto guagePercentage = m_skillPoints % 100;
 	const auto guagePoints = m_skillPoints / 100;
 
-	if (auto player = m_player.lock(); player != nullptr)
+	if (const auto player = m_player.lock(); player != nullptr)
 	{
 		player->post(new GCCard(player->getPlayer()->getId(), guagePercentage, guagePoints));
 	}
 }
 
-void PlayerSkillManager::addSkillPoints(uint32_t skillPoints)
+void PlayerSkillManager::addSkillPoints(const uint32_t skillPoints)
 {
 	m_skillPoints += skillPoints;
 
 	updateSkillPointsForPlayer();
 }
 
-void PlayerSkillManager::removeSkillPoints(uint32_t skillPoints)
+void PlayerSkillManager::removeSkillPoints(const uint32_t skillPoints)
 {
 	if (m_skillPoints <= skillPoints)
 	{
@@ -170,7 +168,7 @@ void PlayerSkillManager::resetSkillPoints()
 
 uint32_t PlayerSkillManager::drawSkill()
 {
-	if (auto player = m_player.lock(); player != nullptr)
+	if (const auto player = m_player.lock(); player != nullptr)
 	{
 		std::unordered_map<uint32_t, uint32_t> skills;
 
@@ -189,28 +187,28 @@ uint32_t PlayerSkillManager::drawSkill()
 	return 0;
 }
 
-std::shared_ptr<Skill> PlayerSkillManager::getActiveSkillCard()
+std::shared_ptr<Skill> PlayerSkillManager::getActiveSkillCard() const
 {
 	return m_activeSkillCard;
 }
 
-std::shared_ptr<Skill> PlayerSkillManager::getDrawnSkillCard()
+std::shared_ptr<Skill> PlayerSkillManager::getDrawnSkillCard() const
 {
 	return m_drawnSkillCard;
 }
 
 
-uint32_t PlayerSkillManager::getActiveSkillCardTargetPlayerId()
+uint32_t PlayerSkillManager::getActiveSkillCardTargetPlayerId() const
 {
 	return m_activeSkillCardTargetPlayerId;
 }
 
-uint32_t PlayerSkillManager::getActiveSkillCardSeqId()
+uint64_t PlayerSkillManager::getActiveSkillCardSeqId() const
 {
 	return m_activeSkillCardSeqId;
 }
 
-uint32_t PlayerSkillManager::getRequiredSkillPoints()
+uint32_t PlayerSkillManager::getRequiredSkillPoints() const
 {
 	if (m_drawnSkillCard == nullptr)
 	{
@@ -221,24 +219,24 @@ uint32_t PlayerSkillManager::getRequiredSkillPoints()
 }
 
 
-double PlayerSkillManager::getSkillGaugeBoostPercentage()
+double PlayerSkillManager::getSkillGaugeBoostPercentage() const
 {
 	return m_skillGaugeBoostPercentage;
 }
 
-bool PlayerSkillManager::hasSufficientSkillPoints()
+bool PlayerSkillManager::hasSufficientSkillPoints() const
 {
 	const auto requiredSkillPoints = getRequiredSkillPoints();
 
 	return (m_skillPoints >= requiredSkillPoints);
 }
 
-bool PlayerSkillManager::hasActiveSkillCard()
+bool PlayerSkillManager::hasActiveSkillCard() const
 {
 	return  (m_activeSkillCard != nullptr);
 }
 
-bool PlayerSkillManager::isDrawnSkillCard(uint32_t itemId)
+bool PlayerSkillManager::isDrawnSkillCard(const uint32_t itemId) const
 {
 	return (m_drawnSkillCard->getItemId() == itemId);
 }
