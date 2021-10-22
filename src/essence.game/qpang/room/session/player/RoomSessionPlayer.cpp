@@ -285,13 +285,13 @@ void RoomSessionPlayer::respawn()
 	m_roomSession->spawnPlayer(shared_from_this());
 }
 
-void RoomSessionPlayer::startRespawnCooldown()
+void RoomSessionPlayer::startRespawnCooldown(const bool hasCooldown)
 {
 	m_isRespawning = true;
 
-	auto cooldown = getRespawnCooldown();
+	const auto cooldown = (hasCooldown) ? getRespawnCooldown() : 0;
 
-	m_respawnTime = time(NULL) + cooldown;
+	m_respawnTime = (time(nullptr) + cooldown);
 
 	post(new GCGameState(getPlayer()->getId(), 29, cooldown * 1000));
 }
@@ -455,7 +455,7 @@ uint32_t RoomSessionPlayer::getExperience()
 	experience += 35 * m_kills;
 	experience += 10 * m_deaths;
 	experience += 10 * m_eventItemPickUps;
-	
+
 	experience += 25 * getTagPoints();
 
 	experience += playTimeExperience;

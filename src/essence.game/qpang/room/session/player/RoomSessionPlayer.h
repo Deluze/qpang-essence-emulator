@@ -56,7 +56,7 @@ public:
 	bool isDead();
 
 	void respawn();
-	void startRespawnCooldown();
+	void startRespawnCooldown(bool hasCooldown = true);
 
 	void setSpectating(bool isSpectating = true);
 	bool isSpectating();

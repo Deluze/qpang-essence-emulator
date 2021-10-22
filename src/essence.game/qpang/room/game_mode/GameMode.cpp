@@ -173,17 +173,11 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	target->resetStreak();
 	target->getEffectManager()->clear();
 
-	if (const auto targetHasActiveSkillCard = target->getSkillManager()->hasActiveSkillCard(); 
-		targetHasActiveSkillCard && target->getSkillManager()->getActiveSkillCard()->shouldInstantlyRespawnOnDeath())
-	{
-		// Show respawn cooldown with 0 seconds.
-		target->post(new GCGameState(target->getPlayer()->getId(), 29, 0));
-		target->respawn();
-	}
-	else
-	{
-		target->startRespawnCooldown();
-	}
+	const auto targetHasActiveSkillCard = target->getSkillManager()->hasActiveSkillCard();
+	const auto targetShouldInstantlyRespawn = targetHasActiveSkillCard
+		&& target->getSkillManager()->getActiveSkillCard()->shouldInstantlyRespawnOnDeath();
+
+	target->startRespawnCooldown(!targetShouldInstantlyRespawn);
 
 	auto* killerStats = killer->getPlayer()->getStatsManager();
 	auto* targetStats = target->getPlayer()->getStatsManager();
