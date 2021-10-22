@@ -39,7 +39,7 @@ public:
 		DASH = 1409286151
 	};
 
-	CGCard() : GameNetEvent{ CG_CARD, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirClientToServer } {};
+	CGCard() : GameNetEvent{ CG_CARD, Guaranteed, DirClientToServer } {};
 
 	void pack(EventConnection* conn, BitStream* bstream) {};
 	void unpack(EventConnection* conn, BitStream* bstream)
@@ -68,22 +68,20 @@ public:
 			return;
 		}
 
-		if (cardType == CardType::ACTION_CARD)
+		if (cardType == ACTION_CARD)
 		{
 			handleActionCard(player, roomPlayer, roomSession);
 
 			return;
 		}
 
-		if (cardType == CardType::SKILL_CARD)
+		if (cardType == SKILL_CARD)
 		{
-			handleSkillCard(player, roomPlayer, roomSession);
-
-			return;
+			handleSkillCard(roomPlayer, roomSession);
 		}
 	}
 
-	void handleSkillCard(Player::Ptr player, const std::shared_ptr<RoomPlayer> roomPlayer, const std::shared_ptr<RoomSession> roomSession)
+	void handleSkillCard(const std::shared_ptr<RoomPlayer>& roomPlayer, const std::shared_ptr<RoomSession>& roomSession) const
 	{
 		//std::cout << "CGCard::handleSkillCard >> Handling skillcard for player " << player->getId() << "." << std::endl;
 		//std::cout << "CGCard::handleSkillCard >> Information PlayerId " << player->getId() << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << "." << std::endl;
@@ -103,7 +101,7 @@ public:
 			return;
 		}
 
-		if (cmd == CMD::ACTIVATE_CARD)
+		if (cmd == ACTIVATE_CARD)
 		{
 			if (roomSessionPlayer->isDead())
 			{
@@ -114,18 +112,14 @@ public:
 			// If a player attempts to activate their skillcard whilst they already have a skillcard active, something isn't right.
 			const auto isDrawnSkillCard = roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId);
 
-			const auto playerHasActiveSkillCard = roomSessionPlayer->getSkillManager()->hasActiveSkillCard();
-
-			if (!isDrawnSkillCard || playerHasActiveSkillCard)
+			if (const auto playerHasActiveSkillCard = roomSessionPlayer->getSkillManager()->hasActiveSkillCard(); !isDrawnSkillCard || playerHasActiveSkillCard)
 			{
 				return;
 			}
 
 			const auto drawnSkillCard = roomSessionPlayer->getSkillManager()->getDrawnSkillCard();
 
-			const auto skillTarget = roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTargetType();
-
-			if (skillTarget != SkillTargetType::SELF)
+			if (const auto skillTarget = roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTargetType(); skillTarget != SkillTargetType::SELF)
 			{
 				const auto targetPlayer = roomSession->find(targetUid);
 
@@ -153,14 +147,11 @@ public:
 					return;
 				}
 
-				const auto targetPlayershouldReflectSkillCard = targetPlayerHasActiveSkillCard && targetPlayerActiveSkillCard->shouldReflectSkillCard();
-
-				if (targetPlayershouldReflectSkillCard && (skillTarget == SkillTargetType::ENEMY) && drawnSkillCard->isReflectableSkillCard())
+				if (const auto targetPlayershouldReflectSkillCard = targetPlayerHasActiveSkillCard 
+					&& targetPlayerActiveSkillCard->shouldReflectSkillCard(); targetPlayershouldReflectSkillCard 
+					&& (skillTarget == SkillTargetType::ENEMY) && drawnSkillCard->isReflectableSkillCard())
 				{
 					roomSessionPlayer->getSkillManager()->activateSkillCard(roomSessionPlayer->getPlayer()->getId(), seqId);
-					
-					//targetPlayer->getSkillManager()->deactivateSkillCard();
-
 					return;
 				}
 
@@ -180,24 +171,18 @@ public:
 		}
 	}
 
-	void handleActionCard(Player::Ptr player, const std::shared_ptr<RoomPlayer> roomPlayer, const std::shared_ptr<RoomSession> roomSession)
+	void handleActionCard(const Player::Ptr& player, const std::shared_ptr<RoomPlayer>& roomPlayer, const std::shared_ptr<RoomSession>& roomSession) const
 	{
-		const auto isPublicEnemyGamemode = roomSession->getGameMode()->isPublicEnemyMode();
-
-		if (isPublicEnemyGamemode)
+		if (roomSession->getGameMode()->isPublicEnemyMode())
 		{
-			const auto character = player->getCharacter();
-
-			if ((itemId == ActionCardId::FAKE_DEATH) && (character == 850 || character == 851))
+			if (const auto character = player->getCharacter(); (itemId == FAKE_DEATH) && (character == 850 || character == 851))
 			{
 				player->broadcast(u"Sorry, you may not use fake death in the public enemy gamemode.");
 
 				return;
 			}
 
-			const auto isSearchingForPublicEnemy = roomSession->isSearchingForNextTag();
-
-			if (isSearchingForPublicEnemy && (cmd == CMD::ACTIVATE_CARD))
+			if (const auto isSearchingForPublicEnemy = roomSession->isSearchingForNextTag(); isSearchingForPublicEnemy && (cmd == ACTIVATE_CARD))
 			{
 				player->broadcast(u"Sorry, you may not perform this action whilst the next public enemy is being selected.");
 
@@ -223,10 +208,7 @@ public:
 		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
 		{
 			const auto shouldDisableOnRollAction = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnRollAction();
-			const auto isRollAction = (itemId == ActionCardId::ROLL_OVER_LEFT)
-				|| (itemId == ActionCardId::ROLL_OVER_RIGHT)
-				|| (itemId == ActionCardId::DASH)
-				|| (itemId == ActionCardId::TUMBLE);
+			const auto isRollAction = (itemId == ROLL_OVER_LEFT) || (itemId == ROLL_OVER_RIGHT) || (itemId == DASH) || (itemId == TUMBLE);
 
 			if (shouldDisableOnRollAction && isRollAction)
 			{
