@@ -8,7 +8,7 @@ To use a skillcard, you will have to raise your skillgauge by either attacking a
 
 Once you have gained enough skillgauge points you will be able to activate a skillcard by right-clicking your mouse.
 
-# Skillcards
+# Skills & Classes
 ## Bronze
 ![](https://github.com/YestinJarrett/qpang-essence-emulator/raw/master/wiki/skillcards/images/card_skill_0026_s.png)
 ### Chaos
