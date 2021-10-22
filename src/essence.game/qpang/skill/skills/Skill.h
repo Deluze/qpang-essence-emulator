@@ -76,11 +76,7 @@ public:
 		return SkillRateType::BRONZE;
 	}
 
-	virtual bool shouldInstantlyRespawnOnDeath()
-	{
-		return false;
-	}
-
+#pragma region Disable SkillCard Handlers
 	virtual bool shouldDisableOnDamageReceive()
 	{
 		return false;
@@ -92,6 +88,12 @@ public:
 	}
 
 	virtual bool shouldDisableOnRollAction()
+	{
+		return false;
+	}
+#pragma endregion Disable SkillCard
+
+	virtual bool shouldInstantlyRespawnOnDeath()
 	{
 		return false;
 	}
@@ -107,6 +109,11 @@ public:
 	}
 
 	virtual bool shouldReceiveReducedDamageFromLaunchers()
+	{
+		return false;
+	}
+
+	virtual bool shouldReceiveReducedDamageFromAllSources()
 	{
 		return false;
 	}

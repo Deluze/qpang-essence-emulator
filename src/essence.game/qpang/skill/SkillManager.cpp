@@ -21,6 +21,7 @@
 #include <qpang/skill/skills/TradeOffSkill.h>
 
 #include "ReplaySkill.h"
+#include "StuntUpSkill.h"
 #include "UndercoverSkill.h"
 
 SkillManager::SkillManager()
@@ -65,6 +66,7 @@ void SkillManager::initializeDeathMatchSkills()
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<ReflectSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<SkillSealSkill>(); });
+			m_skills[GameMode::DM].push_back([]() { return std::make_unique<StuntUpSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
 		}
 
@@ -81,39 +83,40 @@ void SkillManager::initializeTeamDeathMatchSkills()
 {
 	for (uint8_t i = 0; i < 4; i++)
 	{
-		if (i < 4)
-		{
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ChaosSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<CamoSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RageSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ReplaySkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ShacklesSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TrapSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<UndercoverSkill>(); });
-		}
+		//if (i < 4)
+		//{
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ChaosSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<CamoSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RageSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ReplaySkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ShacklesSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TrapSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<UndercoverSkill>(); });
+		//}
 
 		if (i < 3)
 		{
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<AssassinSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<MentalUpSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ReflectSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<SkillSealSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
+			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<AssassinSkill>(); });
+			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<MentalUpSkill>(); });
+			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<PocketSizeSkill>(); });
+			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ReflectSkill>(); });
+			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<SkillSealSkill>(); });
+			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<StuntUpSkill>(); });
+			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
 		}
 
-		if (i < 2)
-		{
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<VitalSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TradeOffSkill>(); });
-		}
+		//if (i < 2)
+		//{
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<VitalSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TradeOffSkill>(); });
+		//}
 
-		if (i < 1)
-		{
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TranseSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<GiantBeastSkill>(); });
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<LastWeaponSkill>(); });
-		}
+		//if (i < 1)
+		//{
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TranseSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<GiantBeastSkill>(); });
+		//	m_skills[GameMode::TDM].push_back([]() { return std::make_unique<LastWeaponSkill>(); });
+		//}
 	}
 }

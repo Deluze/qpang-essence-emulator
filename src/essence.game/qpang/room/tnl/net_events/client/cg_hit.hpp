@@ -179,16 +179,26 @@ public:
 				break;
 			}
 
-			const auto weaponUsedIsLauncher = (weaponUsed.weaponType == WeaponType::LAUNCHER);
-
-			if (areSkillsEnabled && weaponUsedIsLauncher)
+			if (areSkillsEnabled)
 			{
 				const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
-				const auto dstPlayerShouldReceiveReducedDamageFromLaunchers = dstPlayerHasActiveSkill && dstPlayer->getSkillManager()->getActiveSkillCard()->shouldReceiveReducedDamageFromLaunchers();
 
-				if (dstPlayerShouldReceiveReducedDamageFromLaunchers)
+				const auto dstPlayerShouldReceiveReducedDamageFromAllSources = dstPlayerHasActiveSkill
+					&& dstPlayer->getSkillManager()->getActiveSkillCard()->shouldReceiveReducedDamageFromAllSources();
+
+				const auto dstPlayerShouldReceiveReducedDamageFromLaunchers = dstPlayerHasActiveSkill
+					&& dstPlayer->getSkillManager()->getActiveSkillCard()->shouldReceiveReducedDamageFromLaunchers();
+
+				const auto weaponUsedIsLauncher = (weaponUsed.weaponType == LAUNCHER);
+
+				if (dstPlayerShouldReceiveReducedDamageFromAllSources)
 				{
-					damage *= 0.50;
+					// 25% reduced damage.
+					damage *= 0.75;
+				}
+				else if (dstPlayerShouldReceiveReducedDamageFromLaunchers && weaponUsedIsLauncher)
+				{
+					damage += 0.50;
 				}
 			}
 
