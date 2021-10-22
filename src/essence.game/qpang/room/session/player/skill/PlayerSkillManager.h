@@ -11,7 +11,7 @@ class RoomSessionPlayer;
 class PlayerSkillManager
 {
 public:
-	void initialize(std::shared_ptr<RoomSessionPlayer> player);
+	void initialize(const std::shared_ptr<RoomSessionPlayer>& player);
 
 	void tick();
 

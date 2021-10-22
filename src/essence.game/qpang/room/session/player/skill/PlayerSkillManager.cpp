@@ -8,20 +8,18 @@
 
 #include "qpang/room/tnl/net_events/server/gc_card.hpp"
 
-void PlayerSkillManager::initialize(std::shared_ptr<RoomSessionPlayer> player)
+void PlayerSkillManager::initialize(const std::shared_ptr<RoomSessionPlayer>& player)
 {
 	m_player = player;
 
-	if (const auto player = m_player.lock(); player != nullptr)
+	if (const auto roomSessionPlayer = m_player.lock(); player != nullptr)
 	{
-		switch (player->getPlayer()->getEquipmentManager()->getEquippedBooster())
+		switch (roomSessionPlayer->getPlayer()->getEquipmentManager()->getEquippedBooster())
 		{
-			// Cboost
-		case 1426522368:
+		case BOOSTER_CBOOST:
 			m_skillGaugeBoostPercentage = 0.10;
 			break;
-			// Cboost2
-		case 1426522624:
+		case BOOSTER_CBOOST_2:
 			m_skillGaugeBoostPercentage = 0.50;
 			break;
 		default:
