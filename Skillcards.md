@@ -1,10 +1,10 @@
-# What skillcards are there?
-There are 4 different classes of skillcards: Bronze, Silver, Gold and Rainbow. The higher the class, the more skillgauge points it costs to activate a card.
+# What skill cards are there?
+There are 4 different classes of skill cards: Bronze, Silver, Gold and Rainbow. The higher the class, the more skill gauge points it costs to activate a card.
 
-# How does one use a skillcard?
-To use a skillcard, you will have to raise your skillgauge by either attacking an opponent or by being attacked by an opponent.
+# How does one use a skill card?
+To use a skill card, you will have to raise your skill gauge by either attacking an opponent or by being attacked by an opponent.
 
-Once you have gained enough skillgauge points you will be able to activate a skillcard by right-clicking your mouse.
+Once you have gained enough skill gauge points you will be able to activate a skill card by right-clicking your mouse.
 
 # Skills & Classes
 ## Bronze
