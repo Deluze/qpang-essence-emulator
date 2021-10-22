@@ -20,7 +20,7 @@ public:
 
 	void handle(GameConnection* conn, Player::Ptr player)
 	{
-		std::cout << "CGTarget::handle >> CMD: " << cmd << ", PlayerID: " << playerId << ", TargetID: " << targetId << std::endl;
+		//std::cout << "CGTarget::handle >> CMD: " << cmd << ", PlayerID: " << playerId << ", TargetID: " << targetId << std::endl;
 
 		const auto roomPlayer = player->getRoomPlayer();
 
