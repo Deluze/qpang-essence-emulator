@@ -2,30 +2,29 @@
 
 #include <qpang/Game.h>
 
-#include <qpang/skill/skills/RapidFireSkill.h>
-#include <qpang/skill/skills/CamoSkill.h>
-#include <qpang/skill/skills/PocketSizeSkill.h>
-#include <qpang/skill/skills/ChaosSkill.h>
-#include <qpang/skill/skills/RageSkill.h>
-#include <qpang/skill/skills/ShacklesSkill.h>
-#include <qpang/skill/skills/GiantBeast.h>
-#include <qpang/skill/skills/LastWeaponSkill.h>
-#include <qpang/skill/skills/TranseSkill.h>
-#include <qpang/skill/skills/ReflectSkill.h>
-#include <qpang/skill/skills/AssassinSkill.h>
-#include <qpang/skill/skills/WeaponSealSkill.h>
-#include <qpang/skill/skills/SkillSealSkill.h>
-#include <qpang/skill/skills/MentalUpSkill.h>
-
+#include "AssassinSkill.h"
 #include "BlessingSkill.h"
+#include "CamoSkill.h"
+#include "ChaosSkill.h"
+#include "GiantBeast.h"
 #include "IronWallSkill.h"
+#include "LastWeaponSkill.h"
+#include "MentalUpSkill.h"
+#include "PocketSizeSkill.h"
+#include "RageSkill.h"
+#include "RapidFireSkill.h"
+#include "ReflectSkill.h"
 #include "ReplaySkill.h"
+#include "ShacklesSkill.h"
+#include "SkillSealSkill.h"
 #include "StuntUpSkill.h"
 #include "TeamCheerSkill.h"
 #include "TradeOffSkill.h"
+#include "TranseSkill.h"
 #include "TrapSkill.h"
 #include "UndercoverSkill.h"
 #include "VitalSkill.h"
+#include "WeaponSealSkill.h"
 
 class IronWallSkill;
 SkillManager::SkillManager()
