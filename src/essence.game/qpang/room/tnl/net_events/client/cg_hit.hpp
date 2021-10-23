@@ -179,10 +179,10 @@ public:
 				break;
 			}
 
+			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
+
 			if (areSkillsEnabled)
 			{
-				const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
-
 				const auto dstPlayerShouldReceiveReducedDamageFromAllSources = dstPlayerHasActiveSkill
 					&& dstPlayer->getSkillManager()->getActiveSkillCard()->shouldReceiveReducedDamageFromAllSources();
 
@@ -246,13 +246,10 @@ public:
 				srcPlayer->addDamageDealtToTag(damage);
 			}
 
-			const auto srcPlayerHasActiveSkillCard = areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkillCard();
-
-			if (srcPlayerHasActiveSkillCard)
+			if (areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkillCard())
 			{
-				const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkillCard()->shouldInstantlyKillEnemyWithMeleeWeapon();
-
-				if (srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == WeaponType::MELEE))
+				if (const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkillCard()->shouldInstantlyKillEnemyWithMeleeWeapon();
+					srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == MELEE))
 				{
 					damage = 9999;
 
@@ -260,9 +257,18 @@ public:
 				}
 			}
 
+			const auto dstPlayerShouldIgnoreDamageFromAllSources = dstPlayerHasActiveSkill &&
+				dstPlayer->getSkillManager()->getActiveSkillCard()->shouldIgnoreDamageFromAllSources();
+
+			if (dstPlayerShouldIgnoreDamageFromAllSources)
+			{
+				damage = 0;
+			}
+
 			dstPlayer->takeHealth(damage);
 
-			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance; applyEffect && !isSameTeam)
+			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance;
+				applyEffect && !dstPlayerShouldIgnoreDamageFromAllSources && !isSameTeam)
 			{
 				if (dstPlayerIsTagged && weaponUsed.effectDuration > 2)
 				{

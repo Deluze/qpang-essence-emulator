@@ -23,4 +23,9 @@ public:
 	{
 		return SkillRateType::BRONZE;
 	}
+
+	bool shouldIgnoreDamageFromAllSources() override
+	{
+		return true;
+	}
 };

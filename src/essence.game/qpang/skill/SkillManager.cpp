@@ -18,6 +18,7 @@
 #include <qpang/skill/skills/MentalUpSkill.h>
 
 #include "BlessingSkill.h"
+#include "IronWallSkill.h"
 #include "ReplaySkill.h"
 #include "StuntUpSkill.h"
 #include "TeamCheerSkill.h"
@@ -26,6 +27,7 @@
 #include "UndercoverSkill.h"
 #include "VitalSkill.h"
 
+class IronWallSkill;
 SkillManager::SkillManager()
 = default;
 
@@ -55,6 +57,7 @@ void SkillManager::initializeDeathMatchSkills()
 		{
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<ChaosSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<CamoSkill>(); });
+			m_skills[GameMode::DM].push_back([]() { return std::make_unique<IronWallSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<RageSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<ReplaySkill>(); });
@@ -89,6 +92,7 @@ void SkillManager::initializeTeamDeathMatchSkills()
 		{
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ChaosSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<CamoSkill>(); });
+			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<IronWallSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RageSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ReplaySkill>(); });

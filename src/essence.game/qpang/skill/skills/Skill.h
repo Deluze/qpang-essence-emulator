@@ -117,6 +117,11 @@ public:
 	{
 		return false;
 	}
+
+	virtual bool shouldIgnoreDamageFromAllSources()
+	{
+		return false;
+	}
 protected:
 	bool m_hasDuration;
 	uint32_t m_duration;
