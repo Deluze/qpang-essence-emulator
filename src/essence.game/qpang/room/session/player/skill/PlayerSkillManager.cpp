@@ -1,5 +1,6 @@
 #include "PlayerSkillManager.h"
 
+#include "cg_card.hpp"
 #include "qpang/Game.h"
 
 #include "qpang/player/Player.h"
@@ -73,12 +74,25 @@ void PlayerSkillManager::activateSkillCard(const uint32_t targetPlayerId, const 
 		const auto playerId = player->getPlayer()->getId();
 		const auto itemId = m_activeSkillCard->getItemId();
 
-		roomSession->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::ACTIVATE_CARD, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
+		const auto skillTargetType = m_activeSkillCard->getSkillTargetType();
+
+		if (const uint8_t team =
+			(skillTargetType == SkillTargetType::ALLY_TEAM)
+			? player->getTeam() :
+			(skillTargetType == SkillTargetType::ENEMY_TEAM)
+			? (player->getTeam() == 1 ? 2 : 1) : 0; team == 1 || team == 2)
+		{
+			for (const auto& roomSessionPlayer : roomSession->getPlayersForTeam(team))
+			{
+				m_skillTargetPlayerIds.push_back(roomSessionPlayer->getPlayer()->getId());
+			}
+		}
+
+		roomSession->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::ACTIVATE_CARD, CGCard::SKILL_CARD, itemId, seqId, m_skillTargetPlayerIds);
 
 		removeSkillPoints(getRequiredSkillPoints());
 
 		player->getSkillManager()->getActiveSkillCard()->onApply();
-
 	}
 }
 
@@ -94,8 +108,7 @@ void PlayerSkillManager::deactivateSkillCard()
 		const auto playerId = player->getPlayer()->getId();
 		const auto itemId = m_activeSkillCard->getItemId();
 
-		player->getRoomSession()->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::DEACTIVATE_CARD, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId);
-
+		player->getRoomSession()->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::DEACTIVATE_CARD, CGCard::SKILL_CARD, itemId, m_activeSkillCardSeqId, m_skillTargetPlayerIds);
 		player->getSkillManager()->getActiveSkillCard()->onWearOff();
 	}
 
@@ -104,6 +117,8 @@ void PlayerSkillManager::deactivateSkillCard()
 
 	m_activeSkillCardTargetPlayerId = 0;
 	m_activeSkillCardSeqId = 0;
+
+	m_skillTargetPlayerIds.clear();
 
 	updateSkillPointsForPlayer();
 }
@@ -237,4 +252,9 @@ bool PlayerSkillManager::hasActiveSkillCard() const
 bool PlayerSkillManager::isDrawnSkillCard(const uint32_t itemId) const
 {
 	return (m_drawnSkillCard->getItemId() == itemId);
+}
+
+std::vector<uint32_t> PlayerSkillManager::getSkillTargetPlayerIds() const
+{
+	return m_skillTargetPlayerIds;
 }

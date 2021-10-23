@@ -2,15 +2,16 @@
 #define GC_CARD_HPP
 
 #include "GameNetEvent.h"
-#include "cg_card.hpp"
 
 class GCCard : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCCard() : GameNetEvent{ GC_CARD, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
+	GCCard() : GameNetEvent{ GC_CARD, GuaranteedOrdered, DirAny } {};
 
-	GCCard(U32 playerId, U32 targetId, U8 cmd, U32 cardType, U32 itemId, U64 seqId) : GameNetEvent{ GC_CARD, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
+	GCCard(const U32 playerId, const U32 targetId, const U8 cmd, const U32 cardType, const U32 itemId, const U64 seqId,
+		const std::vector<uint32_t>& playerIds = {})
+		: GameNetEvent{ GC_CARD, Guaranteed, DirServerToClient }
 	{
 		this->uid = playerId;
 		this->targetUid = targetId;
@@ -20,7 +21,10 @@ public:
 		this->cardType = cardType;
 		this->itemId = itemId;
 		this->seqId = seqId;
-	};
+
+		this->playerCount = static_cast<U8>(playerIds.size());
+		this->playerIds = playerIds;
+	}
 
 	GCCard(U32 playerId, U32 guagePercentage, U32 guagePoints)
 	{
@@ -46,7 +50,12 @@ public:
 		bstream->write(dataSrcUid);
 		bstream->write(dataTrgUid);
 		bstream->write(unk_01);
-		bstream->write(count);
+		bstream->write(playerCount);
+
+		for (const auto playerId : playerIds)
+		{
+			bstream->write(playerId);
+		}
 	};
 	void unpack(EventConnection* conn, BitStream* bstream) {};
 	void process(EventConnection* ps) {};
@@ -64,7 +73,9 @@ public:
 	U32 dataSrcUid = 0;
 	U32 dataTrgUid = 0;
 	U32 unk_01 = 0;
-	U8 count = 0;
+
+	U8 playerCount = 0; // Amount of team or enemy players.
+	std::vector<uint32_t> playerIds; // Vector full of team/enemy player ids.
 
 	TNL_DECLARE_CLASS(GCCard);
 };

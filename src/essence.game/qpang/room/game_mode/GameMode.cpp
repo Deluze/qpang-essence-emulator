@@ -2,6 +2,7 @@
 
 #include <assert.h>
 
+#include "cg_card.hpp"
 #include "gc_game_state.hpp"
 #include "StringConverter.h"
 #include "qpang/Game.h"
@@ -47,18 +48,15 @@ void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 
 	for (const auto& playingPlayer : session->getRoomSession()->getPlayingPlayers())
 	{
-		const auto playingPlayerHasEquippedMachineGun = playingPlayer->getWeaponManager()->hasEquippedMachineGun();
-
-		if (playingPlayerHasEquippedMachineGun)
+		if (playingPlayer->getWeaponManager()->hasEquippedMachineGun())
 		{
 			const auto seqId = playingPlayer->getWeaponManager()->getEquippedMachineGunSeqId();
 
 			session->post(new GCWeapon(playingPlayer->getPlayer()->getId(), CGWeapon::CMD::EQUIP_MACHINE_GUN, MACHINE_GUN_ITEM_ID, seqId));
 		}
 
-		const auto playingPlayerHasActiveSkillCard = playingPlayer->getSkillManager()->hasActiveSkillCard();
-
-		if (areSkillsEnabled && playingPlayerHasActiveSkillCard)
+		if (const auto playingPlayerHasActiveSkillCard = playingPlayer->getSkillManager()->hasActiveSkillCard();
+			areSkillsEnabled && playingPlayerHasActiveSkillCard)
 		{
 			const auto activeSkillCard = playingPlayer->getSkillManager()->getActiveSkillCard();
 
@@ -67,7 +65,19 @@ void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 			const auto itemId = activeSkillCard->getItemId();
 			const auto seqId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
 
-			session->post(new GCCard(playingPlayer->getPlayer()->getId(), targetPlayerId, CGCard::CMD::ACTIVATE_CARD, CGCard::CardType::SKILL_CARD, itemId, seqId));
+			const auto skillCardTargetPlayerIds = playingPlayer->getSkillManager()->getSkillTargetPlayerIds();
+
+			session->post(
+				new GCCard(
+					playingPlayer->getPlayer()->getId(),
+					targetPlayerId,
+					CGCard::CMD::ACTIVATE_CARD,
+					CGCard::CardType::SKILL_CARD,
+					itemId,
+					seqId,
+					skillCardTargetPlayerIds
+				)
+			);
 		}
 	}
 }

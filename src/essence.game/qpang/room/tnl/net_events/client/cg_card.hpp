@@ -71,8 +71,8 @@ public:
 
 	void handleSkillCard(const std::shared_ptr<RoomPlayer>& roomPlayer, const std::shared_ptr<RoomSession>& roomSession) const
 	{
-		//std::cout << "CGCard::handleSkillCard >> Handling skillcard for player " << player->getId() << "." << std::endl;
-		//std::cout << "CGCard::handleSkillCard >> Information PlayerId " << player->getId() << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << "." << std::endl;
+		//std::cout << "CGCard::handleSkillCard >> Handling skillcard for player " << uid << "." << std::endl;
+		//std::cout << "CGCard::handleSkillCard >> Information PlayerId " << uid << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << "." << std::endl;
 
 		const auto isSkillValid = roomSession->getSkillManager()->isValidSkill(itemId);
 		const auto areSkillsEnabled = roomPlayer->getRoom()->isSkillsEnabled();

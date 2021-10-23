@@ -3,6 +3,7 @@
 #include <array>
 #include <memory>
 #include <cstdint>
+#include <vector>
 
 #include "Skill.h"
 
@@ -42,16 +43,20 @@ public:
 
 	bool hasActiveSkillCard() const;
 	bool isDrawnSkillCard(uint32_t itemId) const;
+
+	std::vector<uint32_t> getSkillTargetPlayerIds() const;
 private:
 	std::weak_ptr<RoomSessionPlayer> m_player;
 
 	std::shared_ptr<Skill> m_drawnSkillCard;
 	std::shared_ptr<Skill> m_activeSkillCard;
 
-	uint32_t m_skillPoints;
+	uint32_t m_skillPoints = 0;
 
-	uint32_t m_activeSkillCardTargetPlayerId;
-	uint64_t m_activeSkillCardSeqId;
+	uint32_t m_activeSkillCardTargetPlayerId = 0;
+	uint64_t m_activeSkillCardSeqId = 0;
 
-	double m_skillGaugeBoostPercentage;
+	double m_skillGaugeBoostPercentage = 0;
+
+	std::vector<uint32_t> m_skillTargetPlayerIds{};
 };
