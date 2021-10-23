@@ -8,21 +8,23 @@
 #include <qpang/skill/skills/ChaosSkill.h>
 #include <qpang/skill/skills/RageSkill.h>
 #include <qpang/skill/skills/ShacklesSkill.h>
-#include <qpang/skill/skills/VitalSkill.h>
 #include <qpang/skill/skills/GiantBeast.h>
 #include <qpang/skill/skills/LastWeaponSkill.h>
 #include <qpang/skill/skills/TranseSkill.h>
-#include <qpang/skill/skills/TrapSkill.h>
 #include <qpang/skill/skills/ReflectSkill.h>
 #include <qpang/skill/skills/AssassinSkill.h>
 #include <qpang/skill/skills/WeaponSealSkill.h>
 #include <qpang/skill/skills/SkillSealSkill.h>
 #include <qpang/skill/skills/MentalUpSkill.h>
-#include <qpang/skill/skills/TradeOffSkill.h>
 
+#include "BlessingSkill.h"
 #include "ReplaySkill.h"
 #include "StuntUpSkill.h"
+#include "TeamCheerSkill.h"
+#include "TradeOffSkill.h"
+#include "TrapSkill.h"
 #include "UndercoverSkill.h"
+#include "VitalSkill.h"
 
 SkillManager::SkillManager()
 = default;
@@ -47,7 +49,7 @@ std::vector<std::function<std::unique_ptr<Skill>()>> SkillManager::getSkillsForG
 
 void SkillManager::initializeDeathMatchSkills()
 {
-	for (uint8_t i = 0; i < 4; i++)
+	for (size_t i = 0; i < 4; i++)
 	{
 		if (i < 4)
 		{
@@ -81,7 +83,7 @@ void SkillManager::initializeDeathMatchSkills()
 
 void SkillManager::initializeTeamDeathMatchSkills()
 {
-	for (uint8_t i = 0; i < 4; i++)
+	for (size_t i = 0; i < 4; i++)
 	{
 		if (i < 4)
 		{
@@ -103,12 +105,14 @@ void SkillManager::initializeTeamDeathMatchSkills()
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ReflectSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<SkillSealSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<StuntUpSkill>(); });
+			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TeamCheerSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
 		}
 
 		if (i < 2)
 		{
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<VitalSkill>(); });
+			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<BlessingSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TradeOffSkill>(); });
 		}
 
