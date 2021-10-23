@@ -32,9 +32,8 @@ void PlayerEffectManager::tick()
 		effect.weapon.effectDuration--;
 
 		if (effect.weapon.effectId == 12 || effect.weapon.effectId == 13) // poison || fire
+		{ 
 			takeDamageFromEffect(effect);
-		else if (effect.weapon.effectId == 90) {
-		    healFromEffect(effect);
 		}
 	}
 
@@ -110,29 +109,6 @@ void PlayerEffectManager::removeEffect(uint8_t effectId)
 
 	if (sameEffectsCount == 0) // this was the last effect
 		player->getRoomSession()->relayPlaying<GCWeapon>(player->getPlayer()->getId(), 6, effectId);
-}
-
-void PlayerEffectManager::healFromEffect(const Effect& effect) 
-{
-    if (const auto player = m_player.lock(); player != nullptr)
-    {
-        if (player->isDead())
-            return;
-
-        player->addHealth(5);
-
-        if (const auto owner = effect.target.lock(); owner != nullptr)
-        {
-            player->getRoomSession()->relayPlaying<GCHit>(owner->getPlayer()->getId(), player->getPlayer()->getId(), 1, 0, 0, 0, 0, 0, 0, effect.entityId,
-                1, 1, player->getHealth(), 5, effect.weapon.itemId, 1, 1, 1, owner->getStreak() + 1, 0, 0);
-
-            if (player->isDead())
-            {
-                owner->getRoomSession()->getGameMode()->onPlayerKill(owner, player, effect.weapon, 1);
-                owner->getRoomSession()->relayPlaying<GCGameState>(player->getPlayer()->getId(), 17, effect.weapon.effectId, owner->getPlayer()->getId());
-            }
-        }
-    }
 }
 
 void PlayerEffectManager::takeDamageFromEffect(const Effect& effect)

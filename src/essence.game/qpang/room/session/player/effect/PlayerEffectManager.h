@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <vector>
 #include <unordered_map>
-#include <mutex>
 #include <memory>
 
 #include "qpang/room/session/player/effect/Effect.h"
@@ -24,7 +23,6 @@ private:
 
 	void removeEffect(uint8_t effectId);
 	void takeDamageFromEffect(const Effect& effect);
-	void healFromEffect(const Effect& effect);
 
 	time_t m_lastTick;
 
