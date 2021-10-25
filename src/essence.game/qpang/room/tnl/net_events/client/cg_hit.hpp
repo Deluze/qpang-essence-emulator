@@ -322,23 +322,9 @@ public:
 
 			srcPlayer->getEntityManager()->addKill(entityId);
 
-			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);
 			roomSession->relayPlaying<GCGameState>(dstId, hitLocation == 0 ? 28 : 17, weaponId, srcId);
+			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);
 
-			for (const auto& playingPlayer : roomSession->getPlayingPlayers())
-			{
-				if (playingPlayer->getSkillManager()->hasActiveSkillCard())
-				{
-					const auto skillTarget = playingPlayer->getSkillManager()->getActiveSkillCard()->getSkillTargetType();
-					const auto skillCardTargetPlayerId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
-
-					// NOTE: Added the check for skill target since the Vital skill shouldnt disable if the playng player dies.
-					if ((skillTarget != SkillTargetType::ALLY_TEAM) && (skillCardTargetPlayerId == dstPlayer->getPlayer()->getId()))
-					{
-						playingPlayer->getSkillManager()->deactivateSkillCard();
-					}
-				}
-			}
 		}
 	}
 

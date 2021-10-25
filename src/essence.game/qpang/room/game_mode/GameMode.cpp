@@ -208,19 +208,38 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 
 	switch (weapon.weaponType)
 	{
-	case WeaponType::MELEE:
+	case MELEE:
 		killerStats->addMeleeKills();
 		break;
-	case WeaponType::RIFLE:
+	case RIFLE:
 		killerStats->addGunKills();
 		break;
-	case WeaponType::LAUNCHER:
+	case LAUNCHER:
 		killerStats->addLauncherKills();
 		break;
-	case WeaponType::BOMB:
+	case BOMB:
 	default:
 		killerStats->addBombKills();
 		break;
+	}
+
+	if (areSkillCardsEnabled)
+	{
+		for (const auto& roomSessionPlayer : roomSession->getPlayingPlayers())
+		{
+			// Check if a player in the room has an active skillcard.
+			if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
+			{
+				// Grab the skilltarget type.
+				const auto skillTargetType = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->getSkillTargetType();
+
+				if (const auto skillCardTargetPlayerId = roomSessionPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
+					(skillTargetType != SkillTargetType::ALLY_TEAM) && (skillCardTargetPlayerId == target->getPlayer()->getId()))
+				{
+					roomSessionPlayer->getSkillManager()->deactivateSkillCard();
+				}
+			}
+		}
 	}
 
 	if (roomSession->canFinish())
