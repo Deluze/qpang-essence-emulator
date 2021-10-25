@@ -10,6 +10,29 @@ class GCGameState : public GameNetEvent
 	typedef NetEvent Parent;
 
 public:
+	enum BonusId : uint16_t
+	{
+		BONUS_YOU_GOT_NO_DEATH = 2,
+		BONUS_MULTI_KILL = 5,
+		BONUS_COMBO = 6,
+		BONUS_MVP = 8,
+		BONUS_FRIENDS = 11,
+		BONUS_EXTRA_EXP_EVENT = 12,
+		BONUS_EXTRA_DON_EVENT = 13,
+		BONUS_KILLING_PROS = 14,
+		BONUS_FIRST_KILL = 15,
+		BONUS_FIRST_MATCH_GAME = 16,
+		BONUS_FIRST_MISSION = 17,
+		BONUS_START_OFF_EXP = 18,
+		BONUS_Q_BONUS = 19,
+		BONUS_EXP_MAKER = 20,
+		BONUS_MONEY_MAKER = 21,
+		BONUS_PC_CAFE_DON = 22,
+		BONUS_PC_CAFE_EXP = 23,
+		BONUS_CANDY_AMOUNT = 24,
+		BONUS_COIN_BOOSTER = 25,
+	};
+
 	GCGameState() : GameNetEvent{ GC_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {}
 
 	GCGameState(U32 playerId, U32 cmd, const U32 value = 0, const U32 dataUid = 0) : GameNetEvent{ GC_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
@@ -33,7 +56,7 @@ public:
 		this->unk_01 = player->getPlayer()->getAchievementContainer()->listRecent();
 	}
 
-	void pack(EventConnection* conn, BitStream* bstream) 
+	void pack(EventConnection* conn, BitStream* bstream)
 	{
 		bstream->write(uid);
 		bstream->write(cmd);
@@ -48,20 +71,20 @@ public:
 			bstream->write(U16(unk_01[i]));
 		}
 
-		bstream->write(U8(0));
+		bstream->write(static_cast<U8>(mBonusInfoList.size()));
 
-		for (int i = 0; i < mBonusCount; i++)
+		for (const auto& [id, exp, don, op, type] : mBonusInfoList)
 		{
-			bstream->write(U16(1));
-			bstream->write(F32(1234));
-			bstream->write(F32(2345));
-			bstream->write(U8(12));
-			bstream->write(U8(1));
+			bstream->write(id);
+			bstream->write(exp);
+			bstream->write(don);
+			bstream->write(op);
+			bstream->write(type);
 		}
 	};
 	void unpack(EventConnection* conn, BitStream* bstream) {};
 	void process(EventConnection* ps) {};
-	
+
 
 	struct BonusInfo
 	{
@@ -82,9 +105,7 @@ public:
 	U8 counter = 0;
 	std::vector<uint32_t> unk_01 = {}; //size: mCounter
 
-	U8 mBonusCount = 0;
-	//Bonus list
-	std::vector<BonusInfo> mBonusList = {}; //size: mBonusCount
+	std::vector<BonusInfo> mBonusInfoList = {};
 
 	TNL_DECLARE_CLASS(GCGameState);
 };
