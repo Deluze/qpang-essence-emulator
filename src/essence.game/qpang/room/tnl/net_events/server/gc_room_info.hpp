@@ -19,13 +19,13 @@ public:
 		this->goalPoint = room->isPointsGame() ? room->getScorePoints() : room->getScoreTime();
 		this->mapNum = room->getMap();
 		this->roomState = room->getState();
-		this->respawnTime = 10 * 1000;
+		this->respawnTime = 7 * 1000;
 		this->p2pWaitTime = 6000;
 		this->title = room->getName();
 		this->isTime = !room->isPointsGame();
 		this->rounds = 0;
 		this->levelLimit = false;
-		this->gameId = 10;
+		this->gameId = room->getId();
 		this->teamBalance = room->isTeamSorting();
 		this->skillMode = room->isSkillsEnabled();
 		this->pingLevel = NULL;
