@@ -435,9 +435,13 @@ void RoomSession::finish()
 	{
 		const auto actPlayer = player->getPlayer();
 
+		std::vector<GCGameState::BonusInfo> tempBonuses{};
+
 		player->post(new GCGameState(actPlayer->getId(), 1));
-		player->post(new GCGameState(player, 23));
+		player->post(new GCGameState(player, 23, tempBonuses));
 		player->post(new GCScoreResult(shared_from_this(), playingPlayers));
+
+		// TODO: Send gc game state for bonus.
 	}
 
 	m_room->finish();

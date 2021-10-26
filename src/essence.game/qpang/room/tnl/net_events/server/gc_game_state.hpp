@@ -18,10 +18,10 @@ public:
 		BONUS_MVP = 8,
 		BONUS_FRIENDS = 11,
 		BONUS_EXTRA_EXP_EVENT = 12,
-		BONUS_EXTRA_DON_EVENT = 13,
-		BONUS_KILLING_PROS = 14,
-		BONUS_FIRST_KILL = 15,
-		BONUS_FIRST_MATCH_GAME = 16,
+		BONUS_EXTRA_DON_EVENT = 13, // killing pros?
+		BONUS_KILLING_PROS = 14, // first kill
+		BONUS_FIRST_KILL = 15, // first mission
+		BONUS_FIRST_MATCH_GAME = 16, // start off
 		BONUS_FIRST_MISSION = 17,
 		BONUS_START_OFF_EXP = 18,
 		BONUS_Q_BONUS = 19,
@@ -33,9 +33,18 @@ public:
 		BONUS_COIN_BOOSTER = 25,
 	};
 
+	struct BonusInfo
+	{
+		U16 mId;
+		F32 mExp;
+		F32 mDon;
+		U8 mOp;
+		U8 mType;
+	};
+
 	GCGameState() : GameNetEvent{ GC_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {}
 
-	GCGameState(U32 playerId, U32 cmd, const U32 value = 0, const U32 dataUid = 0) : GameNetEvent{ GC_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
+	GCGameState(U32 playerId, U8 cmd, const U32 value = 0, const U32 dataUid = 0) : GameNetEvent{ GC_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
 	{
 		this->uid = playerId;
 		this->cmd = cmd;
@@ -43,7 +52,8 @@ public:
 		this->dataUid = dataUid;
 	}
 
-	GCGameState(const RoomSessionPlayer::Ptr& player, U32 cmd, const U32 value = 0, const U32 dataUid = 0) : GameNetEvent{ GC_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
+	GCGameState(const RoomSessionPlayer::Ptr& player, U8 cmd, const U32 value = 0, const U32 dataUid = 0)
+		: GameNetEvent{ GC_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
 	{
 		this->uid = player->getPlayer()->getId();
 		this->cmd = cmd;
@@ -54,6 +64,14 @@ public:
 		this->gainDon = player->getDon();
 
 		this->unk_01 = player->getPlayer()->getAchievementContainer()->listRecent();
+	}
+
+	GCGameState(const RoomSessionPlayer::Ptr& player, const U8 cmd, const std::vector<BonusInfo>& bonusInfoList)
+		: GameNetEvent{ GC_GAME_STATE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
+	{
+		this->uid = player->getPlayer()->getId();
+		this->cmd = cmd;
+		this->mBonusInfoList = bonusInfoList;
 	}
 
 	void pack(EventConnection* conn, BitStream* bstream)
@@ -82,18 +100,9 @@ public:
 			bstream->write(type);
 		}
 	};
+
 	void unpack(EventConnection* conn, BitStream* bstream) {};
 	void process(EventConnection* ps) {};
-
-
-	struct BonusInfo
-	{
-		U16 mId;
-		F32 mExp;
-		F32 mDon;
-		U8 mOp;
-		U8 mType;
-	};
 
 	U32 uid = 0;
 	U8 cmd = 0;
