@@ -12,17 +12,32 @@ class CGHit final : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 
-	enum HitLocation : U8 {
+	enum HitLocation
+	{
+		FRONT = 1,
+		BACK = 2,
+		BACK_SIDE = 3
+	};
+
+	enum BodyPartHitLocation : U8 {
 		HEAD = 0,
 		BODY = 1,
-		R_ARM = 2,
-		R_HAND = 3,
-		L_ARM = 4,
-		L_HAND = 5,
-		R_LEG = 6,
-		R_FEET = 7,
-		L_LEG = 8,
-		L_FEET = 9
+		RIGHT_ARM = 2,
+		RIGHT_HAND = 3,
+		LEFT_ARM = 4,
+		LEFT_HAND = 5,
+		RIGHT_LEG = 6,
+		RIGHT_FEET = 7,
+		LEFT_LEG = 8,
+		LEFT_FEET = 9,
+		// Explosion? Trowable? = 11
+	};
+
+	enum HitType : U8
+	{
+		PLAYER_HIT = 0,
+		PLAYER_NO_HIT = 1,
+		FALL_DAMAGE = 2
 	};
 
 	enum MapObject : U8 {
@@ -50,17 +65,21 @@ public:
 		bstream->read(&dstPosZ);
 		bstream->read(&entityId);
 		bstream->read(&hitType);
-		bstream->read(&hitLocation);
+		bstream->read(&bodyPartHitLocation);
 		bstream->read(&weaponId);
 		bstream->read(&rtt);
 		bstream->read(&weaponType);
-		bstream->read(&unk_16);
+		bstream->read(&hitLocation);
 		bstream->read(&unk_17);
 		bstream->read(&unk_18);
 	};
 
 	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
+		std::cout << "CGHit::handle >> Player " << srcPlayerId << " hit player " << dstPlayerId
+			<< ". Unk03: " << (int)unk_03 << ", Unk16: " << (int)hitLocation << ", Unk17: "
+			<< (int)unk_17 << ", Unk18: " << (int)unk_18 << "." << std::endl;
+
 		if (const auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 		{
 			if (roomPlayer->isSpectating())
@@ -157,7 +176,7 @@ public:
 
 			damage = weaponUsed.damage;
 
-			switch (hitLocation)
+			switch (bodyPartHitLocation)
 			{
 			case HEAD:
 				damage *= 1;
@@ -165,16 +184,16 @@ public:
 			case BODY:
 				damage *= 0.9;
 				break;
-			case L_LEG:
-			case R_LEG:
-			case L_ARM:
-			case R_ARM:
+			case LEFT_LEG:
+			case RIGHT_LEG:
+			case LEFT_ARM:
+			case RIGHT_ARM:
 				damage *= 0.8;
 				break;
-			case L_FEET:
-			case R_FEET:
-			case L_HAND:
-			case R_HAND:
+			case LEFT_FEET:
+			case RIGHT_FEET:
+			case LEFT_HAND:
+			case RIGHT_HAND:
 				damage *= 0.6;
 				break;
 			}
@@ -285,7 +304,7 @@ public:
 
 		// Why was it previously so that GCHit was never relayed to everyone else if the src and dst player were the same? Certainly explains why octomines didn't disappear.
 		roomSession->relayPlaying<GCHit>(srcPlayerId, dstPlayerId, unk_03, srcPosX, srcPosY, srcPosZ, dstPosX, dstPosY, dstPosZ, entityId,
-			hitType, hitLocation, dstPlayer->getHealth(), damage, weaponId, rtt, weaponType, unk_16, srcPlayer->getStreak() + 1, unk_18, effectId);
+			hitType, bodyPartHitLocation, dstPlayer->getHealth(), damage, weaponId, rtt, weaponType, hitLocation, srcPlayer->getStreak() + 1, unk_18, effectId);
 
 		if (areSkillsEnabled && !isSameTeam)
 		{
@@ -298,7 +317,7 @@ public:
 
 			if (!dstPlayerHasRainbowSkillCard && isValidWeapon)
 			{
-				const auto skillPointsToAdd = (hitLocation == HEAD) ? 10 : 5;
+				const auto skillPointsToAdd = (bodyPartHitLocation == HEAD) ? 10 : 5;
 				const auto skillGaugeBoostPercentage = dstPlayer->getSkillManager()->getSkillGaugeBoostPercentage();
 
 				dstPlayer->getSkillManager()->addSkillPoints(static_cast<uint32_t>(skillPointsToAdd + (skillPointsToAdd * skillGaugeBoostPercentage)));
@@ -322,8 +341,8 @@ public:
 
 			srcPlayer->getEntityManager()->addKill(entityId);
 
-			roomSession->relayPlaying<GCGameState>(dstId, hitLocation == 0 ? 28 : 17, weaponId, srcId);
-			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, hitLocation);
+			roomSession->relayPlaying<GCGameState>(dstId, bodyPartHitLocation == 0 ? 28 : 17, weaponId, srcId);
+			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, bodyPartHitLocation);
 
 		}
 	}
@@ -333,7 +352,7 @@ public:
 		const auto roomSession = srcPlayer->getRoomSession();
 
 		roomSession->relayPlaying<GCHit>(srcPlayerId, 0, unk_03, srcPosX, srcPosY, srcPosZ, dstPosX, dstPosY, dstPosZ, entityId,
-			hitType, hitLocation, 0, 0, weaponId, rtt, weaponType, unk_16, srcPlayer->getStreak() + 1, unk_18, 0);
+			hitType, bodyPartHitLocation, 0, 0, weaponId, rtt, weaponType, hitLocation, srcPlayer->getStreak() + 1, unk_18, 0);
 	}
 
 	static bool isTrap(const uint32_t weaponId)
@@ -380,12 +399,12 @@ public:
 	F32 dstPosZ; //136
 	U32 entityId; //92
 	U8 hitType; //148 
-	U8 hitLocation; //149
+	U8 bodyPartHitLocation; //149
 
 	U32 weaponId; //96
 	U64 rtt; //104
 	U8 weaponType; //112
-	U8 unk_16; //150
+	U8 hitLocation; //150
 	U8 unk_17; //151
 	U32 unk_18; //152
 
