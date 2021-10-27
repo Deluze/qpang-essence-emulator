@@ -72,13 +72,21 @@ public:
 		bstream->read(&hitLocation);
 		bstream->read(&unk_17);
 		bstream->read(&unk_18);
+
+		//std::cout << "================================" << std::endl;
+		//std::cout << "CGHit::unpack >> SourcePlayerId: " << (int)srcPlayerId << ", TargetPlayerId: " << (int)dstPlayerId << ", EntityId: " << (int)entityId << std::endl;
+		//std::cout << "CGHit::unpack >> WeaponId: " << (int)weaponId << ", WeaponType: " << (int)weaponType << std::endl;
+		//std::cout << "CGHit::unpack >> BodyPart: " << (int)bodyPartHitLocation << ", HitLocation: " << (int)hitLocation << ", HitType: " << (int)hitType << std::endl;
+		//std::cout << "CGHit::unpack >> Unk03: " << (int)unk_03 << ", Unk17: " << (int)unk_17 << ", Unk18: " << (int)unk_18 << ", RTT: " << (int)rtt << std::endl;
+		//std::cout << "================================" << std::endl;
 	};
 
+	// TODO: Rewrite this code, rewrite damage system, figure out how to "detect" special attack.
 	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		std::cout << "CGHit::handle >> Player " << srcPlayerId << " hit player " << dstPlayerId
-			<< ". Unk03: " << (int)unk_03 << ", Unk16: " << (int)hitLocation << ", Unk17: "
-			<< (int)unk_17 << ", Unk18: " << (int)unk_18 << "." << std::endl;
+		//std::cout << "CGHit::handle >> Player " << srcPlayerId << " hit player " << dstPlayerId
+		//	<< ". Unk03: " << (int)unk_03 << ", Unk16: " << (int)hitLocation << ", Unk17: "
+		//	<< (int)unk_17 << ", Unk18: " << (int)unk_18 << "." << std::endl;
 
 		if (const auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 		{
@@ -341,9 +349,9 @@ public:
 
 			srcPlayer->getEntityManager()->addKill(entityId);
 
+			// Killfeed?
 			roomSession->relayPlaying<GCGameState>(dstId, bodyPartHitLocation == 0 ? 28 : 17, weaponId, srcId);
 			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, bodyPartHitLocation);
-
 		}
 	}
 

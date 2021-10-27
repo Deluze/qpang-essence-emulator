@@ -31,6 +31,7 @@ public:
 		bstream->read(&zPos);
 	};
 
+	// TODO: Start keeping track of entity ids.
 	void handle(GameConnection* conn, Player::Ptr player)
 	{
 		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
