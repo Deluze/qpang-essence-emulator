@@ -113,17 +113,24 @@ public:
 				return conn->disconnect("Room is full");
 			}
 
-			const auto password = room->getPassword();
+			const auto roomPassword = room->getPassword();
 
-			if (!password.empty() && player->getRank() != 3 || player->getRank() != 4)
+			const auto playerRank = player->getRank();
+			const auto playerCanBypassPasswordCheck = ((playerRank == 3) || (playerRank == 4));
+
+			// If the room has no password OR the player is a GM or Helper, they can bypass the password check.
+			if (roomPassword.empty() || playerCanBypassPasswordCheck)
 			{
-				if (password != password)
-				{
-					return;
-				}
+				room->addPlayer(conn);
+
+				return;
 			}
 
-			room->addPlayer(conn);
+			// Compare the given password with the room password.
+			if (password == roomPassword)
+			{
+				room->addPlayer(conn);
+			}
 		}
 		else
 		{
