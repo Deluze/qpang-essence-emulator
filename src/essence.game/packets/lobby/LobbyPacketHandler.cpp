@@ -1,6 +1,7 @@
 #include "LobbyPacketHandler.h"
 
 #include "GiftCardEvent.h"
+#include "UseRedeemCodeRequest.h"
 #include "UseCraneEvent.h"
 #include "packets/lobby/incoming/Handshake.h"
 #include "packets/lobby/incoming/Login.h"
@@ -46,6 +47,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(623, new EquipWeapon());
 	add(646, new RequestEquippedSkillCards());
 	add(652, new DeleteCard());
+	// 655 - Open gift
 	add(679, new ChangeCharacterEvent());
 	add(691, new RequestPlayerInfo());
 	add(694, new RequestFriendList());
@@ -54,11 +56,14 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(705, new DenyIncomingFriendRequestEvent());
 	add(709, new CancelOutgoingFriendRequestEvent());
 	add(713, new RemoveFriendEvent());
+	// 717 - Invite friend to join the gameroom
 	add(721, new GameRoomInviteRequest());
 	add(725, new RequestMemos());
+	// 728 - Send memo
 	add(738, new WhisperEvent());
 	add(742, new OpenGift());
 	add(745, new RequestGifts());
+	// 751 - Has something to do with joining a room (also occurs with creating a room)
 	add(758, new RequestGameRoomsEvent());
 	add(762, new RequestChannelList());
 	add(766, new RequestChannelHost());
@@ -70,11 +75,17 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(803, new BuyCardEvent());
 	add(809, new ExtendCardEvent());
 	add(812, new GiftCardEvent());
+	// 815 - Gift from shop
+	// 828 - Send request to go into training?
+	// 828 - Send request to leave training?
 	add(831, new RequestCashBalance());
 	add(834, new EnableFunctionCardEvent());
 	add(841, new ResetWinLossEvent());
 	add(844, new ResetKillDeathEvent());
+	// 851 - Redeem code
+	add(851, new UseRedeemCodeRequest());
 	add(861, new DisableFunctionCardEvent());
+	// 875 - Send trade request
 	add(897, new UseCraneEvent());
 	add(901, new RequestDailyBonus());
 }
