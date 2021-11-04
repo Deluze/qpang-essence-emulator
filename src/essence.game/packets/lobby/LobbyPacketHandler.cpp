@@ -1,6 +1,7 @@
 #include "LobbyPacketHandler.h"
 
 #include "GiftCardEvent.h"
+#include "UpdateSkillCardRequest.h"
 #include "UseRedeemCodeRequest.h"
 #include "UseCraneEvent.h"
 #include "packets/lobby/incoming/Handshake.h"
@@ -46,6 +47,8 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(620, new EquipArmor());
 	add(623, new EquipWeapon());
 	add(646, new RequestEquippedSkillCards());
+	// 649 - Equip skillcard (and unequip?)
+	add(649, new UpdateSkillCardRequest());
 	add(652, new DeleteCard());
 	// 655 - Open gift
 	add(679, new ChangeCharacterEvent());

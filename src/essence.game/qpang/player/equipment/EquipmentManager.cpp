@@ -152,22 +152,23 @@ std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t charact
 	};
 }
 
-std::array<InventoryCard, 3> EquipmentManager::getSkillCards()
+std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 {
 	std::lock_guard<std::mutex> l(m_mx);
+
+	std::array<InventoryCard, 3> skillCards;
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
 		InventoryManager* inv = player->getInventoryManager();
 
-		return {
-			inv->get(m_skillCards[0]),
-			inv->get(m_skillCards[1]),
-			inv->get(m_skillCards[2]),
-		};
+		for (int i = 0; i < m_skillCards.size(); i++)
+		{
+			skillCards[i] = inv->get(m_skillCards[i]);
+		}
 	}
 
-	return {};
+	return skillCards;
 }
 
 void EquipmentManager::removeFunctionCard(uint64_t cardId)
@@ -214,6 +215,11 @@ void EquipmentManager::setFunctionCards(const std::vector<uint64_t>& cards)
 	std::lock_guard<std::recursive_mutex> g(m_functionCardMx);
 
 	m_functionCards = cards;
+}
+
+void EquipmentManager::setSkillCards(const std::vector<uint64_t>& skillCardIds)
+{
+	m_skillCards = skillCardIds;
 }
 
 void EquipmentManager::setEquipmentForCharacter(uint16_t character, std::array<uint64_t, 13> equip)

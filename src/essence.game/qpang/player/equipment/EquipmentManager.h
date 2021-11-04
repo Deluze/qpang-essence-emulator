@@ -23,13 +23,15 @@ public:
 	std::array<uint32_t, 9> getArmorItemIdsByCharacter(uint16_t characterId);
 	std::array<uint32_t, 4> getWeaponItemIdsByCharacter(uint16_t characterId);
 	std::array<uint64_t, 4> getWeaponsByCharacter(uint16_t characterId);
-	std::array<InventoryCard, 3> getSkillCards();
+	std::array<InventoryCard, 3> getEquippedSkillCards();
 
 	void removeFunctionCard(uint64_t cardId);
 	void unequipItem(uint64_t cardId);
 	
 	void addFunctionCard(uint64_t cardId);
 	void setFunctionCards(const std::vector<uint64_t>& cards);
+
+	void setSkillCards(const std::vector<uint64_t>& skillCardIds);
 
 	void setEquipmentForCharacter(uint16_t character, std::array<uint64_t, 13> equip);
 	void setWeapons(uint16_t character, const std::array<uint64_t, 4>& weapons);
@@ -54,7 +56,7 @@ public:
 private:
 	std::unordered_map<uint16_t, std::array<uint64_t, 13>> m_equips;
 	std::vector<uint16_t> m_unlockedCharacters;
-	std::array<uint64_t, 3> m_skillCards;
+	std::vector<uint64_t> m_skillCards;
 	std::mutex m_mx;
 
 	std::weak_ptr<Player> m_player;

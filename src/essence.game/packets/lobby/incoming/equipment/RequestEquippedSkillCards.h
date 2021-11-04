@@ -12,7 +12,7 @@ class RequestEquippedSkillCards final : public PacketEvent
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		const std::array<InventoryCard, 3> skills = conn->getPlayer()->getEquipmentManager()->getSkillCards();
+		const std::array<InventoryCard, 3> skills = conn->getPlayer()->getEquipmentManager()->getEquippedSkillCards();
 
 		conn->send(EquippedSkillCards(skills));
 	}

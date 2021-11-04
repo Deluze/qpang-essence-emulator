@@ -25,6 +25,7 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 	StatementResult::Ptr res = stmt->fetch();
 
 	std::vector<uint64_t> functionCardIds;
+	std::vector<uint64_t> skillCardIds;
 
 	while (res->hasNext())
 	{
@@ -49,12 +50,23 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 			m_gifts[card.id] = card;
 
 		if (card.type == 70 && card.periodType != 1 && card.isActive) // is function card, and is either rounds/days so we can equip it
+		{
 			functionCardIds.push_back(card.id);
+		}
+
+		if (card.type == 75 && card.isActive)
+		{
+			if (skillCardIds.size() < 3)
+			{
+				skillCardIds.push_back(card.id);
+			}
+		}
 
 		res->next();
 	}
 
 	player->getEquipmentManager()->setFunctionCards(functionCardIds);
+	player->getEquipmentManager()->setSkillCards(skillCardIds);
 }
 
 std::vector<InventoryCard> InventoryManager::list()

@@ -11,12 +11,11 @@ class EquippedSkillCards : public LobbyServerPacket
 public:
 	explicit EquippedSkillCards(const std::array<InventoryCard, 3>& skillCards) : LobbyServerPacket(647)
 	{
-		for (size_t i = 0; i < 5; i++)
+		for (const InventoryCard& skillCard : skillCards)
 		{
-			for (const InventoryCard& skillCard : skillCards)
-			{
-				InventoryCardWriter::write(this, skillCard);
-			}
+			InventoryCardWriter::write(this, skillCard);
 		}
+
+		writeEmpty(22 * 43);
 	}
 };

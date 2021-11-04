@@ -17,7 +17,16 @@ public:
 		packet->writeEmpty(6); // 16
 		packet->writeInt(card.timeCreated); // 22
 		packet->writeFlag(card.isOpened); // 26
-		packet->writeShort(card.isActive ? 0 : 1); // if 1, function card de-quipped. if 0 equipped?????? // 27
+
+		if (card.type == 75)
+		{
+			packet->writeShort(0);
+		}
+		else
+		{
+			packet->writeShort(card.isActive ? 0 : 1);
+		}
+
 		packet->writeFlag(false); // hidden // 28
 		packet->writeFlag(false);
 		packet->writeShort(card.period);
