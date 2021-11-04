@@ -20,7 +20,7 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 
 	m_player = player;
 
-	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ?");
+	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ? AND period > 0");
 	stmt->bindInteger(playerId);
 	StatementResult::Ptr res = stmt->fetch();
 
@@ -240,7 +240,8 @@ void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
 		return;
 	}
 
-	if (periodType == 3)
+	// Rounds or uses.
+	if (periodType == 3 || periodType == 1)
 	{
 		if (card.period > 0)
 		{
@@ -248,11 +249,13 @@ void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
 		}
 	}
 	else if (periodType == 2)
+	{
 		card.period = card.period <= period ? 0 : card.period - period;
+	}
 
 	if (periodType != 254)
 	{
-		DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = IF(period_type = 3, period - 1, period - ?) "\
+		DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = IF(period_type = 3 OR period_type = 1, period - 1, period - ?) "\
 			"WHERE id = ?"
 			, {
 				period,
@@ -260,14 +263,21 @@ void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
 			});
 	}
 
-	if (it->second.period == 0)
+	if (it->second.period <= 0)
 	{
 		if (card.type == 86 || card.type == 87)
+		{
 			player->getEquipmentManager()->unequipItem(cardId);
+		}
 		else if (card.type == 70)
 		{
 			card.isActive = false;
 			player->getEquipmentManager()->removeFunctionCard(cardId);
+		}
+		else if (card.type == 75)
+		{
+			card.isActive = false;
+			player->getEquipmentManager()->removeSkillCard(cardId);
 		}
 	}
 }
@@ -380,6 +390,10 @@ void InventoryManager::close()
 	std::lock_guard<std::mutex> lg(m_mx);
 
 	for (const auto& [id, card] : m_cards)
-		if (isEquippableFunction(card.itemId))
+	{
+		if (isEquippableFunction(card.itemId) || card.type == 75)
+		{
 			DATABASE_DISPATCHER->dispatch("UPDATE player_items SET active = ? WHERE id = ?", { card.isActive, card.id });
+		}
+	}
 }

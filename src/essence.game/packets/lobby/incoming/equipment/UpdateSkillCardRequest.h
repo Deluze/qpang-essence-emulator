@@ -41,17 +41,6 @@ public:
 
 		std::cout << "Card ids: " << firstCardId << ", " << secondCardId << ", " << thirdCardId << std::endl;
 
-		//std::array<std::array<uint64_t, 3>, 5> skillSet = {};
-
-		player->getEquipmentManager()->setSkillCards({ firstCardId, secondCardId, thirdCardId });
-
-		for (const auto equippedSkillCard : player->getEquipmentManager()->getEquippedSkillCards())
-		{
-			std::cout << "Equipped skillcard card id: " << equippedSkillCard.id << std::endl;
-
-			player->getInventoryManager()->setCardActive(equippedSkillCard.id, true);
-		}
-
 		player->getEquipmentManager()->setSkillCards({ firstCardId, secondCardId, thirdCardId });
 
 		for (const auto equippedSkillCard : player->getEquipmentManager()->getEquippedSkillCards())
@@ -62,6 +51,5 @@ public:
 		}
 
 		conn->send(UpdateSkillCardResponse(player->getEquipmentManager()->getEquippedSkillCards()));
-
 	}
 };

@@ -183,6 +183,18 @@ void EquipmentManager::removeFunctionCard(uint64_t cardId)
 	), m_functionCards.end());
 }
 
+void EquipmentManager::removeSkillCard(uint64_t cardId)
+{
+	std::lock_guard<std::recursive_mutex> g(m_skillCardMx);
+
+	m_skillCards.erase(std::remove_if(m_skillCards.begin(), m_skillCards.end(),
+		[cardId](const uint64_t& lhs)
+		{
+			return lhs == cardId;
+		}
+	), m_skillCards.end());
+}
+
 void EquipmentManager::unequipItem(uint64_t cardId)
 {
 	std::lock_guard<std::mutex> l(m_mx);
@@ -219,6 +231,8 @@ void EquipmentManager::setFunctionCards(const std::vector<uint64_t>& cards)
 
 void EquipmentManager::setSkillCards(const std::vector<uint64_t>& skillCardIds)
 {
+	std::lock_guard<std::recursive_mutex> g(m_skillCardMx);
+
 	m_skillCards = skillCardIds;
 }
 

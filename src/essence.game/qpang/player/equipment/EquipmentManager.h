@@ -26,6 +26,7 @@ public:
 	std::array<InventoryCard, 3> getEquippedSkillCards();
 
 	void removeFunctionCard(uint64_t cardId);
+	void removeSkillCard(uint64_t cardId);
 	void unequipItem(uint64_t cardId);
 	
 	void addFunctionCard(uint64_t cardId);
@@ -56,8 +57,11 @@ public:
 private:
 	std::unordered_map<uint16_t, std::array<uint64_t, 13>> m_equips;
 	std::vector<uint16_t> m_unlockedCharacters;
-	std::vector<uint64_t> m_skillCards;
 	std::mutex m_mx;
+
+	std::vector<uint64_t> m_skillCards;
+	std::recursive_mutex m_skillCardMx;
+
 
 	std::weak_ptr<Player> m_player;
 
