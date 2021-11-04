@@ -6,10 +6,10 @@
 #include "InventoryCardWriter.h"
 #include "packets/LobbyServerPacket.h"
 
-class UpdateSkillCardResponse : public LobbyServerPacket
+class UpdateSkillSetResponse : public LobbyServerPacket
 {
 public:
-	explicit UpdateSkillCardResponse(const std::array<InventoryCard, 3>& skillCards) : LobbyServerPacket(650)
+	explicit UpdateSkillSetResponse(const std::array<InventoryCard, 3>& skillCards) : LobbyServerPacket(650)
 	{
 		for (const InventoryCard& skillCard : skillCards)
 		{
