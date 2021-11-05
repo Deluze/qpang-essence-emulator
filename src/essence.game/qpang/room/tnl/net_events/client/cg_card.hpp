@@ -19,8 +19,7 @@ public:
 		DENY_CARD_ACTIVATION = 3,
 		ACTIVATE_CARD = 4,
 		DEACTIVATE_CARD = 9,
-		// 10 and 15 both do the same.
-		FAIL_CARD_ACTIVATION = 10,
+		FAIL_CARD_ACTIVATION = 10/* and 15 */,
 	};
 
 	enum CardType : U32
@@ -41,7 +40,7 @@ public:
 		bstream->read(&seqId);
 	}
 
-	void handle(GameConnection* conn, Player::Ptr player)
+	void handle(GameConnection* conn, const Player::Ptr player)
 	{
 		std::cout << "CGCard::handle >> Handling card for player " << uid << " (CMD: " << cmd << ", CardType: " << cardType << ")" << std::endl;
 		std::cout << "CGCard::handle >> Information PlayerId " << uid << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << std::endl;
@@ -155,7 +154,7 @@ public:
 			//}
 
 			//roomSessionPlayer->getSkillManager()->activateSkillCard(targetUid, seqId);
-			roomSession->relayPlaying<GCCard>(roomSessionPlayer->getPlayer()->getId(), targetUid, 10, cardType, itemId, seqId, std::vector<uint32_t>{});
+			roomSession->relayPlaying<GCCard>(roomSessionPlayer->getPlayer()->getId(), targetUid, 4, cardType, itemId, seqId, std::vector<uint32_t>{});
 			roomSessionPlayer->getSkillManager()->addSkillPoints(0);
 
 			return;
