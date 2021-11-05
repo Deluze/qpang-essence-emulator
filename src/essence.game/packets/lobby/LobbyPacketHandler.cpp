@@ -1,9 +1,11 @@
 #include "LobbyPacketHandler.h"
 
+#include "ChangeNickNameRequest.h"
 #include "GiftCardEvent.h"
 #include "UpdateSkillSetRequest.h"
 #include "UseRedeemCodeRequest.h"
 #include "UseCraneEvent.h"
+#include "CheckNickNameRequest.h"
 #include "packets/lobby/incoming/Handshake.h"
 #include "packets/lobby/incoming/Login.h"
 #include "packets/lobby/incoming/channel/RequestChannelHost.h"
@@ -50,6 +52,8 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(646, new RequestEquippedSkillCards());
 	add(649, new UpdateSkillSetRequest());
 	add(652, new DeleteCard());
+	// 667 - Check if name is valid for name change
+	add(667, new CheckNickNameRequest());
 	// 655 - Open gift
 	add(679, new ChangeCharacterEvent());
 	add(691, new RequestPlayerInfo());
@@ -84,6 +88,8 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(828, new TrainingRequest());
 	add(831, new RequestCashBalance());
 	add(834, new EnableFunctionCardEvent());
+	// 837 - Definitively change your name.
+	add(837, new ChangeNickNameRequest());
 	add(841, new ResetWinLossEvent());
 	add(844, new ResetKillDeathEvent());
 	// 851 - Redeem code
@@ -92,4 +98,6 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	// 875 - Send trade request
 	add(897, new UseCraneEvent());
 	add(901, new RequestDailyBonus());
+	// 903 - Request to boost clothing piece
+	// 906 - Panthalassa box opening, 
 }
