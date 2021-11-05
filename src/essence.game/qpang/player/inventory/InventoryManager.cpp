@@ -66,7 +66,7 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 	}
 
 	player->getEquipmentManager()->setFunctionCards(functionCardIds);
-	player->getEquipmentManager()->setSkillCards(skillCardIds);
+	player->getEquipmentManager()->setSkillCardIds(skillCardIds);
 }
 
 std::vector<InventoryCard> InventoryManager::list()

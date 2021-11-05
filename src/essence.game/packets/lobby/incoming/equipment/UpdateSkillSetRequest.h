@@ -13,19 +13,19 @@ public:
 
 		unequipSkillSet(player);
 
-		std::vector<uint64_t> skillCards{};
+		std::vector<uint64_t> skillCardIds{};
 
 		for (int i = 0; i < 3; i++)
 		{
 			if (const auto cardId = packet.readLong(); cardId != 0)
 			{
-				skillCards.push_back(cardId);
+				skillCardIds.push_back(cardId);
 			}
 
 			packet.readEmpty(35);
 		}
 
-		player->getEquipmentManager()->setSkillCards(skillCards);
+		player->getEquipmentManager()->setSkillCardIds(skillCardIds);
 
 		equipSkillSet(player);
 

@@ -162,9 +162,9 @@ std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 	{
 		InventoryManager* inv = player->getInventoryManager();
 
-		for (int i = 0; i < m_skillCards.size(); i++)
+		for (int i = 0; i < m_skillCardIds.size(); i++)
 		{
-			skillCards[i] = inv->get(m_skillCards[i]);
+			skillCards[i] = inv->get(m_skillCardIds[i]);
 		}
 	}
 
@@ -187,12 +187,12 @@ void EquipmentManager::removeSkillCard(uint64_t cardId)
 {
 	std::lock_guard<std::recursive_mutex> g(m_skillCardMx);
 
-	m_skillCards.erase(std::remove_if(m_skillCards.begin(), m_skillCards.end(),
+	m_skillCardIds.erase(std::remove_if(m_skillCardIds.begin(), m_skillCardIds.end(),
 		[cardId](const uint64_t& lhs)
 		{
 			return lhs == cardId;
 		}
-	), m_skillCards.end());
+	), m_skillCardIds.end());
 }
 
 void EquipmentManager::unequipItem(uint64_t cardId)
@@ -217,23 +217,23 @@ void EquipmentManager::unequipItem(uint64_t cardId)
 
 void EquipmentManager::addFunctionCard(uint64_t cardId)
 {
-	std::lock_guard<std::recursive_mutex> g(m_functionCardMx);
+	std::lock_guard g(m_functionCardMx);
 
 	m_functionCards.push_back(cardId);
 }
 
 void EquipmentManager::setFunctionCards(const std::vector<uint64_t>& cards)
 {
-	std::lock_guard<std::recursive_mutex> g(m_functionCardMx);
+	std::lock_guard g(m_functionCardMx);
 
 	m_functionCards = cards;
 }
 
-void EquipmentManager::setSkillCards(const std::vector<uint64_t>& skillCardIds)
+void EquipmentManager::setSkillCardIds(const std::vector<uint64_t>& skillCardIds)
 {
-	std::lock_guard<std::recursive_mutex> g(m_skillCardMx);
+	std::lock_guard g(m_skillCardMx);
 
-	m_skillCards = skillCardIds;
+	m_skillCardIds = skillCardIds;
 }
 
 void EquipmentManager::setEquipmentForCharacter(uint16_t character, std::array<uint64_t, 13> equip)
@@ -337,7 +337,7 @@ bool EquipmentManager::hasEquipped(const uint64_t cardId, const uint16_t charact
 		if (equipment == cardId)
 			return true;
 
-	for (const auto& skillCard : m_skillCards)
+	for (const auto& skillCard : m_skillCardIds)
 		if (skillCard == cardId)
 			return true;
 

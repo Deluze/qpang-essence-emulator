@@ -32,7 +32,7 @@ public:
 	void addFunctionCard(uint64_t cardId);
 	void setFunctionCards(const std::vector<uint64_t>& cards);
 
-	void setSkillCards(const std::vector<uint64_t>& skillCardIds);
+	void setSkillCardIds(const std::vector<uint64_t>& skillCardIds);
 
 	void setEquipmentForCharacter(uint16_t character, std::array<uint64_t, 13> equip);
 	void setWeapons(uint16_t character, const std::array<uint64_t, 4>& weapons);
@@ -59,7 +59,7 @@ private:
 	std::vector<uint16_t> m_unlockedCharacters;
 	std::mutex m_mx;
 
-	std::vector<uint64_t> m_skillCards;
+	std::vector<uint64_t> m_skillCardIds;
 	std::recursive_mutex m_skillCardMx;
 
 
