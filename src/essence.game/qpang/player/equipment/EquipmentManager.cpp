@@ -31,11 +31,11 @@ void EquipmentManager::initialize(std::shared_ptr<Player> player, uint16_t playe
 	stmt->bindInteger(playerId);
 	StatementResult::Ptr res = stmt->fetch();
 
-	std::lock_guard<std::mutex> l(m_mx);
+	std::lock_guard l(m_mx);
 
 	while (res->hasNext())
 	{
-		std::array<uint64_t, 13> equips;
+		std::array<uint64_t, 13> equips{};
 
 		uint16_t characterId = res->getShort("character_id");
 		equips[0] = res->getInt("head");
@@ -67,7 +67,7 @@ std::vector<uint16_t> EquipmentManager::getUnlockedCharacters()
 
 std::array<uint64_t, 13> EquipmentManager::getEquipmentByCharacter(uint16_t characterId)
 {
-	std::lock_guard<std::mutex> l(m_mx);
+	std::lock_guard l(m_mx);
 
 	const auto it = m_equips.find(characterId);
 
@@ -79,7 +79,7 @@ std::array<uint64_t, 13> EquipmentManager::getEquipmentByCharacter(uint16_t char
 
 std::array<uint64_t, 9> EquipmentManager::getArmorByCharacter(uint16_t characterId)
 {
-	std::lock_guard<std::mutex> l(m_mx);
+	std::lock_guard l(m_mx);
 
 	auto it = m_equips.find(characterId);
 
@@ -135,7 +135,7 @@ std::array<uint32_t, 4> EquipmentManager::getWeaponItemIdsByCharacter(uint16_t c
 
 std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t characterId)
 {
-	std::lock_guard<std::mutex> l(m_mx);
+	std::lock_guard l(m_mx);
 
 	auto it = m_equips.find(characterId);
 
@@ -154,7 +154,7 @@ std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t charact
 
 std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 {
-	std::lock_guard<std::mutex> l(m_mx);
+	std::lock_guard l(m_mx);
 
 	std::array<InventoryCard, 3> skillCards;
 
@@ -173,7 +173,7 @@ std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 
 void EquipmentManager::removeFunctionCard(uint64_t cardId)
 {
-	std::lock_guard<std::recursive_mutex> g(m_functionCardMx);
+	std::lock_guard g(m_functionCardMx);
 
 	m_functionCards.erase(std::remove_if(m_functionCards.begin(), m_functionCards.end(),
 		[cardId](const uint64_t& lhs)
@@ -185,7 +185,7 @@ void EquipmentManager::removeFunctionCard(uint64_t cardId)
 
 void EquipmentManager::removeSkillCard(uint64_t cardId)
 {
-	std::lock_guard<std::recursive_mutex> g(m_skillCardMx);
+	std::lock_guard g(m_skillCardMx);
 
 	m_skillCardIds.erase(std::remove_if(m_skillCardIds.begin(), m_skillCardIds.end(),
 		[cardId](const uint64_t& lhs)
@@ -197,7 +197,7 @@ void EquipmentManager::removeSkillCard(uint64_t cardId)
 
 void EquipmentManager::unequipItem(uint64_t cardId)
 {
-	std::lock_guard<std::mutex> l(m_mx);
+	std::lock_guard l(m_mx);
 
 	for (size_t i = 0; i < m_unlockedCharacters.size(); i++)
 	{
@@ -435,7 +435,7 @@ uint16_t EquipmentManager::getBonusHealth()
 		case 1429412098:
 		case 1429412099:
 		case 1429412100:
-		// Squirtle shield
+			// Squirtle shield
 		case 1429410049:
 		case 1429410304: // bat wing s (cash)
 			return 20;
@@ -485,7 +485,7 @@ uint32_t EquipmentManager::getEquippedBooster()
 {
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
-		const auto &equip = m_equips[player->getCharacter()];
+		const auto& equip = m_equips[player->getCharacter()];
 		const auto itemId = player->getInventoryManager()->get(equip[7]).itemId;
 
 		return itemId;
@@ -510,12 +510,16 @@ void EquipmentManager::finishRound(const std::shared_ptr<RoomSessionPlayer>& ses
 		return;
 
 	for (const auto& equipment : it->second)
+	{
 		player->getInventoryManager()->useCard(equipment, playtime);
+	}
 
 	m_functionCardMx.lock();
 
 	for (const auto& function : m_functionCards)
+	{
 		player->getInventoryManager()->useCard(function, playtime);
+	}
 
 	m_functionCardMx.unlock();
 
