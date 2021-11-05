@@ -27,16 +27,15 @@ void PlayerWeaponManager::initialize(const std::shared_ptr<RoomSessionPlayer>& p
 	auto* equipmentManager = player->getPlayer()->getEquipmentManager();
 
 	const auto itemIds = equipmentManager->getWeaponItemIdsByCharacter(player->getCharacter());
-
-	auto hasPreSelectedWeapon = false;
 	const auto isMeleeOnly = player->getRoomSession()->getRoom()->isMeleeOnly();
 
-	for (uint8_t i = 0; i < itemIds.size(); i++)
+	for (int i = 0; i < itemIds.size(); i++)
 	{
-		auto weapon = Game::instance()->getWeaponManager()->get(itemIds[i]);
+		const auto weapon = Game::instance()->getWeaponManager()->get(itemIds[i]);
 
 		if (isMeleeOnly)
 		{
+			// melee weapon
 			if (i == 3)
 			{
 				m_weapons[3] = weapon;
@@ -51,13 +50,9 @@ void PlayerWeaponManager::initialize(const std::shared_ptr<RoomSessionPlayer>& p
 
 		first = weapon.clipCount + equipmentManager->getExtraAmmoForWeaponIndex(i);
 		second = weapon.clipSize;
-
-		if (m_weapons[i].itemId != NULL && !hasPreSelectedWeapon)
-		{
-			m_selectedWeaponIndex = i;
-			hasPreSelectedWeapon = true;
-		}
 	}
+
+	m_selectedWeaponIndex = 3;
 }
 
 Weapon PlayerWeaponManager::getSelectedWeapon()
