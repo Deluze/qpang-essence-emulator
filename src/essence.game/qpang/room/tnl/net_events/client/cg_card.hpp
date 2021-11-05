@@ -12,9 +12,11 @@ class CGCard : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	enum CMD : U32
+	CGCard() : GameNetEvent{ CG_CARD, Guaranteed, DirClientToServer } {}
+
+	enum Cmd : U32
 	{
-		CARD_UNK_1 = 3, // Disallow skillcard from activating?
+		DENY_CARD_ACTIVATION = 3,
 		ACTIVATE_CARD = 4,
 		DEACTIVATE_CARD = 9,
 		// 10 and 15 both do the same.
@@ -25,12 +27,10 @@ public:
 	{
 		INVENTORY_SKILL_CARD = 1,
 		ACTION_CARD = 7,
-		SKILL_CARD = 9,
+		DRAWN_SKILL_CARD = 9,
 	};
 
-	CGCard() : GameNetEvent{ CG_CARD, Guaranteed, DirClientToServer } {};
-
-	void pack(EventConnection* conn, BitStream* bstream) {};
+	void pack(EventConnection* conn, BitStream* bstream) {}
 	void unpack(EventConnection* conn, BitStream* bstream)
 	{
 		bstream->read(&uid);
@@ -39,7 +39,7 @@ public:
 		bstream->read(&cardType);
 		bstream->read(&itemId);
 		bstream->read(&seqId);
-	};
+	}
 
 	void handle(GameConnection* conn, Player::Ptr player)
 	{
@@ -67,7 +67,7 @@ public:
 			return;
 		}
 
-		if (cardType == SKILL_CARD || cardType == INVENTORY_SKILL_CARD)
+		if (cardType == DRAWN_SKILL_CARD || cardType == INVENTORY_SKILL_CARD)
 		{
 			handleSkillCard(roomPlayer, roomSession);
 		}
@@ -155,7 +155,7 @@ public:
 			//}
 
 			//roomSessionPlayer->getSkillManager()->activateSkillCard(targetUid, seqId);
-			roomSession->relayPlaying<GCCard>(roomSessionPlayer->getPlayer()->getId(), targetUid, 3, cardType, itemId, seqId, std::vector<uint32_t>{});
+			roomSession->relayPlaying<GCCard>(roomSessionPlayer->getPlayer()->getId(), targetUid, 10, cardType, itemId, seqId, std::vector<uint32_t>{});
 			roomSessionPlayer->getSkillManager()->addSkillPoints(0);
 
 			return;
@@ -214,7 +214,7 @@ public:
 	void process(EventConnection* ps)
 	{
 		post<CGCard>(ps);
-	};
+	}
 
 	U32 uid;
 	U32 targetUid;

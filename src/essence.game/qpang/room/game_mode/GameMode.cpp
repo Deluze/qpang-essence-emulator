@@ -71,8 +71,8 @@ void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 				new GCCard(
 					playingPlayer->getPlayer()->getId(),
 					targetPlayerId,
-					CGCard::CMD::ACTIVATE_CARD,
-					CGCard::CardType::SKILL_CARD,
+					CGCard::Cmd::ACTIVATE_CARD,
+					CGCard::CardType::DRAWN_SKILL_CARD,
 					itemId,
 					seqId,
 					skillCardTargetPlayerIds
