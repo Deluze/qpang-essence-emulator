@@ -1,5 +1,6 @@
 #include "RoomSessionPlayer.h"
 
+#include "cc_user_info.hpp"
 #include "ConfigManager.h"
 
 #include "packets/lobby/outgoing/account/UpdateAccount.h"
@@ -104,7 +105,12 @@ void RoomSessionPlayer::initialize()
 
 	m_effectManager.initialize(shared_from_this());
 	m_weaponManager.initialize(shared_from_this());
-	m_skillManager.initialize(shared_from_this());
+
+	if (m_roomSession->getRoom()->isSkillsEnabled())
+	{
+		m_skillManager.initialize(shared_from_this());
+	}
+
 	m_entityManager.initialize(shared_from_this());
 }
 
@@ -113,6 +119,12 @@ void RoomSessionPlayer::tick()
 	if (canStart())
 	{
 		start();
+
+		if (m_roomSession->getRoom()->isSkillsEnabled())
+		{
+			post(new CCUserInfo(shared_from_this()));
+			getSkillManager()->resetSkillPoints();
+		}
 
 		m_roomSession->spawnPlayer(shared_from_this());
 	}
