@@ -39,6 +39,7 @@
 #include "packets/lobby/incoming/shop/RequestShopItems.h"
 #include "packets/lobby/incoming/shop/RequestShopPackages.h"
 #include "packets/lobby/incoming/misc/RequestDailyBonus.h"
+#include "training/TrainingRequest.h"
 
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 {
@@ -47,7 +48,6 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(620, new EquipArmor());
 	add(623, new EquipWeapon());
 	add(646, new RequestEquippedSkillCards());
-	// 649 - Equip skillcard (and unequip?)
 	add(649, new UpdateSkillSetRequest());
 	add(652, new DeleteCard());
 	// 655 - Open gift
@@ -81,6 +81,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	// 815 - Gift from shop
 	// 828 - Send request to go into training?
 	// 828 - Send request to leave training?
+	add(828, new TrainingRequest());
 	add(831, new RequestCashBalance());
 	add(834, new EnableFunctionCardEvent());
 	add(841, new ResetWinLossEvent());
