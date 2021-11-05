@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "InventoryCard.h"
 #include "Skill.h"
 
 class RoomSessionPlayer;
@@ -47,6 +48,8 @@ public:
 	std::vector<uint32_t> getSkillTargetPlayerIds() const;
 private:
 	std::weak_ptr<RoomSessionPlayer> m_player;
+
+	std::array<InventoryCard, 3> m_equippedSkillCards{};
 
 	std::shared_ptr<Skill> m_drawnSkillCard;
 	std::shared_ptr<Skill> m_activeSkillCard;

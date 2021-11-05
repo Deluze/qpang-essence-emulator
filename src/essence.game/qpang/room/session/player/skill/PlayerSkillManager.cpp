@@ -12,24 +12,20 @@
 void PlayerSkillManager::initialize(const std::shared_ptr<RoomSessionPlayer>& player)
 {
 	m_player = player;
+	m_equippedSkillCards = player->getPlayer()->getEquipmentManager()->getEquippedSkillCards();
 
-	if (const auto roomSessionPlayer = m_player.lock(); player != nullptr)
+	switch (player->getPlayer()->getEquipmentManager()->getEquippedBooster())
 	{
-		switch (roomSessionPlayer->getPlayer()->getEquipmentManager()->getEquippedBooster())
-		{
-		case BOOSTER_CBOOST:
-			m_skillGaugeBoostPercentage = 0.10;
-			break;
-		case BOOSTER_CBOOST_2:
-			m_skillGaugeBoostPercentage = 0.50;
-			break;
-		default:
-			m_skillGaugeBoostPercentage = 0.00;
-			break;
-		}
+	case BOOSTER_CBOOST:
+		m_skillGaugeBoostPercentage = 0.10;
+		break;
+	case BOOSTER_CBOOST_2:
+		m_skillGaugeBoostPercentage = 0.50;
+		break;
+	default:
+		m_skillGaugeBoostPercentage = 0.00;
+		break;
 	}
-
-	resetSkillPoints();
 }
 
 void PlayerSkillManager::tick()
