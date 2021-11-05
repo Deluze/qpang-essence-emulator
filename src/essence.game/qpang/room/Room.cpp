@@ -426,8 +426,10 @@ void Room::setTeamSorting(const bool teamSorting)
 	update(CGRoom::Command::TEAM_ROOM, teamSorting);
 }
 
+// TODO: Rename to "areSkillsEnabled"
 bool Room::isSkillsEnabled() const
 {
+	// TODO: Rename to "m_areSkillsEnabled"
 	return m_isSkillsEnabled;
 }
 
