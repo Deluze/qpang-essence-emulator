@@ -20,7 +20,7 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 
 	m_player = player;
 
-	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ? AND period > 0");
+	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ? AND period > 0 ORDER BY id");
 	stmt->bindInteger(playerId);
 	StatementResult::Ptr res = stmt->fetch();
 
@@ -45,11 +45,16 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 		};
 
 		if (card.isOpened)
+		{
 			m_cards[card.id] = card;
+		}
 		else
+		{
 			m_gifts[card.id] = card;
+		}
 
-		if (card.type == 70 && card.periodType != 1 && card.isActive) // is function card, and is either rounds/days so we can equip it
+		// Must be a function card, period can not be 1 and card must be active.
+		if (card.type == 70 && card.periodType != 1 && card.isActive)
 		{
 			functionCardIds.push_back(card.id);
 		}
@@ -240,8 +245,14 @@ void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
 		return;
 	}
 
+	// Skillcards do not get handled here.
+	if (card.type == 75)
+	{
+		return;
+	}
+
 	// Rounds or uses.
-	if (periodType == 3 || periodType == 1)
+	if (periodType == 3)
 	{
 		if (card.period > 0)
 		{
@@ -255,7 +266,7 @@ void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
 
 	if (periodType != 254)
 	{
-		DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = IF(period_type = 3 OR period_type = 1, period - 1, period - ?) "\
+		DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = IF(period_type = 3, period - 1, period - ?) "\
 			"WHERE id = ?"
 			, {
 				period,
@@ -273,11 +284,6 @@ void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
 		{
 			card.isActive = false;
 			player->getEquipmentManager()->removeFunctionCard(cardId);
-		}
-		else if (card.type == 75)
-		{
-			card.isActive = false;
-			player->getEquipmentManager()->removeSkillCard(cardId);
 		}
 	}
 }
