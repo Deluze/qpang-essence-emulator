@@ -12,12 +12,13 @@ class RoomSessionPlayer;
 class RoomSessionSkillManager
 {
 public:
-	void initialize(std::shared_ptr<RoomSession> room);
+	void initialize(const std::shared_ptr<RoomSession>& roomSession);
+	std::shared_ptr<Skill> getSkillByItemId(const uint32_t itemId);
 
 	std::shared_ptr<Skill> generateRandomSkill();
 
-	bool isValidSkill(uint32_t itemId);
+	bool isValidSkillForGameMode(uint32_t itemId);
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
-	std::vector<std::function<std::unique_ptr<Skill>()>> m_skills;
+	std::vector<std::function<std::unique_ptr<Skill>()>> m_skillsForGameMode;
 };

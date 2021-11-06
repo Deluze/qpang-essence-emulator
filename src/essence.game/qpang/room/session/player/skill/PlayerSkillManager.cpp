@@ -12,19 +12,82 @@
 void PlayerSkillManager::initialize(const std::shared_ptr<RoomSessionPlayer>& player)
 {
 	m_player = player;
-	m_equippedSkillCards = player->getPlayer()->getEquipmentManager()->getEquippedSkillCards();
 
-	switch (player->getPlayer()->getEquipmentManager()->getEquippedBooster())
+	setupEquippedSkillCards();
+	initializeSkillGaugeBoosters();
+}
+
+void PlayerSkillManager::setupEquippedSkillCards()
+{
+	if (const auto roomSessionPlayer = m_player.lock(); roomSessionPlayer != nullptr)
 	{
-	case BOOSTER_CBOOST:
-		m_skillGaugeBoostPercentage = 0.10;
-		break;
-	case BOOSTER_CBOOST_2:
-		m_skillGaugeBoostPercentage = 0.50;
-		break;
-	default:
-		m_skillGaugeBoostPercentage = 0.00;
-		break;
+		const auto player = roomSessionPlayer->getPlayer();
+		const auto equippedSkillCardIds = player->getEquipmentManager()->getEquippedSkillCardIds();
+
+		for (size_t i = 0; i < equippedSkillCardIds.size() && i < 3; i++)
+		{
+			const auto cardId = equippedSkillCardIds[i];
+
+			if (cardId == 0)
+			{
+				continue;
+			}
+
+			const auto [id, playerOwnerId, itemId, type, periodType, period, isActive, isOpened, isGiftable, boostLevel,
+				timeCreated] = player->getInventoryManager()->get(cardId);
+
+			if (i == 0)
+			{
+				m_firstSkillCard = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
+
+				if (m_firstSkillCard != nullptr)
+				{
+					m_firstSkillCard->setUsesLeftCount(period);
+					m_firstSkillCard->bind(roomSessionPlayer);
+				}
+
+			}
+			else if (i == 1)
+			{
+				m_secondSkillCard = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
+
+				if (m_secondSkillCard != nullptr)
+				{
+					m_secondSkillCard->setUsesLeftCount(period);
+					m_secondSkillCard->bind(roomSessionPlayer);
+				}
+
+			}
+			else if (i == 2)
+			{
+				m_thirdSkillCard = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
+
+				if (m_thirdSkillCard != nullptr)
+				{
+					m_thirdSkillCard->setUsesLeftCount(period);
+					m_thirdSkillCard->bind(roomSessionPlayer);
+				}
+			}
+		}
+	}
+}
+
+void PlayerSkillManager::initializeSkillGaugeBoosters()
+{
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		switch (player->getPlayer()->getEquipmentManager()->getEquippedBooster())
+		{
+		case BOOSTER_CBOOST:
+			m_skillGaugeBoostPercentage = 0.10;
+			break;
+		case BOOSTER_CBOOST_2:
+			m_skillGaugeBoostPercentage = 0.50;
+			break;
+		default:
+			m_skillGaugeBoostPercentage = 0.00;
+			break;
+		}
 	}
 }
 
@@ -44,19 +107,15 @@ void PlayerSkillManager::tick()
 	}
 }
 
-void PlayerSkillManager::activateSkillCard(const uint32_t targetPlayerId, const uint64_t seqId)
+void PlayerSkillManager::activateSkillCard(const std::shared_ptr<Skill>& skill, const uint32_t targetPlayerId,
+	const uint64_t seqId, const uint32_t cardType)
 {
-	if (!hasSufficientSkillPoints())
-	{
-		failSkillCard(targetPlayerId, seqId);
-
-		return;
-	}
-
-	m_activeSkillCard = m_drawnSkillCard;
+	m_activeSkillCard = skill;
 
 	m_activeSkillCardTargetPlayerId = targetPlayerId;
 	m_activeSkillCardSeqId = seqId;
+
+	m_cardType = cardType;
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
@@ -84,9 +143,13 @@ void PlayerSkillManager::activateSkillCard(const uint32_t targetPlayerId, const 
 			}
 		}
 
-		roomSession->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::ACTIVATE_CARD, CGCard::DRAWN_SKILL_CARD, itemId, seqId, m_skillTargetPlayerIds);
+		skill->use();
 
-		removeSkillPoints(getRequiredSkillPoints());
+		const auto usesLeftCount = skill->getUsesLeftCount();
+
+		roomSession->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::ACTIVATE_CARD, cardType, itemId, seqId, usesLeftCount, m_skillTargetPlayerIds);
+
+		removeSkillPoints(getRequiredSkillPoints(skill));
 
 		player->getSkillManager()->getActiveSkillCard()->onApply();
 	}
@@ -104,11 +167,12 @@ void PlayerSkillManager::deactivateSkillCard()
 		const auto playerId = player->getPlayer()->getId();
 		const auto itemId = m_activeSkillCard->getItemId();
 
-		player->getRoomSession()->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::DEACTIVATE_CARD, CGCard::DRAWN_SKILL_CARD, itemId, m_activeSkillCardSeqId, m_skillTargetPlayerIds);
+		player->getRoomSession()->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::DEACTIVATE_CARD, m_cardType, itemId, m_activeSkillCardSeqId, m_skillTargetPlayerIds);
 		player->getSkillManager()->getActiveSkillCard()->onWearOff();
 	}
 
-	m_drawnSkillCard = nullptr;
+	//m_drawnSkillCard = nullptr;
+	m_cardType = 0;
 	m_activeSkillCard = nullptr;
 
 	m_activeSkillCardTargetPlayerId = 0;
@@ -119,21 +183,37 @@ void PlayerSkillManager::deactivateSkillCard()
 	updateSkillPointsForPlayer();
 }
 
-void PlayerSkillManager::failSkillCard(const uint32_t targetPlayerId, const uint64_t seqId)
+void PlayerSkillManager::failSkillCard(const std::shared_ptr<Skill>& skill, const uint32_t targetPlayerId,
+	const uint64_t seqId, const uint32_t cardType)
 {
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
 		const auto playerId = player->getPlayer()->getId();
-		const auto itemId = m_drawnSkillCard->getItemId();
+		const auto itemId = skill->getItemId();
 
-		player->getRoomSession()->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::FAIL_CARD_ACTIVATION, CGCard::DRAWN_SKILL_CARD, itemId, seqId);
+		skill->use();
 
-		const auto requiredSkillPoints = getRequiredSkillPoints();
+		const auto usesLeftCount = skill->getUsesLeftCount();
 
-		removeSkillPoints(requiredSkillPoints);
+		player->getRoomSession()->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::FAIL_CARD_ACTIVATION, cardType, itemId, seqId, usesLeftCount);
 
-		m_drawnSkillCard = nullptr;
+		removeSkillPoints(getRequiredSkillPoints(skill));
+
+		if (usesLeftCount == 0)
+		{
+			//skill = nullptr;
+		}
 	}
+}
+
+bool PlayerSkillManager::isDrawnOrEquippedSkillCard(const uint32_t itemId) const
+{
+	const auto isDrawnSkillCard = (m_drawnSkillCard != nullptr) && (m_drawnSkillCard->getItemId() == itemId);
+	const auto isEquippedSkillCard = (m_firstSkillCard != nullptr && m_firstSkillCard->getItemId() == itemId)
+		|| (m_secondSkillCard != nullptr && m_secondSkillCard->getItemId() == itemId)
+		|| (m_thirdSkillCard != nullptr && m_thirdSkillCard->getItemId() == itemId);
+
+	return (isDrawnSkillCard || isEquippedSkillCard);
 }
 
 void PlayerSkillManager::updateSkillPointsForPlayer() const
@@ -206,6 +286,29 @@ std::shared_ptr<Skill> PlayerSkillManager::getDrawnSkillCard() const
 	return m_drawnSkillCard;
 }
 
+std::shared_ptr<Skill> PlayerSkillManager::getEquippedSkillCard(const uint64_t seqId) const
+{
+	for (const auto& skillCard : { m_firstSkillCard, m_secondSkillCard, m_thirdSkillCard })
+	{
+		if (skillCard != nullptr && skillCard->getItemId() == seqId)
+		{
+			return skillCard;
+		}
+	}
+
+	return nullptr;
+}
+
+std::array<std::shared_ptr<Skill>, 3> PlayerSkillManager::getEquippedSkillCards() const
+{
+	std::array<std::shared_ptr<Skill>, 3> skillCards = {};
+
+	skillCards[0] = m_firstSkillCard;
+	skillCards[1] = m_secondSkillCard;
+	skillCards[2] = m_thirdSkillCard;
+
+	return skillCards;
+}
 
 uint32_t PlayerSkillManager::getActiveSkillCardTargetPlayerId() const
 {
@@ -217,27 +320,21 @@ uint64_t PlayerSkillManager::getActiveSkillCardSeqId() const
 	return m_activeSkillCardSeqId;
 }
 
-uint32_t PlayerSkillManager::getRequiredSkillPoints() const
+uint32_t PlayerSkillManager::getRequiredSkillPoints(const std::shared_ptr<Skill>& skill)
 {
-	if (m_drawnSkillCard == nullptr)
-	{
-		return std::numeric_limits<unsigned int>::max();
-	}
-
-	return (m_drawnSkillCard->getSkillPointCost() * 100);
+	return (skill != nullptr)
+		? (skill->getSkillPointCost() * 100)
+		: std::numeric_limits<unsigned int>::max();
 }
-
 
 double PlayerSkillManager::getSkillGaugeBoostPercentage() const
 {
 	return m_skillGaugeBoostPercentage;
 }
 
-bool PlayerSkillManager::hasSufficientSkillPoints() const
+bool PlayerSkillManager::hasSufficientSkillPoints(const std::shared_ptr<Skill>& skill) const
 {
-	const auto requiredSkillPoints = getRequiredSkillPoints();
-
-	return (m_skillPoints >= requiredSkillPoints);
+	return (m_skillPoints >= getRequiredSkillPoints(skill));
 }
 
 bool PlayerSkillManager::hasActiveSkillCard() const

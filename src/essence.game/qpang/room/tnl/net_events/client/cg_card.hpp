@@ -42,9 +42,6 @@ public:
 
 	void handle(GameConnection* conn, const Player::Ptr player)
 	{
-		std::cout << "CGCard::handle >> Handling card for player " << uid << " (CMD: " << cmd << ", CardType: " << cardType << ")" << std::endl;
-		std::cout << "CGCard::handle >> Information PlayerId " << uid << ", TargetId: " << targetUid << ", ItemId: " << itemId << ", SeqId: " << seqId << std::endl;
-
 		const auto roomPlayer = player->getRoomPlayer();
 
 		if (roomPlayer == nullptr)
@@ -74,91 +71,100 @@ public:
 
 	void handleSkillCard(const std::shared_ptr<RoomPlayer>& roomPlayer, const std::shared_ptr<RoomSession>& roomSession) const
 	{
-		/*const auto isSkillValid = roomSession->getSkillManager()->isValidSkill(itemId);
-		const auto areSkillsEnabled = roomPlayer->getRoom()->isSkillsEnabled();
-
-		if (!areSkillsEnabled || !isSkillValid)
+		if (const auto areSkillsEnabled = roomPlayer->getRoom()->isSkillsEnabled(); !areSkillsEnabled)
 		{
 			return;
-		}*/
+		}
 
 		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
 
-		if (roomSessionPlayer == nullptr)
+		if (roomSessionPlayer == nullptr || roomSessionPlayer->isDead() || cmd != ACTIVATE_CARD)
 		{
 			return;
 		}
 
-		if (cmd == ACTIVATE_CARD)
+		// Check if player already has a skillcard activated.
+		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
 		{
-			if (roomSessionPlayer->isDead())
+			return;
+		}
+
+		const auto isValidSkillForGameMode = roomSession->getSkillManager()->isValidSkillForGameMode(itemId);
+		const auto isDrawnOrEquippedSkillCard = roomSessionPlayer->getSkillManager()->isDrawnOrEquippedSkillCard(itemId);
+
+		if (!isValidSkillForGameMode || !isDrawnOrEquippedSkillCard)
+		{
+			return;
+		}
+
+		const auto& skill =
+			(cardType == INVENTORY_SKILL_CARD) ? roomSessionPlayer->getSkillManager()->getEquippedSkillCard(seqId) :
+			(cardType == DRAWN_SKILL_CARD) ? roomSessionPlayer->getSkillManager()->getDrawnSkillCard() :
+			nullptr;
+
+		if (skill == nullptr)
+		{
+			return;
+		}
+
+		// Check if player has sufficient skill points.
+		if (!roomSessionPlayer->getSkillManager()->hasSufficientSkillPoints(skill))
+		{
+			return;
+		}
+
+		if (!skill->hasUsesLeft())
+		{
+			return;
+		}
+
+		if (roomSessionPlayer->getWeaponManager()->hasEquippedMachineGun())
+		{
+			roomSessionPlayer->getSkillManager()->failSkillCard(skill, targetUid, seqId, cardType);
+
+			return;
+		}
+
+		const auto skillTargetPlayer = roomSession->find(targetUid);
+
+		if (skillTargetPlayer == nullptr)
+		{
+			roomSessionPlayer->getSkillManager()->failSkillCard(skill, targetUid, seqId, cardType);
+
+			return;
+		}
+
+		if (skillTargetPlayer->getWeaponManager()->hasEquippedMachineGun())
+		{
+			roomSessionPlayer->getSkillManager()->failSkillCard(skill, targetUid, seqId, cardType);
+
+			return;
+		}
+
+		if (skillTargetPlayer->getSkillManager()->hasActiveSkillCard())
+		{
+			const auto skillTargetPlayerActiveSkillCard = skillTargetPlayer->getSkillManager()->getActiveSkillCard();
+
+			// TODO: For now, we disallow any skills from being casted on an enemy that has a rainbow skillcard active.
+			if (skillTargetPlayerActiveSkillCard->getSkillRateType() == SkillRateType::RAINBOW)
 			{
+				roomSessionPlayer->getSkillManager()->failSkillCard(skill, targetUid, seqId, cardType);
+
 				return;
 			}
 
-			// In other words, is the skill the player wants to activate also the skill that they have drawn.
-			// If a player attempts to activate their skillcard whilst they already have a skillcard active, something isn't right.
-			//const auto isDrawnSkillCard = roomSessionPlayer->getSkillManager()->isDrawnSkillCard(itemId);
+			if (skillTargetPlayerActiveSkillCard->shouldReflectSkillCard() && skill->isReflectableSkillCard()
+				&& skill->getSkillTargetType() == SkillTargetType::ENEMY)
+			{
+				const auto targetPlayerId = roomSessionPlayer->getPlayer()->getId();
 
-			//if (const auto playerHasActiveSkillCard = roomSessionPlayer->getSkillManager()->hasActiveSkillCard(); !isDrawnSkillCard || playerHasActiveSkillCard)
-			//{
-			//	return;
-			//}
+				roomSessionPlayer->getSkillManager()->activateSkillCard(skill, targetPlayerId, seqId, cardType);
 
-			//const auto drawnSkillCard = roomSessionPlayer->getSkillManager()->getDrawnSkillCard();
-
-			//if (const auto skillTarget = roomSessionPlayer->getSkillManager()->getDrawnSkillCard()->getSkillTargetType(); skillTarget != SkillTargetType::SELF)
-			//{
-			//	const auto targetPlayer = roomSession->find(targetUid);
-
-			//	if (targetPlayer == nullptr)
-			//	{
-			//		roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
-
-			//		return;
-			//	}
-
-			//	if (targetPlayer->getWeaponManager()->hasEquippedMachineGun())
-			//	{
-			//		roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
-
-			//		return;
-			//	}
-
-			//	const auto targetPlayerHasActiveSkillCard = targetPlayer->getSkillManager()->hasActiveSkillCard();
-			//	const auto targetPlayerActiveSkillCard = targetPlayer->getSkillManager()->getActiveSkillCard();
-
-			//	if (targetPlayerHasActiveSkillCard && targetPlayerActiveSkillCard->getSkillRateType() == SkillRateType::RAINBOW)
-			//	{
-			//		roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
-
-			//		return;
-			//	}
-
-			//	if (const auto targetPlayershouldReflectSkillCard = targetPlayerHasActiveSkillCard
-			//		&& targetPlayerActiveSkillCard->shouldReflectSkillCard(); targetPlayershouldReflectSkillCard
-			//		&& (skillTarget == SkillTargetType::ENEMY) && drawnSkillCard->isReflectableSkillCard())
-			//	{
-			//		roomSessionPlayer->getSkillManager()->activateSkillCard(roomSessionPlayer->getPlayer()->getId(), seqId);
-			//		return;
-			//	}
-
-			//	// TODO: Quality checks to ensure the target player matches the skillcard target type.
-			//}
-
-			//if (roomSessionPlayer->getWeaponManager()->hasEquippedMachineGun())
-			//{
-			//	roomSessionPlayer->getSkillManager()->failSkillCard(targetUid, seqId);
-
-			//	return;
-			//}
-
-			//roomSessionPlayer->getSkillManager()->activateSkillCard(targetUid, seqId);
-			roomSession->relayPlaying<GCCard>(roomSessionPlayer->getPlayer()->getId(), targetUid, 4, cardType, itemId, seqId, std::vector<uint32_t>{});
-			roomSessionPlayer->getSkillManager()->addSkillPoints(0);
-
-			return;
+				return;
+			}
 		}
+
+		roomSessionPlayer->getSkillManager()->activateSkillCard(skill, targetUid, seqId, cardType);
 	}
 
 	void handleActionCard(const Player::Ptr& player, const std::shared_ptr<RoomPlayer>& roomPlayer, const std::shared_ptr<RoomSession>& roomSession) const
