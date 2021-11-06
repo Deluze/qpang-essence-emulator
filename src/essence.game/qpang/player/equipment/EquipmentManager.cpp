@@ -171,6 +171,11 @@ std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 	return skillCards;
 }
 
+std::vector<uint64_t> EquipmentManager::getEquippedSkillCardIds() const
+{
+	return m_skillCardIds;
+}
+
 void EquipmentManager::removeFunctionCard(uint64_t cardId)
 {
 	std::lock_guard g(m_functionCardMx);

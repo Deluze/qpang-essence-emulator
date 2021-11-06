@@ -24,6 +24,7 @@ public:
 	std::array<uint32_t, 4> getWeaponItemIdsByCharacter(uint16_t characterId);
 	std::array<uint64_t, 4> getWeaponsByCharacter(uint16_t characterId);
 	std::array<InventoryCard, 3> getEquippedSkillCards();
+	std::vector<uint64_t> getEquippedSkillCardIds() const;
 
 	void removeFunctionCard(uint64_t cardId);
 	void removeSkillCard(uint64_t cardId);
