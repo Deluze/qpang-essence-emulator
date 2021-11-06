@@ -28,6 +28,8 @@ public:
 
 	void onWearOff() override
 	{
+		Skill::onWearOff();
+
 		if (!m_player->isDead())
 		{
 			m_player->setHealth(m_player->getDefaultHealth(), true);

@@ -22,6 +22,16 @@ public:
 		m_player->setHealth((currentHealth + bonusHealth), true);
 	}
 
+	void onWearOff() override
+	{
+		Skill::onWearOff();
+
+		if (!m_player->isDead())
+		{
+			m_player->setHealth(m_player->getDefaultHealth(), true);
+		}
+	}
+
 	uint32_t getSkillPointCost() override
 	{
 		return 2;

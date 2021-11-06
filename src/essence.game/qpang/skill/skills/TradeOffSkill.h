@@ -14,6 +14,8 @@ public:
 
 	void onApply() override
 	{
+		Skill::onApply();
+
 		m_player->getSkillManager()->resetSkillPoints();
 
 		const auto myTeam = m_player->getTeam();
