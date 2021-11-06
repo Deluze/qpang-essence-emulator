@@ -94,6 +94,9 @@ public:
 
 		if (!isValidSkillForGameMode || !isDrawnOrEquippedSkillCard)
 		{
+			roomSessionPlayer->send<GCCard>(uid, targetUid, DENY_CARD_ACTIVATION, cardType, itemId, seqId);
+			roomSessionPlayer->getSkillManager()->updateSkillPointsForPlayer();
+
 			return;
 		}
 
