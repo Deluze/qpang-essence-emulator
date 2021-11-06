@@ -23,6 +23,7 @@ public:
 	void setCardActive(const uint64_t cardId, bool isActive = true);
 	bool addCard(const InventoryCard& card);
 	void storeCard(InventoryCard& card);
+	void useSkillCard(uint64_t cardId, uint16_t period);
 	void useCard(const uint64_t cardId, const uint32_t period = 0);
 	bool isExpired(const uint64_t cardId);
 	bool hasSpace();

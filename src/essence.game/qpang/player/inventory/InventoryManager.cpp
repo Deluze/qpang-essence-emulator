@@ -20,7 +20,7 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 
 	m_player = player;
 
-	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ? AND period > 0 ORDER BY id");
+	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ? ORDER BY time");
 	stmt->bindInteger(playerId);
 	StatementResult::Ptr res = stmt->fetch();
 
@@ -216,6 +216,53 @@ void InventoryManager::storeCard(InventoryCard& card)
 	card.playerOwnerId = player->getId();
 
 	addCard(card);
+}
+
+void InventoryManager::useSkillCard(const uint64_t cardId, const uint16_t period)
+{
+	std::lock_guard lg(m_mx);
+
+	const auto player = m_player.lock();
+
+	if (player == nullptr)
+	{
+		return;
+	}
+
+	const auto it = m_cards.find(cardId);
+
+	if (it == m_cards.cend())
+	{
+		return;
+	}
+
+	auto& card = it->second;
+
+	if (card.periodType == 254)
+	{
+		return;
+	}
+
+	if (card.type != 75 || card.periodType != 1)
+	{
+		return;
+	}
+
+	card.period = period;
+
+	if (card.period <= 0)
+	{
+		card.isActive = false;
+
+		player->getEquipmentManager()->removeSkillCard(cardId);
+	}
+
+	DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = ?, active = ? WHERE id = ?",
+		{
+			card.period,
+			card.isActive,
+			card.id
+		});
 }
 
 void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
