@@ -2,6 +2,7 @@
 
 #include "cc_user_info.hpp"
 #include "ConfigManager.h"
+#include "UpdateSkillSetResponse.h"
 
 #include "packets/lobby/outgoing/account/UpdateAccount.h"
 
@@ -120,9 +121,10 @@ void RoomSessionPlayer::tick()
 	{
 		start();
 
-		if (m_roomSession->getRoom()->isSkillsEnabled())
+		if (m_roomSession->getRoom()->isSkillsEnabled() && !m_isSpectating)
 		{
 			post(new CCUserInfo(shared_from_this()));
+
 			getSkillManager()->resetSkillPoints();
 		}
 
@@ -167,6 +169,20 @@ void RoomSessionPlayer::stop()
 
 	const auto curr = shared_from_this();
 
+	const auto equippedInventorySkillCards = player->getEquipmentManager()->getEquippedSkillCards();
+	const auto equippedInGameSkillCards = curr->getSkillManager()->getEquippedSkillCards();
+
+	for (size_t i = 0; i < equippedInventorySkillCards.size(); i++)
+	{
+		const auto& equippedInventorySkillCard = equippedInventorySkillCards[i];
+		const auto& equippedInGameSkillCard = equippedInGameSkillCards[i];
+
+		if (equippedInGameSkillCard != nullptr)
+		{
+			curr->getPlayer()->getInventoryManager()->useSkillCard(equippedInventorySkillCard.id, equippedInGameSkillCard->getUsesLeftCount());
+		}
+	}
+
 	player->getEquipmentManager()->finishRound(curr);
 	player->getStatsManager()->apply(curr);
 
@@ -176,6 +192,7 @@ void RoomSessionPlayer::stop()
 	player->update();
 
 	player->send(UpdateAccount(player));
+	player->send(UpdateSkillSetResponse(player->getEquipmentManager()->getEquippedSkillCards()));
 }
 
 bool RoomSessionPlayer::canStart()

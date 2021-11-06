@@ -1,7 +1,6 @@
 #include "RoomSession.h"
 
 #include <numeric>
-#include <chrono>
 
 #include "ConfigManager.h"
 
@@ -14,6 +13,8 @@
 #include "qpang/room/tnl/net_events/server/gc_weapon.hpp"
 #include "qpang/room/tnl/net_events/server/gc_hit_essence.hpp"
 #include <utils/StringConverter.h>
+
+#include "UpdateSkillSetResponse.h"
 
 constexpr auto TAG_BASE_HEALTH = 500;
 
@@ -155,6 +156,22 @@ bool RoomSession::removePlayer(uint32_t playerId)
 	{
 		resetCurrentlySelectedTag();
 	}
+
+	const auto equippedInventorySkillCards = player->getPlayer()->getEquipmentManager()->getEquippedSkillCards();
+	const auto equippedInGameSkillCards = player->getSkillManager()->getEquippedSkillCards();
+
+	for (size_t i = 0; i < equippedInventorySkillCards.size(); i++)
+	{
+		const auto& equippedInventorySkillCard = equippedInventorySkillCards[i];
+		const auto& equippedInGameSkillCard = equippedInGameSkillCards[i];
+
+		if (equippedInGameSkillCard != nullptr)
+		{
+			player->getPlayer()->getInventoryManager()->useSkillCard(equippedInventorySkillCard.id, equippedInGameSkillCard->getUsesLeftCount());
+		}
+	}
+
+	player->getPlayer()->send(UpdateSkillSetResponse(player->getPlayer()->getEquipmentManager()->getEquippedSkillCards()));
 
 	m_players.erase(it);
 	m_playerMx.unlock();
