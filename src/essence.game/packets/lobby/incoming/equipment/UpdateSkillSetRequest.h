@@ -1,52 +1,68 @@
 #pragma once
 
+#include "EquippedSkillCards.h"
+#include "Inventory.h"
 #include "UpdateSkillSetResponse.h"
 #include "core/communication/packet/PacketEvent.h"
+
+auto constexpr CARD_DATA_LENGTH = 43;
+auto constexpr SKILL_CARDS_PER_SET = 3;
 
 class UpdateSkillSetRequest final : public PacketEvent
 {
 public:
-	// TODO: Rewrite this so we do not deactivate ALL skillcards but only the one that has changed.
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto player = conn->getPlayer();
 
-		unequipSkillSet(player);
+		std::vector<uint64_t> incomingCardIds{};
 
-		std::vector<uint64_t> skillCardIds{};
-
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < SKILL_CARDS_PER_SET; i++)
 		{
-			if (const auto cardId = packet.readLong(); cardId != 0)
+			const auto incomingCardId = packet.readLong();
+
+			packet.readEmpty(CARD_DATA_LENGTH - 8);
+
+			if (!player->getInventoryManager()->hasCard(incomingCardId))
 			{
-				skillCardIds.push_back(cardId);
+				continue;
 			}
 
-			packet.readEmpty(35);
+			const auto incomingCard = player->getInventoryManager()->get(incomingCardId);
+
+			bool hasCardId = false;
+
+			for (const auto cardId : incomingCardIds)
+			{
+				if (const auto card = player->getInventoryManager()->get(cardId); (card.itemId == incomingCard.itemId))
+				{
+					hasCardId = true;
+
+					break;
+				}
+			}
+
+			if (!hasCardId)
+			{
+				incomingCardIds.push_back(incomingCardId);
+			}
 		}
 
-		player->getEquipmentManager()->setSkillCardIds(skillCardIds);
+		toggleActiveStateForInventoryCards(player, false);
 
-		equipSkillSet(player);
+		player->getEquipmentManager()->setSkillCardIds(incomingCardIds);
+
+		toggleActiveStateForInventoryCards(player, true);
 
 		conn->send(UpdateSkillSetResponse(player->getEquipmentManager()->getEquippedSkillCards()));
 	}
 private:
-	static void unequipSkillSet(const Player::Ptr& player)
+	static void toggleActiveStateForInventoryCards(const Player::Ptr& player, const bool isActive)
 	{
 		for (const auto& [id, playerOwnerId, itemId, type, periodType, period, isActive, isOpened, isGiftable,
 			boostLevel, timeCreated] : player->getEquipmentManager()->getEquippedSkillCards())
 		{
-			player->getInventoryManager()->setCardActive(id, false);
-		}
-	}
-
-	static void equipSkillSet(const Player::Ptr& player)
-	{
-		for (const auto& [id, playerOwnerId, itemId, type, periodType, period, isActive, isOpened, isGiftable,
-			boostLevel, timeCreated] : player->getEquipmentManager()->getEquippedSkillCards())
-		{
-			player->getInventoryManager()->setCardActive(id, true);
+			player->getInventoryManager()->setCardActive(id, isActive);
 		}
 	}
 };
