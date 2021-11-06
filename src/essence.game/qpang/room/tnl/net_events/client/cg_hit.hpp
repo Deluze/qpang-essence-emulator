@@ -206,15 +206,15 @@ public:
 				break;
 			}
 
-			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
+			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkill();
 
 			if (areSkillsEnabled)
 			{
 				const auto dstPlayerShouldReceiveReducedDamageFromAllSources = dstPlayerHasActiveSkill
-					&& dstPlayer->getSkillManager()->getActiveSkillCard()->shouldReceiveReducedDamageFromAllSources();
+					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldReceiveReducedDamageFromAllSources();
 
 				const auto dstPlayerShouldReceiveReducedDamageFromLaunchers = dstPlayerHasActiveSkill
-					&& dstPlayer->getSkillManager()->getActiveSkillCard()->shouldReceiveReducedDamageFromLaunchers();
+					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldReceiveReducedDamageFromLaunchers();
 
 				const auto weaponUsedIsLauncher = (weaponUsed.weaponType == LAUNCHER);
 
@@ -273,19 +273,19 @@ public:
 				srcPlayer->addDamageDealtToTag(damage);
 			}
 
-			if (areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkillCard())
+			if (areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkill())
 			{
-				if (const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkillCard()->shouldInstantlyKillEnemyWithMeleeWeapon();
+				if (const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkill()->shouldInstantlyKillEnemyWithMeleeWeapon();
 					srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == MELEE))
 				{
 					damage = 9999;
 
-					srcPlayer->getSkillManager()->deactivateSkillCard();
+					srcPlayer->getSkillManager()->deactivateSkill();
 				}
 			}
 
 			const auto dstPlayerShouldIgnoreDamageFromAllSources = dstPlayerHasActiveSkill &&
-				dstPlayer->getSkillManager()->getActiveSkillCard()->shouldIgnoreDamageFromAllSources();
+				dstPlayer->getSkillManager()->getActiveSkill()->shouldIgnoreDamageFromAllSources();
 
 			if (dstPlayerShouldIgnoreDamageFromAllSources)
 			{
@@ -316,9 +316,9 @@ public:
 
 		if (areSkillsEnabled && !isSameTeam)
 		{
-			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkillCard();
+			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkill();
 			const auto dstPlayerHasRainbowSkillCard = dstPlayerHasActiveSkill
-				&& dstPlayer->getSkillManager()->getActiveSkillCard()->getSkillRateType() == SkillRateType::RAINBOW;
+				&& dstPlayer->getSkillManager()->getActiveSkill()->getSkillRateType() == SkillRateType::RAINBOW;
 
 			const auto isValidWeapon = !isTrapWeapon
 				&& ((weaponUsed.weaponType == MELEE) || (weaponUsed.weaponType == RIFLE) || (weaponUsed.weaponType == LAUNCHER));
@@ -331,11 +331,11 @@ public:
 				dstPlayer->getSkillManager()->addSkillPoints(static_cast<uint32_t>(skillPointsToAdd + (skillPointsToAdd * skillGaugeBoostPercentage)));
 			}
 
-			if (dstPlayer->getSkillManager()->hasActiveSkillCard())
+			if (dstPlayer->getSkillManager()->hasActiveSkill())
 			{
-				if (dstPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnDamageReceive())
+				if (dstPlayer->getSkillManager()->getActiveSkill()->shouldDisableOnDamageReceive())
 				{
-					dstPlayer->getSkillManager()->deactivateSkillCard();
+					dstPlayer->getSkillManager()->deactivateSkill();
 				}
 			}
 		}

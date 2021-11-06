@@ -36,7 +36,7 @@ public:
 			enemyPlayer->getPlayer()->broadcast(u"Your skillpoints have been reduced by 1 due to the Trade Off skill.");
 		}
 
-		m_player->getSkillManager()->deactivateSkillCard();
+		m_player->getSkillManager()->deactivateSkill();
 	}
 
 	uint32_t getSkillPointCost() override

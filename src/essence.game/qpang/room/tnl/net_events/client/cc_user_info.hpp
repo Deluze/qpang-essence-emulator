@@ -25,7 +25,7 @@ public:
 		this->skillCard2 = equippedSkillCards[1].itemId;
 		this->skillCard3 = equippedSkillCards[2].itemId;
 
-		const auto activeSkillCard = roomSessionPlayer->getSkillManager()->getActiveSkillCard();
+		const auto activeSkillCard = roomSessionPlayer->getSkillManager()->getActiveSkill();
 		const auto activeSkillCardItemId = (activeSkillCard == nullptr) ? 0 : activeSkillCard->getItemId();
 
 		this->skillCard4 = activeSkillCardItemId;

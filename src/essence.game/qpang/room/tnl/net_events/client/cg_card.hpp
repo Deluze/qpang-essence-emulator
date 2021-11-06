@@ -84,13 +84,13 @@ public:
 		}
 
 		// Check if player already has a skillcard activated.
-		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
+		if (roomSessionPlayer->getSkillManager()->hasActiveSkill())
 		{
 			return;
 		}
 
 		const auto isValidSkillForGameMode = roomSession->getSkillManager()->isValidSkillForGameMode(itemId);
-		const auto isDrawnOrEquippedSkillCard = roomSessionPlayer->getSkillManager()->isDrawnOrEquippedSkillCard(itemId);
+		const auto isDrawnOrEquippedSkillCard = roomSessionPlayer->getSkillManager()->isDrawnOrEquippedSkill(itemId);
 
 		if (!isValidSkillForGameMode || !isDrawnOrEquippedSkillCard)
 		{
@@ -98,8 +98,8 @@ public:
 		}
 
 		const auto& skill =
-			(cardType == INVENTORY_SKILL_CARD) ? roomSessionPlayer->getSkillManager()->getEquippedSkillCard(seqId) :
-			(cardType == DRAWN_SKILL_CARD) ? roomSessionPlayer->getSkillManager()->getDrawnSkillCard() :
+			(cardType == INVENTORY_SKILL_CARD) ? roomSessionPlayer->getSkillManager()->getEquippedSkill(seqId) :
+			(cardType == DRAWN_SKILL_CARD) ? roomSessionPlayer->getSkillManager()->getDrawnSkill() :
 			nullptr;
 
 		if (skill == nullptr)
@@ -120,7 +120,7 @@ public:
 
 		if (roomSessionPlayer->getWeaponManager()->hasEquippedMachineGun())
 		{
-			roomSessionPlayer->getSkillManager()->failSkillCard(skill, targetUid, seqId, cardType);
+			roomSessionPlayer->getSkillManager()->failSkill(skill, targetUid, seqId, cardType);
 
 			return;
 		}
@@ -129,26 +129,26 @@ public:
 
 		if (skillTargetPlayer == nullptr)
 		{
-			roomSessionPlayer->getSkillManager()->failSkillCard(skill, targetUid, seqId, cardType);
+			roomSessionPlayer->getSkillManager()->failSkill(skill, targetUid, seqId, cardType);
 
 			return;
 		}
 
 		if (skillTargetPlayer->getWeaponManager()->hasEquippedMachineGun())
 		{
-			roomSessionPlayer->getSkillManager()->failSkillCard(skill, targetUid, seqId, cardType);
+			roomSessionPlayer->getSkillManager()->failSkill(skill, targetUid, seqId, cardType);
 
 			return;
 		}
 
-		if (skillTargetPlayer->getSkillManager()->hasActiveSkillCard())
+		if (skillTargetPlayer->getSkillManager()->hasActiveSkill())
 		{
-			const auto skillTargetPlayerActiveSkillCard = skillTargetPlayer->getSkillManager()->getActiveSkillCard();
+			const auto skillTargetPlayerActiveSkillCard = skillTargetPlayer->getSkillManager()->getActiveSkill();
 
 			// TODO: For now, we disallow any skills from being casted on an enemy that has a rainbow skillcard active.
 			if (skillTargetPlayerActiveSkillCard->getSkillRateType() == SkillRateType::RAINBOW)
 			{
-				roomSessionPlayer->getSkillManager()->failSkillCard(skill, targetUid, seqId, cardType);
+				roomSessionPlayer->getSkillManager()->failSkill(skill, targetUid, seqId, cardType);
 
 				return;
 			}
@@ -158,13 +158,13 @@ public:
 			{
 				const auto targetPlayerId = roomSessionPlayer->getPlayer()->getId();
 
-				roomSessionPlayer->getSkillManager()->activateSkillCard(skill, targetPlayerId, seqId, cardType);
+				roomSessionPlayer->getSkillManager()->activateSkill(skill, targetPlayerId, seqId, cardType);
 
 				return;
 			}
 		}
 
-		roomSessionPlayer->getSkillManager()->activateSkillCard(skill, targetUid, seqId, cardType);
+		roomSessionPlayer->getSkillManager()->activateSkill(skill, targetUid, seqId, cardType);
 	}
 
 	void handleActionCard(const Player::Ptr& player, const std::shared_ptr<RoomPlayer>& roomPlayer, const std::shared_ptr<RoomSession>& roomSession) const
@@ -201,9 +201,9 @@ public:
 		// TODO: Check if the player's character can actually perform the card action.
 		roomSession->relayPlaying<GCCard>(uid, targetUid, cmd, cardType, itemId, seqId);
 
-		if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
+		if (roomSessionPlayer->getSkillManager()->hasActiveSkill())
 		{
-			const auto shouldDisableOnRollAction = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->shouldDisableOnRollAction();
+			const auto shouldDisableOnRollAction = roomSessionPlayer->getSkillManager()->getActiveSkill()->shouldDisableOnRollAction();
 			const auto isRollAction = (itemId == ACTION_CARD_ROLL_OVER_LEFT)
 				|| (itemId == ACTION_CARD_ROLL_OVER_RIGHT)
 				|| (itemId == ACTION_CARD_DASH)
@@ -211,7 +211,7 @@ public:
 
 			if (shouldDisableOnRollAction && isRollAction)
 			{
-				roomSessionPlayer->getSkillManager()->deactivateSkillCard();
+				roomSessionPlayer->getSkillManager()->deactivateSkill();
 			}
 		}
 	}

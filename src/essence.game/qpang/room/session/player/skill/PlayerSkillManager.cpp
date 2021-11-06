@@ -38,34 +38,34 @@ void PlayerSkillManager::setupEquippedSkillCards()
 
 			if (i == 0)
 			{
-				m_firstSkillCard = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
+				m_firstSkill = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
 
-				if (m_firstSkillCard != nullptr)
+				if (m_firstSkill != nullptr)
 				{
-					m_firstSkillCard->setUsesLeftCount(period);
-					m_firstSkillCard->bind(roomSessionPlayer);
+					m_firstSkill->setUsesLeftCount(period);
+					m_firstSkill->bind(roomSessionPlayer);
 				}
 
 			}
 			else if (i == 1)
 			{
-				m_secondSkillCard = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
+				m_secondSkill = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
 
-				if (m_secondSkillCard != nullptr)
+				if (m_secondSkill != nullptr)
 				{
-					m_secondSkillCard->setUsesLeftCount(period);
-					m_secondSkillCard->bind(roomSessionPlayer);
+					m_secondSkill->setUsesLeftCount(period);
+					m_secondSkill->bind(roomSessionPlayer);
 				}
 
 			}
 			else if (i == 2)
 			{
-				m_thirdSkillCard = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
+				m_thirdSkill = roomSessionPlayer->getRoomSession()->getSkillManager()->getSkillByItemId(itemId);
 
-				if (m_thirdSkillCard != nullptr)
+				if (m_thirdSkill != nullptr)
 				{
-					m_thirdSkillCard->setUsesLeftCount(period);
-					m_thirdSkillCard->bind(roomSessionPlayer);
+					m_thirdSkill->setUsesLeftCount(period);
+					m_thirdSkill->bind(roomSessionPlayer);
 				}
 			}
 		}
@@ -93,29 +93,29 @@ void PlayerSkillManager::initializeSkillGaugeBoosters()
 
 void PlayerSkillManager::tick()
 {
-	if (hasActiveSkillCard() && m_activeSkillCard->hasDuration())
+	if (hasActiveSkill() && m_activeSkill->hasDuration())
 	{
-		if (m_activeSkillCard->getDuration() > 0)
+		if (m_activeSkill->getDuration() > 0)
 		{
-			m_activeSkillCard->tick();
+			m_activeSkill->tick();
 		}
 
-		if (m_activeSkillCard->getDuration() == 0)
+		if (m_activeSkill->getDuration() == 0)
 		{
-			deactivateSkillCard();
+			deactivateSkill();
 		}
 	}
 }
 
-void PlayerSkillManager::activateSkillCard(const std::shared_ptr<Skill>& skill, const uint32_t targetPlayerId,
+void PlayerSkillManager::activateSkill(const std::shared_ptr<Skill>& skill, const uint32_t targetPlayerId,
 	const uint64_t seqId, const uint32_t cardType)
 {
-	m_activeSkillCard = skill;
+	m_activeSkill = skill;
 
-	m_activeSkillCardTargetPlayerId = targetPlayerId;
-	m_activeSkillCardSeqId = seqId;
+	m_activeSkillTargetPlayerId = targetPlayerId;
+	m_activeSkillSeqId = seqId;
 
-	m_cardType = cardType;
+	m_activeSkillCardType = cardType;
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
@@ -127,9 +127,9 @@ void PlayerSkillManager::activateSkillCard(const std::shared_ptr<Skill>& skill, 
 		}
 
 		const auto playerId = player->getPlayer()->getId();
-		const auto itemId = m_activeSkillCard->getItemId();
+		const auto itemId = m_activeSkill->getItemId();
 
-		const auto skillTargetType = m_activeSkillCard->getSkillTargetType();
+		const auto skillTargetType = m_activeSkill->getSkillTargetType();
 
 		if (const uint8_t team =
 			(skillTargetType == SkillTargetType::ALLY_TEAM)
@@ -151,13 +151,13 @@ void PlayerSkillManager::activateSkillCard(const std::shared_ptr<Skill>& skill, 
 
 		removeSkillPoints(getRequiredSkillPoints(skill));
 
-		player->getSkillManager()->getActiveSkillCard()->onApply();
+		player->getSkillManager()->getActiveSkill()->onApply();
 	}
 }
 
-void PlayerSkillManager::deactivateSkillCard()
+void PlayerSkillManager::deactivateSkill()
 {
-	if (m_activeSkillCard == nullptr)
+	if (m_activeSkill == nullptr)
 	{
 		return;
 	}
@@ -165,25 +165,24 @@ void PlayerSkillManager::deactivateSkillCard()
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
 		const auto playerId = player->getPlayer()->getId();
-		const auto itemId = m_activeSkillCard->getItemId();
+		const auto itemId = m_activeSkill->getItemId();
 
-		player->getRoomSession()->relayPlaying<GCCard>(playerId, m_activeSkillCardTargetPlayerId, CGCard::DEACTIVATE_CARD, m_cardType, itemId, m_activeSkillCardSeqId, m_skillTargetPlayerIds);
-		player->getSkillManager()->getActiveSkillCard()->onWearOff();
+		player->getRoomSession()->relayPlaying<GCCard>(playerId, m_activeSkillTargetPlayerId, CGCard::DEACTIVATE_CARD, m_activeSkillCardType, itemId, m_activeSkillSeqId, m_skillTargetPlayerIds);
+		player->getSkillManager()->getActiveSkill()->onWearOff();
 	}
 
-	//m_drawnSkillCard = nullptr;
-	m_cardType = 0;
-	m_activeSkillCard = nullptr;
+	m_activeSkillCardType = 0;
+	m_activeSkill = nullptr;
 
-	m_activeSkillCardTargetPlayerId = 0;
-	m_activeSkillCardSeqId = 0;
+	m_activeSkillTargetPlayerId = 0;
+	m_activeSkillSeqId = 0;
 
 	m_skillTargetPlayerIds.clear();
 
 	updateSkillPointsForPlayer();
 }
 
-void PlayerSkillManager::failSkillCard(const std::shared_ptr<Skill>& skill, const uint32_t targetPlayerId,
+void PlayerSkillManager::failSkill(const std::shared_ptr<Skill>& skill, const uint32_t targetPlayerId,
 	const uint64_t seqId, const uint32_t cardType)
 {
 	if (const auto player = m_player.lock(); player != nullptr)
@@ -206,12 +205,12 @@ void PlayerSkillManager::failSkillCard(const std::shared_ptr<Skill>& skill, cons
 	}
 }
 
-bool PlayerSkillManager::isDrawnOrEquippedSkillCard(const uint32_t itemId) const
+bool PlayerSkillManager::isDrawnOrEquippedSkill(const uint32_t itemId) const
 {
-	const auto isDrawnSkillCard = (m_drawnSkillCard != nullptr) && (m_drawnSkillCard->getItemId() == itemId);
-	const auto isEquippedSkillCard = (m_firstSkillCard != nullptr && m_firstSkillCard->getItemId() == itemId)
-		|| (m_secondSkillCard != nullptr && m_secondSkillCard->getItemId() == itemId)
-		|| (m_thirdSkillCard != nullptr && m_thirdSkillCard->getItemId() == itemId);
+	const auto isDrawnSkillCard = (m_drawnSkill != nullptr) && (m_drawnSkill->getItemId() == itemId);
+	const auto isEquippedSkillCard = (m_firstSkill != nullptr && m_firstSkill->getItemId() == itemId)
+		|| (m_secondSkill != nullptr && m_secondSkill->getItemId() == itemId)
+		|| (m_thirdSkill != nullptr && m_thirdSkill->getItemId() == itemId);
 
 	return (isDrawnSkillCard || isEquippedSkillCard);
 }
@@ -261,34 +260,34 @@ uint32_t PlayerSkillManager::drawSkill()
 	{
 		std::unordered_map<uint32_t, uint32_t> skills;
 
-		m_drawnSkillCard = player->getRoomSession()->getSkillManager()->generateRandomSkill();
+		m_drawnSkill = player->getRoomSession()->getSkillManager()->generateRandomSkill();
 
-		if (m_drawnSkillCard == nullptr)
+		if (m_drawnSkill == nullptr)
 		{
 			return 0;
 		}
 
-		m_drawnSkillCard->bind(player);
+		m_drawnSkill->bind(player);
 
-		return m_drawnSkillCard->getItemId();
+		return m_drawnSkill->getItemId();
 	}
 
 	return 0;
 }
 
-std::shared_ptr<Skill> PlayerSkillManager::getActiveSkillCard() const
+std::shared_ptr<Skill> PlayerSkillManager::getActiveSkill() const
 {
-	return m_activeSkillCard;
+	return m_activeSkill;
 }
 
-std::shared_ptr<Skill> PlayerSkillManager::getDrawnSkillCard() const
+std::shared_ptr<Skill> PlayerSkillManager::getDrawnSkill() const
 {
-	return m_drawnSkillCard;
+	return m_drawnSkill;
 }
 
-std::shared_ptr<Skill> PlayerSkillManager::getEquippedSkillCard(const uint64_t seqId) const
+std::shared_ptr<Skill> PlayerSkillManager::getEquippedSkill(const uint64_t seqId) const
 {
-	for (const auto& skillCard : { m_firstSkillCard, m_secondSkillCard, m_thirdSkillCard })
+	for (const auto& skillCard : { m_firstSkill, m_secondSkill, m_thirdSkill })
 	{
 		if (skillCard != nullptr && skillCard->getItemId() == seqId)
 		{
@@ -299,25 +298,30 @@ std::shared_ptr<Skill> PlayerSkillManager::getEquippedSkillCard(const uint64_t s
 	return nullptr;
 }
 
-std::array<std::shared_ptr<Skill>, 3> PlayerSkillManager::getEquippedSkillCards() const
+std::array<std::shared_ptr<Skill>, 3> PlayerSkillManager::getEquippedSkills() const
 {
 	std::array<std::shared_ptr<Skill>, 3> skillCards = {};
 
-	skillCards[0] = m_firstSkillCard;
-	skillCards[1] = m_secondSkillCard;
-	skillCards[2] = m_thirdSkillCard;
+	skillCards[0] = m_firstSkill;
+	skillCards[1] = m_secondSkill;
+	skillCards[2] = m_thirdSkill;
 
 	return skillCards;
 }
 
-uint32_t PlayerSkillManager::getActiveSkillCardTargetPlayerId() const
+uint32_t PlayerSkillManager::getActiveSkillTargetPlayerId() const
 {
-	return m_activeSkillCardTargetPlayerId;
+	return m_activeSkillTargetPlayerId;
 }
 
-uint64_t PlayerSkillManager::getActiveSkillCardSeqId() const
+uint64_t PlayerSkillManager::getActiveSkillSeqId() const
 {
-	return m_activeSkillCardSeqId;
+	return m_activeSkillSeqId;
+}
+
+uint32_t PlayerSkillManager::getActiveSkillCardType()
+{
+	return m_activeSkillCardType;
 }
 
 uint32_t PlayerSkillManager::getRequiredSkillPoints(const std::shared_ptr<Skill>& skill)
@@ -337,14 +341,14 @@ bool PlayerSkillManager::hasSufficientSkillPoints(const std::shared_ptr<Skill>& 
 	return (m_skillPoints >= getRequiredSkillPoints(skill));
 }
 
-bool PlayerSkillManager::hasActiveSkillCard() const
+bool PlayerSkillManager::hasActiveSkill() const
 {
-	return  (m_activeSkillCard != nullptr);
+	return  (m_activeSkill != nullptr);
 }
 
-bool PlayerSkillManager::isDrawnSkillCard(const uint32_t itemId) const
+bool PlayerSkillManager::isDrawnSkill(const uint32_t itemId) const
 {
-	return (m_drawnSkillCard->getItemId() == itemId);
+	return (m_drawnSkill->getItemId() == itemId);
 }
 
 std::vector<uint32_t> PlayerSkillManager::getSkillTargetPlayerIds() const

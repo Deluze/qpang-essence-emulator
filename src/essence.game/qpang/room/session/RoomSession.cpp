@@ -134,9 +134,9 @@ bool RoomSession::removePlayer(uint32_t playerId)
 		player->getWeaponManager()->unequipMachineGun();
 	}
 
-	if (player->getSkillManager()->hasActiveSkillCard())
+	if (player->getSkillManager()->hasActiveSkill())
 	{
-		player->getSkillManager()->deactivateSkillCard();
+		player->getSkillManager()->deactivateSkill();
 	}
 
 	if (player == m_blueVip)
@@ -158,7 +158,7 @@ bool RoomSession::removePlayer(uint32_t playerId)
 	}
 
 	const auto equippedInventorySkillCards = player->getPlayer()->getEquipmentManager()->getEquippedSkillCards();
-	const auto equippedInGameSkillCards = player->getSkillManager()->getEquippedSkillCards();
+	const auto equippedInGameSkillCards = player->getSkillManager()->getEquippedSkills();
 
 	for (size_t i = 0; i < equippedInventorySkillCards.size(); i++)
 	{
@@ -393,9 +393,9 @@ void RoomSession::finish()
 			player->getWeaponManager()->unequipMachineGun();
 		}
 
-		if (player->getSkillManager()->hasActiveSkillCard())
+		if (player->getSkillManager()->hasActiveSkill())
 		{
-			player->getSkillManager()->deactivateSkillCard();
+			player->getSkillManager()->deactivateSkill();
 		}
 	}
 

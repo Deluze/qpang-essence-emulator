@@ -55,27 +55,29 @@ void GameMode::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 			session->post(new GCWeapon(playingPlayer->getPlayer()->getId(), CGWeapon::CMD::EQUIP_MACHINE_GUN, MACHINE_GUN_ITEM_ID, seqId));
 		}
 
-		if (const auto playingPlayerHasActiveSkillCard = playingPlayer->getSkillManager()->hasActiveSkillCard();
+		if (const auto playingPlayerHasActiveSkillCard = playingPlayer->getSkillManager()->hasActiveSkill();
 			areSkillsEnabled && playingPlayerHasActiveSkillCard)
 		{
-			const auto activeSkillCard = playingPlayer->getSkillManager()->getActiveSkillCard();
+			const auto activeSkillCard = playingPlayer->getSkillManager()->getActiveSkill();
 
-			const auto targetPlayerId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
+			const auto targetPlayerId = playingPlayer->getSkillManager()->getActiveSkillTargetPlayerId();
 
 			const auto itemId = activeSkillCard->getItemId();
-			const auto seqId = playingPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
+			const auto seqId = playingPlayer->getSkillManager()->getActiveSkillTargetPlayerId();
 
-			const auto skillCardTargetPlayerIds = playingPlayer->getSkillManager()->getSkillTargetPlayerIds();
+			const auto cardType = playingPlayer->getSkillManager()->getActiveSkillCardType();
+
+			const auto skillTargetPlayerIds = playingPlayer->getSkillManager()->getSkillTargetPlayerIds();
 
 			session->post(
 				new GCCard(
 					playingPlayer->getPlayer()->getId(),
 					targetPlayerId,
 					CGCard::Cmd::ACTIVATE_CARD,
-					CGCard::CardType::DRAWN_SKILL_CARD,
+					cardType,
 					itemId,
 					seqId,
-					skillCardTargetPlayerIds
+					skillTargetPlayerIds
 				)
 			);
 		}
@@ -98,10 +100,10 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 
 	const auto areSkillCardsEnabled = roomSession->getRoom()->isSkillsEnabled();
 
-	const auto killerHasActiveSkillCard = killer->getSkillManager()->hasActiveSkillCard();
+	const auto killerHasActiveSkillCard = killer->getSkillManager()->hasActiveSkill();
 
 	const auto killerPlayerHasRainbowSkillCard = areSkillCardsEnabled && killerHasActiveSkillCard
-		&& killer->getSkillManager()->getActiveSkillCard()->getSkillRateType() == SkillRateType::RAINBOW;
+		&& killer->getSkillManager()->getActiveSkill()->getSkillRateType() == SkillRateType::RAINBOW;
 
 	if (isSuicide && !isPublicEnemyMode)
 	{
@@ -123,7 +125,6 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 
 			player->addCash(cashCount);
 			player->broadcast(StringConverter::Utf8ToUtf16(buffer));
-
 
 			// give the player that died some love ;(
 
@@ -183,9 +184,9 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	target->resetStreak();
 	target->getEffectManager()->clear();
 
-	const auto targetHasActiveSkillCard = target->getSkillManager()->hasActiveSkillCard();
+	const auto targetHasActiveSkillCard = target->getSkillManager()->hasActiveSkill();
 	const auto targetShouldInstantlyRespawn = targetHasActiveSkillCard
-		&& target->getSkillManager()->getActiveSkillCard()->shouldInstantlyRespawnOnDeath();
+		&& target->getSkillManager()->getActiveSkill()->shouldInstantlyRespawnOnDeath();
 
 	target->startRespawnCooldown(!targetShouldInstantlyRespawn);
 
@@ -228,15 +229,15 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 		for (const auto& roomSessionPlayer : roomSession->getPlayingPlayers())
 		{
 			// Check if a player in the room has an active skillcard.
-			if (roomSessionPlayer->getSkillManager()->hasActiveSkillCard())
+			if (roomSessionPlayer->getSkillManager()->hasActiveSkill())
 			{
 				// Grab the skilltarget type.
-				const auto skillTargetType = roomSessionPlayer->getSkillManager()->getActiveSkillCard()->getSkillTargetType();
+				const auto skillTargetType = roomSessionPlayer->getSkillManager()->getActiveSkill()->getSkillTargetType();
 
-				if (const auto skillCardTargetPlayerId = roomSessionPlayer->getSkillManager()->getActiveSkillCardTargetPlayerId();
+				if (const auto skillCardTargetPlayerId = roomSessionPlayer->getSkillManager()->getActiveSkillTargetPlayerId();
 					(skillTargetType != SkillTargetType::ALLY_TEAM) && (skillCardTargetPlayerId == target->getPlayer()->getId()))
 				{
-					roomSessionPlayer->getSkillManager()->deactivateSkillCard();
+					roomSessionPlayer->getSkillManager()->deactivateSkill();
 				}
 			}
 		}

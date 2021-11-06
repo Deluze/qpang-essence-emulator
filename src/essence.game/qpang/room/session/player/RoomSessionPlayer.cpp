@@ -170,7 +170,7 @@ void RoomSessionPlayer::stop()
 	const auto curr = shared_from_this();
 
 	const auto equippedInventorySkillCards = player->getEquipmentManager()->getEquippedSkillCards();
-	const auto equippedInGameSkillCards = curr->getSkillManager()->getEquippedSkillCards();
+	const auto equippedInGameSkillCards = curr->getSkillManager()->getEquippedSkills();
 
 	for (size_t i = 0; i < equippedInventorySkillCards.size(); i++)
 	{

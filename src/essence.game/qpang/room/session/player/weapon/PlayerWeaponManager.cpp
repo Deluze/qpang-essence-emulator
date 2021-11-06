@@ -246,7 +246,7 @@ void PlayerWeaponManager::equipMachineGun(const uint64_t seqId)
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
-		if (player->getSkillManager()->hasActiveSkillCard())
+		if (player->getSkillManager()->hasActiveSkill())
 		{
 			return;
 		}
