@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "ItemId.h"
+
 #include "SkillRateType.h"
 #include "SkillTargetType.h"
 
@@ -14,7 +15,9 @@ class Skill  // NOLINT(cppcoreguidelines-special-member-functions)
 public:
 	explicit Skill(const bool hasDuration = false, const uint32_t duration = 0) :
 		m_hasDuration(hasDuration),
-		m_duration(duration)
+		m_duration(duration),
+		m_initialDuration(duration),
+		m_usesLeftCount(1)
 	{
 	}
 
@@ -23,6 +26,29 @@ public:
 	void bind(const std::shared_ptr<RoomSessionPlayer>& player)
 	{
 		m_player = player;
+	}
+
+	void use()
+	{
+		if (m_usesLeftCount > 0)
+		{
+			m_usesLeftCount -= 1;
+		}
+	}
+
+	void setUsesLeftCount(const uint32_t usesLeftCount)
+	{
+		m_usesLeftCount = usesLeftCount;
+	}
+
+	bool hasUsesLeft() const
+	{
+		return (m_usesLeftCount > 0);
+	}
+
+	uint32_t getUsesLeftCount() const
+	{
+		return m_usesLeftCount;
 	}
 
 	[[nodiscard]] bool hasDuration() const
@@ -54,6 +80,7 @@ public:
 
 	virtual void onWearOff()
 	{
+		m_duration = m_initialDuration;
 	}
 
 	virtual bool isReflectableSkillCard()
@@ -98,6 +125,7 @@ public:
 		return false;
 	}
 
+	// TODO: Refactor (rename).
 	virtual bool shouldReflectSkillCard()
 	{
 		return false;
@@ -124,7 +152,11 @@ public:
 	}
 protected:
 	bool m_hasDuration;
+
 	uint32_t m_duration;
+	uint32_t m_initialDuration;
+
+	uint32_t m_usesLeftCount;
 
 	std::shared_ptr<RoomSessionPlayer> m_player;
 };
