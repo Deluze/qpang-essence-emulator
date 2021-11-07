@@ -145,28 +145,38 @@ void InventoryManager::setCardActive(const uint64_t cardId, bool isActive)
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
-		auto equipmentManager = player->getEquipmentManager();
+		const auto equipmentManager = player->getEquipmentManager();
 
-		const auto it = m_cards.find(cardId);
+		const auto& it = m_cards.find(cardId);
 
 		if (it == m_cards.cend())
+		{
 			return;
-
-		auto card = it->second;
-		const auto alreadyHasSameFunctionCard = equipmentManager->hasFunctionCard(card.itemId);
-
-		if (isActive && !alreadyHasSameFunctionCard)
-		{
-			card.timeCreated = time(nullptr);
-			card.isActive = true;
-			equipmentManager->addFunctionCard(cardId);
-			player->send(EnableFunctionCard(card));
 		}
-		else if (!isActive && alreadyHasSameFunctionCard)
+
+		auto& card = it->second;
+
+		if (card.type == 70)
 		{
-			card.isActive = false;
-			equipmentManager->removeFunctionCard(cardId);
-			player->send(DisableFunctionCard(card));
+			const auto alreadyHasSameFunctionCard = equipmentManager->hasFunctionCard(card.itemId);
+
+			if (isActive && !alreadyHasSameFunctionCard)
+			{
+				card.timeCreated = time(nullptr);
+				card.isActive = true;
+				equipmentManager->addFunctionCard(cardId);
+				player->send(EnableFunctionCard(card));
+			}
+			else if (!isActive && alreadyHasSameFunctionCard)
+			{
+				card.isActive = false;
+				equipmentManager->removeFunctionCard(cardId);
+				player->send(DisableFunctionCard(card));
+			}
+		}
+		else if (card.type == 75)
+		{
+			card.isActive = isActive;
 		}
 
 		m_cards[card.id] = card;
@@ -229,7 +239,7 @@ void InventoryManager::useSkillCard(const uint64_t cardId, const uint16_t period
 		return;
 	}
 
-	const auto it = m_cards.find(cardId);
+	const auto& it = m_cards.find(cardId);
 
 	if (it == m_cards.cend())
 	{

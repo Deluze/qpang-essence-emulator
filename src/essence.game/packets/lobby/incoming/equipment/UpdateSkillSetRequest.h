@@ -59,10 +59,9 @@ public:
 private:
 	static void toggleActiveStateForInventoryCards(const Player::Ptr& player, const bool isActive)
 	{
-		for (const auto& [id, playerOwnerId, itemId, type, periodType, period, isActive, isOpened, isGiftable,
-			boostLevel, timeCreated] : player->getEquipmentManager()->getEquippedSkillCards())
+		for (const auto& equippedSkillCard : player->getEquipmentManager()->getEquippedSkillCards())
 		{
-			player->getInventoryManager()->setCardActive(id, isActive);
+			player->getInventoryManager()->setCardActive(equippedSkillCard.id, isActive);
 		}
 	}
 };
