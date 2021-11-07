@@ -20,7 +20,7 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 
 	m_player = player;
 
-	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ? ORDER BY time");
+	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ? AND ((type = 75 AND period > 0) OR (type != 75)) ORDER BY time");
 	stmt->bindInteger(playerId);
 	StatementResult::Ptr res = stmt->fetch();
 

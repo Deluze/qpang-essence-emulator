@@ -14,7 +14,7 @@ void ShopManager::initialize()
 	m_items.clear();
 	m_orderedItems.clear();
 
-	const auto stmt = DATABASE->prepare("SELECT * FROM `items`");
+	const auto stmt = DATABASE->prepare("SELECT * FROM `items` ORDER BY item_id, seq_id, name");
 	const auto res = stmt->fetch();
 
 	std::cout << "Loading shop items.\n";
