@@ -2,7 +2,7 @@
 
 #include "ChangeNickNameRequest.h"
 #include "GiftCardEvent.h"
-#include "UpdateSkillSetRequest.h"
+#include "UpdateSkillCardSetRequest.h"
 #include "UseRedeemCodeRequest.h"
 #include "UseCraneEvent.h"
 #include "CheckNickNameRequest.h"
@@ -50,7 +50,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(620, new EquipArmor());
 	add(623, new EquipWeapon());
 	add(646, new RequestEquippedSkillCards());
-	add(649, new UpdateSkillSetRequest());
+	add(649, new UpdateSkillCardSetRequest());
 	add(652, new DeleteCard());
 	// 667 - Check if name is valid for name change
 	add(667, new CheckNickNameRequest());

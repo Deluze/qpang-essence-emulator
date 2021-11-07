@@ -14,7 +14,7 @@
 #include "qpang/room/tnl/net_events/server/gc_hit_essence.hpp"
 #include <utils/StringConverter.h>
 
-#include "UpdateSkillSetResponse.h"
+#include "UpdateSkillCardSetResponse.h"
 
 constexpr auto TAG_BASE_HEALTH = 500;
 
@@ -171,7 +171,7 @@ bool RoomSession::removePlayer(uint32_t playerId)
 		}
 	}
 
-	player->getPlayer()->send(UpdateSkillSetResponse(player->getPlayer()->getEquipmentManager()->getEquippedSkillCards()));
+	player->getPlayer()->send(UpdateSkillCardSetResponse(player->getPlayer()->getEquipmentManager()->getEquippedSkillCards()));
 
 	m_players.erase(it);
 	m_playerMx.unlock();

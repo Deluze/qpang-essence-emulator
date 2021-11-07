@@ -2,13 +2,13 @@
 
 #include "EquippedSkillCards.h"
 #include "Inventory.h"
-#include "UpdateSkillSetResponse.h"
+#include "UpdateSkillCardSetResponse.h"
 #include "core/communication/packet/PacketEvent.h"
 
 auto constexpr CARD_DATA_LENGTH = 43;
 auto constexpr SKILL_CARDS_PER_SET = 3;
 
-class UpdateSkillSetRequest final : public PacketEvent
+class UpdateSkillCardSetRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
@@ -54,7 +54,7 @@ public:
 
 		toggleActiveStateForInventoryCards(player, true);
 
-		conn->send(UpdateSkillSetResponse(player->getEquipmentManager()->getEquippedSkillCards()));
+		conn->send(UpdateSkillCardSetResponse(player->getEquipmentManager()->getEquippedSkillCards()));
 	}
 private:
 	static void toggleActiveStateForInventoryCards(const Player::Ptr& player, const bool isActive)
