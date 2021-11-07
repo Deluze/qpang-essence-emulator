@@ -1,6 +1,6 @@
 #include "InventoryManager.h"
 
-
+#include "OpenCardSuccess.h"
 #include "OpenGift.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
@@ -68,6 +68,13 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 		}
 
 		res->next();
+	}
+
+	std::cout << "Player has the following gifts:" << std::endl;
+
+	for (const auto& gift : m_gifts)
+	{
+		std::cout << "- " << gift.second.id << std::endl;
 	}
 
 	player->getEquipmentManager()->setFunctionCards(functionCardIds);
@@ -195,14 +202,16 @@ bool InventoryManager::addCard(const InventoryCard& card)
 	return true;
 }
 
-void InventoryManager::storeCard(InventoryCard& card)
+InventoryCard InventoryManager::storeCard(InventoryCard& card)
 {
-	auto player = m_player.lock();
+	const auto player = m_player.lock();
 
 	if (player == nullptr)
-		return;
+	{
+		return InventoryCard{};
+	}
 
-	auto stmt = DATABASE->prepare(
+	const auto stmt = DATABASE->prepare(
 		"INSERT INTO player_items (player_id, item_id, period, period_type, type, active, opened, giftable, boosted, boost_level, time)" \
 		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -216,16 +225,19 @@ void InventoryManager::storeCard(InventoryCard& card)
 	stmt->bindInteger(card.isGiftable);
 	stmt->bindInteger(card.boostLevel > 0);
 	stmt->bindInteger(card.boostLevel);
-	stmt->bindLong(time(NULL));
+	stmt->bindLong(time(nullptr));
 
 	stmt->execute();
-	auto cardId = stmt->getLastInsertId();
+
+	const auto cardId = stmt->getLastInsertId();
 
 	card.id = cardId;
-	card.timeCreated = time(NULL);
+	card.timeCreated = time(nullptr);
 	card.playerOwnerId = player->getId();
 
 	addCard(card);
+
+	return card;
 }
 
 void InventoryManager::useSkillCard(const uint64_t cardId, const uint16_t period)
@@ -357,7 +369,12 @@ bool InventoryManager::isExpired(const uint64_t cardId)
 	return it->second.period == 0;
 }
 
-bool InventoryManager::hasSpace()
+bool InventoryManager::hasSpace(const uint32_t space) const
+{
+	return m_cards.size() + m_gifts.size() + space < 200;
+}
+
+bool InventoryManager::hasSpace() const
 {
 	return m_cards.size() + m_gifts.size() < 200;
 }
@@ -423,14 +440,18 @@ void InventoryManager::openGift(uint64_t cardId)
 	const auto player = m_player.lock();
 
 	if (player == nullptr)
+	{
 		return;
+	}
 
 	std::lock_guard<std::mutex> lg(m_mx);
 
 	const auto it = m_gifts.find(cardId);
 
 	if (it == m_gifts.cend())
+	{
 		return;
+	}
 
 	auto card = it->second;
 	card.isOpened = true;
@@ -446,6 +467,35 @@ void InventoryManager::openGift(uint64_t cardId)
 bool InventoryManager::hasGiftSpace() const
 {
 	return m_gifts.size() < 5;
+}
+
+void InventoryManager::openCard(const uint64_t cardId)
+{
+	const auto player = m_player.lock();
+
+	if (player == nullptr)
+	{
+		return;
+	}
+
+	std::lock_guard<std::mutex> lg(m_mx);
+
+	const auto it = m_cards.find(cardId);
+
+	if (it == m_cards.cend())
+	{
+		return;
+	}
+
+	auto card = it->second;
+
+	card.isOpened = true;
+
+	m_cards[card.id] = card;
+
+	DATABASE_DISPATCHER->dispatch("UPDATE player_items SET opened = 1 WHERE id = ?", { card.id });
+
+	player->send(OpenCardSuccess(cardId));
 }
 
 void InventoryManager::close()

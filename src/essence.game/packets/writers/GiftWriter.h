@@ -12,5 +12,6 @@ public:
 		packet->writeLong(card.id);
 		packet->writeFlag(true);
 		packet->writeInt(card.timeCreated);
+		packet->writeEmpty(4);
 	}
 };

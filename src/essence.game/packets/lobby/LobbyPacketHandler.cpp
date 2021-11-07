@@ -6,6 +6,7 @@
 #include "UseRedeemCodeRequest.h"
 #include "UseCraneEvent.h"
 #include "CheckNickNameRequest.h"
+#include "OpenCardRequest.h"
 #include "packets/lobby/incoming/Handshake.h"
 #include "packets/lobby/incoming/Login.h"
 #include "packets/lobby/incoming/channel/RequestChannelHost.h"
@@ -54,7 +55,8 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(652, new DeleteCard());
 	// 667 - Check if name is valid for name change
 	add(667, new CheckNickNameRequest());
-	// 655 - Open gift
+	// 655 - Open card
+	add(655, new OpenCardRequest());
 	add(679, new ChangeCharacterEvent());
 	add(691, new RequestPlayerInfo());
 	add(694, new RequestFriendList());

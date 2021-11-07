@@ -13,9 +13,9 @@ public:
 	{
 		const uint16_t size = static_cast<uint16_t>(cards.size());
 
-		writeShort(size);
-		writeShort(size);
-		writeShort(size);
+		writeShort(size); // Total amount of elements
+		writeShort(size); // How many elements have been send in total + the amount of elements in the packet.
+		writeShort(size); // Total elements in the current packet.
 
 		for (const InventoryCard& card : cards)
 		{

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GiftWriter.h"
 #include "InventoryCardWriter.h"
 #include "packets/LobbyServerPacket.h"
 

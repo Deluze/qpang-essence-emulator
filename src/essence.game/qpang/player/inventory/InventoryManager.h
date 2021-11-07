@@ -22,16 +22,20 @@ public:
 	void deleteCard(const uint64_t cardId);
 	void setCardActive(const uint64_t cardId, bool isActive = true);
 	bool addCard(const InventoryCard& card);
-	void storeCard(InventoryCard& card);
+	InventoryCard storeCard(InventoryCard& card);
 	void useSkillCard(uint64_t cardId, uint16_t period);
 	void useCard(const uint64_t cardId, const uint32_t period = 0);
 	bool isExpired(const uint64_t cardId);
-	bool hasSpace();
+	bool hasSpace(uint32_t space) const;
+	bool hasSpace() const;
 
 	void giftCard(InventoryCard& card, const std::shared_ptr<Player>& player);
 	void receiveGift(InventoryCard& card, const std::u16string& sender);
 	void openGift(uint64_t cardId);
+
 	bool hasGiftSpace() const;
+
+	void openCard(uint64_t cardId);
 
 	void close();
 private:

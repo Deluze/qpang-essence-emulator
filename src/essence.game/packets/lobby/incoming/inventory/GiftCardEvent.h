@@ -30,15 +30,12 @@ public:
 
 		if (targetPlayer == nullptr || !targetPlayer)
 		{
-			player->broadcast(u"The target player does not exist.");
-
 			return;
 		}
 
-		if (!targetPlayer->getInventoryManager()->hasSpace() || !targetPlayer->getInventoryManager()->hasGiftSpace())
+		if (!targetPlayer->getInventoryManager()->hasSpace() /*|| !targetPlayer->getInventoryManager()->hasGiftSpace()*/)
 		{
-			player->broadcast(u"This player does not have enough space in their inventory to receive a gift."
-				"\nA player may only have 5 unopened gifts at a time.");
+			player->broadcast(u"The player you are trying to gift an item to does not have enough inventory space.");
 			
 			return;
 		}
