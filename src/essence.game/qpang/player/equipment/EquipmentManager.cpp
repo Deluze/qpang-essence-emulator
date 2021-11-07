@@ -417,7 +417,6 @@ uint16_t EquipmentManager::getBonusHealth()
 		switch (player->getInventoryManager()->get(equip[6]).itemId)
 		{
 		case 1429407489: // green turtle
-		case 1429407745: // bat wing (don)
 			return 10;
 		case 1429410048: // brown turtle
 		case 1429408256: // sidekick
@@ -442,7 +441,6 @@ uint16_t EquipmentManager::getBonusHealth()
 		case 1429412100:
 			// Squirtle shield
 		case 1429410049:
-		case 1429410304: // bat wing s (cash)
 			return 20;
 		case 1429415424: // novice back
 			return 30;
