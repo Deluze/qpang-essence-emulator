@@ -276,7 +276,7 @@ public:
 			if (areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkill())
 			{
 				if (const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkill()->shouldInstantlyKillEnemyWithMeleeWeapon();
-					srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == MELEE))
+					srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == MELEE) && !isSameTeam)
 				{
 					damage = 9999;
 
@@ -287,7 +287,7 @@ public:
 			const auto dstPlayerShouldIgnoreDamageFromAllSources = dstPlayerHasActiveSkill &&
 				dstPlayer->getSkillManager()->getActiveSkill()->shouldIgnoreDamageFromAllSources();
 
-			if (dstPlayerShouldIgnoreDamageFromAllSources)
+			if (dstPlayerShouldIgnoreDamageFromAllSources && !isSameTeam)
 			{
 				damage = 1;
 			}
