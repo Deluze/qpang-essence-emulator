@@ -8,13 +8,12 @@
 class ShopItems : public LobbyServerPacket
 {
 public:
-	explicit ShopItems(const std::vector<ShopItem>& items) : LobbyServerPacket(798)
+	explicit ShopItems(const std::vector<ShopItem>& items, const uint16_t totalItemCount, const uint16_t currentlySendCount,
+	                   const uint16_t currentItemCount) : LobbyServerPacket(798)
 	{
-		const auto size = static_cast<uint16_t>(items.size());
-
-		writeShort(size);
-		writeShort(size);
-		writeShort(size);
+		writeShort(totalItemCount);
+		writeShort(currentlySendCount);
+		writeShort(currentItemCount);
 
 		// ReSharper disable once CppUseStructuredBinding
 		for (const ShopItem& item : items)
@@ -26,5 +25,7 @@ public:
 			writeInt(item.stock == 9999 || item.soldCount < item.stock ? 1 : 0);
 			writeByte(item.shopCategory);
 		}
+
+		writeEmpty(4);
 	}
 };

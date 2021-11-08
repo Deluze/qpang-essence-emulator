@@ -14,7 +14,7 @@ void ShopManager::initialize()
 	m_items.clear();
 	m_orderedItems.clear();
 
-	const auto stmt = DATABASE->prepare("SELECT * FROM `items` ORDER BY item_id, seq_id, name");
+	const auto stmt = DATABASE->prepare("SELECT * FROM `items` ORDER BY seq_id");
 	const auto res = stmt->fetch();
 
 	std::cout << "Loading shop items.\n";
@@ -46,22 +46,50 @@ void ShopManager::initialize()
 
 std::vector<ShopItem> ShopManager::list()
 {
-	std::vector<ShopItem> items;
+	std::vector<ShopItem> items {};
 
 	for (const auto& [id, item] : m_items)
+	{
 		items.push_back(item);
+	}
 
 	return items;
 }
 
-ShopItem ShopManager::get(uint32_t seqId)
+void ShopManager::sendShopItems(const Player::Ptr& player)
+{
+	// list of every element. the size of this list = the first short
+	const std::vector<ShopItem> items = list();
+	
+	// the amount of elements after which the packet will be divided. can be configured
+	constexpr uint16_t partitionSize = 20;
+
+	// the amount of partitions to send
+	const auto partitionCount = static_cast<uint32_t>(ceil(items.size() / static_cast<double>(partitionSize)));
+
+	for (uint16_t i = 0; i < partitionCount; i++)
+	{
+		// this value = the second short
+		const uint16_t currentSendCount = i * partitionSize + partitionSize >= items.size()
+			? static_cast<uint16_t>(items.size())
+			: i * partitionSize + partitionSize;
+
+		// create a sublist. the size of this = the third short
+		std::vector<ShopItem> partition = slice(items, i * partitionSize, currentSendCount);
+
+		// now send the data
+		player->send(ShopItems(partition, static_cast<uint16_t>(items.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
+	}
+}
+
+ShopItem ShopManager::get(const uint32_t seqId)
 {
 	auto it = m_items.find(seqId);
 
 	return it != m_items.cend() ? (*it).second : ShopItem{};
 }
 
-bool ShopManager::exists(uint32_t seqId)
+bool ShopManager::exists(const uint32_t seqId)
 {
 	return m_items.find(seqId) != m_items.cend();
 }
@@ -136,10 +164,9 @@ InventoryCard ShopManager::buy(const std::shared_ptr<Player>& player, const uint
 
 	if (updateShopItems)
 	{
-		player->send(ShopItems(list()));
+		sendShopItems(player);
 		player->send(CardPurchaseComplete(shopItem, { card }, shopItem.isCash ? player->getCash() : player->getDon()));
 	}
-
 
 	return card;
 }
