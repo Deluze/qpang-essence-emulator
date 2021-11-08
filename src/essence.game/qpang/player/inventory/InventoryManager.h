@@ -12,7 +12,7 @@ class Player;
 class InventoryManager
 {
 public:
-	void initialize(std::shared_ptr<Player> player, uint32_t playerId);
+	void initialize(const std::shared_ptr<Player>& player, uint32_t playerId);
 	std::vector<InventoryCard> list();
 	std::vector<InventoryCard> listGifts();
 	InventoryCard get(uint64_t cardId);

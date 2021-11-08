@@ -7,6 +7,7 @@
 #include "UseCraneEvent.h"
 #include "CheckNickNameRequest.h"
 #include "OpenCardRequest.h"
+#include "SendPresentInShopRequest.h"
 #include "packets/lobby/incoming/Handshake.h"
 #include "packets/lobby/incoming/Login.h"
 #include "packets/lobby/incoming/channel/RequestChannelHost.h"
@@ -55,7 +56,6 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(652, new DeleteCard());
 	// 667 - Check if name is valid for name change
 	add(667, new CheckNickNameRequest());
-	// 655 - Open card
 	add(655, new OpenCardRequest());
 	add(679, new ChangeCharacterEvent());
 	add(691, new RequestPlayerInfo());
@@ -84,9 +84,8 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(803, new BuyCardEvent());
 	add(809, new ExtendCardEvent());
 	add(812, new GiftCardEvent());
-	// 815 - Gift from shop
-	// 828 - Send request to go into training?
-	// 828 - Send request to leave training?
+	add(815, new SendPresentInShopRequest());
+	// 826 = Trigger NTS_ROY_NEWBIE_EVENT_DESC_START_1 (outgoing)
 	add(828, new TrainingRequest());
 	add(831, new RequestCashBalance());
 	add(834, new EnableFunctionCardEvent());
@@ -101,5 +100,5 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(897, new UseCraneEvent());
 	add(901, new RequestDailyBonus());
 	// 903 - Request to boost clothing piece
-	// 906 - Panthalassa box opening, 
+	// 906 - Panthalassa box opening
 }

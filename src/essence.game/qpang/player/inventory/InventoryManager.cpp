@@ -1,47 +1,49 @@
 #include "InventoryManager.h"
 
+#include "ItemId.h"
 #include "OpenCardSuccess.h"
 #include "OpenGift.h"
+#include "packets/lobby/outgoing/inventory/DisableFunctionCard.h"
+#include "packets/lobby/outgoing/inventory/EnableFunctionCard.h"
+#include "packets/lobby/outgoing/inventory/GiftCardSuccess.h"
+#include "packets/lobby/outgoing/inventory/OpenGiftSuccess.h"
+#include "packets/lobby/outgoing/inventory/ReceiveGift.h"
+#include "packets/lobby/outgoing/inventory/RemoveCard.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
-#include "packets/lobby/outgoing/inventory/RemoveCard.h"
-#include "packets/lobby/outgoing/inventory/DisableFunctionCard.h"
-#include "packets/lobby/outgoing/inventory/EnableFunctionCard.h"
-#include "packets/lobby/outgoing/inventory/ReceiveGift.h"
-#include "packets/lobby/outgoing/inventory/GiftCardSuccess.h"
-#include "packets/lobby/outgoing/inventory/OpenGiftSuccess.h"
-
-#include "qpang/ItemId.h"
-
-void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playerId)
+void InventoryManager::initialize(const std::shared_ptr<Player>& player, const uint32_t playerId)
 {
 	assert(player != nullptr);
 
 	m_player = player;
 
-	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_items WHERE player_id = ? AND ((type = 75 AND period > 0) OR (type != 75)) ORDER BY time");
-	stmt->bindInteger(playerId);
-	StatementResult::Ptr res = stmt->fetch();
+	const auto statement = DATABASE->prepare(
+		"SELECT * FROM player_items WHERE player_id = ? AND ((type = 75 AND period > 0) OR (type != 75)) ORDER BY time"
+	);
+
+	statement->bindInteger(playerId);
+
+	const auto result = statement->fetch();
 
 	std::vector<uint64_t> functionCardIds;
 	std::vector<uint64_t> skillCardIds;
 
-	while (res->hasNext())
+	while (result->hasNext())
 	{
 		InventoryCard card
 		{
-			res->getBigInt("id"),
-			res->getInt("player_id"),
-			res->getInt("item_id"),
-			res->getTiny("type"),
-			res->getTiny("period_type"),
-			res->getShort("period"),
-			res->getFlag("active"),
-			res->getFlag("opened"),
-			res->getFlag("giftable"),
-			res->getTiny("boost_level"),
-			res->getInt("time")
+			result->getBigInt("id"),
+			result->getInt("player_id"),
+			result->getInt("item_id"),
+			result->getTiny("type"),
+			result->getTiny("period_type"),
+			result->getShort("period"),
+			result->getFlag("active"),
+			result->getFlag("opened"),
+			result->getFlag("giftable"),
+			result->getTiny("boost_level"),
+			result->getInt("time")
 		};
 
 		if (card.isOpened)
@@ -53,28 +55,27 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 			m_gifts[card.id] = card;
 		}
 
-		// Must be a function card, period can not be 1 and card must be active.
-		if (card.type == 70 && card.periodType != 1 && card.isActive)
+		// ReSharper disable once CppTooWideScope
+		const auto isActiveFunctionCard = (card.type == 70 && card.periodType != 1 && card.isActive);
+
+		if (isActiveFunctionCard)
 		{
 			functionCardIds.push_back(card.id);
 		}
 
-		if (card.type == 75 && card.isActive)
+		// ReSharper disable once CppTooWideScope
+		const auto isActiveSkillCard = (card.type == 75 && card.isActive);
+
+		if (isActiveSkillCard)
 		{
+			// You can not have more than 3 active skill cards.
 			if (skillCardIds.size() < 3)
 			{
 				skillCardIds.push_back(card.id);
 			}
 		}
 
-		res->next();
-	}
-
-	std::cout << "Player has the following gifts:" << std::endl;
-
-	for (const auto& gift : m_gifts)
-	{
-		std::cout << "- " << gift.second.id << std::endl;
+		result->next();
 	}
 
 	player->getEquipmentManager()->setFunctionCards(functionCardIds);
@@ -83,7 +84,7 @@ void InventoryManager::initialize(std::shared_ptr<Player> player, uint32_t playe
 
 std::vector<InventoryCard> InventoryManager::list()
 {
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	std::vector<InventoryCard> cards;
 
@@ -95,7 +96,7 @@ std::vector<InventoryCard> InventoryManager::list()
 
 std::vector<InventoryCard> InventoryManager::listGifts()
 {
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	std::vector<InventoryCard> cards;
 
@@ -105,7 +106,7 @@ std::vector<InventoryCard> InventoryManager::listGifts()
 	return cards;
 }
 
-InventoryCard InventoryManager::get(uint64_t cardId)
+InventoryCard InventoryManager::get(const uint64_t cardId)
 {
 	const auto it = m_cards.find(cardId);
 
@@ -114,7 +115,7 @@ InventoryCard InventoryManager::get(uint64_t cardId)
 
 bool InventoryManager::hasCard(const uint64_t cardId)
 {
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	const auto it = m_cards.find(cardId);
 
@@ -124,16 +125,18 @@ bool InventoryManager::hasCard(const uint64_t cardId)
 void InventoryManager::deleteCard(const uint64_t cardId)
 {
 	if (!hasCard(cardId))
+	{
 		return;
+	}
 
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
-		const auto isCurrentlyEquipped = player->getEquipmentManager()->hasEquipped(cardId);
-
-		if (isCurrentlyEquipped)
+		if (player->getEquipmentManager()->hasEquipped(cardId))
+		{
 			return;
+		}
 
 		m_cards.erase(cardId);
 
@@ -148,7 +151,7 @@ void InventoryManager::deleteCard(const uint64_t cardId)
 
 void InventoryManager::setCardActive(const uint64_t cardId, bool isActive)
 {
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
@@ -193,11 +196,20 @@ void InventoryManager::setCardActive(const uint64_t cardId, bool isActive)
 bool InventoryManager::addCard(const InventoryCard& card)
 {
 	if (!hasSpace())
+	{
 		return false;
+	}
 
 	std::lock_guard lg(m_mx);
 
-	m_cards[card.id] = card;
+	if (card.isOpened)
+	{
+		m_cards[card.id] = card;
+	}
+	else
+	{
+		m_gifts[card.id] = card;
+	}
 
 	return true;
 }
@@ -359,7 +371,7 @@ void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)
 
 bool InventoryManager::isExpired(const uint64_t cardId)
 {
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	const auto it = m_cards.find(cardId);
 
@@ -386,7 +398,7 @@ void InventoryManager::giftCard(InventoryCard& card, const std::shared_ptr<Playe
 	if (our == nullptr)
 		return;
 
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	auto cardOwnerPlayer = Game::instance()->getPlayer(card.playerOwnerId);
 
@@ -426,7 +438,7 @@ void InventoryManager::receiveGift(InventoryCard& card, const std::u16string& se
 	if (player == nullptr)
 		return;
 
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	card.isOpened = false;
 	card.playerOwnerId = player->getId();
@@ -444,7 +456,7 @@ void InventoryManager::openGift(uint64_t cardId)
 		return;
 	}
 
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	const auto it = m_gifts.find(cardId);
 
@@ -478,7 +490,7 @@ void InventoryManager::openCard(const uint64_t cardId)
 		return;
 	}
 
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	const auto it = m_cards.find(cardId);
 
@@ -500,7 +512,7 @@ void InventoryManager::openCard(const uint64_t cardId)
 
 void InventoryManager::close()
 {
-	std::lock_guard<std::mutex> lg(m_mx);
+	std::lock_guard lg(m_mx);
 
 	for (const auto& [id, card] : m_cards)
 	{
