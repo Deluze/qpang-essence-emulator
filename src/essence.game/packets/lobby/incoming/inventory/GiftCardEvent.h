@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GiftCardFail.h"
 #include "core/communication/packet/PacketEvent.h"
 
 #include "qpang/Game.h"
@@ -8,6 +9,14 @@
 class GiftCardEvent final : public PacketEvent
 {
 public:
+	//814 = LS_SEND_PRESENT_INDEC_FAIL
+	enum LS_SEND_PRESENT_INDEC_FAIL
+	{
+		INVENTORY_FULL_UNSEAL = 362,
+		SEND_GIFT_FAIL_TARGET_NOT_EXIST = 365,
+		GIFT_FAIL_UNTRADABLE_CARD = 871
+	};
+
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto player = conn->getPlayer();
@@ -21,27 +30,31 @@ public:
 
 		if (!card.isGiftable)
 		{
-			player->broadcast(u"This card may not be gifted.");
+			conn->send(GiftCardFail(GIFT_FAIL_UNTRADABLE_CARD));
 
 			return;
 		}
 
 		const auto targetPlayer = Game::instance()->getPlayer(nickname);
 
-		if (targetPlayer == nullptr || !targetPlayer)
+		if (targetPlayer == nullptr)
 		{
+			conn->send(GiftCardFail(SEND_GIFT_FAIL_TARGET_NOT_EXIST));
+
 			return;
 		}
 
 		if (!targetPlayer->getInventoryManager()->hasSpace() /*|| !targetPlayer->getInventoryManager()->hasGiftSpace()*/)
 		{
-			player->broadcast(u"The player you are trying to gift an item to does not have enough inventory space.");
-			
+			conn->send(GiftCardFail(INVENTORY_FULL_UNSEAL));
+
 			return;
 		}
 
 		if (player->getEquipmentManager()->hasEquipped(cardId))
 		{
+			conn->send(GiftCardFail(GIFT_FAIL_UNTRADABLE_CARD));
+
 			return;
 		}
 
