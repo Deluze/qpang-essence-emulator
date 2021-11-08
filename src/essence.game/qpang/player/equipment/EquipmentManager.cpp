@@ -257,13 +257,19 @@ void EquipmentManager::setWeapons(uint16_t character, const std::array<uint64_t,
 		for (const auto& weapon : weapons)
 		{
 			if (weapon == NULL)
+			{
 				continue;
+			}
 
 			if (!Game::instance()->getWeaponManager()->canEquip(inv->get(weapon).itemId, characterId))
+			{
 				return;
+			}
 
 			if (!inv->hasCard(weapon) || inv->isExpired(weapon))
+			{
 				return;
+			}
 		}
 
 		m_equips[characterId][9] = weapons[0];

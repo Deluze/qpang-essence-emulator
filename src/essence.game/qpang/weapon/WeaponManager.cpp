@@ -4,82 +4,89 @@
 
 void WeaponManager::initialize()
 {
-	auto stmt = DATABASE->prepare("SELECT * FROM weapons");
-	auto res = stmt->fetch();
+	const auto statement = DATABASE->prepare("SELECT * FROM weapons");
+	const auto result = statement->fetch();
 
-	if (!res->hasResults())
+	// TODO: Give all weapons in the database a strength/weight value (from config).
+
+	if (!result->hasResults())
+	{
 		return;
+	}
 
-	std::lock_guard<std::mutex> lg(m_weaponMx);
+	std::lock_guard lg(m_weaponMx);
 
 	m_weapons.clear();
 
 	std::cout << "Loading weapons.\n";
 
-	while (res->hasNext())
+	while (result->hasNext())
 	{
-		uint32_t itemId = res->getInt("item_id");
+		const uint32_t itemId = result->getInt("item_id");
 
-		Weapon wp{
+		Weapon weapon{
 			itemId,
-			res->getShort("damage"),
-			res->getShort("clip_size"),
-			res->getTiny("clip_amount"),
-			res->getTiny("weight"),
-			res->getTiny("effect_id"),
-			res->getTiny("chance"),
-			res->getTiny("duration"),
-			getWeaponType(res->getInt("type")),
+			result->getShort("damage"),
+			result->getShort("clip_size"),
+			result->getTiny("clip_amount"),
+			result->getTiny("weight"),
+			result->getTiny("effect_id"),
+			result->getTiny("chance"),
+			result->getTiny("duration"),
+			getWeaponType(result->getInt("type")),
 		};
 
-		m_weapons[wp.itemId] = wp;
+		m_weapons[weapon.itemId] = weapon;
 
-		res->next();
+		result->next();
 	}
 
 	std::cout << "Loaded " << m_weapons.size() << " weapons.\n";
 }
 
-bool WeaponManager::canEquip(uint32_t weaponId, uint16_t characterId)
+bool WeaponManager::canEquip(const uint32_t weaponId, const uint16_t characterId)
 {
-	auto weapon = get(weaponId);
+	const auto weapon = get(weaponId);
 
-	auto it = m_characterPower.find(characterId);
+	const auto it = m_characterPower.find(characterId);
 
 	if (it == m_characterPower.cend())
+	{
 		return false;
+	}
 
 	return weapon.weight <= it->second;
 }
 
-Weapon WeaponManager::get(uint32_t weaponId)
+Weapon WeaponManager::get(const uint32_t weaponId)
 {
-	std::lock_guard<std::mutex> lg(m_weaponMx);
+	std::lock_guard lg(m_weaponMx);
 
-	auto it = m_weapons.find(weaponId);
+	const auto it = m_weapons.find(weaponId);
 
 	if (it == m_weapons.cend())
+	{
 		return {};
+	}
 
 	return it->second;
 }
 
 // type: 0 = melee, 1 = rifle, 2 = launcher, 3 = bomb
-WeaponType WeaponManager::getWeaponType(uint32_t type)
+WeaponType WeaponManager::getWeaponType(const uint32_t weaponType)
 {
-
-	switch (type)
+	switch (weaponType)
 	{
 	case 0:
-		return WeaponType::MELEE;
+		return MELEE;
 	case 1:
-		return WeaponType::RIFLE;
+		return RIFLE;
 	case 2:
-		return WeaponType::LAUNCHER;
+		return LAUNCHER;
 	case 3:
-	// 999 is onbekend, maar die defaulten we dan naar BOMB.
+	// 999 = unknown, so we default to bomb.
 	case 999:
 	default:
-		return WeaponType::BOMB;
+		return BOMB;
 	}
 }
