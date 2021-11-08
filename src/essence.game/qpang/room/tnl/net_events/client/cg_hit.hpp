@@ -319,11 +319,13 @@ public:
 			const auto dstPlayerHasActiveSkill = dstPlayer->getSkillManager()->hasActiveSkill();
 			const auto dstPlayerHasRainbowSkillCard = dstPlayerHasActiveSkill
 				&& dstPlayer->getSkillManager()->getActiveSkill()->getSkillRateType() == SkillRateType::RAINBOW;
+			const auto dstPlayerShouldIgnoreDamageFromAllSources = dstPlayerHasActiveSkill
+				&& dstPlayer->getSkillManager()->getActiveSkill()->shouldIgnoreDamageFromAllSources();
 
 			const auto isValidWeapon = !isTrapWeapon
 				&& ((weaponUsed.weaponType == MELEE) || (weaponUsed.weaponType == RIFLE) || (weaponUsed.weaponType == LAUNCHER));
 
-			if (!dstPlayerHasRainbowSkillCard && isValidWeapon)
+			if (!dstPlayerHasRainbowSkillCard && !dstPlayerShouldIgnoreDamageFromAllSources && isValidWeapon)
 			{
 				const auto skillPointsToAdd = (bodyPartHitLocation == HEAD) ? 10 : 5;
 				const auto skillGaugeBoostPercentage = dstPlayer->getSkillManager()->getSkillGaugeBoostPercentage();
