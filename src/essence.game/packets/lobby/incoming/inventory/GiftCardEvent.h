@@ -14,6 +14,7 @@ public:
 	{
 		INVENTORY_FULL_UNSEAL = 362,
 		SEND_GIFT_FAIL_TARGET_NOT_EXIST = 365,
+		GIFT_FAIL_SEND_TO_SELF = 846,
 		GIFT_FAIL_UNTRADABLE_CARD = 871
 	};
 
@@ -40,6 +41,13 @@ public:
 		if (targetPlayer == nullptr)
 		{
 			conn->send(GiftCardFail(SEND_GIFT_FAIL_TARGET_NOT_EXIST));
+
+			return;
+		}
+
+		if (player->getId() == targetPlayer->getId())
+		{
+			conn->send(GiftCardFail(GIFT_FAIL_SEND_TO_SELF));
 
 			return;
 		}
