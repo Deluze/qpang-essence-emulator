@@ -3,7 +3,6 @@
 #include "CardPurchaseComplete.h"
 #include "SendPresentInShopFail.h"
 #include "SendPresentInShopSuccess.h"
-#include "UpdateAccount.h"
 #include "core/communication/packet/PacketEvent.h"
 
 class SendPresentInShopRequest final : public PacketEvent
@@ -112,7 +111,6 @@ public:
 		targetPlayer->getInventoryManager()->receiveGift(createdInventoryCard, buyingPlayer->getName());
 
 		// Send buying player success.
-		conn->send(SendPresentInShopSuccess());
-		conn->send(UpdateAccount(buyingPlayer));
+		conn->send(SendPresentInShopSuccess(shopItem.isCash, shopItem.isCash ? buyingPlayer->getCash() : buyingPlayer->getDon()));
 	}
 };
