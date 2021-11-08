@@ -202,14 +202,7 @@ bool InventoryManager::addCard(const InventoryCard& card)
 
 	std::lock_guard lg(m_mx);
 
-	if (card.isOpened)
-	{
-		m_cards[card.id] = card;
-	}
-	else
-	{
-		m_gifts[card.id] = card;
-	}
+	m_cards[card.id] = card;
 
 	return true;
 }
