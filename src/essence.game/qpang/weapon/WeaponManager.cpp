@@ -7,8 +7,6 @@ void WeaponManager::initialize()
 	const auto statement = DATABASE->prepare("SELECT * FROM weapons");
 	const auto result = statement->fetch();
 
-	// TODO: Give all weapons in the database a strength/weight value (from config).
-
 	if (!result->hasResults())
 	{
 		return;
