@@ -3,7 +3,6 @@
 
 #include "GameNetEvent.h"
 #include "qpang/Game.h"
-#include "qpang/room/tnl/net_events/server/gc_card.hpp"
 #include "qpang/room/tnl/net_events/server/gc_hit.hpp"
 
 // ReSharper disable once CppInconsistentNaming
@@ -149,7 +148,7 @@ public:
 
 		auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponId);
 
-		if (weaponUsed.weaponType != BOMB && srcPlayer->isDead())
+		if (weaponUsed.weaponType != WeaponType::BOMB && srcPlayer->isDead())
 		{
 			return;
 		}
@@ -216,7 +215,7 @@ public:
 				const auto dstPlayerShouldReceiveReducedDamageFromLaunchers = dstPlayerHasActiveSkill
 					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldReceiveReducedDamageFromLaunchers();
 
-				const auto weaponUsedIsLauncher = (weaponUsed.weaponType == LAUNCHER);
+				const auto weaponUsedIsLauncher = (weaponUsed.weaponType == WeaponType::LAUNCHER);
 
 				if (dstPlayerShouldReceiveReducedDamageFromAllSources)
 				{
@@ -276,7 +275,7 @@ public:
 			if (areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkill())
 			{
 				if (const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkill()->shouldInstantlyKillEnemyWithMeleeWeapon();
-					srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == MELEE) && !isSameTeam)
+					srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == WeaponType::MELEE) && !isSameTeam)
 				{
 					damage = 9999;
 
@@ -323,7 +322,7 @@ public:
 				&& dstPlayer->getSkillManager()->getActiveSkill()->shouldIgnoreDamageFromAllSources();
 
 			const auto isValidWeapon = !isTrapWeapon
-				&& ((weaponUsed.weaponType == MELEE) || (weaponUsed.weaponType == RIFLE) || (weaponUsed.weaponType == LAUNCHER));
+				&& ((weaponUsed.weaponType == WeaponType::MELEE) || (weaponUsed.weaponType == WeaponType::RIFLE) || (weaponUsed.weaponType == WeaponType::LAUNCHER));
 
 			if (!dstPlayerHasRainbowSkillCard && !dstPlayerShouldIgnoreDamageFromAllSources && isValidWeapon)
 			{

@@ -209,16 +209,16 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 
 	switch (weapon.weaponType)
 	{
-	case MELEE:
+	case WeaponType::MELEE:
 		killerStats->addMeleeKills();
 		break;
-	case RIFLE:
+	case WeaponType::RIFLE:
 		killerStats->addGunKills();
 		break;
-	case LAUNCHER:
+	case WeaponType::LAUNCHER:
 		killerStats->addLauncherKills();
 		break;
-	case BOMB:
+	case WeaponType::BOMB:
 	default:
 		killerStats->addBombKills();
 		break;

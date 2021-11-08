@@ -76,15 +76,15 @@ WeaponType WeaponManager::getWeaponType(const uint32_t weaponType)
 	switch (weaponType)
 	{
 	case 0:
-		return MELEE;
+		return WeaponType::MELEE;
 	case 1:
-		return RIFLE;
+		return WeaponType::RIFLE;
 	case 2:
-		return LAUNCHER;
+		return WeaponType::LAUNCHER;
 	case 3:
 	// 999 = unknown, so we default to bomb.
 	case 999:
 	default:
-		return BOMB;
+		return WeaponType::BOMB;
 	}
 }
