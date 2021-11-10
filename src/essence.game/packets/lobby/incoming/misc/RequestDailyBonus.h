@@ -10,7 +10,7 @@ public:
 	{
 		const auto player = conn->getPlayer();
 		
-		const auto playerDailyBonusRedeemedAtTime = (time_t) GetPlayerDailyBonusRedeemedAtTime(player->getId());
+		const auto playerDailyBonusRedeemedAtTime = GetPlayerDailyBonusRedeemedAtTime(player->getId());
 
 		if (playerDailyBonusRedeemedAtTime == -1)
 		{
@@ -43,7 +43,7 @@ public:
 	}
 
 private:
-	void RequestDailyBonus::SetPlayerDailyBonusRedeemedAtTime(uint32_t playerId, uint64_t time) 
+	static void RequestDailyBonus::SetPlayerDailyBonusRedeemedAtTime(const uint32_t playerId, const uint64_t time) 
 	{
 		const auto statement = DATABASE->prepare("UPDATE players SET daily_bonus_redeemed_at = ? WHERE id = ?");
 
@@ -53,7 +53,7 @@ private:
 		statement->execute();
 	}
 
-	time_t RequestDailyBonus::GetPlayerDailyBonusRedeemedAtTime(uint32_t playerId) 
+	static time_t RequestDailyBonus::GetPlayerDailyBonusRedeemedAtTime(const uint32_t playerId) 
 	{
 		const auto statement = DATABASE->prepare("SELECT daily_bonus_redeemed_at FROM players WHERE id = ? LIMIT 1");
 
