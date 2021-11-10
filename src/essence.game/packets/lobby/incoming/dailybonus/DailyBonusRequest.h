@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include <packets/lobby/outgoing/misc/DailyBonusResponse.h>
+#include "dailybonus/DailyBonusResponse.h"
 
 class DailyBonusRequest final : public PacketEvent
 {
@@ -10,7 +10,7 @@ public:
 	{
 		const auto player = conn->getPlayer();
 		
-		const auto playerDailyBonusRedeemedAtTime = GetPlayerDailyBonusRedeemedAtTime(player->getId());
+		const auto playerDailyBonusRedeemedAtTime = getPlayerDailyBonusRedeemedAtTime(player->getId());
 
 		if (playerDailyBonusRedeemedAtTime == -1)
 		{
@@ -36,14 +36,14 @@ public:
 
 		if (isEligibleForDailyBonus)
 		{
-			SetPlayerDailyBonusRedeemedAtTime(player->getId(), now);	
+			setPlayerDailyBonusRedeemedAtTime(player->getId(), now);	
 		}
 
 		player->send(DailyBonusResponse(player, isEligibleForDailyBonus));
 	}
 
 private:
-	static void DailyBonusRequest::SetPlayerDailyBonusRedeemedAtTime(const uint32_t playerId, const uint64_t time) 
+	static void setPlayerDailyBonusRedeemedAtTime(const uint32_t playerId, const uint64_t time) 
 	{
 		const auto statement = DATABASE->prepare("UPDATE players SET daily_bonus_redeemed_at = ? WHERE id = ?");
 
@@ -53,7 +53,7 @@ private:
 		statement->execute();
 	}
 
-	static time_t DailyBonusRequest::GetPlayerDailyBonusRedeemedAtTime(const uint32_t playerId) 
+	static time_t getPlayerDailyBonusRedeemedAtTime(const uint32_t playerId) 
 	{
 		const auto statement = DATABASE->prepare("SELECT daily_bonus_redeemed_at FROM players WHERE id = ? LIMIT 1");
 

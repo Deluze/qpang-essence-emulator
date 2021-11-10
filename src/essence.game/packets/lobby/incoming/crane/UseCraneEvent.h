@@ -1,8 +1,8 @@
 #pragma once
 
-#include "UseCraneFailResponse.h"
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/misc/UseCraneSuccessResponse.h"
+#include "crane/UseCraneFailResponse.h"
+#include "crane/UseCraneSuccessResponse.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 

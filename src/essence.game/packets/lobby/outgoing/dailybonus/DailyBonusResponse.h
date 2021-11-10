@@ -3,6 +3,8 @@
 #include "packets/LobbyServerPacket.h"
 #include <qpang/player/Player.h>
 
+#include "UpdateCashBalance.h"
+
 class DailyBonusResponse : public LobbyServerPacket
 {
 public:
