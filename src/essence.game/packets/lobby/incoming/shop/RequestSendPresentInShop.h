@@ -1,11 +1,10 @@
 #pragma once
 
-#include "CardPurchaseComplete.h"
 #include "SendPresentInShopFail.h"
 #include "SendPresentInShopSuccess.h"
 #include "core/communication/packet/PacketEvent.h"
 
-class SendPresentInShopRequest final : public PacketEvent
+class RequestSendPresentInShop final : public PacketEvent
 {
 public:
 	enum LS_SEND_PRESENT_IN_SHOP_FAIL
@@ -94,10 +93,19 @@ public:
 			return;
 		}
 
+		uint32_t newBalance;
+
 		// Remove the funds from the buying player.
-		(shopItem.isCash)
-			? buyingPlayer->removeCash(shopItem.price)
-			: buyingPlayer->removeDon(shopItem.price);
+		if (shopItem.isCash)
+		{
+			buyingPlayer->removeCash(shopItem.price);
+			newBalance = buyingPlayer->getCash();
+		}
+		else
+		{
+			buyingPlayer->removeDon(shopItem.price);
+			newBalance = buyingPlayer->getDon();
+		}
 
 		// Create the card from shop item.
 		auto inventoryCard = InventoryCard::fromShopItem(shopItem);
@@ -111,6 +119,6 @@ public:
 		targetPlayer->getInventoryManager()->receiveGift(createdInventoryCard, buyingPlayer->getName());
 
 		// Send buying player success.
-		conn->send(SendPresentInShopSuccess(shopItem.isCash, shopItem.isCash ? buyingPlayer->getCash() : buyingPlayer->getDon()));
+		conn->send(SendPresentInShopSuccess(shopItem.isCash, newBalance));
 	}
 };

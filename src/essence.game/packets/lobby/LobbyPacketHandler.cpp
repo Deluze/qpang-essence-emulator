@@ -42,7 +42,7 @@
 #include "shop/BuyCardEvent.h"
 #include "shop/RequestShopItems.h"
 #include "shop/RequestShopPackages.h"
-#include "shop/SendPresentInShopRequest.h"
+#include "shop/RequestSendPresentInShop.h"
 #include "training/TrainingRequest.h"
 
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
@@ -83,7 +83,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(803, new BuyCardEvent());
 	add(809, new ExtendCardEvent());
 	add(812, new GiftCardEvent());
-	add(815, new SendPresentInShopRequest());
+	add(815, new RequestSendPresentInShop());
 	// 826 = Trigger NTS_ROY_NEWBIE_EVENT_DESC_START_1 (outgoing)
 	add(828, new TrainingRequest());
 	add(831, new RequestCashBalance());
