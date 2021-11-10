@@ -8,8 +8,6 @@ class DailyBonusResponse : public LobbyServerPacket
 public:
 	DailyBonusResponse(const Player::Ptr& player, const bool isEligibleForDailyBonus) : LobbyServerPacket(902)
 	{
-		const auto currentCoinBalance = player->getCoins();
-
 		if (isEligibleForDailyBonus)
 		{
 			SendDailyBonusSuccess(player);
@@ -24,7 +22,7 @@ public:
 	}
 
 private:
-	void DailyBonusResponse::SendDailyBonusSuccess(const Player::Ptr& player)
+	void SendDailyBonusSuccess(const Player::Ptr& player)
 	{
 		const auto playerIsPatreon = player->isPatreon();
 
@@ -61,7 +59,7 @@ private:
 		writeFlag(hasExtraRewards);
 	}
 
-	void DailyBonusResponse::SendDailyBonusFailure(const Player::Ptr& player)
+	void SendDailyBonusFailure(const Player::Ptr& player)
 	{
 		const auto currentCoinBalance = player->getCoins();
 

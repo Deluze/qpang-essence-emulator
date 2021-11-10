@@ -3,7 +3,7 @@
 #include "core/communication/packet/PacketEvent.h"
 #include <packets/lobby/outgoing/misc/DailyBonusResponse.h>
 
-class RequestDailyBonus final : public PacketEvent
+class DailyBonusRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override
@@ -43,7 +43,7 @@ public:
 	}
 
 private:
-	static void RequestDailyBonus::SetPlayerDailyBonusRedeemedAtTime(const uint32_t playerId, const uint64_t time) 
+	static void DailyBonusRequest::SetPlayerDailyBonusRedeemedAtTime(const uint32_t playerId, const uint64_t time) 
 	{
 		const auto statement = DATABASE->prepare("UPDATE players SET daily_bonus_redeemed_at = ? WHERE id = ?");
 
@@ -53,7 +53,7 @@ private:
 		statement->execute();
 	}
 
-	static time_t RequestDailyBonus::GetPlayerDailyBonusRedeemedAtTime(const uint32_t playerId) 
+	static time_t DailyBonusRequest::GetPlayerDailyBonusRedeemedAtTime(const uint32_t playerId) 
 	{
 		const auto statement = DATABASE->prepare("SELECT daily_bonus_redeemed_at FROM players WHERE id = ? LIMIT 1");
 

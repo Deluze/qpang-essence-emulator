@@ -42,7 +42,7 @@
 #include "packets/lobby/incoming/shop/BuyCardEvent.h"
 #include "packets/lobby/incoming/shop/RequestShopItems.h"
 #include "packets/lobby/incoming/shop/RequestShopPackages.h"
-#include "packets/lobby/incoming/misc/RequestDailyBonus.h"
+#include "packets/lobby/incoming/misc/DailyBonusRequest.h"
 #include "training/TrainingRequest.h"
 
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
@@ -97,7 +97,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(861, new DisableFunctionCardEvent());
 	// 875 - Send trade request
 	add(897, new UseCraneEvent());
-	add(901, new RequestDailyBonus());
+	add(901, new DailyBonusRequest());
 	// 903 - Request to boost clothing piece
 	// 906 - Panthalassa box opening
 }
