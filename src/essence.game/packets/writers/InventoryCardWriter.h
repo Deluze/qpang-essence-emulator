@@ -36,5 +36,7 @@ public:
 		packet->writeFlag(card.boostLevel > 0);
 		packet->writeFlag(false);
 		packet->writeEmpty(4);
+
+		// Total 43 bytes.
 	}
 };

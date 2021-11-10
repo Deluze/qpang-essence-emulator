@@ -1,23 +1,30 @@
 #pragma once
 
+#include "UseCraneFailResponse.h"
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/misc/UseCrainFail.h"
-#include "packets/lobby/outgoing/misc/UseCraneSuccess.h"
+#include "packets/lobby/outgoing/misc/UseCraneSuccessResponse.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
 class UseCraneEvent final : public PacketEvent
 {
 public:
+	enum LS_USE_CRANE_FAIL
+	{
+		INVALID_AMOUNT_OF_ATTEMPTS = 0x36f, // 879
+		NOT_ENOUGH_COINS = 0x36e,			// 878
+		INVENTORY_FULL = 0x16a,				// 362
+	};
+
 	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override
 	{
-		const auto times = pack.readShort();
-
 		const auto player = conn->getPlayer();
 
-		if (player->getInventoryManager()->list().size() >= 200 - times)
+		const auto times = pack.readShort();
+
+		if (!player->getInventoryManager()->hasSpace(times))
 		{
-			player->broadcast(u"You have too many items in your inventory to be able to use the cranemachine.");
+			conn->send(UseCraneFailResponse(INVENTORY_FULL));
 
 			return;
 		}
@@ -26,7 +33,7 @@ public:
 
 		if (!crane->isEnabled())
 		{
-			player->broadcast(u"The cranemachine is currently out of use.");
+			conn->send(UseCraneFailResponse());
 
 			return;
 		}
@@ -45,12 +52,14 @@ public:
 			requiredCoins = 1200;
 			break;
 		default:
+			conn->send(UseCraneFailResponse(INVALID_AMOUNT_OF_ATTEMPTS));
+
 			return;
 		}
 
 		if (requiredCoins > player->getCoins())
 		{
-			player->broadcast(u"You do not have the required amount of coins to use the crane machine.");
+			conn->send(UseCraneFailResponse(NOT_ENOUGH_COINS));
 
 			return;
 		}
@@ -66,11 +75,11 @@ public:
 			inventoryCard.playerOwnerId = player->getId();
 			inventoryCard.isOpened = true;
 
-			player->getInventoryManager()->storeCard(inventoryCard);
+			const auto createdCard = player->getInventoryManager()->storeCard(inventoryCard);
 
-			cards.push_back(inventoryCard);
+			cards.push_back(createdCard);
 		}
 
-		player->send(UseCraneSuccess(player, cards));
+		conn->send(UseCraneSuccessResponse(player, cards));
 	}
 };
