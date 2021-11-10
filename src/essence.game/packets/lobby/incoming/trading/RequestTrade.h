@@ -25,7 +25,9 @@ public:
 		std::cout << "RequestTrade::handle >> Player " << player->getId() << " has requested to trade with " << targetPlayerId << std::endl;
 
 		// 876 - Shows trade request menu.
-		conn->send(LobbyServerPacket(876));
+		//conn->send(LobbyServerPacket(876));
+
+		conn->send(LobbyServerPacket(877));
 
 		//targetPlayer->send(LobbyServerPacket(881)); // The other side has cancelled the request.
 	}
