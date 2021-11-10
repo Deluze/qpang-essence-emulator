@@ -5,7 +5,7 @@
 #include "UpdateSkillCardSetRequest.h"
 #include "UseRedeemCodeRequest.h"
 #include "UseCraneEvent.h"
-#include "CheckNickNameRequest.h"
+#include "ValidateNickNameRequest.h"
 #include "OpenCardRequest.h"
 #include "SendPresentInShopRequest.h"
 #include "packets/lobby/incoming/Handshake.h"
@@ -55,7 +55,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(649, new UpdateSkillCardSetRequest());
 	add(652, new DeleteCard());
 	// 667 - Check if name is valid for name change
-	add(667, new CheckNickNameRequest());
+	add(667, new ValidateNickNameRequest());
 	add(655, new OpenCardRequest());
 	add(679, new ChangeCharacterEvent());
 	add(691, new RequestPlayerInfo());
@@ -89,7 +89,6 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(828, new TrainingRequest());
 	add(831, new RequestCashBalance());
 	add(834, new EnableFunctionCardEvent());
-	// 837 - Definitively change your name.
 	add(837, new ChangeNickNameRequest());
 	add(841, new ResetWinLossEvent());
 	add(844, new ResetKillDeathEvent());
