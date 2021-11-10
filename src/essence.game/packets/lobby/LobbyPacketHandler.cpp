@@ -3,8 +3,8 @@
 #include "GiftCardEvent.h"
 #include "Handshake.h"
 #include "Login.h"
+#include "EnchantItemEvent.h"
 #include "RequestTrade.h"
-#include "RequestTradeAction.h"
 #include "channel/RequestChannelHost.h"
 #include "channel/RequestChannelList.h"
 #include "crane/UseCraneEvent.h"
@@ -98,9 +98,9 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	// 875 - Send trade request
 	add(875, new RequestTrade());
 	// 884 - Trade cancel?
-	add(884, new RequestTradeAction());
 	add(897, new UseCraneEvent());
 	add(901, new DailyBonusRequest());
+	add(903, new EnchantItemEvent());
 	// 903 - Request to boost clothing piece
 	// 906 - Panthalassa box opening
 }
