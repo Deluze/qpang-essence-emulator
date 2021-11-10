@@ -17,6 +17,7 @@ It conists out of:
 - **Event relays**: Matches won't be p2p anymore, and every event is now relayed between players on the server-side, yay!
 - **User Authentication** (with bcrypt hashed passwords, yes, this server doesn't use plain text passwords. :^))
 - **Fully working inventory/character customization** (besides name changers & quick revive)
+- **Gifting** You can gift items to others from your inventory and from the shop
 - **Friends**
 - **Chat, Whispers & In-Game Announcements**
 - **Bans & Mutes**
@@ -26,7 +27,7 @@ It conists out of:
   - **In-game Power-ups** (medkit, team medkit, ammunition)
   - **Team balancing**
   - **In-game skillcards (20 implemented cards)**, by picking up a skillbook in-game you receive a weighted random skillcard based on its class (bronze, silver, gold or rainbow), to activate this skillcard you musth have enough skillpoints. Skillpoints can be earned by fighting with other players, more specificly; by killing other players and getting attacked by other players.                        
-    For more information about skillcards, visit [our wiki](https://github.com/YestinJarrett/qpang-essence-emulator/wiki#skillcards).
+    For more information about skillcards, visit [our website](https://www.qfighter.eu/skillcards).
   - **Ensures "quality" matches**, prevents players from joining late game and losing items
   - **Most achievements are implemented** (We don't know what the requirements of some achievements are)
   - **Point & Time based matches**
