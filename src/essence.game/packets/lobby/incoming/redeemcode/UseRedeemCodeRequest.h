@@ -21,6 +21,7 @@ public:
 		bool isActive;
 	};
 
+	// TODO: Find out error codes for redeem failure.
 	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override
 	{
 		const auto player = conn->getPlayer();
@@ -34,8 +35,6 @@ public:
 		if (redeemCode.id == NULL)
 		{
 			conn->send(UseRedeemCodeFailResponse());
-
-			player->broadcast(u"The given redeem code has already been used or does not exist.");
 
 			return;
 		}
