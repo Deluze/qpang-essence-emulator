@@ -90,8 +90,10 @@ std::vector<InventoryCard> InventoryManager::list()
 
 	std::vector<InventoryCard> cards;
 
-	for (const auto& [key, val] : m_cards)
-		cards.push_back(val);
+	for (const auto& [key, card] : m_cards)
+	{
+		cards.push_back(card);
+	}
 
 	return cards;
 }
@@ -108,8 +110,15 @@ void InventoryManager::sendCards()
 	// list of every element. the size of this list = the first short
 	const std::vector<InventoryCard> inventoryCards = list();
 
+	if (inventoryCards.empty())
+	{
+		player->send(Inventory({}, 0, 0, 0));
+
+		return;
+	}
+
 	// the amount of elements after which the packet will be divided. can be configured
-	constexpr uint16_t partitionSize = 25;
+	constexpr uint16_t partitionSize = 50;
 
 	// the amount of partitions to send
 	const auto partitionCount = static_cast<uint32_t>(ceil(inventoryCards.size() / static_cast<double>(partitionSize)));
@@ -141,33 +150,34 @@ void InventoryManager::sendGifts()
 	// list of every element. the size of this list = the first short
 	const std::vector<InventoryCard> gifts = listGifts();
 
-	if (gifts.size() == 0)
+	if (gifts.empty())
 	{
-		player->send(Gifts(gifts, gifts.size(), gifts.size(), gifts.size()));
+		player->send(Gifts({}, 0, 0, 0));
 
 		return;
 	}
 
 	// the amount of elements after which the packet will be divided. can be configured
-	constexpr uint16_t partitionSize = 10;
+	constexpr uint16_t partitionSize = 1;
 
 	// the amount of partitions to send
 	const auto partitionCount = static_cast<uint32_t>(ceil(gifts.size() / static_cast<double>(partitionSize)));
 
 	for (uint16_t i = 0; i < partitionCount; i++)
 	{
-		std::cout << "Gift Partition: " << i << std::endl;
-
 		// this value = the second short
 		const uint16_t currentSendCount = i * partitionSize + partitionSize >= gifts.size()
 			? static_cast<uint16_t>(gifts.size())
 			: i * partitionSize + partitionSize;
 
 		// create a sublist. the size of this = the third short
+
 		std::vector<InventoryCard> partition = slice(gifts, i * partitionSize, currentSendCount);
 
-		std::cout << "Size: " << partition.size() << std::endl;
-
+		while (partition.size() > partitionSize)
+		{
+			partition.pop_back();
+		}
 
 		// now send the data
 		player->send(Gifts(partition, static_cast<uint16_t>(gifts.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
@@ -178,12 +188,14 @@ std::vector<InventoryCard> InventoryManager::listGifts()
 {
 	std::lock_guard lg(m_mx);
 
-	std::vector<InventoryCard> cards;
+	std::vector<InventoryCard> gifts{};
 
 	for (const auto& [key, card] : m_gifts)
-		cards.push_back(card);
+	{
+		gifts.push_back(card);
+	}
 
-	return cards;
+	return gifts;
 }
 
 InventoryCard InventoryManager::get(const uint64_t cardId)
