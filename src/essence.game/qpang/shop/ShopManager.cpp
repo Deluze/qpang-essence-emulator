@@ -46,7 +46,7 @@ void ShopManager::initialize()
 
 std::vector<ShopItem> ShopManager::list()
 {
-	std::vector<ShopItem> items {};
+	std::vector<ShopItem> items{};
 
 	for (const auto& [id, item] : m_items)
 	{
@@ -60,9 +60,9 @@ void ShopManager::sendShopItems(const Player::Ptr& player)
 {
 	// list of every element. the size of this list = the first short
 	const std::vector<ShopItem> items = list();
-	
+
 	// the amount of elements after which the packet will be divided. can be configured
-	constexpr uint16_t partitionSize = 20;
+	constexpr uint16_t partitionSize = 75;
 
 	// the amount of partitions to send
 	const auto partitionCount = static_cast<uint32_t>(ceil(items.size() / static_cast<double>(partitionSize)));
@@ -75,7 +75,7 @@ void ShopManager::sendShopItems(const Player::Ptr& player)
 			: i * partitionSize + partitionSize;
 
 		// create a sublist. the size of this = the third short
-		std::vector<ShopItem> partition = slice(items, i * partitionSize, currentSendCount);
+		std::vector<ShopItem> partition = slice(items, i * partitionSize + 1, currentSendCount);
 
 		// now send the data
 		player->send(ShopItems(partition, static_cast<uint16_t>(items.size()), currentSendCount, static_cast<uint16_t>(partition.size())));

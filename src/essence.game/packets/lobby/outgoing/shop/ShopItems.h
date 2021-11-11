@@ -25,7 +25,5 @@ public:
 			writeInt(item.stock == 9999 || item.soldCount < item.stock ? 1 : 0);
 			writeByte(item.shopCategory);
 		}
-
-		writeEmpty(4);
 	}
 };
