@@ -210,10 +210,10 @@ public:
 			if (areSkillsEnabled)
 			{
 				const auto dstPlayerShouldReceiveReducedDamageFromAllSources = dstPlayerHasActiveSkill
-					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldReceiveReducedDamageFromAllSources();
+					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldTakeLessDamageFromAllSources();
 
 				const auto dstPlayerShouldReceiveReducedDamageFromLaunchers = dstPlayerHasActiveSkill
-					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldReceiveReducedDamageFromLaunchers();
+					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldTakeLessDamageFromLaunchers();
 
 				const auto weaponUsedIsLauncher = (weaponUsed.weaponType == WeaponType::LAUNCHER);
 
@@ -284,7 +284,7 @@ public:
 			}
 
 			const auto dstPlayerShouldIgnoreDamageFromAllSources = dstPlayerHasActiveSkill &&
-				dstPlayer->getSkillManager()->getActiveSkill()->shouldIgnoreDamageFromAllSources();
+				dstPlayer->getSkillManager()->getActiveSkill()->shouldDenyDamageFromAllSources();
 
 			if (dstPlayerShouldIgnoreDamageFromAllSources && !isSameTeam)
 			{
@@ -319,7 +319,7 @@ public:
 			const auto dstPlayerHasRainbowSkillCard = dstPlayerHasActiveSkill
 				&& dstPlayer->getSkillManager()->getActiveSkill()->getSkillRateType() == SkillRateType::RAINBOW;
 			const auto dstPlayerShouldIgnoreDamageFromAllSources = dstPlayerHasActiveSkill
-				&& dstPlayer->getSkillManager()->getActiveSkill()->shouldIgnoreDamageFromAllSources();
+				&& dstPlayer->getSkillManager()->getActiveSkill()->shouldDenyDamageFromAllSources();
 
 			const auto isValidWeapon = !isTrapWeapon
 				&& ((weaponUsed.weaponType == WeaponType::MELEE) || (weaponUsed.weaponType == WeaponType::RIFLE) || (weaponUsed.weaponType == WeaponType::LAUNCHER));
@@ -334,7 +334,7 @@ public:
 
 			if (dstPlayer->getSkillManager()->hasActiveSkill())
 			{
-				if (dstPlayer->getSkillManager()->getActiveSkill()->shouldDisableOnDamageReceive())
+				if (dstPlayer->getSkillManager()->getActiveSkill()->shouldDisableWhenDamageIsTaken())
 				{
 					dstPlayer->getSkillManager()->deactivateSkill();
 				}

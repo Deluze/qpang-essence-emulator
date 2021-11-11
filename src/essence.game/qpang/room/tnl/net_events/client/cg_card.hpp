@@ -156,7 +156,7 @@ public:
 				return;
 			}
 
-			if (skillTargetPlayerActiveSkillCard->shouldReflectSkillCard() && skill->isReflectableSkillCard()
+			if (skillTargetPlayerActiveSkillCard->shouldReflectTargettedSkillsOntoCasters() && skill->isReflectableSkillCard()
 				&& skill->getSkillTargetType() == SkillTargetType::ENEMY)
 			{
 				const auto targetPlayerId = roomSessionPlayer->getPlayer()->getId();
@@ -206,7 +206,7 @@ public:
 
 		if (roomSessionPlayer->getSkillManager()->hasActiveSkill())
 		{
-			const auto shouldDisableOnRollAction = roomSessionPlayer->getSkillManager()->getActiveSkill()->shouldDisableOnRollAction();
+			const auto shouldDisableOnRollAction = roomSessionPlayer->getSkillManager()->getActiveSkill()->shouldDisableWhenPerformingRollAction();
 			const auto isRollAction = (itemId == ACTION_CARD_ROLL_OVER_LEFT)
 				|| (itemId == ACTION_CARD_ROLL_OVER_RIGHT)
 				|| (itemId == ACTION_CARD_DASH)

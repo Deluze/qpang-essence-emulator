@@ -229,7 +229,7 @@ void GameItemManager::onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32
 
 	if (player->getSkillManager()->hasActiveSkill())
 	{
-		const auto shouldDisableOnGameItemPickup = player->getSkillManager()->getActiveSkill()->shouldDisableOnGameItemPickup();
+		const auto shouldDisableOnGameItemPickup = player->getSkillManager()->getActiveSkill()->shouldDisableWhenGameItemIsPickedUp();
 
 		if (shouldDisableOnGameItemPickup)
 		{
@@ -260,7 +260,7 @@ void GameItemManager::onPickUpEventItem(std::shared_ptr<RoomSessionPlayer> playe
 
 	if (player->getSkillManager()->hasActiveSkill())
 	{
-		const auto shouldDisableOnGameItemPickup = player->getSkillManager()->getActiveSkill()->shouldDisableOnGameItemPickup();
+		const auto shouldDisableOnGameItemPickup = player->getSkillManager()->getActiveSkill()->shouldDisableWhenGameItemIsPickedUp();
 
 		if (shouldDisableOnGameItemPickup)
 		{

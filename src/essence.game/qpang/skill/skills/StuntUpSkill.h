@@ -24,7 +24,7 @@ public:
 		return SkillRateType::SILVER;
 	}
 
-	bool shouldReceiveReducedDamageFromAllSources() override
+	bool shouldTakeLessDamageFromAllSources() override
 	{
 		return true;
 	}

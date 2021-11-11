@@ -22,7 +22,7 @@ public:
 		return SkillRateType::SILVER;
 	}
 
-	bool shouldReceiveReducedDamageFromLaunchers() override
+	bool shouldTakeLessDamageFromLaunchers() override
 	{
 		return true;
 	}

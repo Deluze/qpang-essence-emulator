@@ -186,7 +186,7 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 
 	const auto targetHasActiveSkillCard = target->getSkillManager()->hasActiveSkill();
 	const auto targetShouldInstantlyRespawn = targetHasActiveSkillCard
-		&& target->getSkillManager()->getActiveSkill()->shouldInstantlyRespawnOnDeath();
+		&& target->getSkillManager()->getActiveSkill()->shouldInstantlyRespawnWhenPlayerHasDied();
 
 	target->startRespawnCooldown(!targetShouldInstantlyRespawn);
 

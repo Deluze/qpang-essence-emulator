@@ -22,17 +22,17 @@ public:
 		return SkillRateType::BRONZE;
 	}
 
-	bool shouldDisableOnDamageReceive() override
+	bool shouldDisableWhenDamageIsTaken() override
 	{
 		return true;
 	}
 
-	bool shouldDisableOnGameItemPickup() override
+	bool shouldDisableWhenGameItemIsPickedUp() override
 	{
 		return true;
 	}
 
-	bool shouldDisableOnRollAction() override
+	bool shouldDisableWhenPerformingRollAction() override
 	{
 		return true;
 	}

@@ -104,49 +104,57 @@ public:
 	}
 
 #pragma region Disable SkillCard Handlers
-	virtual bool shouldDisableOnDamageReceive()
+	// Invisible Skill
+	virtual bool shouldDisableWhenDamageIsTaken()
 	{
 		return false;
 	}
 
-	virtual bool shouldDisableOnGameItemPickup()
+	// Invisible Skill
+	virtual bool shouldDisableWhenGameItemIsPickedUp()
 	{
 		return false;
 	}
 
-	virtual bool shouldDisableOnRollAction()
+	// Invisible Skill
+	virtual bool shouldDisableWhenPerformingRollAction()
 	{
 		return false;
 	}
 #pragma endregion Disable SkillCard
 
-	virtual bool shouldInstantlyRespawnOnDeath()
+	// Replay Skill
+	virtual bool shouldInstantlyRespawnWhenPlayerHasDied()
 	{
 		return false;
 	}
 
-	// TODO: Refactor (rename).
-	virtual bool shouldReflectSkillCard()
+	// Reflect Skill
+	virtual bool shouldReflectTargettedSkillsOntoCasters()
 	{
 		return false;
 	}
 
+	// Assassin Skill
 	virtual bool shouldInstantlyKillEnemyWithMeleeWeapon()
 	{
 		return false;
 	}
 
-	virtual bool shouldReceiveReducedDamageFromLaunchers()
+	// Mental Up Skill
+	virtual bool shouldTakeLessDamageFromLaunchers()
 	{
 		return false;
 	}
 
-	virtual bool shouldReceiveReducedDamageFromAllSources()
+	// Stunt Up Skill
+	virtual bool shouldTakeLessDamageFromAllSources()
 	{
 		return false;
 	}
 
-	virtual bool shouldIgnoreDamageFromAllSources()
+	// Iron Wall Skill
+	virtual bool shouldDenyDamageFromAllSources()
 	{
 		return false;
 	}
