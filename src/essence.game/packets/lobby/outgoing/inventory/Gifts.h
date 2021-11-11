@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 
 #include "packets/LobbyServerPacket.h"
@@ -9,13 +10,12 @@
 class Gifts : public LobbyServerPacket
 {
 public:
-	explicit Gifts(const std::vector<InventoryCard>& gifts) : LobbyServerPacket(746)
+	explicit Gifts(const std::vector<InventoryCard>& gifts, const uint16_t totalItemCount,
+	               const uint16_t currentlySendCount, const uint16_t currentItemCount) : LobbyServerPacket(746)
 	{
-		const uint16_t size = static_cast<uint16_t>(gifts.size());
-
-		writeShort(size);
-		writeShort(size);
-		writeShort(size);
+		writeShort(totalItemCount);
+		writeShort(currentlySendCount);
+		writeShort(currentItemCount);
 
 		for (const auto& gift : gifts)
 		{

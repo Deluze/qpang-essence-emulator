@@ -17,8 +17,6 @@ public:
 			return;
 		}
 
-		const auto& gifts = player->getInventoryManager()->listGifts();
-
-		conn->send(Gifts(gifts));
+		player->getInventoryManager()->sendGifts();
 	}
 };

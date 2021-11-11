@@ -9,13 +9,12 @@
 class Inventory : public LobbyServerPacket
 {
 public:
-	explicit Inventory(const std::vector<InventoryCard>& cards) : LobbyServerPacket(781)
+	explicit Inventory(const std::vector<InventoryCard>& cards, const uint16_t totalItemCount,
+	                   const uint16_t currentlySendCount, const uint16_t currentItemCount) : LobbyServerPacket(781)
 	{
-		const uint16_t size = static_cast<uint16_t>(cards.size());
-
-		writeShort(size); // Total amount of elements
-		writeShort(size); // How many elements have been send in total + the amount of elements in the packet.
-		writeShort(size); // Total elements in the current packet.
+		writeShort(totalItemCount);
+		writeShort(currentlySendCount);
+		writeShort(currentItemCount);
 
 		for (const InventoryCard& card : cards)
 		{

@@ -1,5 +1,7 @@
 #include "InventoryManager.h"
 
+#include "Gifts.h"
+#include "Inventory.h"
 #include "ItemId.h"
 #include "OpenCardSuccess.h"
 #include "OpenGift.h"
@@ -92,6 +94,84 @@ std::vector<InventoryCard> InventoryManager::list()
 		cards.push_back(val);
 
 	return cards;
+}
+
+void InventoryManager::sendCards()
+{
+	const auto player = m_player.lock();
+
+	if (player == nullptr)
+	{
+		return;
+	}
+
+	// list of every element. the size of this list = the first short
+	const std::vector<InventoryCard> inventoryCards = list();
+
+	// the amount of elements after which the packet will be divided. can be configured
+	constexpr uint16_t partitionSize = 25;
+
+	// the amount of partitions to send
+	const auto partitionCount = static_cast<uint32_t>(ceil(inventoryCards.size() / static_cast<double>(partitionSize)));
+
+	for (uint16_t i = 0; i < partitionCount; i++)
+	{
+		// this value = the second short
+		const uint16_t currentSendCount = i * partitionSize + partitionSize >= inventoryCards.size()
+			? static_cast<uint16_t>(inventoryCards.size())
+			: i * partitionSize + partitionSize;
+
+		// create a sublist. the size of this = the third short
+		std::vector<InventoryCard> partition = slice(inventoryCards, i * partitionSize + 1, currentSendCount);
+
+		// now send the data
+		player->send(Inventory(partition, static_cast<uint16_t>(inventoryCards.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
+	}
+}
+
+void InventoryManager::sendGifts()
+{
+	const auto player = m_player.lock();
+
+	if (player == nullptr)
+	{
+		return;
+	}
+
+	// list of every element. the size of this list = the first short
+	const std::vector<InventoryCard> gifts = listGifts();
+
+	if (gifts.size() == 0)
+	{
+		player->send(Gifts(gifts, gifts.size(), gifts.size(), gifts.size()));
+
+		return;
+	}
+
+	// the amount of elements after which the packet will be divided. can be configured
+	constexpr uint16_t partitionSize = 10;
+
+	// the amount of partitions to send
+	const auto partitionCount = static_cast<uint32_t>(ceil(gifts.size() / static_cast<double>(partitionSize)));
+
+	for (uint16_t i = 0; i < partitionCount; i++)
+	{
+		std::cout << "Gift Partition: " << i << std::endl;
+
+		// this value = the second short
+		const uint16_t currentSendCount = i * partitionSize + partitionSize >= gifts.size()
+			? static_cast<uint16_t>(gifts.size())
+			: i * partitionSize + partitionSize;
+
+		// create a sublist. the size of this = the third short
+		std::vector<InventoryCard> partition = slice(gifts, i * partitionSize, currentSendCount);
+
+		std::cout << "Size: " << partition.size() << std::endl;
+
+
+		// now send the data
+		player->send(Gifts(partition, static_cast<uint16_t>(gifts.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
+	}
 }
 
 std::vector<InventoryCard> InventoryManager::listGifts()

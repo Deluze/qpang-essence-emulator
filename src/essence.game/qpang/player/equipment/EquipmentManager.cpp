@@ -534,7 +534,7 @@ void EquipmentManager::finishRound(const std::shared_ptr<RoomSessionPlayer>& ses
 
 	const auto cards = player->getInventoryManager()->list();
 
-	player->send(Inventory(cards));
+	player->getInventoryManager()->sendCards();
 
 	save();
 }
