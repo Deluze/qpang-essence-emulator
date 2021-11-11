@@ -291,6 +291,30 @@ public:
 				damage = 1;
 			}
 
+			if (areSkillsEnabled && dstPlayerHasActiveSkill && !isSameTeam)
+			{
+				const auto activeSkill = dstPlayer->getSkillManager()->getActiveSkill();
+				const auto dstPlayerShouldOnlyTakeMeleeDamage = activeSkill->shouldOnlyTakeMeleeDamage();
+
+				if (dstPlayerShouldOnlyTakeMeleeDamage && weaponUsed.weaponType != WeaponType::MELEE)
+				{
+					damage = 0;
+				}
+			}
+
+			const auto srcPlayerHasActiveSkill = areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkill();
+
+			if (areSkillsEnabled && srcPlayerHasActiveSkill && !isSameTeam)
+			{
+				const auto activeSkill = srcPlayer->getSkillManager()->getActiveSkill();
+				const auto srcPlayerShouldOnlyDealMeleeDamage = activeSkill->shouldOnlyDealMeleeDamage();
+
+				if (srcPlayerShouldOnlyDealMeleeDamage && weaponUsed.weaponType != WeaponType::MELEE)
+				{
+					damage = 0;
+				}
+			}
+
 			dstPlayer->takeHealth(damage);
 
 			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance;

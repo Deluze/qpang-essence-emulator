@@ -158,6 +158,18 @@ public:
 	{
 		return false;
 	}
+
+	// Melee Challenge Skill
+	virtual bool shouldOnlyTakeMeleeDamage()
+	{
+		return false;
+	}
+
+	// Melee Challenge Skill
+	virtual bool shouldOnlyDealMeleeDamage()
+	{
+		return false;
+	}
 protected:
 	bool m_hasDuration;
 

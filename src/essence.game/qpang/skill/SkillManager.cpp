@@ -9,6 +9,7 @@
 #include "GiantBeast.h"
 #include "IronWallSkill.h"
 #include "LastWeaponSkill.h"
+#include "MeleeChallengeSkill.h"
 #include "MentalUpSkill.h"
 #include "PocketSizeSkill.h"
 #include "RageSkill.h"
@@ -74,6 +75,11 @@ void SkillManager::initializeDeathMatchSkills()
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<WeaponSealSkill>(); });
 		}
 
+		if (i < 2)
+		{
+			m_skills[GameMode::DM].push_back([]() { return std::make_unique<MeleeChallengeSkill>(); });
+		}
+
 		if (i < 1)
 		{
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<TranseSkill>(); });
@@ -114,6 +120,7 @@ void SkillManager::initializeTeamDeathMatchSkills()
 
 		if (i < 2)
 		{
+			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<MeleeChallengeSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<VitalSkill>(); });
 			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<BlessingSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TradeOffSkill>(); });

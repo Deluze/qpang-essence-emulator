@@ -82,7 +82,7 @@ void PlayerSkillManager::initializeSkillGaugeBoosters()
 			m_skillGaugeBoostPercentage = 0.10;
 			break;
 		case BOOSTER_CBOOST_2:
-			m_skillGaugeBoostPercentage = 0.50;
+			m_skillGaugeBoostPercentage = 0.25;
 			break;
 		default:
 			m_skillGaugeBoostPercentage = 0.00;
