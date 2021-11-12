@@ -69,8 +69,7 @@ static std::unordered_map<uint32_t, Spawn> mapBounds =
 	{ 6, Spawn({58, 0, 38}) }, // City
 	{ 8, Spawn({58, 0, 60}) }, // Bunker
 	{ 9, Spawn({58, 0, 58}) }, // Temple
-	//{ 11, Spawn({37, 0, 92}) }, // Bridge temporarily disabled
-	{ 11, Spawn({37, 0, 92}) }, // Malta
+	{ 11, Spawn({37, 0, 92}) }, // Bridge temporarily disabled
 	{ 12, Spawn({66, 0, 66}) }, // Castaway
 };
 
