@@ -28,6 +28,7 @@ public:
 	/// Updates the redeem code use count, and gives the cash/don/inventory cards to the player.
 	/// </summary>
 	static void sendRedeemCodeRewardsToPlayer(const Player::Ptr& player, const RedeemCode& redeemCode, std::vector<InventoryCard> inventoryCards);
+	static void sendUseRedeemCodeFailToPlayer(const Player::Ptr& player, const uint32_t failCode);
 private:
 	/// <summary>
 	/// Updates the redeem code use count for the player in the redeem_codes and redeem_code_uses db tables.

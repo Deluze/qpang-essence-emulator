@@ -2,6 +2,7 @@
 
 #include "Database.h"
 #include "Emulator.h"
+#include "UseRedeemCodeFailResponse.h"
 #include "UseRedeemCodeSuccessResponse.h"
 
 bool RedeemCodeManager::isOfValidLength(const std::u16string& redeemCode)
@@ -112,8 +113,13 @@ void RedeemCodeManager::updateRedeemCodeUseCountForPlayer(const uint32_t redeemC
 	insertStatement->execute();
 }
 
+void RedeemCodeManager::sendUseRedeemCodeFailToPlayer(const Player::Ptr& player, const uint32_t failCode)
+{
+	player->send(UseRedeemCodeFailResponse(failCode));
+}
+
 void RedeemCodeManager::sendRedeemCodeRewardsToPlayer(const Player::Ptr& player, const RedeemCode& redeemCode,
-	std::vector<InventoryCard> inventoryCards)
+                                                      std::vector<InventoryCard> inventoryCards)
 {
 	updateRedeemCodeUseCountForPlayer(redeemCode.id, player->getId());
 
