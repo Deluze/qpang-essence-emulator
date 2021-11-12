@@ -27,38 +27,59 @@ void EquipmentManager::initialize(std::shared_ptr<Player> player, uint16_t playe
 		851
 	};
 
-	Statement::Ptr stmt = DATABASE->prepare("SELECT * FROM player_equipment WHERE player_id = ?");
-	stmt->bindInteger(playerId);
-	StatementResult::Ptr res = stmt->fetch();
+	const auto selectPlayerEquipmentStatement = DATABASE->prepare("SELECT * FROM player_equipment WHERE player_id = ?");
+
+	selectPlayerEquipmentStatement->bindInteger(playerId);
+
+	const auto result = selectPlayerEquipmentStatement->fetch();
 
 	std::lock_guard l(m_mx);
 
-	while (res->hasNext())
+	while (result->hasNext())
 	{
 		std::array<uint64_t, 13> equips{};
 
-		uint16_t characterId = res->getShort("character_id");
-		equips[0] = res->getInt("head");
-		equips[1] = res->getInt("face");
-		equips[2] = res->getInt("body");
-		equips[3] = res->getInt("hands");
-		equips[4] = res->getInt("legs");
-		equips[5] = res->getInt("shoes");
-		equips[6] = res->getInt("back");
-		equips[7] = res->getInt("side");
+		uint16_t characterId = result->getShort("character_id");
+		equips[0] = result->getInt("head");
+		equips[1] = result->getInt("face");
+		equips[2] = result->getInt("body");
+		equips[3] = result->getInt("hands");
+		equips[4] = result->getInt("legs");
+		equips[5] = result->getInt("shoes");
+		equips[6] = result->getInt("back");
+		equips[7] = result->getInt("side");
 		equips[8] = 0; // ?
-		equips[9] = res->getInt("primary");
-		equips[10] = res->getInt("secondary");
-		equips[11] = res->getInt("throw");
-		equips[12] = res->getInt("melee");
+		equips[9] = result->getInt("primary");
+		equips[10] = result->getInt("secondary");
+		equips[11] = result->getInt("throw");
+		equips[12] = result->getInt("melee");
 
 		m_equips[characterId] = equips;
 
-		res->next();
+		result->next();
 	}
+
+	const auto selectSkillsStatement = DATABASE->prepare("															\
+		SELECT skill_1_card_id, skill_2_card_id, skill_3_card_id FROM player_skill_cards where player_id = ? LIMIT 1\
+	");
+
+	selectSkillsStatement->bindInteger(player->getId());
+
+	const auto selectSkillsResult = selectSkillsStatement->fetch();
+
+	std::vector<uint64_t> skillCards{};
+
+	if (selectSkillsResult->hasResults())
+	{
+		skillCards.push_back(selectSkillsResult->getBigInt("skill_1_card_id"));
+		skillCards.push_back(selectSkillsResult->getBigInt("skill_2_card_id"));
+		skillCards.push_back(selectSkillsResult->getBigInt("skill_3_card_id"));
+	}
+
+	setSkillCards(skillCards);
 }
 
-std::vector<uint16_t> EquipmentManager::getUnlockedCharacters()
+std::vector<uint16_t> EquipmentManager::getUnlockedCharacters() const
 {
 	return {
 		m_unlockedCharacters
@@ -81,12 +102,14 @@ std::array<uint64_t, 9> EquipmentManager::getArmorByCharacter(uint16_t character
 {
 	std::lock_guard l(m_mx);
 
-	auto it = m_equips.find(characterId);
+	const auto it = m_equips.find(characterId);
 
 	if (it == m_equips.cend())
+	{
 		return {};
+	}
 
-	std::array<uint64_t, 13> equip = it->second;
+	const std::array<uint64_t, 13> equip = it->second;
 
 	return {
 		equip[0],
@@ -137,10 +160,12 @@ std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t charact
 {
 	std::lock_guard l(m_mx);
 
-	auto it = m_equips.find(characterId);
+	const auto it = m_equips.find(characterId);
 
 	if (it == m_equips.cend())
+	{
 		return {};
+	}
 
 	const std::array<uint64_t, 13>& equip = it->second;
 
@@ -154,17 +179,17 @@ std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t charact
 
 std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 {
-	std::lock_guard l(m_mx);
+	std::lock_guard l(m_skillCardMx);
 
 	std::array<InventoryCard, 3> skillCards;
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
-		InventoryManager* inv = player->getInventoryManager();
+		InventoryManager* inventoryManager = player->getInventoryManager();
 
-		for (int i = 0; i < m_skillCardIds.size(); i++)
+		for (size_t i = 0; i < m_skillCards.size(); i++)
 		{
-			skillCards[i] = inv->get(m_skillCardIds[i]);
+			skillCards[i] = inventoryManager->get(m_skillCards[i]);
 		}
 	}
 
@@ -173,7 +198,7 @@ std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 
 std::vector<uint64_t> EquipmentManager::getEquippedSkillCardIds() const
 {
-	return m_skillCardIds;
+	return m_skillCards;
 }
 
 void EquipmentManager::removeFunctionCard(uint64_t cardId)
@@ -190,17 +215,17 @@ void EquipmentManager::removeFunctionCard(uint64_t cardId)
 
 void EquipmentManager::removeSkillCard(uint64_t cardId)
 {
-	std::lock_guard g(m_skillCardMx);
+	std::lock_guard l(m_skillCardMx);
 
-	m_skillCardIds.erase(std::remove_if(m_skillCardIds.begin(), m_skillCardIds.end(),
+	m_skillCards.erase(std::remove_if(m_skillCards.begin(), m_skillCards.end(),
 		[cardId](const uint64_t& lhs)
 		{
 			return lhs == cardId;
 		}
-	), m_skillCardIds.end());
+	), m_skillCards.end());
 }
 
-void EquipmentManager::unequipItem(uint64_t cardId)
+void EquipmentManager::unequipItem(const uint64_t cardId)
 {
 	std::lock_guard l(m_mx);
 
@@ -234,11 +259,11 @@ void EquipmentManager::setFunctionCards(const std::vector<uint64_t>& cards)
 	m_functionCards = cards;
 }
 
-void EquipmentManager::setSkillCardIds(const std::vector<uint64_t>& skillCardIds)
+void EquipmentManager::setSkillCards(const std::vector<uint64_t>& skillCards)
 {
-	std::lock_guard g(m_skillCardMx);
+	std::lock_guard l(m_skillCardMx);
 
-	m_skillCardIds = skillCardIds;
+	m_skillCards = skillCards;
 }
 
 void EquipmentManager::setEquipmentForCharacter(uint16_t character, std::array<uint64_t, 13> equip)
@@ -348,7 +373,7 @@ bool EquipmentManager::hasEquipped(const uint64_t cardId, const uint16_t charact
 		if (equipment == cardId)
 			return true;
 
-	for (const auto& skillCard : m_skillCardIds)
+	for (const auto& skillCard : m_skillCards)
 		if (skillCard == cardId)
 			return true;
 
@@ -388,9 +413,9 @@ bool EquipmentManager::hasMeleeWeapon()
 	return false;
 }
 
-uint16_t EquipmentManager::getBaseHealth()
+uint16_t EquipmentManager::getBaseHealth() const
 {
-	if (auto player = m_player.lock(); player != nullptr)
+	if (const auto player = m_player.lock(); player != nullptr)
 	{
 		switch (player->getCharacter())
 		{
@@ -416,9 +441,9 @@ uint16_t EquipmentManager::getBaseHealth()
 
 uint16_t EquipmentManager::getBonusHealth()
 {
-	if (auto player = m_player.lock(); player != nullptr)
+	if (const auto player = m_player.lock(); player != nullptr)
 	{
-		auto equip = m_equips[player->getCharacter()];
+		const auto equip = m_equips[player->getCharacter()];
 
 		switch (player->getInventoryManager()->get(equip[6]).itemId)
 		{
@@ -445,8 +470,7 @@ uint16_t EquipmentManager::getBonusHealth()
 		case 1429412098:
 		case 1429412099:
 		case 1429412100:
-			// Squirtle shield
-		case 1429410049:
+		case 1429410049: // squirtle shield
 			return 20;
 		case 1429415424: // novice back
 			return 30;
@@ -458,33 +482,48 @@ uint16_t EquipmentManager::getBonusHealth()
 	return 0;
 }
 
-bool EquipmentManager::hasFunctionCard(uint32_t functionId)
+bool EquipmentManager::hasFunctionCard(const uint32_t functionId)
 {
-	if (auto player = m_player.lock(); player != nullptr)
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
 		for (const auto& functionCard : m_functionCards)
+		{
 			if (player->getInventoryManager()->get(functionCard).itemId == functionId)
+			{
 				return true;
+			}
+		}
+	}
 
 	return false;
 }
 
-uint8_t EquipmentManager::getExtraAmmoForWeaponIndex(uint8_t index)
+uint8_t EquipmentManager::getExtraAmmoForWeaponIndex(const uint8_t index)
 {
 	if (index == 3)
+	{
 		return 0; // melee lol
+	}
 
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
-		auto equip = m_equips[player->getCharacter()];
-
-		auto itemId = player->getInventoryManager()->get(equip[6]).itemId;
+		const auto& equip = m_equips[player->getCharacter()];
+		const auto itemId = player->getInventoryManager()->get(equip[6]).itemId;
 
 		if (index == 0 && itemId == 1429409536) // schiet ammo
+		{
 			return 1;
+		}
+
 		if (index == 1 && itemId == 1429409792) // lanceer ammo
+		{
 			return 1;
+		}
+
 		if (index == 2 && itemId == 1429408001) // werp ammo
+		{
 			return 1;
+		}
 	}
 
 	return 0;
@@ -505,10 +544,12 @@ uint32_t EquipmentManager::getEquippedBooster()
 
 void EquipmentManager::finishRound(const std::shared_ptr<RoomSessionPlayer>& session)
 {
-	auto player = m_player.lock();
+	const auto player = m_player.lock();
 
 	if (player == nullptr)
+	{
 		return;
+	}
 
 	const auto character = session->getCharacter();
 	const auto playtime = session->getPlaytime();
@@ -516,7 +557,9 @@ void EquipmentManager::finishRound(const std::shared_ptr<RoomSessionPlayer>& ses
 	const auto it = m_equips.find(character);
 
 	if (it == m_equips.cend())
+	{
 		return;
+	}
 
 	for (const auto& equipment : it->second)
 	{
@@ -537,6 +580,19 @@ void EquipmentManager::finishRound(const std::shared_ptr<RoomSessionPlayer>& ses
 	player->getInventoryManager()->sendCards();
 
 	save();
+}
+
+void EquipmentManager::saveSkillCards()
+{
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		DATABASE_DISPATCHER->dispatch("											\
+			REPLACE INTO `player_skill_cards`									\
+				(player_id, skill_1_card_id, skill_2_card_id, skill_3_card_id)	\
+			VALUES																\
+				(?, ?, ?, ?)													\
+		", { player->getId(), m_skillCards[0], m_skillCards[1], m_skillCards[2] });
+	}
 }
 
 void EquipmentManager::save()
@@ -574,6 +630,8 @@ void EquipmentManager::save()
 				}
 			);
 		}
+
+		saveSkillCards();
 	}
 }
 

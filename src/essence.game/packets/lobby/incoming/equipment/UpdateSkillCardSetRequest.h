@@ -1,6 +1,7 @@
+// ReSharper disable CppUseStructuredBinding
+// ReSharper disable CppTooWideScopeInitStatement
 #pragma once
 
-#include "EquippedSkillCards.h"
 #include "Inventory.h"
 #include "UpdateSkillCardSetResponse.h"
 #include "core/communication/packet/PacketEvent.h"
@@ -15,44 +16,9 @@ public:
 	{
 		const auto player = conn->getPlayer();
 
-		std::vector<uint64_t> incomingCardIds{};
+		const auto readCardIds = readAndGetCardIds(packet, player);
 
-		for (int i = 0; i < SKILL_CARDS_PER_SET; i++)
-		{
-			const auto incomingCardId = packet.readLong();
-
-			packet.readEmpty(CARD_DATA_LENGTH - 8);
-
-			if (!player->getInventoryManager()->hasCard(incomingCardId))
-			{
-				continue;
-			}
-
-			const auto incomingCard = player->getInventoryManager()->get(incomingCardId);
-
-			bool hasCardId = false;
-
-			for (const auto cardId : incomingCardIds)
-			{
-				if (const auto card = player->getInventoryManager()->get(cardId); (card.itemId == incomingCard.itemId))
-				{
-					hasCardId = true;
-
-					break;
-				}
-			}
-
-			if (!hasCardId)
-			{
-				incomingCardIds.push_back(incomingCardId);
-			}
-		}
-
-		toggleActiveStateForInventoryCards(player, false);
-
-		player->getEquipmentManager()->setSkillCardIds(incomingCardIds);
-
-		toggleActiveStateForInventoryCards(player, true);
+		player->getEquipmentManager()->setSkillCards(readCardIds);
 
 		conn->send(UpdateSkillCardSetResponse(player->getEquipmentManager()->getEquippedSkillCards()));
 	}
@@ -63,5 +29,41 @@ private:
 		{
 			player->getInventoryManager()->setCardActive(equippedSkillCard.id, isActive);
 		}
+	}
+
+	static std::vector<uint64_t> readAndGetCardIds(QpangPacket& packet, const Player::Ptr& player)
+	{
+		std::vector<uint64_t> readCardIds = {};
+
+		for (size_t i = 0; i < 3; i++)
+		{
+			if (const auto readCardId = packet.readLong(); player->getInventoryManager()->hasCard(readCardId))
+			{
+				// Player has card, now lets check player has not equipped multiple cards with the same itemId.
+				const auto inventoryCard = player->getInventoryManager()->get(readCardId);
+
+				auto isDuplicateItemId = false;
+
+				for (const auto cardId : readCardIds)
+				{
+					const auto lookupInventoryCard = player->getInventoryManager()->get(cardId);
+
+					if (inventoryCard.itemId == lookupInventoryCard.itemId)
+					{
+						isDuplicateItemId = true;
+					}
+				}
+
+				readCardIds.push_back(isDuplicateItemId ? 0 : readCardId);
+			}
+			else
+			{
+				readCardIds.push_back(0);
+			}
+
+			packet.readEmpty(35);
+		}
+
+		return readCardIds;
 	}
 };
