@@ -16,7 +16,7 @@ class EquipmentManager
 public:
 	void initialize(std::shared_ptr<Player> player, uint16_t playerId);
 
-	std::vector<uint16_t> getUnlockedCharacters() const;
+	std::vector<uint16_t> getUnlockedCharacters();
 
 	std::array<uint64_t, 13> getEquipmentByCharacter(uint16_t characterId);
 	std::array<uint64_t, 9> getArmorByCharacter(uint16_t characterId);
@@ -29,23 +29,23 @@ public:
 	void removeFunctionCard(uint64_t cardId);
 	void removeSkillCard(uint64_t cardId);
 	void unequipItem(uint64_t cardId);
-	
+
 	void addFunctionCard(uint64_t cardId);
 	void setFunctionCards(const std::vector<uint64_t>& cards);
 
-	void setSkillCards(const std::vector<uint64_t>& skillCards);
+	void setSkillCardIds(const std::vector<uint64_t>& skillCardIds);
 
 	void setEquipmentForCharacter(uint16_t character, std::array<uint64_t, 13> equip);
 	void setWeapons(uint16_t character, const std::array<uint64_t, 4>& weapons);
 	void setArmor(uint16_t character, const std::array<uint64_t, 9>& armor);
 
-	static uint16_t characterIndexToId(const uint16_t characterIndex);
+	uint16_t characterIndexToId(const uint16_t characterIndex);
 	bool hasEquipped(const uint64_t cardId);
 	bool hasEquipped(const uint64_t cardId, const uint16_t character);
 	uint32_t getDefaultWeapon();
 	bool hasMeleeWeapon();
 
-	uint16_t getBaseHealth() const;
+	uint16_t getBaseHealth();
 	uint16_t getBonusHealth();
 	bool hasFunctionCard(uint32_t functionId);
 
@@ -53,8 +53,6 @@ public:
 	uint32_t getEquippedBooster();
 
 	void finishRound(const std::shared_ptr<RoomSessionPlayer>& player);
-
-	void saveSkillCards();
 	void save();
 	void close();
 private:
@@ -62,7 +60,7 @@ private:
 	std::vector<uint16_t> m_unlockedCharacters;
 	std::mutex m_mx;
 
-	std::vector<uint64_t> m_skillCards;
+	std::vector<uint64_t> m_skillCardIds;
 	std::recursive_mutex m_skillCardMx;
 
 

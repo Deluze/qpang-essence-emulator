@@ -1,9 +1,8 @@
 #include "InventoryManager.h"
 
-#include "ItemId.h"
-
 #include "Gifts.h"
 #include "Inventory.h"
+#include "ItemId.h"
 #include "OpenCardSuccess.h"
 #include "OpenGift.h"
 #include "packets/lobby/outgoing/inventory/DisableFunctionCard.h"
@@ -66,10 +65,23 @@ void InventoryManager::initialize(const std::shared_ptr<Player>& player, const u
 			functionCardIds.push_back(card.id);
 		}
 
+		// ReSharper disable once CppTooWideScope
+		const auto isActiveSkillCard = (card.type == 75 && card.isActive);
+
+		if (isActiveSkillCard)
+		{
+			// You can not have more than 3 active skill cards.
+			if (skillCardIds.size() < 3)
+			{
+				skillCardIds.push_back(card.id);
+			}
+		}
+
 		result->next();
 	}
 
 	player->getEquipmentManager()->setFunctionCards(functionCardIds);
+	player->getEquipmentManager()->setSkillCardIds(skillCardIds);
 }
 
 std::vector<InventoryCard> InventoryManager::list()
@@ -359,12 +371,15 @@ void InventoryManager::useSkillCard(const uint64_t cardId, const uint16_t period
 
 	if (card.period <= 0)
 	{
+		card.isActive = false;
+
 		player->getEquipmentManager()->removeSkillCard(cardId);
 	}
 
-	DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = ? WHERE id = ?",
+	DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = ?, active = ? WHERE id = ?",
 		{
 			card.period,
+			card.isActive,
 			card.id
 		});
 }
@@ -466,18 +481,14 @@ void InventoryManager::giftCard(InventoryCard& card, const std::shared_ptr<Playe
 	const auto our = m_player.lock();
 
 	if (our == nullptr)
-	{
 		return;
-	}
 
 	std::lock_guard lg(m_mx);
 
-	const auto cardOwnerPlayer = Game::instance()->getPlayer(card.playerOwnerId);
+	auto cardOwnerPlayer = Game::instance()->getPlayer(card.playerOwnerId);
 
 	m_cards.erase(card.id);
-
 	card.timeCreated = time(nullptr);
-
 	player->getInventoryManager()->receiveGift(card, our->getName());
 
 	DATABASE_DISPATCHER->dispatch(
@@ -507,18 +518,15 @@ void InventoryManager::giftCard(InventoryCard& card, const std::shared_ptr<Playe
 
 void InventoryManager::receiveGift(InventoryCard& card, const std::u16string& sender)
 {
-	const auto player = m_player.lock();
+	auto player = m_player.lock();
 
 	if (player == nullptr)
-	{
 		return;
-	}
 
 	std::lock_guard lg(m_mx);
 
 	card.isOpened = false;
 	card.playerOwnerId = player->getId();
-
 	m_gifts[card.id] = card;
 
 	player->send(ReceiveGift(card, sender));
