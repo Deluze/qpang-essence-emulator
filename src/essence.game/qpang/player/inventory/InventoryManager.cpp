@@ -361,16 +361,12 @@ void InventoryManager::useSkillCard(const uint64_t cardId, const uint16_t period
 	{
 		player->getEquipmentManager()->removeSkillCard(cardId);
 	}
-	else
-	{
-		DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = ? WHERE id = ?",
-			{
-				card.period,
-				card.id
-			});
-	}
 
-	player->getEquipmentManager()->saveSkillCards();
+	DATABASE_DISPATCHER->dispatch("UPDATE player_items SET period = ? WHERE id = ?",
+		{
+			card.period,
+			card.id
+		});
 }
 
 void InventoryManager::useCard(const uint64_t cardId, const uint32_t period)

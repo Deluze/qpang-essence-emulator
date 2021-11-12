@@ -179,7 +179,7 @@ std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t charact
 
 std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 {
-	std::lock_guard l(m_skillCardMx);
+	std::lock_guard l(m_mx);
 
 	std::array<InventoryCard, 3> skillCards;
 
@@ -630,12 +630,11 @@ void EquipmentManager::save()
 				}
 			);
 		}
-
-		saveSkillCards();
 	}
 }
 
 void EquipmentManager::close()
 {
 	save();
+	saveSkillCards();
 }
