@@ -27,9 +27,7 @@
 #include "VitalSkill.h"
 #include "WeaponSealSkill.h"
 
-class IronWallSkill;
-SkillManager::SkillManager()
-= default;
+SkillManager::SkillManager() = default;
 
 void SkillManager::initialize()
 {
