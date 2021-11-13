@@ -3,6 +3,8 @@
 #include <iostream>
 #include <ctime>
 
+#include "AABBHelper.h"
+#include "RoomSession.h"
 #include "core/Emulator.h"
 #include "core/database/Database.h"
 
@@ -58,7 +60,81 @@ void SpawnManager::initialize()
 }
 
 // TODO: Create a method for grabbing a random spawn for deathmatch specifically that's calculated
-// based on the amount of players near a spawn so the less populated spawn is always picked.
+Spawn SpawnManager::getLeastPopulatedSpawn(const uint8_t map, const uint8_t team,
+	const std::vector<RoomSessionPlayer::Ptr>& players, const RoomSession::Ptr& roomSession)
+{
+	std::lock_guard lg(m_mx);
+
+	// The team must be solo (0), blue (1) or yellow (2) for it to be valid.
+	if (team != 0 && team != 1 && team != 2)
+	{
+		return {};
+	}
+
+	const auto& spawns = m_spawns[map][team];
+
+	// If there are no spawns we return an empty struct.
+	if (spawns.empty())
+	{
+		return {};
+	}
+
+	std::unordered_map<uint32_t, uint32_t> spawnPopulations{};
+
+	uint32_t lowestSpawnPopulationCount = std::numeric_limits<uint32_t>::max();
+
+	for (uint32_t i = 0; i < spawns.size(); i++)
+	{
+		const auto& spawn = spawns[i];
+
+		spawnPopulations[i] = 0;
+
+		for (const auto& player : players)
+		{
+			const auto playerPosition = player->getPosition();
+
+			// ReSharper disable once CppTooWideScope
+			const auto isWithinSpawnRadius = AABBHelper::IsPositionWithinSpawnRadius(playerPosition, spawn, 15);
+
+			if (isWithinSpawnRadius)
+			{
+				spawnPopulations[i]++;
+			}
+		}
+
+		if (spawnPopulations[i] < lowestSpawnPopulationCount)
+		{
+			lowestSpawnPopulationCount = spawnPopulations[i];
+		}
+	}
+
+	uint32_t spawnIndex = 0;
+	std::vector<Spawn> lowestSpawnPopulations{};
+
+	for (const auto& spawnPopulation : spawnPopulations)
+	{
+		if (spawnPopulation.second == lowestSpawnPopulationCount)
+		{
+			lowestSpawnPopulations.push_back(spawns[spawnIndex]);
+		}
+
+		spawnIndex++;
+	}
+
+	const auto lastRespawnLocation = roomSession->getLastRespawnLocation();
+
+	auto findRespawnLocationAttempt = 1;
+	auto newRespawnLocation = lastRespawnLocation;
+
+	while ((findRespawnLocationAttempt <= 5) && lastRespawnLocation.x == newRespawnLocation.x && lastRespawnLocation.y == newRespawnLocation.y && lastRespawnLocation.z == newRespawnLocation.z)
+	{
+		newRespawnLocation = lowestSpawnPopulations[rand() % lowestSpawnPopulations.size()];
+
+		findRespawnLocationAttempt++;
+	}
+
+	return newRespawnLocation;
+}
 
 Spawn SpawnManager::getRandomSpawn(uint8_t map, uint8_t team)
 {
