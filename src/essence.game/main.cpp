@@ -7,6 +7,8 @@
 
 uint32_t main()
 {
+	srand(time(nullptr));
+
 	Emulator::instance()->initialize();
 
 	Game::instance()->initialize();
@@ -14,4 +16,5 @@ uint32_t main()
 	Game::instance()->run();
 
 	Emulator::instance()->run();
+
 }
