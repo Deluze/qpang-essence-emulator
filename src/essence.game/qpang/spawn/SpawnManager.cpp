@@ -59,7 +59,6 @@ void SpawnManager::initialize()
 	}
 }
 
-// TODO: Create a method for grabbing a random spawn for deathmatch specifically that's calculated
 Spawn SpawnManager::getLeastPopulatedSpawn(const uint8_t map, const uint8_t team,
 	const std::vector<RoomSessionPlayer::Ptr>& players, const RoomSession::Ptr& roomSession)
 {
