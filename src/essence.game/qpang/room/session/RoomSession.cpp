@@ -512,6 +512,16 @@ bool RoomSession::isAlmostFinished()
 
 }
 
+void RoomSession::setLastRespawnLocation(Spawn spawn)
+{
+	m_lastRespawnLocation = spawn;
+}
+
+Spawn RoomSession::getLastRespawnLocation() const
+{
+	return m_lastRespawnLocation;
+}
+
 void RoomSession::addPointsForTeam(uint8_t team, uint32_t amount)
 {
 	if (team == 1)
@@ -888,9 +898,12 @@ void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 	}
 
 	const auto isTeamMode = getGameMode()->isTeamMode();
-	const auto team = (isTeamMode ? player->getTeam() : 0);
+	const uint8_t team = (isTeamMode ? player->getTeam() : 0);
 
-	const auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), team);
+	const auto spawn = Game::instance()->getSpawnManager()->
+		getLeastPopulatedSpawn(m_room->getMap(), team, getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team), shared_from_this());
+
+	setLastRespawnLocation(spawn);
 
 	// Whether someone becomes VIP or not *has* to be decided during respawn.
 	if (this->getRoom()->getMode() == GameMode::Mode::VIP)
@@ -999,6 +1012,23 @@ std::vector<RoomSessionPlayer::Ptr> RoomSession::getPlayingPlayers()
 	for (const auto& [id, session] : m_players)
 		if (session->isPlaying() && !session->isSpectating())
 			players.push_back(session);
+
+	return players;
+}
+
+std::vector<RoomSessionPlayer::Ptr> RoomSession::getAlivePlayingPlayersExcept(const uint32_t playerId, const uint8_t team)
+{
+	std::lock_guard lg(m_playerMx);
+
+	std::vector<RoomSessionPlayer::Ptr> players;
+
+	for (const auto& [id, session] : m_players)
+	{
+		if (session->isPlaying() && !session->isSpectating() && !session->isDead() && (id != playerId))
+		{
+			players.push_back(session);
+		}
+	}
 
 	return players;
 }

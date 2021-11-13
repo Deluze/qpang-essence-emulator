@@ -39,6 +39,9 @@ public:
 	bool canFinish();
 	bool isAlmostFinished();
 
+	void setLastRespawnLocation(Spawn spawn);
+	Spawn getLastRespawnLocation() const;
+
 	void addPointsForTeam(uint8_t team, uint32_t amount = 1);
 	void addBluePoints(uint32_t amount = 1);
 	void addYellowPoints(uint32_t amount = 1);
@@ -61,6 +64,7 @@ public:
 
 	std::vector<RoomSessionPlayer::Ptr> getPlayers();
 	std::vector<RoomSessionPlayer::Ptr> getPlayingPlayers();
+	std::vector<RoomSessionPlayer::Ptr> getAlivePlayingPlayersExcept(const uint32_t playerId, const uint8_t team);
 	std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersToBeSelectedAsTag();
 	std::vector<RoomSessionPlayer::Ptr> getPlayersForTeam(uint8_t team);
 	uint32_t getPointsForTeam(uint8_t team);
@@ -229,6 +233,8 @@ private:
 
 	uint32_t m_tagCountdown;
 	uint32_t m_initialWaitTime;
+
+	Spawn m_lastRespawnLocation{};
 
 	std::vector<uint32_t> m_previouslySelectedTagPlayers = {};
 };
