@@ -35,7 +35,6 @@ public:
 		m_useCount++;
 	}
 
-	// new
 	void setMaxUseCount(const uint16_t count)
 	{
 		m_maxUseCount = count;
@@ -50,8 +49,6 @@ public:
 	{
 		return m_useCount;
 	}
-
-	// end new
 
 	[[nodiscard]] bool hasDuration() const
 	{
