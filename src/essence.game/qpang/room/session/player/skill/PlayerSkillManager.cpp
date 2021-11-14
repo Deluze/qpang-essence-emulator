@@ -42,7 +42,7 @@ void PlayerSkillManager::setupEquippedSkillCards()
 
 				if (m_firstSkill != nullptr)
 				{
-					m_firstSkill->setUsesLeftCount(period);
+					m_firstSkill->setMaxUseCount(period);
 					m_firstSkill->bind(roomSessionPlayer);
 				}
 
@@ -53,7 +53,7 @@ void PlayerSkillManager::setupEquippedSkillCards()
 
 				if (m_secondSkill != nullptr)
 				{
-					m_secondSkill->setUsesLeftCount(period);
+					m_secondSkill->setMaxUseCount(period);
 					m_secondSkill->bind(roomSessionPlayer);
 				}
 
@@ -64,7 +64,7 @@ void PlayerSkillManager::setupEquippedSkillCards()
 
 				if (m_thirdSkill != nullptr)
 				{
-					m_thirdSkill->setUsesLeftCount(period);
+					m_thirdSkill->setMaxUseCount(period);
 					m_thirdSkill->bind(roomSessionPlayer);
 				}
 			}
@@ -145,7 +145,9 @@ void PlayerSkillManager::activateSkill(const std::shared_ptr<Skill>& skill, cons
 
 		skill->use();
 
-		const auto usesLeftCount = skill->getUsesLeftCount();
+		std::cout << "Increased use count to " << skill->getUseCount() << std::endl;
+
+		const auto usesLeftCount = (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
 
 		roomSession->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::ACTIVATE_CARD, cardType, itemId, seqId, usesLeftCount, m_skillTargetPlayerIds);
 
@@ -192,7 +194,9 @@ void PlayerSkillManager::failSkill(const std::shared_ptr<Skill>& skill, const ui
 
 		skill->use();
 
-		const auto usesLeftCount = skill->getUsesLeftCount();
+		std::cout << "Increased use count to " << skill->getUseCount() << std::endl;
+
+		const auto usesLeftCount = (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
 
 		player->getRoomSession()->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::FAIL_CARD_ACTIVATION, cardType, itemId, seqId, usesLeftCount);
 
@@ -319,7 +323,7 @@ uint64_t PlayerSkillManager::getActiveSkillSeqId() const
 	return m_activeSkillSeqId;
 }
 
-uint32_t PlayerSkillManager::getActiveSkillCardType()
+uint32_t PlayerSkillManager::getActiveSkillCardType() const
 {
 	return m_activeSkillCardType;
 }

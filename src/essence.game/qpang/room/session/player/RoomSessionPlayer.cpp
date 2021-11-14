@@ -179,7 +179,9 @@ void RoomSessionPlayer::stop()
 
 		if (equippedInGameSkillCard != nullptr)
 		{
-			curr->getPlayer()->getInventoryManager()->useSkillCard(equippedInventorySkillCard.id, equippedInGameSkillCard->getUsesLeftCount());
+			const uint16_t remainingPeriod = (equippedInventorySkillCard.period - equippedInGameSkillCard->getUseCount());
+
+			curr->getPlayer()->getInventoryManager()->useSkillCard(equippedInventorySkillCard.id, remainingPeriod > 0 ? remainingPeriod : 0);
 		}
 	}
 

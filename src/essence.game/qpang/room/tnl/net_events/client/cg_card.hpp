@@ -116,7 +116,7 @@ public:
 			return;
 		}
 
-		if (!skill->hasUsesLeft())
+		if (!skill->canUse())
 		{
 			return;
 		}

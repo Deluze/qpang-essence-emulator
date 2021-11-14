@@ -40,7 +40,7 @@ public:
 
 	uint32_t getActiveSkillTargetPlayerId() const;
 	uint64_t getActiveSkillSeqId() const;
-	uint32_t getActiveSkillCardType();
+	uint32_t getActiveSkillCardType() const;
 
 	static uint32_t getRequiredSkillPoints(const std::shared_ptr<Skill>& skill);
 

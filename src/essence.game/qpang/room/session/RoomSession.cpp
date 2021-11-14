@@ -167,7 +167,9 @@ bool RoomSession::removePlayer(uint32_t playerId)
 
 		if (equippedInGameSkillCard != nullptr)
 		{
-			player->getPlayer()->getInventoryManager()->useSkillCard(equippedInventorySkillCard.id, equippedInGameSkillCard->getUsesLeftCount());
+			const uint16_t remainingPeriod = (equippedInventorySkillCard.period - equippedInGameSkillCard->getUseCount());
+
+			player->getPlayer()->getInventoryManager()->useSkillCard(equippedInventorySkillCard.id, remainingPeriod > 0 ? remainingPeriod : 0);
 		}
 	}
 

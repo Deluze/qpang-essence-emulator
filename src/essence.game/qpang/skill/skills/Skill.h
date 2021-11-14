@@ -3,8 +3,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "ItemId.h"
-
+#include <ItemId.h>
 #include "SkillRateType.h"
 #include "SkillTargetType.h"
 
@@ -13,11 +12,14 @@ class RoomSessionPlayer;
 class Skill  // NOLINT(cppcoreguidelines-special-member-functions)
 {
 public:
+	inline static constexpr uint8_t GLOBAL_MAX_USE_COUNT = 3;
+
 	explicit Skill(const bool hasDuration = false, const uint32_t duration = 0) :
 		m_hasDuration(hasDuration),
 		m_duration(duration),
 		m_initialDuration(duration),
-		m_usesLeftCount(1)
+		m_useCount(0),
+		m_maxUseCount(1)
 	{
 	}
 
@@ -30,26 +32,26 @@ public:
 
 	void use()
 	{
-		if (m_usesLeftCount > 0)
-		{
-			m_usesLeftCount -= 1;
-		}
+		m_useCount++;
 	}
 
-	void setUsesLeftCount(const uint32_t usesLeftCount)
+	// new
+	void setMaxUseCount(const uint16_t count)
 	{
-		m_usesLeftCount = usesLeftCount;
+		m_maxUseCount = count;
 	}
 
-	bool hasUsesLeft() const
+	uint16_t canUse() const
 	{
-		return (m_usesLeftCount > 0);
+		return (m_useCount < GLOBAL_MAX_USE_COUNT) && (m_useCount < m_maxUseCount);
 	}
 
-	uint32_t getUsesLeftCount() const
+	uint16_t getUseCount() const
 	{
-		return m_usesLeftCount;
+		return m_useCount;
 	}
+
+	// end new
 
 	[[nodiscard]] bool hasDuration() const
 	{
@@ -176,7 +178,8 @@ protected:
 	uint32_t m_duration;
 	uint32_t m_initialDuration;
 
-	uint32_t m_usesLeftCount;
+	uint16_t m_useCount;
+	uint16_t m_maxUseCount;
 
 	std::shared_ptr<RoomSessionPlayer> m_player;
 };
