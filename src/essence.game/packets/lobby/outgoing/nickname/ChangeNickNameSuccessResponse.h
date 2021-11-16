@@ -5,7 +5,8 @@
 class ChangeNickNameSuccessResponse : public LobbyServerPacket
 {
 public:
-	explicit ChangeNickNameSuccessResponse() : LobbyServerPacket(838)
+	explicit ChangeNickNameSuccessResponse(const std::u16string nickName) : LobbyServerPacket(838)
 	{
+		writeString(nickName, 16);
 	}
 };
