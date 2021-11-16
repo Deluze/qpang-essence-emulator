@@ -2,8 +2,8 @@
 
 #include <boost/format.hpp>
 
-#include "AddSpawnCommand.h"
 #include "BanCommand.h"
+#include "DebugCommand.h"
 #include "DatabaseCommand.h"
 #include "ReloadCommand.h"
 #include "UnlimitedCommand.h"
