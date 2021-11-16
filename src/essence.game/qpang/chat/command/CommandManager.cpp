@@ -51,16 +51,15 @@ void CommandManager::initialize()
 		{u"ban", new BanCommand()},
 		{u"permban", new PermBanCommand()},
 		{u"database", new DatabaseCommand()},
-		//{u"unlimited", new UnlimitedCommand()},
 		{u"reload", new ReloadCommand()},
 		{u"spectate", new SpectateCommand()},
-		{u"nc", new NameChangeCommand()},
 		{u"invincible", new InvincibleCommand()},
 		{u"r3", new ToggleReloadGlitchCommand()},
 		{u"addskillpoints", new AddSkillPointsCommand()},
 		{u"asp", new AddSkillPointsCommand()},
 		{u"fakedeath", new FakeDeathCommand()},
 		{u"fakedeathall", new FakeDeathAllCommand()},
+		{u"debug", new DebugCommand()},
 	};
 }
 
