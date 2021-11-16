@@ -26,8 +26,7 @@ public:
 			return;
 		}
 
-		// TODO: Check if nickname has special characters in name (regex).
-		// Nickname may only contain certain characters.
+		// TODO: Validate nickname with regular expression.
 
 		const auto statement = DATABASE->prepare("SELECT * FROM `players` WHERE name = ? LIMIT 1");
 
@@ -39,6 +38,10 @@ public:
 
 			return;
 		}
+
+		// TODO: Check if nickname is in player_nickname_registration table.
+
+		// TODO: If all goes well, add nickname to player_nickname_registration table.
 
 		conn->send(ValidateNickNameSuccessResponse());
 	}
