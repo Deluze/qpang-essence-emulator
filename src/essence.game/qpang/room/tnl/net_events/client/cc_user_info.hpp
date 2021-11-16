@@ -35,19 +35,19 @@ public:
 		this->launcherWeapon = equippedWeapons[1];
 		this->throwingWeapon = equippedWeapons[2];
 
-		this->unk_05 = roomSessionPlayer->getHealth();
+		this->playerHealth = roomSessionPlayer->getHealth();
 	}
 
 	U32 cmd = 0; // 1 = unk, 2 = unk, 3 = sets data
 	U32 playerId = 0;
 	U16 unk_03 = 0;
 	U8 unk_04 = 0; // selects melee as weapon?
-	U16 unk_05 = 0; // hp decrease?
+	U16 playerHealth = 0; // hp decrease?
 	U8 unk_06 = 0; // sets a numberbox
 	U32 skillCard1 = 0;
 	U32 skillCard2 = 0;
 	U32 skillCard3 = 0;
-	U32 skillCard4 = 0; // don't use; reserved for skill books
+	U32 skillCard4 = 0;
 	U32 meleeWeapon = 0;
 	U32 gunWeapon = 0;
 	U32 launcherWeapon = 0;
@@ -62,7 +62,7 @@ public:
 		bstream->write(playerId);
 		bstream->write(unk_03);
 		bstream->write(unk_04);
-		bstream->write(unk_05);
+		bstream->write(playerHealth);
 		bstream->write(unk_06);
 		bstream->write(skillCard1);
 		bstream->write(skillCard2);
