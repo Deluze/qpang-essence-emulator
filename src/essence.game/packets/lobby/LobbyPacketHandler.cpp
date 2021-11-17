@@ -4,7 +4,7 @@
 #include "Handshake.h"
 #include "Login.h"
 #include "HandleEnchantItemRequest.h"
-#include "RequestTrade.h"
+#include "HandleTradeRequest.h"
 #include "channel/HandleRequestChannelHost.h"
 #include "channel/HandleRequestChannelList.h"
 #include "crane/HandleUseCraneRequest.h"
@@ -45,7 +45,7 @@
 #include "shop/HandleGetShopItemsRequest.h"
 #include "shop/HandleGetShopPackagesRequest.h"
 #include "shop/HandleSendGiftInShopRequest.h"
-#include "training/TrainingRequest.h"
+#include "training/HandleTrainingRequest.h"
 #include "account/HandleAccountRegistrationRequest.h"
 #include "account/HandleReferralRegistrationRequest.h"
 
@@ -93,7 +93,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(812, new HandleGiftCardRequest());
 	add(815, new HandleSendGiftInShopRequest());
 	// 826 = Trigger NTS_ROY_NEWBIE_EVENT_DESC_START_1 (outgoing)
-	add(828, new TrainingRequest());
+	add(828, new HandleTrainingRequest());
 	add(831, new HandleGetPlayerCashBalanceRequest());
 	add(834, new HandleEnableFunctionCardRequest());
 	add(837, new HandleChangeNickNameRequest());
@@ -102,7 +102,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(851, new HandleUseRedeemCodeRequest());
 	add(861, new HandleDisableFunctionCardRequest());
 	// 875 - Send trade request
-	add(875, new RequestTrade());
+	add(875, new HandleTradeRequest());
 	// 884 - Trade cancel?
 	add(897, new HandleUseCraneRequest());
 	add(901, new HandleGetDailyBonusRequest());

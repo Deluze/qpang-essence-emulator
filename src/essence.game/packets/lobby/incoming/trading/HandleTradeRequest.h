@@ -2,7 +2,7 @@
 
 #include "core/communication/packet/PacketEvent.h"
 
-class RequestTrade final : public PacketEvent
+class HandleTradeRequest final : public PacketEvent
 {
 public:
 	// Trade cancel 884
@@ -22,7 +22,7 @@ public:
 			return;
 		}
 
-		std::cout << "RequestTrade::handle >> Player " << player->getId() << " has requested to trade with " << targetPlayerId << std::endl;
+		std::cout << "HandleTradeRequest::handle >> Player " << player->getId() << " has requested to trade with " << targetPlayerId << std::endl;
 
 		// 876 - Shows trade request menu.
 		//conn->send(LobbyServerPacket(876));
