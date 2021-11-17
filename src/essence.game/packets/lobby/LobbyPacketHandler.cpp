@@ -1,6 +1,6 @@
 #include "LobbyPacketHandler.h"
 
-#include "GiftCardEvent.h"
+#include "HandleGiftCardRequest.h"
 #include "Handshake.h"
 #include "Login.h"
 #include "HandleEnchantItemRequest.h"
@@ -22,14 +22,14 @@
 #include "gameroom/HandleGameRoomInviteRequest.h"
 #include "gameroom/HandleGetGameRoomsRequest.h"
 #include "gameroom/HandleGetGameSettingsRequest.h"
-#include "inventory/DeleteCard.h"
-#include "inventory/DisableFunctionCardEvent.h"
-#include "inventory/EnableFunctionCardEvent.h"
-#include "inventory/ExtendCardEvent.h"
-#include "inventory/OpenCardRequest.h"
-#include "inventory/OpenGift.h"
-#include "inventory/RequestGifts.h"
-#include "inventory/RequestInventory.h"
+#include "inventory/HandleDeleteInventoryCardRequest.h"
+#include "inventory/HandleDisableFunctionCardRequest.h"
+#include "inventory/HandleEnableFunctionCardRequest.h"
+#include "inventory/HandleExtendInventoryCardRequest.h"
+#include "inventory/HandleOpenInventoryCardRequest.h"
+#include "inventory/HandleOpenGiftRequest.h"
+#include "inventory/HandleGetGiftsRequest.h"
+#include "inventory/HandleGetInventoryRequest.h"
 #include "memo/RequestMemos.h"
 #include "nickname/ChangeNickNameRequest.h"
 #include "nickname/ValidateNickNameRequest.h"
@@ -57,8 +57,8 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(623, new HandleEquipWeaponRequest());
 	add(646, new HandleGetEquippedSkillCardsRequest());
 	add(649, new HandleUpdateSkillSetRequest());
-	add(652, new DeleteCard());
-	add(655, new OpenCardRequest());
+	add(652, new HandleDeleteInventoryCardRequest());
+	add(655, new HandleOpenInventoryCardRequest());
 	add(667, new ValidateNickNameRequest());
 	// 670 - Choose nickname and characters, create account.
 	add(670, new HandleAccountRegistrationRequest());
@@ -77,30 +77,30 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(725, new RequestMemos());
 	// 728 - Send memo
 	add(738, new WhisperEvent());
-	add(742, new OpenGift());
-	add(745, new RequestGifts());
+	add(742, new HandleOpenGiftRequest());
+	add(745, new HandleGetGiftsRequest());
 	// 751 - Has something to do with joining a room (also occurs with creating a room)
 	add(758, new HandleGetGameRoomsRequest());
 	add(762, new HandleRequestChannelList());
 	add(766, new HandleRequestChannelHost());
 	add(769, new HandleGetGameSettingsRequest());
-	add(780, new RequestInventory());
+	add(780, new HandleGetInventoryRequest());
 	add(791, new RequestPlayerRanking());
 	add(797, new RequestShopItems());
 	add(800, new RequestShopPackages());
 	add(803, new BuyCardEvent());
-	add(809, new ExtendCardEvent());
-	add(812, new GiftCardEvent());
+	add(809, new HandleExtendInventoryCardRequest());
+	add(812, new HandleGiftCardRequest());
 	add(815, new RequestSendPresentInShop());
 	// 826 = Trigger NTS_ROY_NEWBIE_EVENT_DESC_START_1 (outgoing)
 	add(828, new TrainingRequest());
 	add(831, new RequestCashBalance());
-	add(834, new EnableFunctionCardEvent());
+	add(834, new HandleEnableFunctionCardRequest());
 	add(837, new ChangeNickNameRequest());
 	add(841, new ResetWinLossEvent());
 	add(844, new ResetKillDeathEvent());
 	add(851, new UseRedeemCodeRequest());
-	add(861, new DisableFunctionCardEvent());
+	add(861, new HandleDisableFunctionCardRequest());
 	// 875 - Send trade request
 	add(875, new RequestTrade());
 	// 884 - Trade cancel?

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/inventory/SendDisableFunctionCard.h"
+#include "packets/lobby/outgoing/inventory/SendEnableFunctionCard.h"
 #include "qpang/ItemId.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/inventory/InventoryManager.h"
 
-class DisableFunctionCardEvent final : public PacketEvent
+class HandleEnableFunctionCardRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
@@ -21,7 +21,7 @@ public:
 
 		if (const auto card = player->getInventoryManager()->get(cardId); isEquippableFunction(card.itemId))
 		{
-			player->getInventoryManager()->setCardActive(card.id, false);
+			return player->getInventoryManager()->setCardActive(card.id, true);
 		}
 	}
 };

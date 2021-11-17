@@ -4,7 +4,7 @@
 #include "SendInventoryCards.h"
 #include "ItemId.h"
 #include "SendOpenCardSuccess.h"
-#include "OpenGift.h"
+#include "HandleOpenGiftRequest.h"
 #include "packets/lobby/outgoing/inventory/SendDisableFunctionCard.h"
 #include "packets/lobby/outgoing/inventory/SendEnableFunctionCard.h"
 #include "packets/lobby/outgoing/inventory/SendGiftInventoryCardSuccess.h"

@@ -6,7 +6,7 @@
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
-class GiftCardEvent final : public PacketEvent
+class HandleGiftCardRequest final : public PacketEvent
 {
 public:
 	//814 = LS_SEND_PRESENT_INDEC_FAIL

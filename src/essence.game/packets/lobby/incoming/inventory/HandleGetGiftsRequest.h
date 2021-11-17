@@ -4,11 +4,18 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/inventory/InventoryManager.h"
 
-class RequestInventory final : public PacketEvent
+class HandleGetGiftsRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
-		conn->getPlayer()->getInventoryManager()->sendCards();
+		const auto player = conn->getPlayer();
+
+		if (player == nullptr)
+		{
+			return;
+		}
+
+		player->getInventoryManager()->sendGifts();
 	}
 };

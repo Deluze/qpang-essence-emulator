@@ -6,9 +6,10 @@
 #include "SendUpdatePlayerCashBalance.h"
 #include "core/communication/packet/PacketEvent.h"
 
-class ExtendCardEvent final : public PacketEvent
+class HandleExtendInventoryCardRequest final : public PacketEvent
 {
 public:
+	// TODO: Find out error response op code and error message codes.
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto cardId = packet.readLong();

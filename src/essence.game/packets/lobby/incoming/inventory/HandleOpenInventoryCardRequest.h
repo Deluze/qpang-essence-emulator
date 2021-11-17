@@ -2,7 +2,7 @@
 
 #include "core/communication/packet/PacketEvent.h"
 
-class OpenCardRequest final : public PacketEvent
+class HandleOpenInventoryCardRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

@@ -4,7 +4,7 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/inventory/InventoryManager.h"
 
-class DeleteCard final : public PacketEvent
+class HandleDeleteInventoryCardRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
