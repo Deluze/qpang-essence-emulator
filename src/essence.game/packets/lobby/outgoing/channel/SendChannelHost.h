@@ -6,10 +6,10 @@
 #include "packets/LobbyServerPacket.h"
 #include "qpang/channel/Channel.h"
 
-class ChannelHost : public LobbyServerPacket
+class SendChannelHost : public LobbyServerPacket
 {
 public:
-	explicit ChannelHost(const Channel& ch) : LobbyServerPacket(767)
+	explicit SendChannelHost(const Channel& ch) : LobbyServerPacket(767)
 	{
 		writeInt(ch.id);
 		writeLong(0);

@@ -5,10 +5,10 @@
 #include "packets/LobbyServerPacket.h"
 #include "qpang/channel/Channel.h"
 
-class ChannelList : public LobbyServerPacket
+class SendChannelList : public LobbyServerPacket
 {
 public:
-	explicit ChannelList(const std::vector<Channel>& channels) : LobbyServerPacket(763)
+	explicit SendChannelList(const std::vector<Channel>& channels) : LobbyServerPacket(763)
 	{
 		const auto size = static_cast<uint16_t>(channels.size());
 

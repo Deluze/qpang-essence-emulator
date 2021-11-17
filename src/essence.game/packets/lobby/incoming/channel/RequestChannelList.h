@@ -12,6 +12,6 @@ public:
 	{
 		const std::vector<Channel> channels = Game::instance()->getChannelManager()->list();
 
-		conn->send(ChannelList(channels));
+		conn->send(SendChannelList(channels));
 	}
 };

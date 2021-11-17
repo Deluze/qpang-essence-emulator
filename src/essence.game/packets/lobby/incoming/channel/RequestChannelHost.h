@@ -16,6 +16,6 @@ public:
 
 		const Channel ch = Game::instance()->getChannelManager()->getChannel(channelId);
 
-		conn->send(ChannelHost(ch));
+		conn->send(SendChannelHost(ch));
 	}
 };
