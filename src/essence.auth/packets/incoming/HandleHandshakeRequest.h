@@ -5,7 +5,7 @@
 #include "core/communication/packet/PacketEvent.h"
 #include "packets/outgoing/SendHandshakeResponse.h"
 
-class Handshake : public PacketEvent
+class HandleHandshakeRequest : public PacketEvent
 {
 public:
 	bool isUnauthorizedPacket() override

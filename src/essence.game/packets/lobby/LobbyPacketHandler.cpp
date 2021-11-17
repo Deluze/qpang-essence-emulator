@@ -1,7 +1,7 @@
 #include "LobbyPacketHandler.h"
 
 #include "HandleGiftCardRequest.h"
-#include "Handshake.h"
+#include "HandleHandshakeRequest.h"
 #include "Login.h"
 #include "HandleEnchantItemRequest.h"
 #include "HandleTradeRequest.h"
@@ -51,7 +51,7 @@
 
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 {
-	add(1, new Handshake());
+	add(1, new HandleHandshakeRequest());
 	add(600, new Login());
 	add(620, new HandleEquipArmorRequest());
 	add(623, new HandleEquipWeaponRequest());

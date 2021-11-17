@@ -4,7 +4,7 @@
 #include "packets/square/incoming/ChatRequest.h"
 #include "packets/square/incoming/ConnectRequest.h"
 #include "packets/square/incoming/EmoteEvent.h"
-#include "packets/square/incoming/Handshake.h"
+#include "packets/square/incoming/HandleHandshakeRequest.h"
 #include "packets/square/incoming/JoinSquare.h"
 #include "packets/square/incoming/LeftInventory.h"
 #include "packets/square/incoming/ReloadSquareEvent.h"
@@ -14,7 +14,7 @@
 
 SquarePacketHandler::SquarePacketHandler() : PacketHandler()
 {
-	add(1, new Handshake());
+	add(1, new HandleHandshakeRequest());
 
 	add(6500, new ConnectRequest());
 	add(6537, new JoinSquare());
