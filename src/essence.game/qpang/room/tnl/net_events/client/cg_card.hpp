@@ -156,7 +156,7 @@ public:
 				return;
 			}
 
-			if (skillTargetPlayerActiveSkillCard->shouldReflectTargettedSkillsOntoCasters() && skill->isReflectableSkillCard()
+			if (skillTargetPlayerActiveSkillCard->isReflectSkill() && skill->isReflectableSkillCard()
 				&& skill->getSkillTargetType() == SkillTargetType::ENEMY)
 			{
 				const auto targetPlayerId = roomSessionPlayer->getPlayer()->getId();

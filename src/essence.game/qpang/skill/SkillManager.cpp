@@ -9,7 +9,7 @@
 #include "GiantBeast.h"
 #include "IronWallSkill.h"
 #include "LastWeaponSkill.h"
-#include "MeleeChallengeSkill.h"
+#include "MeleeOnlySkill.h"
 #include "MentalUpSkill.h"
 #include "PocketSizeSkill.h"
 #include "RageSkill.h"
@@ -26,6 +26,7 @@
 #include "UndercoverSkill.h"
 #include "VitalSkill.h"
 #include "WeaponSealSkill.h"
+#include "EnergyShieldSkill.h"
 
 SkillManager::SkillManager() = default;
 
@@ -55,6 +56,7 @@ void SkillManager::initializeDeathMatchSkills()
 		{
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<ChaosSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<CamoSkill>(); });
+			m_skills[GameMode::DM].push_back([]() { return std::make_unique<EnergyShieldSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<IronWallSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<RageSkill>(); });
 			m_skills[GameMode::DM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
@@ -75,7 +77,7 @@ void SkillManager::initializeDeathMatchSkills()
 
 		if (i < 2)
 		{
-			m_skills[GameMode::DM].push_back([]() { return std::make_unique<MeleeChallengeSkill>(); });
+			m_skills[GameMode::DM].push_back([]() { return std::make_unique<MeleeOnlySkill>(); });
 		}
 
 		if (i < 1)
@@ -95,6 +97,7 @@ void SkillManager::initializeTeamDeathMatchSkills()
 		{
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<ChaosSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<CamoSkill>(); });
+			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<EnergyShieldSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<IronWallSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RageSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<RapidFireSkill>(); });
@@ -118,7 +121,7 @@ void SkillManager::initializeTeamDeathMatchSkills()
 
 		if (i < 2)
 		{
-			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<MeleeChallengeSkill>(); });
+			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<MeleeOnlySkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<VitalSkill>(); });
 			//m_skills[GameMode::TDM].push_back([]() { return std::make_unique<BlessingSkill>(); });
 			m_skills[GameMode::TDM].push_back([]() { return std::make_unique<TradeOffSkill>(); });

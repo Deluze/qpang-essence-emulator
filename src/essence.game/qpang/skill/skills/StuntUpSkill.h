@@ -24,7 +24,7 @@ public:
 		return SkillRateType::SILVER;
 	}
 
-	bool shouldTakeLessDamageFromAllSources() override
+	bool isStuntUpSkill() override
 	{
 		return true;
 	}

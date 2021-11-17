@@ -1,6 +1,7 @@
 #ifndef CG_HIT_H
 #define CG_HIT_H
 
+#include "AABBHelper.h"
 #include "GameNetEvent.h"
 #include "qpang/Game.h"
 #include "qpang/room/tnl/net_events/server/gc_hit.hpp"
@@ -29,6 +30,8 @@ public:
 		RIGHT_FEET = 7,
 		LEFT_LEG = 8,
 		LEFT_FEET = 9,
+		SPLASH_1 = 10,
+		SPLASH_2 = 11
 		// Explosion? Trowable? = 11
 	};
 
@@ -72,12 +75,12 @@ public:
 		bstream->read(&unk_17);
 		bstream->read(&unk_18);
 
-		//std::cout << "================================" << std::endl;
-		//std::cout << "CGHit::unpack >> SourcePlayerId: " << (int)srcPlayerId << ", TargetPlayerId: " << (int)dstPlayerId << ", EntityId: " << (int)entityId << std::endl;
-		//std::cout << "CGHit::unpack >> WeaponId: " << (int)weaponId << ", WeaponType: " << (int)weaponType << std::endl;
-		//std::cout << "CGHit::unpack >> BodyPart: " << (int)bodyPartHitLocation << ", HitLocation: " << (int)hitLocation << ", HitType: " << (int)hitType << std::endl;
-		//std::cout << "CGHit::unpack >> Unk03: " << (int)unk_03 << ", Unk17: " << (int)unk_17 << ", Unk18: " << (int)unk_18 << ", RTT: " << (int)rtt << std::endl;
-		//std::cout << "================================" << std::endl;
+		std::cout << "================================" << std::endl;
+		std::cout << "CGHit::unpack >> SourcePlayerId: " << (int)srcPlayerId << ", TargetPlayerId: " << (int)dstPlayerId << ", EntityId: " << (int)entityId << std::endl;
+		std::cout << "CGHit::unpack >> WeaponId: " << (int)weaponId << ", WeaponType: " << (int)weaponType << std::endl;
+		std::cout << "CGHit::unpack >> BodyPart: " << (int)bodyPartHitLocation << ", HitLocation: " << (int)hitLocation << ", HitType: " << (int)hitType << std::endl;
+		std::cout << "CGHit::unpack >> Unk03: " << (int)unk_03 << ", Unk17: " << (int)unk_17 << ", Unk18: " << (int)unk_18 << ", RTT: " << (int)rtt << std::endl;
+		std::cout << "================================" << std::endl;
 	};
 
 	// TODO: Rewrite this code, rewrite damage system, figure out how to "detect" special attack.
@@ -210,10 +213,10 @@ public:
 			if (areSkillsEnabled)
 			{
 				const auto dstPlayerShouldReceiveReducedDamageFromAllSources = dstPlayerHasActiveSkill
-					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldTakeLessDamageFromAllSources();
+					&& dstPlayer->getSkillManager()->getActiveSkill()->isStuntUpSkill();
 
 				const auto dstPlayerShouldReceiveReducedDamageFromLaunchers = dstPlayerHasActiveSkill
-					&& dstPlayer->getSkillManager()->getActiveSkill()->shouldTakeLessDamageFromLaunchers();
+					&& dstPlayer->getSkillManager()->getActiveSkill()->isMentalUpSkill();
 
 				const auto weaponUsedIsLauncher = (weaponUsed.weaponType == WeaponType::LAUNCHER);
 
@@ -274,7 +277,7 @@ public:
 
 			if (areSkillsEnabled && srcPlayer->getSkillManager()->hasActiveSkill())
 			{
-				if (const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkill()->shouldInstantlyKillEnemyWithMeleeWeapon();
+				if (const auto srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon = srcPlayer->getSkillManager()->getActiveSkill()->isAssassinSkill();
 					srcPlayerShouldInstantlyKillEnemyWithMeleeWeapon && (weaponUsed.weaponType == WeaponType::MELEE) && !isSameTeam)
 				{
 					damage = 9999;
@@ -284,7 +287,7 @@ public:
 			}
 
 			const auto dstPlayerShouldIgnoreDamageFromAllSources = dstPlayerHasActiveSkill &&
-				dstPlayer->getSkillManager()->getActiveSkill()->shouldDenyDamageFromAllSources();
+				dstPlayer->getSkillManager()->getActiveSkill()->IsIronWallSkill();
 
 			if (dstPlayerShouldIgnoreDamageFromAllSources && !isSameTeam)
 			{
@@ -312,6 +315,24 @@ public:
 				if (srcPlayerShouldOnlyDealMeleeDamage && weaponUsed.weaponType != WeaponType::MELEE)
 				{
 					damage = 0;
+				}
+			}
+
+			if (areSkillsEnabled && dstPlayerHasActiveSkill && !isSameTeam)
+			{
+				const auto activeSkill = dstPlayer->getSkillManager()->getActiveSkill();
+				const auto isEnergyShieldSkill = activeSkill->isEnergyShieldSkill();
+
+				if (isEnergyShieldSkill)
+				{
+					const auto isSplashDamage = (bodyPartHitLocation == SPLASH_1 || bodyPartHitLocation == SPLASH_2);
+					const auto isBackDamage = (hitLocation != HitLocation::FRONT);
+					const auto isCloseRange = AABBHelper::getDistanceBetweenPositions(srcPlayer->getPosition(), dstPlayer->getPosition()) <= 3;
+
+					if (!isCloseRange && !isBackDamage && !isSplashDamage)
+					{
+						damage = 0;
+					}
 				}
 			}
 
@@ -343,7 +364,7 @@ public:
 			const auto dstPlayerHasRainbowSkillCard = dstPlayerHasActiveSkill
 				&& dstPlayer->getSkillManager()->getActiveSkill()->getSkillRateType() == SkillRateType::RAINBOW;
 			const auto dstPlayerShouldIgnoreDamageFromAllSources = dstPlayerHasActiveSkill
-				&& dstPlayer->getSkillManager()->getActiveSkill()->shouldDenyDamageFromAllSources();
+				&& dstPlayer->getSkillManager()->getActiveSkill()->IsIronWallSkill();
 
 			const auto isValidWeapon = !isTrapWeapon
 				&& ((weaponUsed.weaponType == WeaponType::MELEE) || (weaponUsed.weaponType == WeaponType::RIFLE) || (weaponUsed.weaponType == WeaponType::LAUNCHER));

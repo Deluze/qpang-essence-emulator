@@ -22,7 +22,7 @@ public:
 		return SkillRateType::SILVER;
 	}
 
-	bool shouldTakeLessDamageFromLaunchers() override
+	bool isMentalUpSkill() override
 	{
 		return true;
 	}

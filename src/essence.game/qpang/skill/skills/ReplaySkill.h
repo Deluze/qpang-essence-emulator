@@ -24,7 +24,7 @@ public:
 		return SkillRateType::SILVER;
 	}
 
-	bool shouldInstantlyRespawnWhenPlayerHasDied() override
+	bool isReplaySkill() override
 	{
 		return true;
 	}

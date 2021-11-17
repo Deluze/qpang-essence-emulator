@@ -2,10 +2,10 @@
 
 #include "Skill.h"
 
-class MeleeChallengeSkill final : public Skill
+class MeleeOnlySkill final : public Skill
 {
 public:
-	MeleeChallengeSkill() : Skill(true, 15)
+	MeleeOnlySkill() : Skill(true, 15)
 	{
 	}
 
@@ -24,13 +24,13 @@ public:
 		return SkillRateType::GOLD;
 	}
 
-	// Melee Challenge Skill
+	// Melee Only Skill
 	bool shouldOnlyTakeMeleeDamage() override
 	{
 		return true;
 	}
 
-	// Melee Challenge Skill
+	// Melee Only Skill
 	bool shouldOnlyDealMeleeDamage() override
 	{
 		return true;

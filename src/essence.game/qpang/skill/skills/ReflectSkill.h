@@ -22,7 +22,7 @@ public:
 		return SkillRateType::SILVER;
 	}
 
-	bool shouldReflectTargettedSkillsOntoCasters() override
+	bool isReflectSkill() override
 	{
 		return true;
 	}

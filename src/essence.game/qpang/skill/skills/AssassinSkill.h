@@ -22,7 +22,7 @@ public:
 		return SkillRateType::SILVER;
 	}
 
-	bool shouldInstantlyKillEnemyWithMeleeWeapon() override
+	bool isAssassinSkill() override
 	{
 		return true;
 	}

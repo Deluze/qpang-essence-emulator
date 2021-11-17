@@ -24,7 +24,7 @@ public:
 		return SkillRateType::BRONZE;
 	}
 
-	bool shouldDenyDamageFromAllSources() override
+	bool IsIronWallSkill() override
 	{
 		return true;
 	}

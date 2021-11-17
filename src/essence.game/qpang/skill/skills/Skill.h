@@ -123,49 +123,55 @@ public:
 #pragma endregion Disable SkillCard
 
 	// Replay Skill
-	virtual bool shouldInstantlyRespawnWhenPlayerHasDied()
+	virtual bool isReplaySkill()
 	{
 		return false;
 	}
 
 	// Reflect Skill
-	virtual bool shouldReflectTargettedSkillsOntoCasters()
+	virtual bool isReflectSkill()
 	{
 		return false;
 	}
 
 	// Assassin Skill
-	virtual bool shouldInstantlyKillEnemyWithMeleeWeapon()
+	virtual bool isAssassinSkill()
 	{
 		return false;
 	}
 
 	// Mental Up Skill
-	virtual bool shouldTakeLessDamageFromLaunchers()
+	virtual bool isMentalUpSkill()
 	{
 		return false;
 	}
 
 	// Stunt Up Skill
-	virtual bool shouldTakeLessDamageFromAllSources()
+	virtual bool isStuntUpSkill()
 	{
 		return false;
 	}
 
 	// Iron Wall Skill
-	virtual bool shouldDenyDamageFromAllSources()
+	virtual bool IsIronWallSkill()
 	{
 		return false;
 	}
 
-	// Melee Challenge Skill
+	// Melee Only Skill
 	virtual bool shouldOnlyTakeMeleeDamage()
 	{
 		return false;
 	}
 
-	// Melee Challenge Skill
+	// Melee Only Skill
 	virtual bool shouldOnlyDealMeleeDamage()
+	{
+		return false;
+	}
+
+	// EnergyShield Skill
+	virtual bool isEnergyShieldSkill()
 	{
 		return false;
 	}
