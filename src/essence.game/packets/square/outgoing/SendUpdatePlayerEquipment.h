@@ -5,10 +5,10 @@
 #include "qpang/player/Player.h"
 #include "qpang/square/SquarePlayer.h"
 
-class UpdatePlayerEquipment : public SquareServerPacket
+class SendUpdatePlayerEquipment : public SquareServerPacket
 {
 public:
-	explicit UpdatePlayerEquipment(const SquarePlayer::Ptr squarePlayer) : SquareServerPacket(6517)
+	explicit SendUpdatePlayerEquipment(const SquarePlayer::Ptr& squarePlayer) : SquareServerPacket(6517)
 	{
 		const auto player = squarePlayer->getPlayer();
 

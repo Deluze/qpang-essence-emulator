@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/square/outgoing/Players.h"
+#include "packets/square/outgoing/SendSquarePlayers.h"
 #include "qpang/square/SquarePlayer.h"
 
 class RequestPlayers final : public PacketEvent
@@ -28,6 +28,6 @@ public:
 		const auto square = squarePlayer->getSquare();
 		const auto players = square->listPlayers();
 
-		conn->send(Players(players, player->getId()));
+		conn->send(SendSquarePlayers(players, player->getId()));
 	}
 };

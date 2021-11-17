@@ -7,10 +7,10 @@
 
 #include "packets/writers/SquarePlayerWriter.h"
 
-class Players : public SquareServerPacket
+class SendSquarePlayers : public SquareServerPacket
 {
 public:
-	Players(const std::vector<SquarePlayer::Ptr>& players, const uint32_t ourId) : SquareServerPacket(6508)
+	SendSquarePlayers(const std::vector<SquarePlayer::Ptr>& players, const uint32_t ourId) : SquareServerPacket(6508)
 	{
 		//10010u
 		const auto size = players.size();

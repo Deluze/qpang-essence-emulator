@@ -6,10 +6,10 @@
 #include "packets/writers/SquareEntryWriter.h"
 #include "qpang/square/Square.h"
 
-class SquareList : public SquareServerPacket
+class SendSquareList : public SquareServerPacket
 {
 public:
-	explicit SquareList(const std::vector<Square::Ptr>& squares) : SquareServerPacket(6501)
+	explicit SendSquareList(const std::vector<Square::Ptr>& squares) : SquareServerPacket(6501)
 	{
 		const uint16_t size = static_cast<uint16_t>(squares.size());
 

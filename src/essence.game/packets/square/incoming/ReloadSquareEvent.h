@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/square/outgoing/SetPosition.h"
+#include "packets/square/outgoing/SendSquarePlayerPosition.h"
 #include "qpang/player/Player.h"
 #include "qpang/square/SquarePlayer.h"
 
@@ -24,7 +24,7 @@ public:
 			return;
 		}
 
-		conn->send(SetPosition(squarePlayer));
+		conn->send(SendSquarePlayerPosition(squarePlayer));
 
 		squarePlayer->setState(0);
 	}

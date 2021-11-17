@@ -6,10 +6,10 @@
 #include "qpang/square/SquareManager.h"
 #include "qpang/square/SquarePlayer.h"
 
-#include "packets/square/outgoing/JoinSquareSuccess.h"
-#include "packets/square/outgoing/AddPlayer.h"
-#include "packets/square/outgoing/RemovePlayer.h"
-#include "packets/square/outgoing/UpdateSquareEntry.h"
+#include "packets/square/outgoing/SendJoinSquareSuccess.h"
+#include "packets/square/outgoing/SendAddSquarePlayer.h"
+#include "packets/square/outgoing/SendSquareRemovePlayer.h"
+#include "packets/square/outgoing/SendUpdateSquareEntry.h"
 
 Square::Square(uint32_t id, std::u16string name, uint8_t capacity) :
 	m_id(id),
@@ -39,11 +39,11 @@ bool Square::add(std::shared_ptr<Player> player)
 	m_players[player->getId()] = squarePlayer;
 	m_playerMx.unlock();
 
-	Game::instance()->getSquareManager()->broadcast(UpdateSquareEntry(curr, true));
+	Game::instance()->getSquareManager()->broadcast(SendUpdateSquareEntry(curr, true));
 
 	player->enterSquare(squarePlayer);
 
-	sendPacketExcept(AddPlayer(squarePlayer), player->getId());
+	sendPacketExcept(SendAddSquarePlayer(squarePlayer), player->getId());
 
 	return true;
 }
@@ -54,10 +54,10 @@ void Square::remove(uint32_t playerId)
 	m_players.erase(playerId);
 	m_playerMx.unlock();
 
-	sendPacket(RemovePlayer(playerId));
+	sendPacket(SendSquareRemovePlayer(playerId));
 	
 	const auto curr = shared_from_this();
-	Game::instance()->getSquareManager()->broadcast(UpdateSquareEntry(curr, true));
+	Game::instance()->getSquareManager()->broadcast(SendUpdateSquareEntry(curr, true));
 
 	if (m_players.empty())
 		Game::instance()->getSquareManager()->close(m_id);

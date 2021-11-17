@@ -5,7 +5,7 @@
 
 #include "utils/StringConverter.h"
 
-#include "packets/square/outgoing/DeleteSquareEntry.h"
+#include "packets/square/outgoing/SendDeleteSquareEntry.h"
 
 SquareManager::SquareManager()
 {
@@ -77,7 +77,7 @@ void SquareManager::close(uint32_t id)
 	std::lock_guard<std::recursive_mutex> lg(m_squareMx);
 
 	for (const auto& [id, square] : m_squares)
-		square->sendPacket(DeleteSquareEntry(id));
+		square->sendPacket(SendDeleteSquareEntry(id));
 
 	m_squares.erase(id);
 }

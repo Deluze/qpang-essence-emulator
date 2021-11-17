@@ -10,8 +10,8 @@
 #include "qpang/square/SquareManager.h"
 #include "qpang/room/tnl/GameConnection.h"
 
-#include "packets/square/outgoing/JoinSquareSuccess.h"
-#include "packets/square/outgoing/UpdatePlayerLevel.h"
+#include "packets/square/outgoing/SendJoinSquareSuccess.h"
+#include "packets/square/outgoing/SendUpdateSquarePlayerLevel.h"
 #include "packets/lobby/outgoing/player/SendUpdatePlayerCharacter.h"
 #include "packets/lobby/outgoing/player/SendPlayerReceiveWhisper.h"
 #include "packets/lobby/outgoing/SendMessageBroadcast.h"
@@ -145,7 +145,7 @@ void Player::enterSquare(std::shared_ptr<SquarePlayer> squarePlayer)
 	m_squarePlayer = squarePlayer;
 
 	setOnlineStatus();
-	send(JoinSquareSuccess(squarePlayer));
+	send(SendJoinSquareSuccess(squarePlayer));
 }
 
 void Player::leaveSquare()
@@ -270,7 +270,7 @@ void Player::setLevel(uint8_t level)
 	m_level = level;
 
 	if (auto squarePlayer = m_squarePlayer.lock(); squarePlayer != nullptr)
-		squarePlayer->getSquare()->sendPacket(UpdatePlayerLevel{ m_playerId, m_level });
+		squarePlayer->getSquare()->sendPacket(SendUpdateSquarePlayerLevel{ m_playerId, m_level });
 }
 
 uint8_t Player::getPrestige()

@@ -3,7 +3,7 @@
 #include <string>
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/square/outgoing/SquareList.h"
+#include "packets/square/outgoing/SendSquareList.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
@@ -28,6 +28,6 @@ public:
 
 		const std::vector<Square::Ptr> squares = Game::instance()->getSquareManager()->list();
 
-		conn->send(SquareList(squares));
+		conn->send(SendSquareList(squares));
 	}
 };

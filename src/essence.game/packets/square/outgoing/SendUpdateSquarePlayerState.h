@@ -4,10 +4,10 @@
 #include "qpang/player/Player.h"
 #include "qpang/square/SquarePlayer.h"
 
-class UpdatePlayerState : public SquareServerPacket
+class SendUpdateSquarePlayerState : public SquareServerPacket
 {
 public:
-	UpdatePlayerState(const SquarePlayer::Ptr squarePlayer, const uint8_t value) : SquareServerPacket(6547)
+	SendUpdateSquarePlayerState(const SquarePlayer::Ptr& squarePlayer, const uint8_t value) : SquareServerPacket(6547)
 	{
 		writeInt(squarePlayer->getPlayer()->getId());
 		writeInt(squarePlayer->getState());

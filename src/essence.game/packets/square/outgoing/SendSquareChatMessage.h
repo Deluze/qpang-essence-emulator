@@ -4,10 +4,10 @@
 
 #include "packets/SquareServerPacket.h"
 
-class Chat : public SquareServerPacket
+class SendSquareChatMessage : public SquareServerPacket
 {
 public:
-	Chat(const std::u16string& sender, const std::u16string& message) : SquareServerPacket(6529)
+	SendSquareChatMessage(const std::u16string& sender, const std::u16string& message) : SquareServerPacket(6529)
 	{
 		writeString(sender, 16);
 		writeShort(message.size() % 254);
