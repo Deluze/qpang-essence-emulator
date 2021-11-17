@@ -123,7 +123,12 @@ void RoomSessionPlayer::tick()
 
 		if (m_roomSession->getRoom()->isSkillsEnabled() && !m_isSpectating)
 		{
-			post(new CCUserInfo(shared_from_this()));
+			const auto equippedSkillCards = this->getPlayer()->getEquipmentManager()->getEquippedSkillCardIds();
+
+			if (!equippedSkillCards.empty())
+			{
+				post(new CCUserInfo(shared_from_this()));
+			}
 
 			getSkillManager()->resetSkillPoints();
 		}
