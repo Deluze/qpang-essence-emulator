@@ -75,12 +75,12 @@ public:
 		bstream->read(&unk_17);
 		bstream->read(&unk_18);
 
-		std::cout << "================================" << std::endl;
-		std::cout << "CGHit::unpack >> SourcePlayerId: " << (int)srcPlayerId << ", TargetPlayerId: " << (int)dstPlayerId << ", EntityId: " << (int)entityId << std::endl;
-		std::cout << "CGHit::unpack >> WeaponId: " << (int)weaponId << ", WeaponType: " << (int)weaponType << std::endl;
-		std::cout << "CGHit::unpack >> BodyPart: " << (int)bodyPartHitLocation << ", HitLocation: " << (int)hitLocation << ", HitType: " << (int)hitType << std::endl;
-		std::cout << "CGHit::unpack >> Unk03: " << (int)unk_03 << ", Unk17: " << (int)unk_17 << ", Unk18: " << (int)unk_18 << ", RTT: " << (int)rtt << std::endl;
-		std::cout << "================================" << std::endl;
+		//std::cout << "================================" << std::endl;
+		//std::cout << "CGHit::unpack >> SourcePlayerId: " << (int)srcPlayerId << ", TargetPlayerId: " << (int)dstPlayerId << ", EntityId: " << (int)entityId << std::endl;
+		//std::cout << "CGHit::unpack >> WeaponId: " << (int)weaponId << ", WeaponType: " << (int)weaponType << std::endl;
+		//std::cout << "CGHit::unpack >> BodyPart: " << (int)bodyPartHitLocation << ", HitLocation: " << (int)hitLocation << ", HitType: " << (int)hitType << std::endl;
+		//std::cout << "CGHit::unpack >> Unk03: " << (int)unk_03 << ", Unk17: " << (int)unk_17 << ", Unk18: " << (int)unk_18 << ", RTT: " << (int)rtt << std::endl;
+		//std::cout << "================================" << std::endl;
 	};
 
 	// TODO: Rewrite this code, rewrite damage system, figure out how to "detect" special attack.
