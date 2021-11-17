@@ -40,7 +40,7 @@
 #include "player/HandleResetPlayerKillDeathRequest.h"
 #include "player/HandleResetPlayerWinLossRequest.h"
 #include "player/HandlePlayerWhisperRequest.h"
-#include "redeemcode/UseRedeemCodeRequest.h"
+#include "redeemcode/HandleUseRedeemCodeRequest.h"
 #include "shop/BuyCardEvent.h"
 #include "shop/RequestShopItems.h"
 #include "shop/RequestShopPackages.h"
@@ -99,7 +99,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(837, new HandleChangeNickNameRequest());
 	add(841, new HandleResetPlayerWinLossRequest());
 	add(844, new HandleResetPlayerKillDeathRequest());
-	add(851, new UseRedeemCodeRequest());
+	add(851, new HandleUseRedeemCodeRequest());
 	add(861, new HandleDisableFunctionCardRequest());
 	// 875 - Send trade request
 	add(875, new RequestTrade());

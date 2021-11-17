@@ -4,7 +4,7 @@
 #include "RedeemCodeManager.h"
 #include "core/communication/packet/PacketEvent.h"
 
-class UseRedeemCodeRequest final : public PacketEvent
+class HandleUseRedeemCodeRequest final : public PacketEvent
 {
 public:
 	enum USE_REDEEM_CODE_FAIL_CODE
