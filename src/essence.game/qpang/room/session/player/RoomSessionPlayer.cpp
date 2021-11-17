@@ -4,7 +4,7 @@
 #include "ConfigManager.h"
 #include "UpdateSkillCardSetResponse.h"
 
-#include "packets/lobby/outgoing/account/UpdateAccount.h"
+#include "packets/lobby/outgoing/account/SendAccountUpdate.h"
 
 #include "qpang/ItemId.h"
 #include "qpang/Game.h"
@@ -193,7 +193,7 @@ void RoomSessionPlayer::stop()
 
 	player->update();
 
-	player->send(UpdateAccount(player));
+	player->send(SendAccountUpdate(player));
 	player->send(UpdateSkillCardSetResponse(player->getEquipmentManager()->getEquippedSkillCards()));
 }
 

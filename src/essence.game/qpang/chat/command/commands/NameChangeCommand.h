@@ -3,8 +3,6 @@
 #include "qpang/Game.h"
 #include "qpang/chat/command/Command.h"
 
-#include "packets/lobby/outgoing/account/UpdateAccount.h"
-
 class NameChangeCommand : public Command
 {
 public:

@@ -6,10 +6,10 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/stats/StatsManager.h"
 
-class Authenticated : public LobbyServerPacket
+class SendAccountAuthenticated : public LobbyServerPacket
 {
 public:
-	explicit Authenticated(const Player::Ptr& player) : LobbyServerPacket(601)
+	explicit SendAccountAuthenticated(const Player::Ptr& player) : LobbyServerPacket(601)
 	{
 		// Player info
 		writeInt(player->getId());										// Player id

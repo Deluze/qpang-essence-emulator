@@ -3,7 +3,7 @@
 #include <boost/thread.hpp>
 #include <any>
 
-#include "packets/lobby/outgoing/account/DuplicateLogin.h"
+#include "packets/lobby/outgoing/account/SendAccountDuplicateLogin.h"
 
 #include "utils/StringConverter.h"
 
@@ -113,7 +113,7 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 
 	if (playerFound)
 	{
-		it->second->send(DuplicateLogin());
+		it->second->send(SendAccountDuplicateLogin());
 		it->second->close();
 	}
 

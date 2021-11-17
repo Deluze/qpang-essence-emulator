@@ -7,11 +7,11 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/stats/StatsManager.h"
 
-class UpdateAccount : public LobbyServerPacket
+class SendAccountUpdate : public LobbyServerPacket
 {
 public:
-	// TODO: Duplicate code in Authenticated.h
-	explicit UpdateAccount(const Player::Ptr& player) : LobbyServerPacket(662)
+	// TODO: Duplicate code in SendAccountAuthenticated.h
+	explicit SendAccountUpdate(const Player::Ptr& player) : LobbyServerPacket(662)
 	{
 		// player info
 		writeInt(player->getId());

@@ -8,9 +8,9 @@
 
 #include "qpang/Game.h"
 
-#include "packets/lobby/outgoing/account/VerificationFailure.h"
-#include "packets/lobby/outgoing/account/Banned.h"
-#include "packets/lobby/outgoing/account/Authenticated.h"
+#include "packets/lobby/outgoing/account/SendAccountVerificationFailure.h"
+#include "packets/lobby/outgoing/account/SendAccountBanned.h"
+#include "packets/lobby/outgoing/account/SendAccountAuthenticated.h"
 
 class Login final : public PacketEvent
 {
@@ -39,7 +39,7 @@ public:
 
 			if (!result->hasResults()) // invalid uuid
 			{
-				conn->send(VerificationFailure());
+				conn->send(SendAccountVerificationFailure());
 
 				return conn->close();
 			}
@@ -49,7 +49,7 @@ public:
 
 		if (Game::instance()->getBanManager()->isBanned(userId))
 		{
-			conn->send(Banned());
+			conn->send(SendAccountBanned());
 
 			return conn->close();
 		}
@@ -73,6 +73,6 @@ public:
 
 		Game::instance()->createPlayer(conn, playerId);
 
-		conn->send(Authenticated(conn->getPlayer()));
+		conn->send(SendAccountAuthenticated(conn->getPlayer()));
 	}
 };
