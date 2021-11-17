@@ -8,7 +8,7 @@
 #include "channel/HandleRequestChannelHost.h"
 #include "channel/HandleRequestChannelList.h"
 #include "crane/HandleUseCraneRequest.h"
-#include "dailybonus/DailyBonusRequest.h"
+#include "dailybonus/HandleGetDailyBonusRequest.h"
 #include "equipment/EquipArmor.h"
 #include "equipment/EquipWeapon.h"
 #include "equipment/RequestEquippedSkillCards.h"
@@ -105,7 +105,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(875, new RequestTrade());
 	// 884 - Trade cancel?
 	add(897, new HandleUseCraneRequest());
-	add(901, new DailyBonusRequest());
+	add(901, new HandleGetDailyBonusRequest());
 	add(903, new EnchantItemEvent());
 	// 903 - Request to boost clothing piece
 	// 906 - Panthalassa box opening

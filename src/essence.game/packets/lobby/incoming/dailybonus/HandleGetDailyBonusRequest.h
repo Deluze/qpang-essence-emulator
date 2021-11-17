@@ -3,7 +3,7 @@
 #include "core/communication/packet/PacketEvent.h"
 #include "dailybonus/SendDailyBonus.h"
 
-class DailyBonusRequest final : public PacketEvent
+class HandleGetDailyBonusRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override
