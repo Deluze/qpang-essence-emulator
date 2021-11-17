@@ -3,7 +3,7 @@
 #include <cstdint>
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/player/UpdateCashBalance.h"
+#include "packets/lobby/outgoing/player/SendUpdatePlayerCashBalance.h"
 #include "qpang/player/Player.h"
 
 class RequestCashBalance final : public PacketEvent
@@ -13,6 +13,6 @@ public:
 	{
 		const uint32_t cash = conn->getPlayer()->getCash();
 
-		conn->send(UpdateCashBalance(cash));
+		conn->send(SendUpdatePlayerCashBalance(cash));
 	}
 };

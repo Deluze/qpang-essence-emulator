@@ -3,7 +3,7 @@
 #include "packets/LobbyServerPacket.h"
 #include <qpang/player/Player.h>
 
-#include "UpdateCashBalance.h"
+#include "SendUpdatePlayerCashBalance.h"
 
 class SendDailyBonus : public LobbyServerPacket
 {
@@ -14,7 +14,7 @@ public:
 		{
 			SendSuccess(player);
 
-			player->send(UpdateCashBalance(player->getCash()));
+			player->send(SendUpdatePlayerCashBalance(player->getCash()));
 		}
 		else
 		{

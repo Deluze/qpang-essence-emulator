@@ -4,10 +4,10 @@
 
 #include "packets/LobbyServerPacket.h"
 
-class SendWhisper : public LobbyServerPacket
+class SendPlayerWhisper : public LobbyServerPacket
 {
 public:
-	SendWhisper(const std::u16string& sender, const std::u16string& message) : LobbyServerPacket(739)
+	SendPlayerWhisper(const std::u16string& sender, const std::u16string& message) : LobbyServerPacket(739)
 	{
 		writeInt(0);
 		writeShort(message.size());

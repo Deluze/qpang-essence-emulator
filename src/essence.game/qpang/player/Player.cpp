@@ -12,8 +12,8 @@
 
 #include "packets/square/outgoing/JoinSquareSuccess.h"
 #include "packets/square/outgoing/UpdatePlayerLevel.h"
-#include "packets/lobby/outgoing/player/UpdateCharacter.h"
-#include "packets/lobby/outgoing/player/ReceiveWhisper.h"
+#include "packets/lobby/outgoing/player/SendUpdatePlayerCharacter.h"
+#include "packets/lobby/outgoing/player/SendPlayerReceiveWhisper.h"
 #include "packets/lobby/outgoing/Broadcast.h"
 
 Player::Player(uint32_t playerId) :
@@ -135,7 +135,7 @@ bool Player::isClosed()
 
 void Player::whisper(const std::u16string& nickname, const std::u16string& message) const
 {
-	send(ReceiveWhisper(nickname, message));
+	send(SendPlayerReceiveWhisper(nickname, message));
 }
 
 void Player::enterSquare(std::shared_ptr<SquarePlayer> squarePlayer)
@@ -282,7 +282,7 @@ void Player::setCharacter(uint16_t character)
 {
 	m_character = character;
 
-	send(UpdateCharacter(character));
+	send(SendUpdatePlayerCharacter(character));
 }
 
 uint16_t Player::getCharacter()

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/player/SendWhisper.h"
+#include "packets/lobby/outgoing/player/SendPlayerWhisper.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
@@ -26,7 +26,7 @@ public:
 
 			player->whisper(conn->getPlayer()->getName(), message);
 
-			conn->send(SendWhisper(player->getName(), message));
+			conn->send(SendPlayerWhisper(player->getName(), message));
 		}
 	}
 };

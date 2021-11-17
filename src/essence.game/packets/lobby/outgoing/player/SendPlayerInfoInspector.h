@@ -4,10 +4,10 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/stats/StatsManager.h"
 
-class PlayerInfoInspector : public LobbyServerPacket
+class SendPlayerInfoInspector : public LobbyServerPacket
 {
 public:
-	explicit PlayerInfoInspector(const Player::Ptr& player) : LobbyServerPacket(692)
+	explicit SendPlayerInfoInspector(const Player::Ptr& player) : LobbyServerPacket(692)
 	{
 		writeInt(player->getId());
 		writeEmpty(42);

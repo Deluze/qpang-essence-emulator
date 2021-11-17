@@ -4,10 +4,10 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/stats/StatsManager.h"
 
-class ResetKillDeath : public LobbyServerPacket
+class SendResetPlayerKillDeath : public LobbyServerPacket
 {
 public:
-	ResetKillDeath(const Player::Ptr& player, const InventoryCard& card) : LobbyServerPacket(845)
+	SendResetPlayerKillDeath(const Player::Ptr& player, const InventoryCard& card) : LobbyServerPacket(845)
 	{
 		writeInt(0);
 		InventoryCardWriter::write(this, card);

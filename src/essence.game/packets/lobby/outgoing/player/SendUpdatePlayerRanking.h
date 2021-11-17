@@ -3,10 +3,10 @@
 #include "packets/LobbyServerPacket.h"
 #include "qpang/leaderboard/Leaderboard.h"
 
-class UpdatePlayerRanking : public LobbyServerPacket
+class SendUpdatePlayerRanking : public LobbyServerPacket
 {
 public:
-	explicit UpdatePlayerRanking(const Leaderboard::Position& position) : LobbyServerPacket(792)
+	explicit SendUpdatePlayerRanking(const Leaderboard::Position& position) : LobbyServerPacket(792)
 	{
 		writeEmpty(4);
 		writeInt(position.rank);

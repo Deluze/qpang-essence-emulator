@@ -3,7 +3,7 @@
 #include "SendInventoryCardExtended.h"
 #include "CardPurchaseComplete.h"
 #include "SendOpenGiftSuccess.h"
-#include "UpdateCashBalance.h"
+#include "SendUpdatePlayerCashBalance.h"
 #include "core/communication/packet/PacketEvent.h"
 
 class ExtendCardEvent final : public PacketEvent
@@ -81,7 +81,7 @@ public:
 		const auto boughtInventoryCard = Game::instance()->getShopManager()->buy(player, seqId, false);
 
 		conn->send(SendInventoryCardExtended(boughtInventoryCard, shopItem.isCash ? player->getCash() : player->getDon(), isCash));
-		conn->send(UpdateCashBalance(player->getCash()));
+		conn->send(SendUpdatePlayerCashBalance(player->getCash()));
 
 		player->send(SendOpenGiftSuccess(player, boughtInventoryCard));
 	}

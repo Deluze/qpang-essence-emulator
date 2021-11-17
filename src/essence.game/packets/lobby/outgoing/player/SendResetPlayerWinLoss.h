@@ -4,10 +4,10 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/stats/StatsManager.h"
 
-class ResetWinLoss : public LobbyServerPacket
+class SendResetPlayerWinLoss : public LobbyServerPacket
 {
 public:
-	ResetWinLoss(const Player::Ptr& player, const InventoryCard& card) : LobbyServerPacket(842)
+	SendResetPlayerWinLoss(const Player::Ptr& player, const InventoryCard& card) : LobbyServerPacket(842)
 	{
 		writeInt(0);
 		InventoryCardWriter::write(this, card);

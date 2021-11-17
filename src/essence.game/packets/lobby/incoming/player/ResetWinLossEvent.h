@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/player/ResetWinLoss.h"
+#include "packets/lobby/outgoing/player/SendResetPlayerWinLoss.h"
 #include "qpang/ItemId.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/inventory/InventoryManager.h"
@@ -33,6 +33,6 @@ public:
 			player->getInventoryManager()->deleteCard(cardId);
 		}
 
-		conn->send(ResetWinLoss(player, card));
+		conn->send(SendResetPlayerWinLoss(player, card));
 	}
 };

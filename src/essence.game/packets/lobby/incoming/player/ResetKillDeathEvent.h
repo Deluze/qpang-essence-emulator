@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/player/ResetKillDeath.h"
+#include "packets/lobby/outgoing/player/SendResetPlayerKillDeath.h"
 #include "qpang/ItemId.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/inventory/InventoryManager.h"
@@ -33,6 +33,6 @@ public:
 			player->getInventoryManager()->deleteCard(cardId);
 		}
 		
-		conn->send(ResetKillDeath(player, card));
+		conn->send(SendResetPlayerKillDeath(player, card));
 	}
 };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/player/PlayerInfoInspector.h"
+#include "packets/lobby/outgoing/player/SendPlayerInfoInspector.h"
 #include "qpang/Game.h"
 
 class RequestPlayerInfo final : public PacketEvent
@@ -17,6 +17,6 @@ public:
 			return;
 		}
 
-		conn->send(PlayerInfoInspector(player));
+		conn->send(SendPlayerInfoInspector(player));
 	}
 };

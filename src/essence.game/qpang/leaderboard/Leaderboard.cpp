@@ -4,7 +4,7 @@
 #include "core/database/Database.h"
 
 #include "qpang/Game.h"
-#include "packets/lobby/outgoing/player/UpdatePlayerRanking.h"
+#include "packets/lobby/outgoing/player/SendUpdatePlayerRanking.h"
 
 void Leaderboard::refresh()
 {
@@ -35,7 +35,7 @@ void Leaderboard::refresh()
 		const auto player = Game::instance()->getOnlinePlayer(playerId);
 
 		if (player != nullptr)
-			player->send(UpdatePlayerRanking(pos));
+			player->send(SendUpdatePlayerRanking(pos));
 
 		rank++;
 		res->next();
