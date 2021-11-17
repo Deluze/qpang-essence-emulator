@@ -9,12 +9,13 @@
 
 #include "packets/lobby/outgoing/friend/SendFriendList.h"
 
-class RequestFriendList final : public PacketEvent
+class HandleRequestFriendList final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const std::vector<Friend> friends = conn->getPlayer()->getFriendManager()->list();
+
 		conn->send(SendFriendList(friends));
 	}
 };

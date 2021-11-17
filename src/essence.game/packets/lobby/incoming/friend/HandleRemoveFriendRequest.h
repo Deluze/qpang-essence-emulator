@@ -3,13 +3,11 @@
 #include "core/communication/packet/PacketEvent.h"
 
 #include "qpang/Game.h"
+
 #include "qpang/player/Player.h"
 #include "qpang/player/friend/FriendManager.h"
 
-#include "packets/lobby/outgoing/friend/SendCancelOutgoingFriend.h"
-#include "packets/lobby/outgoing/friend/SendIncomingFriendCancelled.h"
-
-class CancelOutgoingFriendRequestEvent final : public PacketEvent
+class HandleRemoveFriendRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
@@ -20,12 +18,8 @@ public:
 		{
 			const auto player = conn->getPlayer();
 
-			player->getFriendManager()->removeOutgoing(playerId);
-			target->getFriendManager()->removeIncoming(player->getId());
-
-			target->send(SendIncomingFriendCancelled(player));
+			player->getFriendManager()->remove(target->getId());
+			target->getFriendManager()->onRemoved(player->getId());
 		}
-
-		conn->send(SendCancelOutgoingFriend(playerId));
 	}
 };

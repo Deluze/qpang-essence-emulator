@@ -9,7 +9,7 @@
 #include "packets/lobby/outgoing/friend/SendDenyIncomingFriend.h"
 #include "packets/lobby/outgoing/friend/SendOutgoingFriendCancelled.h"
 
-class DenyIncomingFriendRequestEvent final : public PacketEvent
+class HandleDenyIncomingFriendRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

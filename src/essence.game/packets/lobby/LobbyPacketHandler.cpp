@@ -13,12 +13,12 @@
 #include "equipment/HandleEquipWeaponRequest.h"
 #include "equipment/HandleGetEquippedSkillCardsRequest.h"
 #include "equipment/HandleUpdateSkillSetRequest.h"
-#include "friend/AcceptIncomingFriendRequestEvent.h"
-#include "friend/CancelOutgoingFriendRequestEvent.h"
-#include "friend/DenyIncomingFriendRequestEvent.h"
-#include "friend/RemoveFriendEvent.h"
-#include "friend/RequestFriendList.h"
-#include "friend/SendFriendRequestEvent.h"
+#include "friend/HandleAcceptIncomingFriendRequest.h"
+#include "friend/HandleCancelOutgoingFriendRequest.h"
+#include "friend/HandleDenyIncomingFriendRequest.h"
+#include "friend/HandleRemoveFriendRequest.h"
+#include "friend/HandleRequestFriendList.h"
+#include "friend/HandleSendFriendRequest.h"
 #include "gameroom/GameRoomInviteRequest.h"
 #include "gameroom/RequestGameRoomsEvent.h"
 #include "gameroom/RequestGameSettingsEvent.h"
@@ -66,12 +66,12 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(676, new HandleReferralRegistrationRequest());
 	add(679, new ChangeCharacterEvent());
 	add(691, new RequestPlayerInfo());
-	add(694, new RequestFriendList());
-	add(697, new SendFriendRequestEvent());
-	add(701, new AcceptIncomingFriendRequestEvent());
-	add(705, new DenyIncomingFriendRequestEvent());
-	add(709, new CancelOutgoingFriendRequestEvent());
-	add(713, new RemoveFriendEvent());
+	add(694, new HandleRequestFriendList());
+	add(697, new HandleSendFriendRequest());
+	add(701, new HandleAcceptIncomingFriendRequest());
+	add(705, new HandleDenyIncomingFriendRequest());
+	add(709, new HandleCancelOutgoingFriendRequest());
+	add(713, new HandleRemoveFriendRequest());
 	// 717 - Invite friend to join the gameroom
 	add(721, new GameRoomInviteRequest());
 	add(725, new RequestMemos());

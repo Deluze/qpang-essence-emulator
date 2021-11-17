@@ -6,7 +6,7 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/friend/FriendManager.h"
 
-class SendFriendRequestEvent final : public PacketEvent
+class HandleSendFriendRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
