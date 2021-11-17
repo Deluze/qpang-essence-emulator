@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GiftCardFail.h"
+#include "SendGiftInventoryCardFail.h"
 #include "core/communication/packet/PacketEvent.h"
 
 #include "qpang/Game.h"
@@ -31,7 +31,7 @@ public:
 
 		if (!card.isGiftable)
 		{
-			conn->send(GiftCardFail(GIFT_FAIL_UNTRADABLE_CARD));
+			conn->send(SendGiftInventoryCardFail(GIFT_FAIL_UNTRADABLE_CARD));
 
 			return;
 		}
@@ -40,28 +40,28 @@ public:
 
 		if (targetPlayer == nullptr)
 		{
-			conn->send(GiftCardFail(SEND_GIFT_FAIL_TARGET_NOT_EXIST));
+			conn->send(SendGiftInventoryCardFail(SEND_GIFT_FAIL_TARGET_NOT_EXIST));
 
 			return;
 		}
 
 		if (player->getId() == targetPlayer->getId())
 		{
-			conn->send(GiftCardFail(GIFT_FAIL_SEND_TO_SELF));
+			conn->send(SendGiftInventoryCardFail(GIFT_FAIL_SEND_TO_SELF));
 
 			return;
 		}
 
 		if (!targetPlayer->getInventoryManager()->hasSpace() /*|| !targetPlayer->getInventoryManager()->hasGiftSpace()*/)
 		{
-			conn->send(GiftCardFail(INVENTORY_FULL_UNSEAL));
+			conn->send(SendGiftInventoryCardFail(INVENTORY_FULL_UNSEAL));
 
 			return;
 		}
 
 		if (player->getEquipmentManager()->hasEquipped(cardId))
 		{
-			conn->send(GiftCardFail(GIFT_FAIL_UNTRADABLE_CARD));
+			conn->send(SendGiftInventoryCardFail(GIFT_FAIL_UNTRADABLE_CARD));
 
 			return;
 		}

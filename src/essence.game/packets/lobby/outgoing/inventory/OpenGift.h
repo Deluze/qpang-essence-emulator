@@ -4,10 +4,10 @@
 #include "packets/writers/InventoryCardWriter.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-class OpenGiftSuccess : public LobbyServerPacket
+class SendOpenGiftSuccess : public LobbyServerPacket
 {
 public:
-	explicit OpenGiftSuccess(const InventoryCard& card) : LobbyServerPacket(743)
+	explicit SendOpenGiftSuccess(const InventoryCard& card) : LobbyServerPacket(743)
 	{
 		writeInt(0);
 		writeInt(0);

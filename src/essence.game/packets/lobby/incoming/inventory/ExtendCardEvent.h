@@ -1,8 +1,8 @@
 #pragma once
 
-#include "CardExtended.h"
+#include "SendInventoryCardExtended.h"
 #include "CardPurchaseComplete.h"
-#include "OpenGiftSuccess.h"
+#include "SendOpenGiftSuccess.h"
 #include "UpdateCashBalance.h"
 #include "core/communication/packet/PacketEvent.h"
 
@@ -80,9 +80,9 @@ public:
 
 		const auto boughtInventoryCard = Game::instance()->getShopManager()->buy(player, seqId, false);
 
-		conn->send(CardExtended(boughtInventoryCard, shopItem.isCash ? player->getCash() : player->getDon(), isCash));
+		conn->send(SendInventoryCardExtended(boughtInventoryCard, shopItem.isCash ? player->getCash() : player->getDon(), isCash));
 		conn->send(UpdateCashBalance(player->getCash()));
 
-		player->send(OpenGiftSuccess(player, boughtInventoryCard));
+		player->send(SendOpenGiftSuccess(player, boughtInventoryCard));
 	}
 };

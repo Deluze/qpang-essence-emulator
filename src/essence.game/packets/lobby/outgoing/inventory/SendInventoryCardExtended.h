@@ -6,10 +6,10 @@
 #include "packets/writers/InventoryCardWriter.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-class CardExtended : public LobbyServerPacket
+class SendInventoryCardExtended : public LobbyServerPacket
 {
 public:
-	CardExtended(const InventoryCard& card, const uint32_t balance, const bool isCash) : LobbyServerPacket(810)
+	SendInventoryCardExtended(const InventoryCard& card, const uint32_t balance, const bool isCash) : LobbyServerPacket(810)
 	{
 		writeFlag(isCash);
 		writeInt(balance);

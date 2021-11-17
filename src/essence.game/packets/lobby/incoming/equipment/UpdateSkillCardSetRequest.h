@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Inventory.h"
+#include "SendInventoryCards.h"
 #include "SendUpdateSkillSet.h"
 #include "core/communication/packet/PacketEvent.h"
 

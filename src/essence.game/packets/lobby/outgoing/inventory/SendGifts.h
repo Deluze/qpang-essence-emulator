@@ -7,10 +7,10 @@
 #include "packets/writers/GiftWriter.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-class Gifts : public LobbyServerPacket
+class SendGifts : public LobbyServerPacket
 {
 public:
-	explicit Gifts(const std::vector<InventoryCard>& gifts, const uint16_t totalItemCount,
+	explicit SendGifts(const std::vector<InventoryCard>& gifts, const uint16_t totalItemCount,
 	               const uint16_t currentlySendCount, const uint16_t currentItemCount) : LobbyServerPacket(746)
 	{
 		writeShort(totalItemCount);

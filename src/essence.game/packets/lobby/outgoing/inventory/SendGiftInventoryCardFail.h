@@ -2,7 +2,7 @@
 
 #include "packets/LobbyServerPacket.h"
 
-class GiftCardFail : public LobbyServerPacket
+class SendGiftInventoryCardFail : public LobbyServerPacket
 {
 public:
 	enum LS_SEND_PRESENT_INDEC_FAIL
@@ -13,7 +13,7 @@ public:
 		GIFT_FAIL_UNTRADABLE_CARD = 871,
 	};
 
-	explicit GiftCardFail(const uint32_t code) : LobbyServerPacket(814) // 814 = LS_SEND_PRESENT_INDEC_FAIL
+	explicit SendGiftInventoryCardFail(const uint32_t code) : LobbyServerPacket(814) // 814 = LS_SEND_PRESENT_INDEC_FAIL
 	{
 		writeInt(code);
 	}

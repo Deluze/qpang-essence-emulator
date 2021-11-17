@@ -4,10 +4,10 @@
 #include "packets/writers/InventoryCardWriter.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-class DisableFunctionCard : public LobbyServerPacket
+class SendEnableFunctionCard : public LobbyServerPacket
 {
 public:
-	explicit DisableFunctionCard(const InventoryCard& card) : LobbyServerPacket(862)
+	explicit SendEnableFunctionCard(const InventoryCard& card) : LobbyServerPacket(835)
 	{
 		InventoryCardWriter::write(this, card);
 	}

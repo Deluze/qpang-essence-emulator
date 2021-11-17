@@ -1,16 +1,16 @@
 #include "InventoryManager.h"
 
-#include "Gifts.h"
-#include "Inventory.h"
+#include "SendGifts.h"
+#include "SendInventoryCards.h"
 #include "ItemId.h"
-#include "OpenCardSuccess.h"
+#include "SendOpenCardSuccess.h"
 #include "OpenGift.h"
-#include "packets/lobby/outgoing/inventory/DisableFunctionCard.h"
-#include "packets/lobby/outgoing/inventory/EnableFunctionCard.h"
-#include "packets/lobby/outgoing/inventory/GiftCardSuccess.h"
-#include "packets/lobby/outgoing/inventory/OpenGiftSuccess.h"
-#include "packets/lobby/outgoing/inventory/ReceiveGift.h"
-#include "packets/lobby/outgoing/inventory/RemoveCard.h"
+#include "packets/lobby/outgoing/inventory/SendDisableFunctionCard.h"
+#include "packets/lobby/outgoing/inventory/SendEnableFunctionCard.h"
+#include "packets/lobby/outgoing/inventory/SendGiftInventoryCardSuccess.h"
+#include "packets/lobby/outgoing/inventory/SendOpenGiftSuccess.h"
+#include "packets/lobby/outgoing/inventory/SendReceiveGift.h"
+#include "packets/lobby/outgoing/inventory/SendRemoveInventoryCard.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
@@ -112,7 +112,7 @@ void InventoryManager::sendCards()
 
 	if (inventoryCards.empty())
 	{
-		player->send(Inventory({}, 0, 0, 0));
+		player->send(SendInventoryCards({}, 0, 0, 0));
 
 		return;
 	}
@@ -134,7 +134,7 @@ void InventoryManager::sendCards()
 		std::vector<InventoryCard> partition = slice(inventoryCards, i * partitionSize + 1, currentSendCount);
 
 		// now send the data
-		player->send(Inventory(partition, static_cast<uint16_t>(inventoryCards.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
+		player->send(SendInventoryCards(partition, static_cast<uint16_t>(inventoryCards.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
 	}
 }
 
@@ -152,7 +152,7 @@ void InventoryManager::sendGifts()
 
 	if (gifts.empty())
 	{
-		player->send(Gifts({}, 0, 0, 0));
+		player->send(SendGifts({}, 0, 0, 0));
 
 		return;
 	}
@@ -180,7 +180,7 @@ void InventoryManager::sendGifts()
 		}
 
 		// now send the data
-		player->send(Gifts(partition, static_cast<uint16_t>(gifts.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
+		player->send(SendGifts(partition, static_cast<uint16_t>(gifts.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
 	}
 }
 
@@ -237,7 +237,7 @@ void InventoryManager::deleteCard(const uint64_t cardId)
 		stmt->bindInteger(player->getId()); // for security
 		stmt->execute();
 
-		player->send(RemoveCard(cardId));
+		player->send(SendRemoveInventoryCard(cardId));
 	}
 }
 
@@ -267,13 +267,13 @@ void InventoryManager::setCardActive(const uint64_t cardId, bool isActive)
 				card.timeCreated = time(nullptr);
 				card.isActive = true;
 				equipmentManager->addFunctionCard(cardId);
-				player->send(EnableFunctionCard(card));
+				player->send(SendEnableFunctionCard(card));
 			}
 			else if (!isActive && alreadyHasSameFunctionCard)
 			{
 				card.isActive = false;
 				equipmentManager->removeFunctionCard(cardId);
-				player->send(DisableFunctionCard(card));
+				player->send(SendDisableFunctionCard(card));
 			}
 		}
 		else if (card.type == 75)
@@ -511,7 +511,7 @@ void InventoryManager::giftCard(InventoryCard& card, const std::shared_ptr<Playe
 		}
 	);
 
-	our->send(GiftCardSuccess(card.id));
+	our->send(SendGiftInventoryCardSuccess(card.id));
 
 	our->getEquipmentManager()->save();
 }
@@ -529,7 +529,7 @@ void InventoryManager::receiveGift(InventoryCard& card, const std::u16string& se
 	card.playerOwnerId = player->getId();
 	m_gifts[card.id] = card;
 
-	player->send(ReceiveGift(card, sender));
+	player->send(SendReceiveGift(card, sender));
 }
 
 void InventoryManager::openGift(uint64_t cardId)
@@ -558,7 +558,7 @@ void InventoryManager::openGift(uint64_t cardId)
 
 	DATABASE_DISPATCHER->dispatch("UPDATE player_items SET opened = 1 WHERE id = ?", { card.id });
 
-	player->send(OpenGiftSuccess(player, card));
+	player->send(SendOpenGiftSuccess(player, card));
 }
 
 bool InventoryManager::hasGiftSpace() const
@@ -592,7 +592,7 @@ void InventoryManager::openCard(const uint64_t cardId)
 
 	DATABASE_DISPATCHER->dispatch("UPDATE player_items SET opened = 1 WHERE id = ?", { card.id });
 
-	player->send(OpenCardSuccess(cardId));
+	player->send(SendOpenCardSuccess(cardId));
 }
 
 void InventoryManager::close()

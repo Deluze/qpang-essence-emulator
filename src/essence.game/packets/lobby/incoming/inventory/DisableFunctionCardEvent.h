@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/inventory/DisableFunctionCard.h"
+#include "packets/lobby/outgoing/inventory/SendDisableFunctionCard.h"
 #include "qpang/ItemId.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/inventory/InventoryManager.h"

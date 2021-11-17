@@ -12,7 +12,7 @@
 #include "packets/lobby/outgoing/equipment/SendUpdateWeapons.h"
 #include "packets/lobby/outgoing/equipment/SendUpdateArmor.h"
 
-#include "packets/lobby/outgoing/inventory/Inventory.h"
+#include "packets/lobby/outgoing/inventory/SendInventoryCards.h"
 
 void EquipmentManager::initialize(std::shared_ptr<Player> player, uint16_t playerId)
 {

@@ -6,10 +6,10 @@
 #include "packets/writers/InventoryCardWriter.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-class Inventory : public LobbyServerPacket
+class SendInventoryCards : public LobbyServerPacket
 {
 public:
-	explicit Inventory(const std::vector<InventoryCard>& cards, const uint16_t totalItemCount,
+	explicit SendInventoryCards(const std::vector<InventoryCard>& cards, const uint16_t totalItemCount,
 	                   const uint16_t currentlySendCount, const uint16_t currentItemCount) : LobbyServerPacket(781)
 	{
 		writeShort(totalItemCount);
