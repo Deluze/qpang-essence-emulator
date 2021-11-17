@@ -7,7 +7,7 @@
 
 #include "packets/lobby/outgoing/equipment/SendEquippedSkillCards.h"
 
-class RequestEquippedSkillCards final : public PacketEvent
+class HandleGetEquippedSkillCardsRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

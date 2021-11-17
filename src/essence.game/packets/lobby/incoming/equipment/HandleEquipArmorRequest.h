@@ -5,7 +5,7 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/equipment/EquipmentManager.h"
 
-class EquipArmor final : public PacketEvent
+class HandleEquipArmorRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

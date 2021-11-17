@@ -7,7 +7,7 @@
 auto constexpr CARD_DATA_LENGTH = 43;
 auto constexpr SKILL_CARDS_PER_SET = 3;
 
-class UpdateSkillCardSetRequest final : public PacketEvent
+class HandleUpdateSkillSetRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

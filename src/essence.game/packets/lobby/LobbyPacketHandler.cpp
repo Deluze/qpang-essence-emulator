@@ -3,16 +3,16 @@
 #include "GiftCardEvent.h"
 #include "Handshake.h"
 #include "Login.h"
-#include "EnchantItemEvent.h"
+#include "HandleEnchantItemRequest.h"
 #include "RequestTrade.h"
 #include "channel/HandleRequestChannelHost.h"
 #include "channel/HandleRequestChannelList.h"
 #include "crane/HandleUseCraneRequest.h"
 #include "dailybonus/HandleGetDailyBonusRequest.h"
-#include "equipment/EquipArmor.h"
-#include "equipment/EquipWeapon.h"
-#include "equipment/RequestEquippedSkillCards.h"
-#include "equipment/UpdateSkillCardSetRequest.h"
+#include "equipment/HandleEquipArmorRequest.h"
+#include "equipment/HandleEquipWeaponRequest.h"
+#include "equipment/HandleGetEquippedSkillCardsRequest.h"
+#include "equipment/HandleUpdateSkillSetRequest.h"
 #include "friend/AcceptIncomingFriendRequestEvent.h"
 #include "friend/CancelOutgoingFriendRequestEvent.h"
 #include "friend/DenyIncomingFriendRequestEvent.h"
@@ -53,10 +53,10 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 {
 	add(1, new Handshake());
 	add(600, new Login());
-	add(620, new EquipArmor());
-	add(623, new EquipWeapon());
-	add(646, new RequestEquippedSkillCards());
-	add(649, new UpdateSkillCardSetRequest());
+	add(620, new HandleEquipArmorRequest());
+	add(623, new HandleEquipWeaponRequest());
+	add(646, new HandleGetEquippedSkillCardsRequest());
+	add(649, new HandleUpdateSkillSetRequest());
 	add(652, new DeleteCard());
 	add(655, new OpenCardRequest());
 	add(667, new ValidateNickNameRequest());
@@ -106,7 +106,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	// 884 - Trade cancel?
 	add(897, new HandleUseCraneRequest());
 	add(901, new HandleGetDailyBonusRequest());
-	add(903, new EnchantItemEvent());
+	add(903, new HandleEnchantItemRequest());
 	// 903 - Request to boost clothing piece
 	// 906 - Panthalassa box opening
 }

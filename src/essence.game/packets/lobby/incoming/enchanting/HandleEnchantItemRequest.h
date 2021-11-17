@@ -2,11 +2,11 @@
 
 #include "core/communication/packet/PacketEvent.h"
 
-class EnchantItemEvent final : public PacketEvent
+class HandleEnchantItemRequest final : public PacketEvent
 {
 	// TODO: Move classes to their own file.
 
-	class EnchantItemEventFailResponse : public LobbyServerPacket
+	class SendEnchantItemError : public LobbyServerPacket
 	{
 	public:
 		enum LS_ENCHANT_ITEM_FAIL
@@ -15,16 +15,16 @@ class EnchantItemEvent final : public PacketEvent
 			NOT_AVAILABLE_FOR_ENCHANT = 859
 		};
 
-		explicit EnchantItemEventFailResponse(const uint32_t code) : LobbyServerPacket(905)
+		explicit SendEnchantItemError(const uint32_t code) : LobbyServerPacket(905)
 		{
 			writeInt(code);
 		}
 	};
 
-	class EnchantItemEventSuccessResponse : public LobbyServerPacket
+	class SendEnchantItemSuccess : public LobbyServerPacket
 	{
 	public:
-		explicit EnchantItemEventSuccessResponse(const bool hasEnchantSucceeded, const uint32_t donBalance) : LobbyServerPacket(904) 
+		explicit SendEnchantItemSuccess(const bool hasEnchantSucceeded, const uint32_t donBalance) : LobbyServerPacket(904) 
 		{
 			writeFlag(hasEnchantSucceeded);
 			//writeInt(3); // 1 - Roi dances, 2 - Roi is sad
@@ -54,7 +54,7 @@ public:
 		const auto goldenSpannerItemId = packet.readInt();
 
 		// TODO: Find out last 4 bytes.
-		std::cout << "EnchantItemEvent::handle >> CardId: " << cardId <<
+		std::cout << "HandleEnchantItemRequest::handle >> CardId: " << cardId <<
 			", CardItemId: " << cardItemId <<
 			", EnchantCost: " << enchantCost <<
 			", EssenceCardId: " << essenceCardId <<
@@ -63,6 +63,6 @@ public:
 			", GoldenSpannerItemId: " << goldenSpannerItemId <<
 			std::endl;
 
-		conn->send(EnchantItemEventSuccessResponse(true, player->getDon()));
+		conn->send(SendEnchantItemSuccess(true, player->getDon()));
 	}
 };
