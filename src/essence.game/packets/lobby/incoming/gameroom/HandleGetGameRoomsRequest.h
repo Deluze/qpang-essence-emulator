@@ -8,7 +8,7 @@
 
 #include "packets/lobby/outgoing/gameroom/SendGameRoomList.h"
 
-class RequestGameRoomsEvent final : public PacketEvent
+class HandleGetGameRoomsRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

@@ -9,14 +9,13 @@
 #include "core/communication/packet/PacketEvent.h"
 #include "SendGameRoomInvite.h"
 
-class GameRoomInviteRequest final : public PacketEvent
+class HandleGameRoomInviteRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto playerName = conn->getPlayer()->getName();
 
-		// 38 empty bytes.
 		packet.readEmpty(38);
 
 		// TODO: Compare the given host and port from the client to the actual host and port.
@@ -26,7 +25,7 @@ public:
 		// 6 bytes, 1 0 0 0 0 0
 		packet.readEmpty(6);
 
-		const auto mode = (uint8_t) packet.readByte();
+		const auto mode = packet.readByte();
 
 		const auto roomTitle = packet.readStringTerminated(20);
 
@@ -45,7 +44,7 @@ public:
 		}
 	}
 private:
-	std::string readHost(QpangPacket& packet)
+	static std::string readHost(QpangPacket& packet)
 	{
 		std::array<std::byte, 4> hostAddressParts = packet.readArray<std::byte, 4>();
 
@@ -58,7 +57,7 @@ private:
 				stream << '.';
 			}
 
-			stream << (int)hostAddressParts[i];
+			stream << static_cast<int>(hostAddressParts[i]);
 		}
 
 		return stream.str();

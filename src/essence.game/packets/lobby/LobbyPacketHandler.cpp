@@ -19,9 +19,9 @@
 #include "friend/HandleRemoveFriendRequest.h"
 #include "friend/HandleRequestFriendList.h"
 #include "friend/HandleSendFriendRequest.h"
-#include "gameroom/GameRoomInviteRequest.h"
-#include "gameroom/RequestGameRoomsEvent.h"
-#include "gameroom/RequestGameSettingsEvent.h"
+#include "gameroom/HandleGameRoomInviteRequest.h"
+#include "gameroom/HandleGetGameRoomsRequest.h"
+#include "gameroom/HandleGetGameSettingsRequest.h"
 #include "inventory/DeleteCard.h"
 #include "inventory/DisableFunctionCardEvent.h"
 #include "inventory/EnableFunctionCardEvent.h"
@@ -73,17 +73,17 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(709, new HandleCancelOutgoingFriendRequest());
 	add(713, new HandleRemoveFriendRequest());
 	// 717 - Invite friend to join the gameroom
-	add(721, new GameRoomInviteRequest());
+	add(721, new HandleGameRoomInviteRequest());
 	add(725, new RequestMemos());
 	// 728 - Send memo
 	add(738, new WhisperEvent());
 	add(742, new OpenGift());
 	add(745, new RequestGifts());
 	// 751 - Has something to do with joining a room (also occurs with creating a room)
-	add(758, new RequestGameRoomsEvent());
+	add(758, new HandleGetGameRoomsRequest());
 	add(762, new HandleRequestChannelList());
 	add(766, new HandleRequestChannelHost());
-	add(769, new RequestGameSettingsEvent());
+	add(769, new HandleGetGameSettingsRequest());
 	add(780, new RequestInventory());
 	add(791, new RequestPlayerRanking());
 	add(797, new RequestShopItems());

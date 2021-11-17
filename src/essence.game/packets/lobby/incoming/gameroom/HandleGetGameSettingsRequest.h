@@ -10,7 +10,7 @@
 #include "packets/lobby/outgoing/gameroom/SendUpdateGameSettings.h"
 #include "packets/lobby/outgoing/gameroom/SendGameRoomList.h"
 
-class RequestGameSettingsEvent final : public PacketEvent
+class HandleGetGameSettingsRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
