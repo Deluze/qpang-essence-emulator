@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "dailybonus/DailyBonusResponse.h"
+#include "dailybonus/SendDailyBonus.h"
 
 class DailyBonusRequest final : public PacketEvent
 {
@@ -39,7 +39,7 @@ public:
 			setPlayerDailyBonusRedeemedAtTime(player->getId(), now);	
 		}
 
-		player->send(DailyBonusResponse(player, isEligibleForDailyBonus));
+		player->send(SendDailyBonus(player, isEligibleForDailyBonus));
 	}
 
 private:

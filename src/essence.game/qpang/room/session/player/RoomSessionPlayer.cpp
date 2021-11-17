@@ -2,7 +2,7 @@
 
 #include "cc_user_info.hpp"
 #include "ConfigManager.h"
-#include "UpdateSkillCardSetResponse.h"
+#include "SendUpdateSkillSet.h"
 
 #include "packets/lobby/outgoing/account/SendAccountUpdate.h"
 
@@ -194,7 +194,7 @@ void RoomSessionPlayer::stop()
 	player->update();
 
 	player->send(SendAccountUpdate(player));
-	player->send(UpdateSkillCardSetResponse(player->getEquipmentManager()->getEquippedSkillCards()));
+	player->send(SendUpdateSkillSet(player->getEquipmentManager()->getEquippedSkillCards()));
 }
 
 bool RoomSessionPlayer::canStart()

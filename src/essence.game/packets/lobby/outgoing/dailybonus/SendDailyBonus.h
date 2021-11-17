@@ -5,26 +5,26 @@
 
 #include "UpdateCashBalance.h"
 
-class DailyBonusResponse : public LobbyServerPacket
+class SendDailyBonus : public LobbyServerPacket
 {
 public:
-	DailyBonusResponse(const Player::Ptr& player, const bool isEligibleForDailyBonus) : LobbyServerPacket(902)
+	SendDailyBonus(const Player::Ptr& player, const bool isEligibleForDailyBonus) : LobbyServerPacket(902)
 	{
 		if (isEligibleForDailyBonus)
 		{
-			SendDailyBonusSuccess(player);
+			SendSuccess(player);
 
 			player->send(UpdateCashBalance(player->getCash()));
 		}
 		else
 		{
 			// Player has already received their reward.
-			SendDailyBonusFailure(player);
+			SendFail(player);
 		}
 	}
 
 private:
-	void SendDailyBonusSuccess(const Player::Ptr& player)
+	void SendSuccess(const Player::Ptr& player)
 	{
 		const auto playerIsPatreon = player->isPatreon();
 
@@ -61,7 +61,7 @@ private:
 		writeFlag(hasExtraRewards);
 	}
 
-	void SendDailyBonusFailure(const Player::Ptr& player)
+	void SendFail(const Player::Ptr& player)
 	{
 		const auto currentCoinBalance = player->getCoins();
 

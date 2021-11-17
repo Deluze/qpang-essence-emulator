@@ -6,10 +6,10 @@
 #include "packets/writers/InventoryCardWriter.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-class EquippedSkillCards : public LobbyServerPacket
+class SendEquippedSkillCards : public LobbyServerPacket
 {
 public:
-	explicit EquippedSkillCards(const std::array<InventoryCard, 3>& skillCards) : LobbyServerPacket(647)
+	explicit SendEquippedSkillCards(const std::array<InventoryCard, 3>& skillCards) : LobbyServerPacket(647)
 	{
 		for (const InventoryCard& skillCard : skillCards)
 		{

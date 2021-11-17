@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Inventory.h"
-#include "UpdateSkillCardSetResponse.h"
+#include "SendUpdateSkillSet.h"
 #include "core/communication/packet/PacketEvent.h"
 
 auto constexpr CARD_DATA_LENGTH = 43;
@@ -53,7 +53,7 @@ public:
 
 		toggleActiveStateForInventoryCards(player, true);
 
-		conn->send(UpdateSkillCardSetResponse(player->getEquipmentManager()->getEquippedSkillCards()));
+		conn->send(SendUpdateSkillSet(player->getEquipmentManager()->getEquippedSkillCards()));
 	}
 private:
 	static void toggleActiveStateForInventoryCards(const Player::Ptr& player, const bool isActive)

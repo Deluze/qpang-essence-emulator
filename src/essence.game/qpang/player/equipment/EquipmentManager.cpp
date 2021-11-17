@@ -9,8 +9,8 @@
 #include "qpang/player/Player.h"
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 
-#include "packets/lobby/outgoing/equipment/SetWeapons.h"
-#include "packets/lobby/outgoing/equipment/SetArmor.h"
+#include "packets/lobby/outgoing/equipment/SendUpdateWeapons.h"
+#include "packets/lobby/outgoing/equipment/SendUpdateArmor.h"
 
 #include "packets/lobby/outgoing/inventory/Inventory.h"
 
@@ -277,7 +277,7 @@ void EquipmentManager::setWeapons(uint16_t character, const std::array<uint64_t,
 		m_equips[characterId][11] = weapons[2];
 		m_equips[characterId][12] = weapons[3];
 
-		player->send(SetWeapons(character, weapons));
+		player->send(SendUpdateWeapons(character, weapons));
 	}
 }
 
@@ -307,7 +307,7 @@ void EquipmentManager::setArmor(uint16_t character, const std::array<uint64_t, 9
 		m_equips[characterId][6] = armor[6];
 		m_equips[characterId][7] = armor[7];
 
-		player->send(SetArmor(character, armor));
+		player->send(SendUpdateArmor(character, armor));
 	}
 }
 

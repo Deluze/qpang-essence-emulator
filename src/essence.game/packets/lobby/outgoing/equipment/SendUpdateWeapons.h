@@ -5,10 +5,10 @@
 
 #include "packets/LobbyServerPacket.h"
 
-class SetWeapons : public LobbyServerPacket
+class SendUpdateWeapons : public LobbyServerPacket
 {
 public:
-	SetWeapons(const uint16_t characterOffset, const std::array<uint64_t, 4>& weapons) : LobbyServerPacket(624)
+	SendUpdateWeapons(const uint16_t characterOffset, const std::array<uint64_t, 4>& weapons) : LobbyServerPacket(624)
 	{
 		writeShort(characterOffset);
 

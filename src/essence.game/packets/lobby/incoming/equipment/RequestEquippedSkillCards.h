@@ -5,7 +5,7 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/equipment/EquipmentManager.h"
 
-#include "packets/lobby/outgoing/equipment/EquippedSkillCards.h"
+#include "packets/lobby/outgoing/equipment/SendEquippedSkillCards.h"
 
 class RequestEquippedSkillCards final : public PacketEvent
 {
@@ -14,6 +14,6 @@ public:
 	{
 		const std::array<InventoryCard, 3> skillsCards = conn->getPlayer()->getEquipmentManager()->getEquippedSkillCards();
 
-		conn->send(EquippedSkillCards(skillsCards));
+		conn->send(SendEquippedSkillCards(skillsCards));
 	}
 };
