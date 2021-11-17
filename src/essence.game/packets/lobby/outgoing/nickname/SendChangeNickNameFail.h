@@ -2,7 +2,7 @@
 
 #include "packets/LobbyServerPacket.h"
 
-class ChangeNickNameFailResponse : public LobbyServerPacket
+class SendChangeNickNameFail : public LobbyServerPacket
 {
 public:
 	enum LS_CHANGE_NICKNAME_FAIL
@@ -11,7 +11,7 @@ public:
 		FR_LS_INVALID_NICKNAME = 827,
 	};
 
-	explicit ChangeNickNameFailResponse(const uint32_t code) : LobbyServerPacket(839) // LS_CHANGE_NICKNAME_FAIL
+	explicit SendChangeNickNameFail(const uint32_t code) : LobbyServerPacket(839) // LS_CHANGE_NICKNAME_FAIL
 	{
 		// TODO: Find codes to display the correct message.
 		writeInt(code);

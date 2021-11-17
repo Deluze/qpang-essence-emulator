@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ChangeNickNameFailResponse.h"
+#include "SendChangeNickNameFail.h"
 #include "core/communication/packet/PacketEvent.h"
 
 class ChangeNickNameRequest final : public PacketEvent
@@ -21,7 +21,7 @@ public:
 		
 		if (!player->getInventoryManager()->hasCard(cardId))
 		{
-			conn->send(ChangeNickNameFailResponse(BAD_REQUEST));
+			conn->send(SendChangeNickNameFail(BAD_REQUEST));
 
 			return;
 		}
@@ -30,7 +30,7 @@ public:
 
 		if (card.period <= 0)
 		{
-			conn->send(ChangeNickNameFailResponse(BAD_REQUEST));
+			conn->send(SendChangeNickNameFail(BAD_REQUEST));
 
 			return;
 		}
@@ -39,7 +39,7 @@ public:
 
 		if (itemId != NAME_CHANGER)
 		{
-			conn->send(ChangeNickNameFailResponse(BAD_REQUEST));
+			conn->send(SendChangeNickNameFail(BAD_REQUEST));
 
 			return;
 		}

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ValidateNickNameFailResponse.h"
-#include "ValidateNickNameSuccessResponse.h"
+#include "SendValidateNickNameError.h"
+#include "SendValidateNickNameSuccess.h"
 #include "core/communication/packet/PacketEvent.h"
 
 class ValidateNickNameRequest final : public PacketEvent
@@ -21,7 +21,7 @@ public:
 
 		if (nickName.length() < 4 || nickName.length() > 16)
 		{
-			conn->send(ValidateNickNameFailResponse(FR_LS_INVALID_NICKNAME));
+			conn->send(SendValidateNickNameError(FR_LS_INVALID_NICKNAME));
 
 			return;
 		}
@@ -34,7 +34,7 @@ public:
 
 		if (const auto result = statement->fetch(); result->hasResults())
 		{
-			conn->send(ValidateNickNameFailResponse(FR_LS_DUPLICATE_NICKNAME));
+			conn->send(SendValidateNickNameError(FR_LS_DUPLICATE_NICKNAME));
 
 			return;
 		}
@@ -43,6 +43,6 @@ public:
 
 		// TODO: If all goes well, add nickname to player_nickname_registration table.
 
-		conn->send(ValidateNickNameSuccessResponse());
+		conn->send(SendValidateNickNameSuccess());
 	}
 };
