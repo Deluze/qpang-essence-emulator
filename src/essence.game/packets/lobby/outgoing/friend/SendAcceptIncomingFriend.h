@@ -5,10 +5,10 @@
 
 #include "packets/writers/FriendWriter.h"
 
-class AcceptIncomingFriend : public LobbyServerPacket
+class SendAcceptIncomingFriend : public LobbyServerPacket
 {
 public:
-	explicit AcceptIncomingFriend(const Friend& fr) : LobbyServerPacket(702)
+	explicit SendAcceptIncomingFriend(const Friend& fr) : LobbyServerPacket(702)
 	{
 		FriendWriter::write(this, fr);
 	}

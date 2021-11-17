@@ -4,10 +4,10 @@
 #include "packets/writers/FriendWriter.h"
 #include "qpang/player/friend/Friend.h"
 
-class OutgoingFriendAccepted : public LobbyServerPacket
+class SendAddIncomingFriend : public LobbyServerPacket
 {
 public:
-	explicit OutgoingFriendAccepted(const Friend& fr) : LobbyServerPacket(704)
+	explicit SendAddIncomingFriend(const Friend& fr) : LobbyServerPacket(700)
 	{
 		FriendWriter::write(this, fr);
 	}

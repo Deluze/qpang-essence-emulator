@@ -6,10 +6,10 @@
 #include "packets/writers/FriendWriter.h"
 #include "qpang/player/friend/Friend.h"
 
-class FriendList : public LobbyServerPacket
+class SendFriendList : public LobbyServerPacket
 {
 public:
-	explicit FriendList(const std::vector<Friend>& friends) : LobbyServerPacket(695)
+	explicit SendFriendList(const std::vector<Friend>& friends) : LobbyServerPacket(695)
 	{
 		const uint16_t size = static_cast<uint16_t>(friends.size());
 

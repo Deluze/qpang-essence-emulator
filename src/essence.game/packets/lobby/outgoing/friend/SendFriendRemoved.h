@@ -3,10 +3,10 @@
 #include "packets/LobbyServerPacket.h"
 #include "qpang/player/friend/Friend.h"
 
-class FriendRemoved : public LobbyServerPacket
+class SendFriendRemoved : public LobbyServerPacket
 {
 public:
-	explicit FriendRemoved(const Friend& fr) : LobbyServerPacket(716)
+	explicit SendFriendRemoved(const Friend& fr) : LobbyServerPacket(716)
 	{
 		writeInt(fr.playerId);
 		writeEmpty(8);

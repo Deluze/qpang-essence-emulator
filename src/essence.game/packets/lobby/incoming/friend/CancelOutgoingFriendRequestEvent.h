@@ -6,8 +6,8 @@
 #include "qpang/player/Player.h"
 #include "qpang/player/friend/FriendManager.h"
 
-#include "packets/lobby/outgoing/friend/CancelOutgoingFriend.h"
-#include "packets/lobby/outgoing/friend/IncomingFriendCancelled.h"
+#include "packets/lobby/outgoing/friend/SendCancelOutgoingFriend.h"
+#include "packets/lobby/outgoing/friend/SendIncomingFriendCancelled.h"
 
 class CancelOutgoingFriendRequestEvent final : public PacketEvent
 {
@@ -23,9 +23,9 @@ public:
 			player->getFriendManager()->removeOutgoing(playerId);
 			target->getFriendManager()->removeIncoming(player->getId());
 
-			target->send(IncomingFriendCancelled(player));
+			target->send(SendIncomingFriendCancelled(player));
 		}
 
-		conn->send(CancelOutgoingFriend(playerId));
+		conn->send(SendCancelOutgoingFriend(playerId));
 	}
 };
