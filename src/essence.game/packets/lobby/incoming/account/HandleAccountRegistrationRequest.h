@@ -14,7 +14,7 @@ public:
 		const auto nickName = packet.readStringTerminated(16);
 
 		// TODO: Remove.
-		player->setName(nickName);
+		//player->setName(nickName);
 
 		// Seems like the player nickname gets sent if the referral nickname is empty.
 		const auto referralNickName = packet.readStringTerminated(16);
