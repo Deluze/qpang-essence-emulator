@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LobbyServerPacket.h"
+#include "Player.h"
 #include "core/communication/packet/PacketEvent.h"
 
 class HandleEnchantItemRequest final : public PacketEvent
