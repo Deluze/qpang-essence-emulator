@@ -145,7 +145,9 @@ void PlayerSkillManager::activateSkill(const std::shared_ptr<Skill>& skill, cons
 
 		skill->use();
 
-		const auto usesLeftCount = (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
+		const auto usesLeftCount = skill->isDrawnSkill() ? 0 : (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
+
+		std::cout << "Uses left: " << usesLeftCount << std::endl;
 
 		roomSession->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::ACTIVATE_CARD, cardType, itemId, seqId, usesLeftCount, m_skillTargetPlayerIds);
 
@@ -192,7 +194,7 @@ void PlayerSkillManager::failSkill(const std::shared_ptr<Skill>& skill, const ui
 
 		skill->use();
 
-		const auto usesLeftCount = (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
+		const auto usesLeftCount = skill->isDrawnSkill() ? 0 : (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
 
 		player->getRoomSession()->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::FAIL_CARD_ACTIVATION, cardType, itemId, seqId, usesLeftCount);
 
@@ -267,6 +269,7 @@ uint32_t PlayerSkillManager::drawSkill()
 			return 0;
 		}
 
+		m_drawnSkill->setIsDrawnSkill(true);
 		m_drawnSkill->bind(player);
 
 		return m_drawnSkill->getItemId();

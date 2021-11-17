@@ -19,7 +19,8 @@ public:
 		m_duration(duration),
 		m_initialDuration(duration),
 		m_useCount(0),
-		m_maxUseCount(1)
+		m_maxUseCount(1),
+		m_isDrawnSkill(false)
 	{
 	}
 
@@ -33,6 +34,16 @@ public:
 	void use()
 	{
 		m_useCount++;
+	}
+
+	void setIsDrawnSkill(bool value)
+	{
+		m_isDrawnSkill = value;
+	}
+
+	bool isDrawnSkill()
+	{
+		return m_isDrawnSkill;
 	}
 
 	void setMaxUseCount(const uint16_t count)
@@ -183,6 +194,8 @@ protected:
 
 	uint16_t m_useCount;
 	uint16_t m_maxUseCount;
+
+	bool m_isDrawnSkill;
 
 	std::shared_ptr<RoomSessionPlayer> m_player;
 };
