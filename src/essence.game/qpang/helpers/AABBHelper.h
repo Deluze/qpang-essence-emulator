@@ -9,6 +9,7 @@ class AABBHelper
 public:
 	static bool isPositionInBetweenBounds(const Position point, const Position minBound, const Position maxBound);
 	static bool IsPositionWithinSpawnRadius(Position position, Spawn spawn, float radius);
+	static long double AABBHelper::getDistanceBetweenPositions(const Position pos1, const Position pos2);
 private:
 	static bool isNegative(const float value);
 	static bool isInRange(const float value, const float min, const float max);

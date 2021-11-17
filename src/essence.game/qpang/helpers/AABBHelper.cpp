@@ -1,6 +1,7 @@
 #include "AABBHelper.h"
 #include "Position.h"
 #include "Spawn.h"
+#include <cmath>
 
 // ReSharper disable once CppInconsistentNaming
 bool AABBHelper::isPositionInBetweenBounds(const Position point, const Position minBound, const Position maxBound)
@@ -18,6 +19,11 @@ bool AABBHelper::isPositionInBetweenBounds(const Position point, const Position 
 		: isInRange(point.z, minBound.z, maxBound.z));
 
 	return (xPositionInBetweenBounds && yPositionInBetweenBounds && zPositionInBetweenBounds);
+}
+
+long double AABBHelper::getDistanceBetweenPositions(const Position pos1, const Position pos2)
+{
+	return sqrt(pow(pos1.x - pos2.x, 2.0) + pow(pos1.y - pos2.y, 2.0) + pow(pos1.z - pos2.z, 2.0));
 }
 
 bool AABBHelper::IsPositionWithinSpawnRadius(const Position position, const Spawn spawn, const float radius)
