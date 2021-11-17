@@ -5,10 +5,10 @@
 #include "packets/LobbyServerPacket.h"
 #include "qpang/player/memo/Memo.h"
 
-class Memos : public LobbyServerPacket
+class SendMemoList : public LobbyServerPacket
 {
 public:
-	explicit Memos(const std::vector<Memo>& memos) : LobbyServerPacket(726)
+	explicit SendMemoList(const std::vector<Memo>& memos) : LobbyServerPacket(726)
 	{
 		const auto size = static_cast<uint16_t>(memos.size());
 

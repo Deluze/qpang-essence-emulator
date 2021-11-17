@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/memo/Memos.h"
+#include "packets/lobby/outgoing/memo/SendMemoList.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/memo/MemoManager.h"
 
@@ -15,7 +15,7 @@ public:
 		if (const auto player = conn->getPlayer(); player != nullptr)
 		{
 			const std::vector<Memo> memos = player->getMemoManager()->list();
-			conn->send(Memos(memos));
+			conn->send(SendMemoList(memos));
 		}
 	}
 };
