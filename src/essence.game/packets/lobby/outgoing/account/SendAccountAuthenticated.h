@@ -14,10 +14,11 @@ public:
 		// Player info
 		writeInt(player->getId());										// Player id
 		writeEmpty(42);													// Empty
-		writeString(player->getName(), 16);							// Player name
-		writeInt(player->getStatsManager()->getPlayTimeInMinutes());		// Playtime in minutes.
-		writeInt(player->getCash());										// Cash
-		writeInt(player->getRank());										// Rank
+		// TODO: Send empty string as name if player has not fully registered yet.
+		writeString(player->getName(), 16);								// Player name
+		writeInt(player->getStatsManager()->getPlayTimeInMinutes());	// Playtime in minutes.
+		writeInt(player->getCash());									// Cash
+		writeInt(player->getRank());									// Rank
 		writeShort(0); // ?												// Unknown
 		writeShort(player->getCharacter());								// Character id
 		writeInt(player->getLevel());									// Level
