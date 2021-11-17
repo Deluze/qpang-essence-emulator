@@ -5,7 +5,7 @@
 #include "qpang/Game.h"
 #include "qpang/channel/ChannelManager.h"
 
-#include "packets/lobby/outgoing/channel/ChannelHost.h"
+#include "packets/lobby/outgoing/channel/SendChannelHost.h"
 
 class RequestChannelHost final : public PacketEvent
 {

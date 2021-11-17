@@ -3,7 +3,7 @@
 #include "core/communication/packet/PacketEvent.h"
 
 #include "qpang/Game.h"
-#include "packets/lobby/outgoing/channel/ChannelList.h"
+#include "packets/lobby/outgoing/channel/SendChannelList.h"
 
 class RequestChannelList final : public PacketEvent
 {
