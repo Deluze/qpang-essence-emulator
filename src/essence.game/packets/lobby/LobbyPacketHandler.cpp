@@ -30,9 +30,9 @@
 #include "inventory/HandleOpenGiftRequest.h"
 #include "inventory/HandleGetGiftsRequest.h"
 #include "inventory/HandleGetInventoryRequest.h"
-#include "memo/RequestMemos.h"
-#include "nickname/ChangeNickNameRequest.h"
-#include "nickname/ValidateNickNameRequest.h"
+#include "memo/HandleGetMemosRequest.h"
+#include "nickname/HandleChangeNickNameRequest.h"
+#include "nickname/HandleValidateNickNameRequest.h"
 #include "player/ChangeCharacterEvent.h"
 #include "player/RequestCashBalance.h"
 #include "player/RequestPlayerInfo.h"
@@ -59,7 +59,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(649, new HandleUpdateSkillSetRequest());
 	add(652, new HandleDeleteInventoryCardRequest());
 	add(655, new HandleOpenInventoryCardRequest());
-	add(667, new ValidateNickNameRequest());
+	add(667, new HandleValidateNickNameRequest());
 	// 670 - Choose nickname and characters, create account.
 	add(670, new HandleAccountRegistrationRequest());
 	// 767 - Validate/check friend referral.
@@ -74,7 +74,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(713, new HandleRemoveFriendRequest());
 	// 717 - Invite friend to join the gameroom
 	add(721, new HandleGameRoomInviteRequest());
-	add(725, new RequestMemos());
+	add(725, new HandleGetMemosRequest());
 	// 728 - Send memo
 	add(738, new WhisperEvent());
 	add(742, new HandleOpenGiftRequest());
@@ -96,7 +96,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(828, new TrainingRequest());
 	add(831, new RequestCashBalance());
 	add(834, new HandleEnableFunctionCardRequest());
-	add(837, new ChangeNickNameRequest());
+	add(837, new HandleChangeNickNameRequest());
 	add(841, new ResetWinLossEvent());
 	add(844, new ResetKillDeathEvent());
 	add(851, new UseRedeemCodeRequest());

@@ -3,7 +3,7 @@
 #include "SendChangeNickNameFail.h"
 #include "core/communication/packet/PacketEvent.h"
 
-class ChangeNickNameRequest final : public PacketEvent
+class HandleChangeNickNameRequest final : public PacketEvent
 {
 public:
 	enum LS_CHANGE_NICKNAME_FAIL
@@ -44,7 +44,7 @@ public:
 			return;
 		}
 		
-		std::cout << "ChangeNickNameRequest::handle >> CardId: " << cardId << ", ItemId: " << itemId << std::endl;
+		std::cout << "HandleChangeNickNameRequest::handle >> CardId: " << cardId << ", ItemId: " << itemId << std::endl;
 
 		// TODO: Try to retrieve nickname from player_nickname_registration table.
 

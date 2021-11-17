@@ -4,7 +4,7 @@
 #include "SendValidateNickNameSuccess.h"
 #include "core/communication/packet/PacketEvent.h"
 
-class ValidateNickNameRequest final : public PacketEvent
+class HandleValidateNickNameRequest final : public PacketEvent
 {
 public:
 	enum LS_CHECK_NICKNAME_FAIL
