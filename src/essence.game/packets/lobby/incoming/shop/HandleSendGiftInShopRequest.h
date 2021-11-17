@@ -4,7 +4,7 @@
 #include "SendGiftInShopSuccess.h"
 #include "core/communication/packet/PacketEvent.h"
 
-class RequestSendPresentInShop final : public PacketEvent
+class HandleSendGiftInShopRequest final : public PacketEvent
 {
 public:
 	enum LS_SEND_PRESENT_IN_SHOP_FAIL

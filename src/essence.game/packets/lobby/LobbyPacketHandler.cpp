@@ -41,10 +41,10 @@
 #include "player/HandleResetPlayerWinLossRequest.h"
 #include "player/HandlePlayerWhisperRequest.h"
 #include "redeemcode/HandleUseRedeemCodeRequest.h"
-#include "shop/BuyCardEvent.h"
-#include "shop/RequestShopItems.h"
-#include "shop/RequestShopPackages.h"
-#include "shop/RequestSendPresentInShop.h"
+#include "shop/HandleBuyShopCardRequest.h"
+#include "shop/HandleGetShopItemsRequest.h"
+#include "shop/HandleGetShopPackagesRequest.h"
+#include "shop/HandleSendGiftInShopRequest.h"
 #include "training/TrainingRequest.h"
 #include "account/HandleAccountRegistrationRequest.h"
 #include "account/HandleReferralRegistrationRequest.h"
@@ -86,12 +86,12 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(769, new HandleGetGameSettingsRequest());
 	add(780, new HandleGetInventoryRequest());
 	add(791, new HandleGetPlayerRankingRequest());
-	add(797, new RequestShopItems());
-	add(800, new RequestShopPackages());
-	add(803, new BuyCardEvent());
+	add(797, new HandleGetShopItemsRequest());
+	add(800, new HandleGetShopPackagesRequest());
+	add(803, new HandleBuyShopCardRequest());
 	add(809, new HandleExtendInventoryCardRequest());
 	add(812, new HandleGiftCardRequest());
-	add(815, new RequestSendPresentInShop());
+	add(815, new HandleSendGiftInShopRequest());
 	// 826 = Trigger NTS_ROY_NEWBIE_EVENT_DESC_START_1 (outgoing)
 	add(828, new TrainingRequest());
 	add(831, new HandleGetPlayerCashBalanceRequest());

@@ -4,7 +4,7 @@
 #include "qpang/Game.h"
 #include "qpang/shop/ShopManager.h"
 
-class BuyCardEvent final : public PacketEvent
+class HandleBuyShopCardRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override
