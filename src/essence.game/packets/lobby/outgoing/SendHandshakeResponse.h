@@ -4,10 +4,10 @@
 
 #include "packets/LobbyServerPacket.h"
 
-class HandshakeResponse : public LobbyServerPacket
+class SendHandshakeResponse : public LobbyServerPacket
 {
 public:
-	explicit HandshakeResponse(const std::array<char, 4>& key) : LobbyServerPacket(2)
+	explicit SendHandshakeResponse(const std::array<char, 4>& key) : LobbyServerPacket(2)
 	{
 		setCryptoType(BlowfishInstance::CryptoType::PUBLIC);
 

@@ -14,7 +14,7 @@
 #include "packets/square/outgoing/UpdatePlayerLevel.h"
 #include "packets/lobby/outgoing/player/SendUpdatePlayerCharacter.h"
 #include "packets/lobby/outgoing/player/SendPlayerReceiveWhisper.h"
-#include "packets/lobby/outgoing/Broadcast.h"
+#include "packets/lobby/outgoing/SendMessageBroadcast.h"
 
 Player::Player(uint32_t playerId) :
 	m_playerId(playerId),
@@ -73,7 +73,7 @@ void Player::setSquareConn(QpangConnection::Ptr conn)
 
 void Player::broadcast(const std::u16string& message) const
 {
-	Broadcast br(message);
+	SendMessageBroadcast br(message);
 
 	if (const auto lobbyConn = m_lobbyConn.lock(); lobbyConn != nullptr) {
 		lobbyConn->send(br);

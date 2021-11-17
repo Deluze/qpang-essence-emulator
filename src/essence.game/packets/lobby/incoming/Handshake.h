@@ -3,7 +3,7 @@
 #include <array>
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/HandshakeResponse.h"
+#include "packets/lobby/outgoing/SendHandshakeResponse.h"
 
 class Handshake final : public PacketEvent
 {
@@ -17,6 +17,6 @@ public:
 	{
 		const std::array<char, 4> keyPart = conn->getKeyPart();
 
-		conn->send(HandshakeResponse(keyPart));
+		conn->send(SendHandshakeResponse(keyPart));
 	}
 };
