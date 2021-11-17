@@ -4,7 +4,7 @@
 #include "qpang/player/Player.h"
 #include "qpang/square/SquarePlayer.h"
 
-class EmoteEvent final : public PacketEvent
+class HandleSquarePlayerUseEmoteRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

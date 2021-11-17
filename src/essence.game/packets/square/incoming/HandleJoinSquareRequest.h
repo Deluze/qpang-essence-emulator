@@ -5,7 +5,7 @@
 #include "qpang/player/Player.h"
 #include "qpang/square/SquareManager.h"
 
-class JoinSquare final : public PacketEvent
+class HandleJoinSquareRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

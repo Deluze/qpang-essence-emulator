@@ -1,16 +1,19 @@
 #pragma once
 
-#include <vector>
-
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/square/outgoing/SendSquarePlayers.h"
+#include "qpang/player/Player.h"
 #include "qpang/square/SquarePlayer.h"
 
-class RequestPlayers final : public PacketEvent
+class HandleLeaveInventoryRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
+		const auto idk = packet.readInt();
+		const auto character = packet.readShort();
+		const auto selectedWeapon = packet.readInt();
+		const auto equipment = packet.readArray<uint32_t, 9>();
+
 		const auto player = conn->getPlayer();
 
 		if (player == nullptr)
@@ -25,9 +28,6 @@ public:
 			return;
 		}
 
-		const auto square = squarePlayer->getSquare();
-		const auto players = square->listPlayers();
-
-		conn->send(SendSquarePlayers(players, player->getId()));
+		squarePlayer->changeWeapon(selectedWeapon);
 	}
 };

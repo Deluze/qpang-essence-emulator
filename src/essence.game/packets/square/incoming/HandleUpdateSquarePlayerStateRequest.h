@@ -3,7 +3,7 @@
 #include "core/communication/packet/PacketEvent.h"
 #include "qpang/player/Player.h"
 
-class UpdateStateEvent final : public PacketEvent
+class HandleUpdateSquarePlayerStateRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

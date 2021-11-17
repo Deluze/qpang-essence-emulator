@@ -4,7 +4,7 @@
 #include "qpang/Game.h"
 #include "qpang/square/SquarePlayer.h"
 
-class ChatRequest final : public PacketEvent
+class HandleSquarePlayerChatRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
