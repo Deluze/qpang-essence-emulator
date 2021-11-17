@@ -7,7 +7,7 @@
 #include "RequestTrade.h"
 #include "channel/HandleRequestChannelHost.h"
 #include "channel/HandleRequestChannelList.h"
-#include "crane/UseCraneEvent.h"
+#include "crane/HandleUseCraneRequest.h"
 #include "dailybonus/DailyBonusRequest.h"
 #include "equipment/EquipArmor.h"
 #include "equipment/EquipWeapon.h"
@@ -104,7 +104,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	// 875 - Send trade request
 	add(875, new RequestTrade());
 	// 884 - Trade cancel?
-	add(897, new UseCraneEvent());
+	add(897, new HandleUseCraneRequest());
 	add(901, new DailyBonusRequest());
 	add(903, new EnchantItemEvent());
 	// 903 - Request to boost clothing piece

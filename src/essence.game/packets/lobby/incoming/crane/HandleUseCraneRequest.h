@@ -6,7 +6,7 @@
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
-class UseCraneEvent final : public PacketEvent
+class HandleUseCraneRequest final : public PacketEvent
 {
 public:
 	enum LS_USE_CRANE_FAIL
