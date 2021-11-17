@@ -2,7 +2,7 @@
 
 #include "HandleGiftCardRequest.h"
 #include "HandleHandshakeRequest.h"
-#include "Login.h"
+#include "HandleLoginRequest.h"
 #include "HandleEnchantItemRequest.h"
 #include "HandleTradeRequest.h"
 #include "channel/HandleRequestChannelHost.h"
@@ -52,7 +52,7 @@
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 {
 	add(1, new HandleHandshakeRequest());
-	add(600, new Login());
+	add(600, new HandleLoginRequest());
 	add(620, new HandleEquipArmorRequest());
 	add(623, new HandleEquipWeaponRequest());
 	add(646, new HandleGetEquippedSkillCardsRequest());

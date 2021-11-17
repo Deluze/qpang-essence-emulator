@@ -12,7 +12,7 @@
 #include "packets/lobby/outgoing/account/SendAccountBanned.h"
 #include "packets/lobby/outgoing/account/SendAccountAuthenticated.h"
 
-class Login final : public PacketEvent
+class HandleLoginRequest final : public PacketEvent
 {
 public:
 	bool isUnauthorizedPacket() override
