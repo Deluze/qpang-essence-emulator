@@ -1,10 +1,12 @@
 #include "LobbyPacketHandler.h"
 
+#include "HandleEnchantItemRequest.h"
 #include "HandleGiftCardRequest.h"
 #include "HandleHandshakeRequest.h"
 #include "HandleLoginRequest.h"
-#include "HandleEnchantItemRequest.h"
 #include "HandleTradeRequest.h"
+#include "account/HandleAccountRegistrationRequest.h"
+#include "account/HandleReferralRegistrationRequest.h"
 #include "channel/HandleRequestChannelHost.h"
 #include "channel/HandleRequestChannelList.h"
 #include "crane/HandleUseCraneRequest.h"
@@ -25,11 +27,11 @@
 #include "inventory/HandleDeleteInventoryCardRequest.h"
 #include "inventory/HandleDisableFunctionCardRequest.h"
 #include "inventory/HandleEnableFunctionCardRequest.h"
-#include "inventory/HandleExtendInventoryCardRequest.h"
-#include "inventory/HandleOpenInventoryCardRequest.h"
-#include "inventory/HandleOpenGiftRequest.h"
+#include "inventory/HandleRenewInventoryCardRequest.h"
 #include "inventory/HandleGetGiftsRequest.h"
 #include "inventory/HandleGetInventoryRequest.h"
+#include "inventory/HandleOpenGiftRequest.h"
+#include "inventory/HandleOpenInventoryCardRequest.h"
 #include "memo/HandleGetMemosRequest.h"
 #include "nickname/HandleChangeNickNameRequest.h"
 #include "nickname/HandleValidateNickNameRequest.h"
@@ -37,17 +39,15 @@
 #include "player/HandleGetPlayerCashBalanceRequest.h"
 #include "player/HandleGetPlayerInfoRequest.h"
 #include "player/HandleGetPlayerRankingRequest.h"
+#include "player/HandlePlayerWhisperRequest.h"
 #include "player/HandleResetPlayerKillDeathRequest.h"
 #include "player/HandleResetPlayerWinLossRequest.h"
-#include "player/HandlePlayerWhisperRequest.h"
 #include "redeemcode/HandleUseRedeemCodeRequest.h"
 #include "shop/HandleBuyShopCardRequest.h"
 #include "shop/HandleGetShopItemsRequest.h"
 #include "shop/HandleGetShopPackagesRequest.h"
 #include "shop/HandleSendGiftInShopRequest.h"
 #include "training/HandleTrainingRequest.h"
-#include "account/HandleAccountRegistrationRequest.h"
-#include "account/HandleReferralRegistrationRequest.h"
 
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 {
@@ -89,7 +89,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(797, new HandleGetShopItemsRequest());
 	add(800, new HandleGetShopPackagesRequest());
 	add(803, new HandleBuyShopCardRequest());
-	add(809, new HandleExtendInventoryCardRequest());
+	add(809, new HandleRenewInventoryCardRequest());
 	add(812, new HandleGiftCardRequest());
 	add(815, new HandleSendGiftInShopRequest());
 	// 826 = Trigger NTS_ROY_NEWBIE_EVENT_DESC_START_1 (outgoing)

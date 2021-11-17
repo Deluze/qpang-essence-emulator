@@ -1,56 +1,61 @@
 #pragma once
 
-#include "SendInventoryCardExtended.h"
+#include "SendRenewInventoryCardSuccess.h"
 #include "SendShopCardPurchaseComplete.h"
 #include "SendOpenGiftSuccess.h"
 #include "SendUpdatePlayerCashBalance.h"
+#include "SendGiftInShopError.h"
+#include "SendGiftInventoryCardFail.h"
 #include "core/communication/packet/PacketEvent.h"
 
-class HandleExtendInventoryCardRequest final : public PacketEvent
+class HandleRenewInventoryCardRequest final : public PacketEvent
 {
+	class Send811 : public LobbyServerPacket
+	{
+	public:
+		Send811(const uint32_t errorMessageCode) : LobbyServerPacket(811)
+		{
+			writeInt(errorMessageCode);
+		}
+	};
+
 public:
+	enum LS_RENEW_CARD_FAIL {
+		DURATION_CAN_NOT_BE_EXTENDED = 351
+	};
+
 	// TODO: Find out error response op code and error message codes.
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto cardId = packet.readLong();
 		const auto itemId = packet.readInt();
 
-		const auto payType = packet.readFlag() ? 1 : 0; // Paytype (don or cash), true = cash, false = don;
-		const auto isCash = payType == 1;
+		const auto payType = packet.readByte();
+		const auto isCash = (payType == 1);
 
 		const auto price = packet.readInt();
 		const auto seqId = packet.readInt();
-
-		const auto unkFlag1 = packet.readFlag();
-		const auto unkShort1 = packet.readShort();
+		
+		// Remaining 3 bytes are unknown.
 
 		const auto player = conn->getPlayer();
 
-		// Ensure the player exists.
-		if (player == nullptr)
+		const auto hasCard = player->getInventoryManager()->hasCard(cardId);
+		const auto isCardExpired = player->getInventoryManager()->isExpired(cardId);
+		const auto hasCardEquipped = player->getEquipmentManager()->hasEquipped(cardId);
+
+		if (!hasCard || !isCardExpired || hasCardEquipped)
 		{
+			conn->send(Send811(DURATION_CAN_NOT_BE_EXTENDED));
+
 			return;
 		}
 
-		if (const auto squarePlayer = player->getSquarePlayer(); squarePlayer == nullptr)
-		{
-			player->broadcast(u"You may only renew items from the park.");
-
-			return;
-		}
-
-		const auto playerHasCard = player->getInventoryManager()->hasCard(cardId);
-		const auto cardIsExpired = player->getInventoryManager()->isExpired(cardId);
-		const auto cardIsEquipped = player->getEquipmentManager()->hasEquipped(cardId);
-
-		if (!playerHasCard || !cardIsExpired || cardIsEquipped)
-		{
-			return;
-		}
-
-		// You may only extend a card if it currently exists in the shop, so cancel if it does not exist.
+		// Only card that are in the current shop may be renewed.
 		if (!Game::instance()->getShopManager()->exists(seqId))
 		{
+			conn->send(Send811(DURATION_CAN_NOT_BE_EXTENDED));
+
 			return;
 		}
 
@@ -58,7 +63,7 @@ public:
 
 		if (shopItem.soldCount >= shopItem.stock && shopItem.stock != 9999)
 		{
-			player->broadcast(u"You may not renew this item since it is out of stock.");
+			conn->send(SendGiftInShopError(SendGiftInShopError::LS_SEND_PRESENT_IN_SHOP_FAIL::SOLD_OUT));
 
 			return;
 		}
@@ -66,6 +71,8 @@ public:
 		// Validate that the values from the packet are the same as the shop in the database.
 		if ((shopItem.isCash != isCash) || (shopItem.itemId != itemId) || (shopItem.price != price))
 		{
+			conn->send(Send811(DURATION_CAN_NOT_BE_EXTENDED));
+
 			return;
 		}
 
@@ -74,6 +81,8 @@ public:
 			? player->getCash() >= shopItem.price
 			: player->getDon() >= shopItem.price; !hasSufficientFunds)
 		{
+			conn->send(SendGiftInShopError(SendGiftInShopError::LS_SEND_PRESENT_IN_SHOP_FAIL::LACK_MONEY));
+
 			return;
 		}
 
@@ -81,9 +90,8 @@ public:
 
 		const auto boughtInventoryCard = Game::instance()->getShopManager()->buy(player, seqId, false);
 
-		conn->send(SendInventoryCardExtended(boughtInventoryCard, shopItem.isCash ? player->getCash() : player->getDon(), isCash));
+		conn->send(SendRenewInventoryCardSuccess(boughtInventoryCard, shopItem.isCash ? player->getCash() : player->getDon(), isCash));
 		conn->send(SendUpdatePlayerCashBalance(player->getCash()));
-
-		player->send(SendOpenGiftSuccess(player, boughtInventoryCard));
+		conn->send(SendOpenGiftSuccess(player, boughtInventoryCard));
 	}
 };
