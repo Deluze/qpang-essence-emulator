@@ -19,6 +19,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+// TODO: Refactor this class.
 class LoginRequest : public PacketEvent
 {
 public:
