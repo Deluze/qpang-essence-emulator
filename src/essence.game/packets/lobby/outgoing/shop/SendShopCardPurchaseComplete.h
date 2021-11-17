@@ -7,10 +7,10 @@
 #include "qpang/player/inventory/InventoryCard.h"
 #include "qpang/shop/ShopItem.h"
 
-class CardPurchaseComplete : public LobbyServerPacket
+class SendShopCardPurchaseComplete : public LobbyServerPacket
 {
 public:
-	CardPurchaseComplete(const ShopItem& item, const std::vector<InventoryCard>& cards, const uint32_t newBalance) : LobbyServerPacket(804)
+	SendShopCardPurchaseComplete(const ShopItem& item, const std::vector<InventoryCard>& cards, const uint32_t newBalance) : LobbyServerPacket(804)
 	{
 		writeFlag(item.isCash);
 		writeInt(newBalance);

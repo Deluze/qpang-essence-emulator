@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SendInventoryCardExtended.h"
-#include "CardPurchaseComplete.h"
+#include "SendShopCardPurchaseComplete.h"
 #include "SendOpenGiftSuccess.h"
 #include "SendUpdatePlayerCashBalance.h"
 #include "core/communication/packet/PacketEvent.h"

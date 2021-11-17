@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SendPresentInShopFail.h"
-#include "SendPresentInShopSuccess.h"
+#include "SendGiftInShopError.h"
+#include "SendGiftInShopSuccess.h"
 #include "core/communication/packet/PacketEvent.h"
 
 class RequestSendPresentInShop final : public PacketEvent
@@ -34,7 +34,7 @@ public:
 		// Target player does not exist.
 		if (targetPlayer == nullptr)
 		{
-			conn->send(SendPresentInShopFail(SEND_GIFT_FAIL_TARGET_NOT_EXIST));
+			conn->send(SendGiftInShopError(SEND_GIFT_FAIL_TARGET_NOT_EXIST));
 
 			return;
 		}
@@ -42,7 +42,7 @@ public:
 		// Check if the target player is the same as buying player.
 		if (buyingPlayer->getId() == targetPlayer->getId())
 		{
-			conn->send(SendPresentInShopFail(GIFT_FAIL_SEND_TO_SELF));
+			conn->send(SendGiftInShopError(GIFT_FAIL_SEND_TO_SELF));
 
 			return;
 		}
@@ -50,7 +50,7 @@ public:
 		// Check if the shop item exists.
 		if (!Game::instance()->getShopManager()->exists(seqId))
 		{
-			conn->send(SendPresentInShopFail(SOLD_OUT));
+			conn->send(SendGiftInShopError(SOLD_OUT));
 
 			return;
 		}
@@ -63,14 +63,14 @@ public:
 			// If we get here, the buying player has tampered with their amount of don/cash
 			// or they have a shop item opened that no longer exists or which price has changed.
 
-			conn->send(SendPresentInShopFail(LACK_MONEY));
+			conn->send(SendGiftInShopError(LACK_MONEY));
 
 			return;
 		}
 
 		if (shopItem.soldCount >= shopItem.stock && shopItem.stock != 9999)
 		{
-			conn->send(SendPresentInShopFail(SOLD_OUT));
+			conn->send(SendGiftInShopError(SOLD_OUT));
 
 			return;
 		}
@@ -80,7 +80,7 @@ public:
 			? (buyingPlayer->getCash() >= shopItem.price)
 			: (buyingPlayer->getDon() >= shopItem.price); !buyerHasSufficientFunds)
 		{
-			conn->send(SendPresentInShopFail(LACK_MONEY));
+			conn->send(SendGiftInShopError(LACK_MONEY));
 
 			return;
 		}
@@ -88,7 +88,7 @@ public:
 		// Make sure the target player has space.
 		if (!targetPlayer->getInventoryManager()->hasSpace())
 		{
-			conn->send(SendPresentInShopFail(SEND_GIFT_FAIL_TARGET_INVENTORY_FULL));
+			conn->send(SendGiftInShopError(SEND_GIFT_FAIL_TARGET_INVENTORY_FULL));
 
 			return;
 		}
@@ -119,6 +119,6 @@ public:
 		targetPlayer->getInventoryManager()->receiveGift(createdInventoryCard, buyingPlayer->getName());
 
 		// Send buying player success.
-		conn->send(SendPresentInShopSuccess(shopItem.isCash, newBalance));
+		conn->send(SendGiftInShopSuccess(shopItem.isCash, newBalance));
 	}
 };

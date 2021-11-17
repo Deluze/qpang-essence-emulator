@@ -5,10 +5,10 @@
 #include "packets/LobbyServerPacket.h"
 #include "qpang/shop/ShopItem.h"
 
-class ShopItems : public LobbyServerPacket
+class SendShopItems : public LobbyServerPacket
 {
 public:
-	explicit ShopItems(const std::vector<ShopItem>& items, const uint16_t totalItemCount, const uint16_t currentlySendCount,
+	explicit SendShopItems(const std::vector<ShopItem>& items, const uint16_t totalItemCount, const uint16_t currentlySendCount,
 	                   const uint16_t currentItemCount) : LobbyServerPacket(798)
 	{
 		writeShort(totalItemCount);

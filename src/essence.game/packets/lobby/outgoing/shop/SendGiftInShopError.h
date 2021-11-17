@@ -2,7 +2,7 @@
 
 #include "packets/LobbyServerPacket.h"
 
-class SendPresentInShopFail : public LobbyServerPacket
+class SendGiftInShopError : public LobbyServerPacket
 {
 public:
 	enum LS_SEND_PRESENT_IN_SHOP_FAIL
@@ -15,7 +15,7 @@ public:
 		// 872 inappropriate room name
 	};
 
-	explicit SendPresentInShopFail(const uint32_t code) : LobbyServerPacket(817) // 817, = LS_SEND_PRESENT_IN_SHOP_FAIL
+	explicit SendGiftInShopError(const uint32_t code) : LobbyServerPacket(817) // 817, = LS_SEND_PRESENT_IN_SHOP_FAIL
 	{
 		writeInt(code);
 	}

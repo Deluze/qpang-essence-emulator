@@ -6,8 +6,8 @@
 #include "qpang/player/inventory/InventoryManager.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-#include "packets/lobby/outgoing/shop/CardPurchaseComplete.h"
-#include "packets/lobby/outgoing/shop/ShopItems.h"
+#include "packets/lobby/outgoing/shop/SendShopCardPurchaseComplete.h"
+#include "packets/lobby/outgoing/shop/SendShopItems.h"
 
 void ShopManager::initialize()
 {
@@ -78,7 +78,7 @@ void ShopManager::sendShopItems(const Player::Ptr& player)
 		std::vector<ShopItem> partition = slice(items, i * partitionSize + 1, currentSendCount);
 
 		// now send the data
-		player->send(ShopItems(partition, static_cast<uint16_t>(items.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
+		player->send(SendShopItems(partition, static_cast<uint16_t>(items.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
 	}
 }
 
@@ -165,7 +165,7 @@ InventoryCard ShopManager::buy(const std::shared_ptr<Player>& player, const uint
 	if (updateShopItems)
 	{
 		sendShopItems(player);
-		player->send(CardPurchaseComplete(shopItem, { card }, shopItem.isCash ? player->getCash() : player->getDon()));
+		player->send(SendShopCardPurchaseComplete(shopItem, { card }, shopItem.isCash ? player->getCash() : player->getDon()));
 	}
 
 	return card;

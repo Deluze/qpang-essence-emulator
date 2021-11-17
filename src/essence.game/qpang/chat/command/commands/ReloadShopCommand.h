@@ -3,7 +3,7 @@
 #include "qpang/Game.h"
 #include "qpang/chat/command/Command.h"
 
-#include "packets/lobby/outgoing/shop/ShopItems.h"
+#include "packets/lobby/outgoing/shop/SendShopItems.h"
 
 class ReloadShopCommand : public Command
 {
