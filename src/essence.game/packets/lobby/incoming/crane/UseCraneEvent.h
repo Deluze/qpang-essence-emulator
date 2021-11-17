@@ -1,8 +1,8 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "crane/UseCraneFailResponse.h"
-#include "crane/UseCraneSuccessResponse.h"
+#include "crane/SendUseCraneFail.h"
+#include "crane/SendUseCraneSuccess.h"
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
@@ -24,7 +24,7 @@ public:
 
 		if (!player->getInventoryManager()->hasSpace(times))
 		{
-			conn->send(UseCraneFailResponse(INVENTORY_FULL));
+			conn->send(SendUseCraneFail(INVENTORY_FULL));
 
 			return;
 		}
@@ -33,7 +33,7 @@ public:
 
 		if (!crane->isEnabled())
 		{
-			conn->send(UseCraneFailResponse());
+			conn->send(SendUseCraneFail());
 
 			return;
 		}
@@ -52,14 +52,14 @@ public:
 			requiredCoins = 1200;
 			break;
 		default:
-			conn->send(UseCraneFailResponse(INVALID_AMOUNT_OF_ATTEMPTS));
+			conn->send(SendUseCraneFail(INVALID_AMOUNT_OF_ATTEMPTS));
 
 			return;
 		}
 
 		if (requiredCoins > player->getCoins())
 		{
-			conn->send(UseCraneFailResponse(NOT_ENOUGH_COINS));
+			conn->send(SendUseCraneFail(NOT_ENOUGH_COINS));
 
 			return;
 		}
@@ -80,6 +80,6 @@ public:
 			cards.push_back(createdCard);
 		}
 
-		conn->send(UseCraneSuccessResponse(player, cards));
+		conn->send(SendUseCraneSuccess(player, cards));
 	}
 };

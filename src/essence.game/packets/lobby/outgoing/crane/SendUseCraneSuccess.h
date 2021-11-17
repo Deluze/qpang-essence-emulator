@@ -4,10 +4,10 @@
 #include "packets/writers/InventoryCardWriter.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-class UseCraneSuccessResponse : public LobbyServerPacket
+class SendUseCraneSuccess : public LobbyServerPacket
 {
 public:
-	UseCraneSuccessResponse(const std::shared_ptr<Player>& player, const std::vector<InventoryCard>& cards) : LobbyServerPacket(898)
+	SendUseCraneSuccess(const std::shared_ptr<Player>& player, const std::vector<InventoryCard>& cards) : LobbyServerPacket(898)
 	{
 		writeShort(cards.size());
 
