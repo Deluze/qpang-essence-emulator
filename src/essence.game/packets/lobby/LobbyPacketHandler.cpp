@@ -33,13 +33,13 @@
 #include "memo/HandleGetMemosRequest.h"
 #include "nickname/HandleChangeNickNameRequest.h"
 #include "nickname/HandleValidateNickNameRequest.h"
-#include "player/ChangeCharacterEvent.h"
-#include "player/RequestCashBalance.h"
-#include "player/RequestPlayerInfo.h"
-#include "player/RequestPlayerRanking.h"
-#include "player/ResetKillDeathEvent.h"
-#include "player/ResetWinLossEvent.h"
-#include "player/WhisperEvent.h"
+#include "player/HandleChangePlayerCharacterRequest.h"
+#include "player/HandleGetPlayerCashBalanceRequest.h"
+#include "player/HandleGetPlayerInfoRequest.h"
+#include "player/HandleGetPlayerRankingRequest.h"
+#include "player/HandleResetPlayerKillDeathRequest.h"
+#include "player/HandleResetPlayerWinLossRequest.h"
+#include "player/HandlePlayerWhisperRequest.h"
 #include "redeemcode/UseRedeemCodeRequest.h"
 #include "shop/BuyCardEvent.h"
 #include "shop/RequestShopItems.h"
@@ -64,8 +64,8 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(670, new HandleAccountRegistrationRequest());
 	// 767 - Validate/check friend referral.
 	add(676, new HandleReferralRegistrationRequest());
-	add(679, new ChangeCharacterEvent());
-	add(691, new RequestPlayerInfo());
+	add(679, new HandleChangePlayerCharacterRequest());
+	add(691, new HandleGetPlayerInfoRequest());
 	add(694, new HandleRequestFriendList());
 	add(697, new HandleSendFriendRequest());
 	add(701, new HandleAcceptIncomingFriendRequest());
@@ -76,7 +76,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(721, new HandleGameRoomInviteRequest());
 	add(725, new HandleGetMemosRequest());
 	// 728 - Send memo
-	add(738, new WhisperEvent());
+	add(738, new HandlePlayerWhisperRequest());
 	add(742, new HandleOpenGiftRequest());
 	add(745, new HandleGetGiftsRequest());
 	// 751 - Has something to do with joining a room (also occurs with creating a room)
@@ -85,7 +85,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(766, new HandleRequestChannelHost());
 	add(769, new HandleGetGameSettingsRequest());
 	add(780, new HandleGetInventoryRequest());
-	add(791, new RequestPlayerRanking());
+	add(791, new HandleGetPlayerRankingRequest());
 	add(797, new RequestShopItems());
 	add(800, new RequestShopPackages());
 	add(803, new BuyCardEvent());
@@ -94,11 +94,11 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(815, new RequestSendPresentInShop());
 	// 826 = Trigger NTS_ROY_NEWBIE_EVENT_DESC_START_1 (outgoing)
 	add(828, new TrainingRequest());
-	add(831, new RequestCashBalance());
+	add(831, new HandleGetPlayerCashBalanceRequest());
 	add(834, new HandleEnableFunctionCardRequest());
 	add(837, new HandleChangeNickNameRequest());
-	add(841, new ResetWinLossEvent());
-	add(844, new ResetKillDeathEvent());
+	add(841, new HandleResetPlayerWinLossRequest());
+	add(844, new HandleResetPlayerKillDeathRequest());
 	add(851, new UseRedeemCodeRequest());
 	add(861, new HandleDisableFunctionCardRequest());
 	// 875 - Send trade request

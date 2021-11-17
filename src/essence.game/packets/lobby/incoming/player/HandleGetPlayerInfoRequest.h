@@ -4,7 +4,7 @@
 #include "packets/lobby/outgoing/player/SendPlayerInfoInspector.h"
 #include "qpang/Game.h"
 
-class RequestPlayerInfo final : public PacketEvent
+class HandleGetPlayerInfoRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override

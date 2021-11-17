@@ -6,7 +6,7 @@
 #include "core/communication/packet/PacketEvent.h"
 #include "qpang/player/Player.h"
 
-class ChangeCharacterEvent final : public PacketEvent
+class HandleChangePlayerCharacterRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& pack) override

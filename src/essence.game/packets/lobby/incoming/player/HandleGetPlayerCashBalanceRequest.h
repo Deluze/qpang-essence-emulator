@@ -6,7 +6,7 @@
 #include "packets/lobby/outgoing/player/SendUpdatePlayerCashBalance.h"
 #include "qpang/player/Player.h"
 
-class RequestCashBalance final : public PacketEvent
+class HandleGetPlayerCashBalanceRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

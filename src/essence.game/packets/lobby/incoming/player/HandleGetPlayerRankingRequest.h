@@ -3,7 +3,7 @@
 #include "core/communication/packet/PacketEvent.h"
 #include "packets/lobby/outgoing/player/SendUpdatePlayerRanking.h"
 
-class RequestPlayerRanking final : public PacketEvent
+class HandleGetPlayerRankingRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

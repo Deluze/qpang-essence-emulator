@@ -1,12 +1,12 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include "packets/lobby/outgoing/player/SendResetPlayerKillDeath.h"
+#include "packets/lobby/outgoing/player/SendResetPlayerWinLoss.h"
 #include "qpang/ItemId.h"
 #include "qpang/player/Player.h"
 #include "qpang/player/inventory/InventoryManager.h"
 
-class ResetKillDeathEvent final : public PacketEvent
+class HandleResetPlayerWinLossRequest final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
@@ -21,18 +21,18 @@ public:
 
 		auto card = player->getInventoryManager()->get(cardId);
 
-		if (card.itemId != KD_CLEANER || card.period == 0)
+		if (card.itemId != WL_CLEANER || card.period == 0)
 		{
 			return;
 		}
 
-		player->getStatsManager()->clearKD();
+		player->getStatsManager()->clearWL();
 
-		if(card.periodType != 254) // Unlimited
+		if (card.periodType != 254) // Unlimited
 		{
 			player->getInventoryManager()->deleteCard(cardId);
 		}
-		
-		conn->send(SendResetPlayerKillDeath(player, card));
+
+		conn->send(SendResetPlayerWinLoss(player, card));
 	}
 };
