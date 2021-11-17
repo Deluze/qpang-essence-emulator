@@ -4,10 +4,10 @@
 
 #include "packets/LobbyServerPacket.h"
 
-class UpdateGameSettings : public LobbyServerPacket
+class SendUpdateGameSettings : public LobbyServerPacket
 {
 public:
-	UpdateGameSettings(const uint32_t host, const uint16_t port, const bool isEnabled) : LobbyServerPacket(770)
+	SendUpdateGameSettings(const uint32_t host, const uint16_t port, const bool isEnabled) : LobbyServerPacket(770)
 	{
 		writeFlag(isEnabled);
 		writeInt(host);

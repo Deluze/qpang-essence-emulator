@@ -6,10 +6,10 @@
 #include "packets/writers/RoomWriter.h"
 #include "qpang/room/Room.h"
 
-class RoomList : public LobbyServerPacket
+class SendGameRoomList : public LobbyServerPacket
 {
 public:
-	explicit RoomList(const std::vector<Room::Ptr>& rooms) : LobbyServerPacket(759)
+	explicit SendGameRoomList(const std::vector<Room::Ptr>& rooms) : LobbyServerPacket(759)
 	{
 		const auto roomSize = static_cast<uint16_t>(rooms.size());
 

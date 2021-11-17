@@ -6,7 +6,7 @@
 #include "qpang/Game.h"
 #include "qpang/room/RoomManager.h"
 
-#include "packets/lobby/outgoing/gameroom/RoomList.h"
+#include "packets/lobby/outgoing/gameroom/SendGameRoomList.h"
 
 class RequestGameRoomsEvent final : public PacketEvent
 {
@@ -15,6 +15,6 @@ public:
 	{
 		const auto rooms = Game::instance()->getRoomManager()->list();
 
-		conn->send(RoomList(rooms));
+		conn->send(SendGameRoomList(rooms));
 	}
 };

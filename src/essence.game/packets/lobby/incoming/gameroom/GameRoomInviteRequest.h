@@ -7,7 +7,7 @@
 #include "core/config/ConfigManager.h"
 
 #include "core/communication/packet/PacketEvent.h"
-#include "GameRoomInviteResponse.h"
+#include "SendGameRoomInvite.h"
 
 class GameRoomInviteRequest final : public PacketEvent
 {
@@ -40,7 +40,7 @@ public:
 		{
 			if (const auto squarePlayer = player->getSquarePlayer(); squarePlayer != nullptr)
 			{
-				squarePlayer->getPlayer()->send(GameRoomInviteResponse(inet_addr(host.c_str()), port, mode, roomTitle));
+				squarePlayer->getPlayer()->send(SendGameRoomInvite(inet_addr(host.c_str()), port, mode, roomTitle));
 			}
 		}
 	}

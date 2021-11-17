@@ -7,8 +7,8 @@
 #include "core/config/ConfigManager.h"
 #include "core/communication/packet/PacketEvent.h"
 
-#include "packets/lobby/outgoing/gameroom/UpdateGameSettings.h"
-#include "packets/lobby/outgoing/gameroom/RoomList.h"
+#include "packets/lobby/outgoing/gameroom/SendUpdateGameSettings.h"
+#include "packets/lobby/outgoing/gameroom/SendGameRoomList.h"
 
 class RequestGameSettingsEvent final : public PacketEvent
 {
@@ -21,8 +21,8 @@ public:
 
 		const auto rooms = Game::instance()->getRoomManager()->list();
 
-		conn->send(RoomList(rooms));
+		conn->send(SendGameRoomList(rooms));
 		// ReSharper disable once CppDeprecatedEntity
-		conn->send(UpdateGameSettings(inet_addr(host.c_str()), port, isEnabled));
+		conn->send(SendUpdateGameSettings(inet_addr(host.c_str()), port, isEnabled));
 	}
 };
