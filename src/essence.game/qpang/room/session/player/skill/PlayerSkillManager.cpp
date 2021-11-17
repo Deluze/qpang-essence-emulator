@@ -145,8 +145,6 @@ void PlayerSkillManager::activateSkill(const std::shared_ptr<Skill>& skill, cons
 
 		skill->use();
 
-		std::cout << "Increased use count to " << skill->getUseCount() << std::endl;
-
 		const auto usesLeftCount = (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
 
 		roomSession->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::ACTIVATE_CARD, cardType, itemId, seqId, usesLeftCount, m_skillTargetPlayerIds);
@@ -193,8 +191,6 @@ void PlayerSkillManager::failSkill(const std::shared_ptr<Skill>& skill, const ui
 		const auto itemId = skill->getItemId();
 
 		skill->use();
-
-		std::cout << "Increased use count to " << skill->getUseCount() << std::endl;
 
 		const auto usesLeftCount = (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
 
