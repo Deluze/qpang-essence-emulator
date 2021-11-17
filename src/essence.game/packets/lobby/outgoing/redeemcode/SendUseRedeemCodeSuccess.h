@@ -3,10 +3,10 @@
 #include "InventoryCardWriter.h"
 #include "packets/LobbyServerPacket.h"
 
-class UseRedeemCodeSuccessResponse : public LobbyServerPacket
+class SendUseRedeemCodeSuccess : public LobbyServerPacket
 {
 public:
-	explicit UseRedeemCodeSuccessResponse(
+	explicit SendUseRedeemCodeSuccess(
 		const uint32_t donBalance,
 		const uint32_t cashBalance,
 		const std::vector<InventoryCard>& inventoryCards) : LobbyServerPacket(852) // 852

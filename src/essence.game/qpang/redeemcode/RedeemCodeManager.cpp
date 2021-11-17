@@ -2,8 +2,8 @@
 
 #include "Database.h"
 #include "Emulator.h"
-#include "UseRedeemCodeFailResponse.h"
-#include "UseRedeemCodeSuccessResponse.h"
+#include "SendUseRedeemCodeError.h"
+#include "SendUseRedeemCodeSuccess.h"
 
 bool RedeemCodeManager::isOfValidLength(const std::u16string& redeemCode)
 {
@@ -115,7 +115,7 @@ void RedeemCodeManager::updateRedeemCodeUseCountForPlayer(const uint32_t redeemC
 
 void RedeemCodeManager::sendUseRedeemCodeFailToPlayer(const Player::Ptr& player, const uint32_t failCode)
 {
-	player->send(UseRedeemCodeFailResponse(failCode));
+	player->send(SendUseRedeemCodeError(failCode));
 }
 
 void RedeemCodeManager::sendRedeemCodeRewardsToPlayer(const Player::Ptr& player, const RedeemCode& redeemCode,
@@ -135,5 +135,5 @@ void RedeemCodeManager::sendRedeemCodeRewardsToPlayer(const Player::Ptr& player,
 		inventoryCard.playerOwnerId = createdInventoryCard.playerOwnerId;
 	}
 
-	player->send(UseRedeemCodeSuccessResponse(player->getDon(), player->getCash(), inventoryCards));
+	player->send(SendUseRedeemCodeSuccess(player->getDon(), player->getCash(), inventoryCards));
 }
