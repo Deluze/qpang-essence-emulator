@@ -7,7 +7,7 @@
 
 #include "packets/lobby/outgoing/channel/SendChannelHost.h"
 
-class RequestChannelHost final : public PacketEvent
+class HandleRequestChannelHost final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override

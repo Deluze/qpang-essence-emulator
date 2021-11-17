@@ -5,8 +5,8 @@
 #include "Login.h"
 #include "EnchantItemEvent.h"
 #include "RequestTrade.h"
-#include "channel/RequestChannelHost.h"
-#include "channel/RequestChannelList.h"
+#include "channel/HandleRequestChannelHost.h"
+#include "channel/HandleRequestChannelList.h"
 #include "crane/UseCraneEvent.h"
 #include "dailybonus/DailyBonusRequest.h"
 #include "equipment/EquipArmor.h"
@@ -81,8 +81,8 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(745, new RequestGifts());
 	// 751 - Has something to do with joining a room (also occurs with creating a room)
 	add(758, new RequestGameRoomsEvent());
-	add(762, new RequestChannelList());
-	add(766, new RequestChannelHost());
+	add(762, new HandleRequestChannelList());
+	add(766, new HandleRequestChannelHost());
 	add(769, new RequestGameSettingsEvent());
 	add(780, new RequestInventory());
 	add(791, new RequestPlayerRanking());

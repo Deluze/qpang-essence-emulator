@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
-#include <packets/lobby/outgoing/account/SendAccountRegistrationSuccess.h>
 
 class HandleAccountRegistrationRequest final : public PacketEvent
 {

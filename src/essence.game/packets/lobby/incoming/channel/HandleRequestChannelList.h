@@ -5,7 +5,7 @@
 #include "qpang/Game.h"
 #include "packets/lobby/outgoing/channel/SendChannelList.h"
 
-class RequestChannelList final : public PacketEvent
+class HandleRequestChannelList final : public PacketEvent
 {
 public:
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
