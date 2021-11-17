@@ -12,9 +12,9 @@
 
 #include "Authenticator.h"
 
-#include "packets/outgoing/LoginSuccess.h"
-#include "packets/outgoing/error/InvalidVersion.h"
-#include "packets/outgoing/error/InvalidUsername.h"
+#include "packets/outgoing/SendAccountLoginSuccess.h"
+#include "packets/outgoing/error/SendInvalidGameVersion.h"
+#include "packets/outgoing/error/SendInvalidAccountUsername.h"
 
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -37,13 +37,13 @@ public:
 
 	void invalidUsername(QpangConnection::Ptr conn)
 	{
-		conn->send(InvalidUsername());
+		conn->send(SendInvalidAccountUsername());
 		conn->close();
 	}
 
 	void invalidVersion(QpangConnection::Ptr conn)
 	{
-		conn->send(InvalidVersion());
+		conn->send(SendInvalidGameVersion());
 		conn->close();
 	}
 	
@@ -167,7 +167,7 @@ public:
 		updateSessionStmt->bindString(username.c_str());
 		updateSessionStmt->execute();
 
-		conn->send(LoginSuccess(uuidArr, inet_addr(CONFIG_MANAGER->getString("HOST").c_str())));
+		conn->send(SendAccountLoginSuccess(uuidArr, inet_addr(CONFIG_MANAGER->getString("HOST").c_str())));
 	}
 private:
 	boost::uuids::random_generator m_uuidGenerator;

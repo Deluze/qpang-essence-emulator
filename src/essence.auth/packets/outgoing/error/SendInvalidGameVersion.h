@@ -2,7 +2,7 @@
 
 #include "core/communication/packet/ServerErrorPacket.h"
 
-class InvalidVersion : public ServerErrorPacket
+class SendInvalidGameVersion : public ServerErrorPacket
 {
 public:
 	/***
@@ -39,7 +39,7 @@ public:
 	* RsLoginFail - 1107 - Login failed due to server error
 	* RsLoginFail - 1108 - Application was not submitted
 	***/
-	InvalidVersion() : ServerErrorPacket(502)
+	SendInvalidGameVersion() : ServerErrorPacket(502)
 	{
 		writeInt(503);
 	}
