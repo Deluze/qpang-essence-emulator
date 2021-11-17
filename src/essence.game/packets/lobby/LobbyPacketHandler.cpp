@@ -46,6 +46,8 @@
 #include "shop/RequestShopPackages.h"
 #include "shop/RequestSendPresentInShop.h"
 #include "training/TrainingRequest.h"
+#include "account/HandleAccountRegistrationRequest.h"
+#include "account/HandleReferralRegistrationRequest.h"
 
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 {
@@ -56,8 +58,12 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(646, new RequestEquippedSkillCards());
 	add(649, new UpdateSkillCardSetRequest());
 	add(652, new DeleteCard());
-	add(667, new ValidateNickNameRequest());
 	add(655, new OpenCardRequest());
+	add(667, new ValidateNickNameRequest());
+	// 670 - Choose nickname and characters, create account.
+	add(670, new HandleAccountRegistrationRequest());
+	// 767 - Validate/check friend referral.
+	add(676, new HandleReferralRegistrationRequest());
 	add(679, new ChangeCharacterEvent());
 	add(691, new RequestPlayerInfo());
 	add(694, new RequestFriendList());
