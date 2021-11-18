@@ -147,8 +147,6 @@ void PlayerSkillManager::activateSkill(const std::shared_ptr<Skill>& skill, cons
 
 		const auto usesLeftCount = skill->isDrawnSkill() ? 0 : (Skill::GLOBAL_MAX_USE_COUNT - skill->getUseCount());
 
-		std::cout << "Uses left: " << usesLeftCount << std::endl;
-
 		roomSession->relayPlaying<GCCard>(playerId, targetPlayerId, CGCard::ACTIVATE_CARD, cardType, itemId, seqId, usesLeftCount, m_skillTargetPlayerIds);
 
 		removeSkillPoints(getRequiredSkillPoints(skill));
