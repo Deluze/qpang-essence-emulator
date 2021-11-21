@@ -22,8 +22,6 @@ public:
 		// Check if the player that has sent the request is already trading, if so do not allow them to send a trade request to another player.
 		if (tradeManager->isTrading(playerId))
 		{
-			std::cout << "You are trading already." << std::endl;
-
 			return;
 		}
 
@@ -33,8 +31,6 @@ public:
 		// Check to see if the target player is still online.
 		if (targetPlayer == nullptr)
 		{
-			std::cout << "The target player is null." << std::endl;
-
 			return;
 		}
 
@@ -43,13 +39,11 @@ public:
 		{
 			conn->send(SendReceiveTradeRequestError(ALREADY_TRADING));
 
-			std::cout << "The target player is already trading." << std::endl;
-
 			return;
 		}
 
-		// Save the pending 
 		tradeManager->startTradeSession(playerId, targetPlayerId, true);
+		tradeManager->startTradeSession(targetPlayerId, playerId, true);
 
 		// TODO: Move the sending of these packets.
 		player->send(LobbyServerPacket(876));

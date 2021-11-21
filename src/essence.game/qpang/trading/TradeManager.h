@@ -9,9 +9,14 @@ class TradeManager
 public:
 #pragma region TradeSessions
 	/// <summary>
-	/// Determines whether or not a player is in an ongoing trade session.
+	/// Determines whether or not a player is in a trade.
 	/// </summary>
 	bool isTrading(const uint32_t playerId);
+
+	/// <summary>
+	/// Determines whether or not a trade session is pending.
+	/// </summary>
+	bool isPendingTradeSession(const uint32_t playerId);
 
 	/// <summary>
 	/// Starts the trading session for two players.
@@ -32,5 +37,5 @@ public:
 #pragma endregion
 
 private:
-	std::map<uint32_t, TradeSessionInfo*> m_ongoingTradeSessions;
+	std::map<uint32_t, TradeSessionInfo*> m_tradeSessions;
 };

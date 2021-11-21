@@ -37,6 +37,11 @@ public:
 		const auto hasAcceptedTradeRequestValue = packet.readByte();
 		const auto hasAcceptedTradeRequest = (hasAcceptedTradeRequestValue == 1);
 
+		if (!tradeManager->isPendingTradeSession(playerId))
+		{
+			return;
+		}
+
 		if (!hasAcceptedTradeRequest)
 		{
 			targetPlayer->send(SendReceiveTradeRequestResponse(playerId, hasAcceptedTradeRequestValue));
