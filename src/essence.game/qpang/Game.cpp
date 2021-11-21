@@ -265,6 +265,11 @@ CraneManager* Game::getCraneManager()
 	return &m_craneManager;
 }
 
+TradeManager* Game::getTradeManager()
+{
+	return &m_tradeManager;
+}
+
 DatabaseDispatcher* Game::getDatabaseDispatcher()
 {
 	return &m_dbDispatcher;

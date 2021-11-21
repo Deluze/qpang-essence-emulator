@@ -1,16 +1,12 @@
 #include "LobbyPacketHandler.h"
 
-#include "HandleEnchantItemRequest.h"
-#include "HandleGiftCardRequest.h"
-#include "HandleHandshakeRequest.h"
-#include "HandleLoginRequest.h"
-#include "HandleTradeRequest.h"
 #include "account/HandleAccountRegistrationRequest.h"
 #include "account/HandleReferralRegistrationRequest.h"
 #include "channel/HandleRequestChannelHost.h"
 #include "channel/HandleRequestChannelList.h"
 #include "crane/HandleUseCraneRequest.h"
 #include "dailybonus/HandleGetDailyBonusRequest.h"
+#include "enchanting/HandleEnchantItemRequest.h"
 #include "equipment/HandleEquipArmorRequest.h"
 #include "equipment/HandleEquipWeaponRequest.h"
 #include "equipment/HandleGetEquippedSkillCardsRequest.h"
@@ -24,14 +20,17 @@
 #include "gameroom/HandleGameRoomInviteRequest.h"
 #include "gameroom/HandleGetGameRoomsRequest.h"
 #include "gameroom/HandleGetGameSettingsRequest.h"
+#include "HandleHandshakeRequest.h"
+#include "HandleLoginRequest.h"
 #include "inventory/HandleDeleteInventoryCardRequest.h"
 #include "inventory/HandleDisableFunctionCardRequest.h"
 #include "inventory/HandleEnableFunctionCardRequest.h"
-#include "inventory/HandleRenewInventoryCardRequest.h"
 #include "inventory/HandleGetGiftsRequest.h"
 #include "inventory/HandleGetInventoryRequest.h"
+#include "inventory/HandleGiftCardRequest.h"
 #include "inventory/HandleOpenGiftRequest.h"
 #include "inventory/HandleOpenInventoryCardRequest.h"
+#include "inventory/HandleRenewInventoryCardRequest.h"
 #include "memo/HandleGetMemosRequest.h"
 #include "nickname/HandleChangeNickNameRequest.h"
 #include "nickname/HandleValidateNickNameRequest.h"
@@ -47,6 +46,9 @@
 #include "shop/HandleGetShopItemsRequest.h"
 #include "shop/HandleGetShopPackagesRequest.h"
 #include "shop/HandleSendGiftInShopRequest.h"
+#include "trading/HandleReceiveTradeRequest.h"
+#include "trading/HandleTradeRequest.h"
+#include "trading/HandleUpdateTradeStateRequest.h"
 #include "training/HandleTrainingRequest.h"
 
 LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
@@ -101,12 +103,40 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(844, new HandleResetPlayerKillDeathRequest());
 	add(851, new HandleUseRedeemCodeRequest());
 	add(861, new HandleDisableFunctionCardRequest());
-	// 875 - Send trade request
+	
 	add(875, new HandleTradeRequest());
-	// 884 - Trade cancel?
+	add(879, new HandleReceiveTradeRequest());
+	add(884, new HandleUpdateTradeStateRequest());
+
 	add(897, new HandleUseCraneRequest());
 	add(901, new HandleGetDailyBonusRequest());
 	add(903, new HandleEnchantItemRequest());
 	// 903 - Request to boost clothing piece
 	// 906 - Panthalassa box opening
+
+	/*
+		LOBBY_TRADE_ERROR = 877,
+		LOBBY_TRADE_RECEIVE_REQUEST = 878,
+		LOBBY_TRADE_REQUEST = 879,
+		LOBBY_TRADE_REQUEST_RSP = 882,
+		LOBBY_TRADE_OPEN_MENU = 883,
+		LOBBY_TRADE_CANCEL = 884,
+		LOBBY_TRADE_CANCEL_SELF = 885,
+		LOBBY_TRADE_CANCEL_OTHER = 887,
+		LOBBY_TRADE_ADD_CARD = 888,
+		LOBBY_TRADE_ADD_CARD_SELF = 889,
+		LOBBY_TRADE_ADD_CARD_OTHER = 891,
+		LOBBY_TRADE_FINISHED = 892,
+
+		_events[Opcode::LOBBY_OPEN_PLAYER_CARD] = new OpenCardEvent();
+		_events[Opcode::LOBBY_BUY_ITEM] = new BuyCardEvent();
+		_events[Opcode::LOBBY_SHOP_GIFT] = new GiftShopCardEvent();
+		_events[Opcode::LOBBY_TRADE] = new LobbyTradeEvent();
+		_events[Opcode::LOBBY_TRADE_REQUEST] = new TradeRequestEvent();
+		_events[Opcode::LOBBY_TRADE_CANCEL] = new TradeCancelEvent();
+		_events[Opcode::LOBBY_TRADE_ADD_CARD] = new TradeAddCardEvent();
+		_events[Opcode::LOBBY_PLAYERINFO] = new PlayerInfoEvent();
+		_events[Opcode::LOBBY_FRIEND_INVITE] = new AddFriendEvent();
+		_events[Opcode::LOBBY_REMOVE_OUTGOING_FRIEND] = new RemoveOutgoingFriendEvent();
+	*/
 }
