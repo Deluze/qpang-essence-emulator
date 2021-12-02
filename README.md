@@ -47,10 +47,10 @@ It conists out of:
 Missing features:
 
 - PvE gamemode
-- Memos
-- Trading
-- Registration in-game (will not be implemented, registration goes via website)
-- Card boosting/enhancing (purposefully unimplemented, design choice)
+- Memos (Not a priority at the moment)
+- Trading (WIP)
+- Registration in-game (WIP)
+- Card boosting/enhancing (WIP)
 - In-game quests
 
 ## Installation
