@@ -52,6 +52,23 @@ public:
 		// Start the trading session.
 		if (tradeManager->acceptTradeSession(playerId, targetPlayerId)) 
 		{
+			// If this player also has other people requesting a trade to him, cancel those
+			auto tradeRequests = tradeManager->getUsersRequestingTrade(playerId);
+			for (const auto requestUserId : tradeRequests)
+			{
+				if (requestUserId != targetPlayerId)
+				{
+					// Someone else is also requesting a trade, cancel that trade
+					tradeManager->endTradeSession(requestUserId);
+
+					const auto requestPlayer = Game::instance()->getOnlinePlayer(requestUserId);
+					if (requestPlayer)
+					{
+						requestPlayer->send(SendTradeCancelOther(playerId, HandleUpdateTradeStateRequest::State::CANCEL_TRADE));
+					}
+				}
+			}
+
 			// Send the accept trade and open trade window packet to the trading buddy.
 			targetPlayer->send(SendReceiveTradeRequestResponse(playerId, hasAcceptedTradeRequestValue));
 			targetPlayer->send(SendOpenTradeWindow(playerId, hasAcceptedTradeRequestValue));
