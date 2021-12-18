@@ -1,5 +1,11 @@
 #include "TradeManager.h"
 
+#include <qpang/Game.h>
+
+#include <packets/lobby/outgoing/trading/SendTradeRequestCancel.h>
+#include <packets/lobby/outgoing/trading/SendTradeCancelOther.h>
+#include <packets/lobby/incoming/trading/HandleUpdateTradeStateRequest.h>
+
 bool TradeManager::isTrading(uint32_t userId, bool ignorePending) 
 {
 	return m_tradeSessions.count(userId) && (ignorePending || !m_tradeSessions[userId].isPending());
@@ -30,6 +36,32 @@ bool TradeManager::acceptTradeSession(uint32_t userId, uint32_t targetUserId)
 
 	// Add trade session to requestor for the current userid
 	m_tradeSessions[userId] = TradeSessionInfo(targetUserId, false);
+}
+
+void TradeManager::cancelActiveTrades(uint32_t userId)
+{
+	if (this->isTrading(userId, true))
+	{
+		auto tradingSessionInfo = this->getTradeSessionInfo(userId);
+		auto buddyId = tradingSessionInfo.getBuddyId();
+
+		// End trade sessions
+		this->endTradeSession(userId);
+		this->endTradeSession(buddyId);
+
+		const auto targetPlayer = Game::instance()->getOnlinePlayer(buddyId);
+		if (targetPlayer)
+		{
+			if (tradingSessionInfo.isPending())
+			{
+				targetPlayer->send(SendTradeRequestCancel());
+			}
+			else
+			{
+				targetPlayer->send(SendTradeCancelOther(userId, HandleUpdateTradeStateRequest::State::CANCEL_TRADE));
+			}
+		}
+	}
 }
 
 std::vector<uint32_t> TradeManager::getUsersRequestingTrade(uint32_t targetUserId)

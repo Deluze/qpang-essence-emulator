@@ -12,6 +12,8 @@ public:
 	void endTradeSession(uint32_t userId);
 	bool acceptTradeSession(uint32_t userId, uint32_t targetUserId);
 
+	void cancelActiveTrades(uint32_t userId);
+
 	std::vector<uint32_t> getUsersRequestingTrade(uint32_t targetUserId);
 	TradeSessionInfo& getTradeSessionInfo(uint32_t userId);
 private:

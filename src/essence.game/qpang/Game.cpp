@@ -284,6 +284,8 @@ void Game::onLobbyConnectionClosed(QpangConnection::Ptr conn)
 
 	if (auto player = conn->getPlayer(); player != nullptr)
 	{
+		m_squareServer->removeConnection(conn);
+
 		if (player->isClosed())
 			return;
 
@@ -306,24 +308,7 @@ void Game::onSquareConnectionClosed(QpangConnection::Ptr conn)
 		auto playerId = player->getId();
 
 		auto tradeManager = Game::instance()->getTradeManager();
-		if (tradeManager->isTrading(playerId))
-		{
-			auto tradingSessionInfo = tradeManager->getTradeSessionInfo(playerId);
-			auto buddyId = tradingSessionInfo.getBuddyId();
-
-			// End trade sessions
-			tradeManager->endTradeSession(playerId);
-			tradeManager->endTradeSession(buddyId);
-
-			const auto targetPlayer = Game::instance()->getOnlinePlayer(buddyId);
-			if (targetPlayer)
-			{
-				targetPlayer->send(SendTradeCancelOther(playerId, HandleUpdateTradeStateRequest::State::CANCEL_TRADE));
-			}
-		}
-
-		m_squareServer->removeConnection(conn);
-
+		tradeManager->cancelActiveTrades(playerId);
 
 		if (player->isClosed())
 			return;
