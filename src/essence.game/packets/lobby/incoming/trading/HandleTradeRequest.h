@@ -3,6 +3,7 @@
 #include "core/communication/packet/PacketEvent.h"
 #include <packets/lobby/outgoing/trading/SendReceiveTradeRequestError.h>
 #include <packets/lobby/outgoing/trading/SendDeliverTradeRequest.h>
+#include <packets/lobby/outgoing/trading/SendTradeRequestSuccess.h>
 
 class HandleTradeRequest final : public PacketEvent
 {
@@ -43,11 +44,10 @@ public:
 		}
 
 		tradeManager->startTradeSession(playerId, targetPlayerId, true);
-		tradeManager->startTradeSession(targetPlayerId, playerId, true);
 
-		// TODO: Move the sending of these packets.
-		player->send(LobbyServerPacket(876));
-
+		conn->send(SendTradeRequestSuccess());
+		
+		//tradeManager->startTradeSession(targetPlayerId, playerId, true);
 		targetPlayer->send(SendDeliverTradeRequest(playerId));
 	}
 };

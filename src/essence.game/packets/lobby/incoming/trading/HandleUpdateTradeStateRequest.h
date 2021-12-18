@@ -1,31 +1,13 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
+#include <packets/lobby/outgoing/trading/SendTradeCancelSelf.h>
+#include <packets/lobby/outgoing/trading/SendTradeCancelOther.h>
 
 class HandleUpdateTradeStateRequest final : public PacketEvent
 {
-	class SendTradeCancelSelf : public LobbyServerPacket
-	{
-	public:
-		explicit SendTradeCancelSelf(const uint32_t targetPlayerId, const uint8_t state) : LobbyServerPacket(885)
-		{
-			writeInt(targetPlayerId);
-			writeByte(state);
-		}
-	};
-
-	class SendTradeCancelOther : public LobbyServerPacket
-	{
-	public:
-		explicit SendTradeCancelOther(const uint32_t targetPlayerId, const uint8_t state) : LobbyServerPacket(887)
-		{
-			writeInt(targetPlayerId);
-			writeInt(targetPlayerId);
-			writeByte(state);
-		}
-	};
 public:
-	enum TradeState {
+	enum State {
 		CANCEL_TRADE = 50,
 		CONFIRM_AND_LOCK_TRADE = 51,
 		ACCEPT_AND_FINISH_TRADE = 52

@@ -39,6 +39,8 @@ public:
 
 		if (!tradeManager->isPendingTradeSession(playerId))
 		{
+			player->send(SendReceiveTradeRequestError(0));
+
 			return;
 		}
 
@@ -59,11 +61,12 @@ public:
 
 		// Start the trading session.
 		tradeManager->startTradeSession(targetPlayerId, playerId, false);
-		tradeManager->startTradeSession(playerId, targetPlayerId, false);
 
 		// Send the accept trade and open trade window packet to the trading buddy.
 		targetPlayer->send(SendReceiveTradeRequestResponse(playerId, hasAcceptedTradeRequestValue));
 		targetPlayer->send(SendOpenTradeWindow(playerId, hasAcceptedTradeRequestValue));
+
+		tradeManager->startTradeSession(playerId, targetPlayerId, false);
 
 		// Send the accept trade and open trade window to the player.
 		conn->send(SendReceiveTradeRequestResponse(targetPlayerId, hasAcceptedTradeRequestValue));

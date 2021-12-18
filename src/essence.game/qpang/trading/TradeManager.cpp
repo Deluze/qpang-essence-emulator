@@ -29,6 +29,11 @@ void TradeManager::endTradeSession(const uint32_t playerId)
 	m_tradeSessions.erase(playerId);
 }
 
+TradeSessionInfo TradeManager::getTradeSessionInfo(const uint32_t playerId)
+{
+	return *m_tradeSessions[playerId];
+}
+
 uint32_t TradeManager::findTradingBuddyId(const uint32_t playerId)
 {
 	const auto it = m_tradeSessions.find(playerId);

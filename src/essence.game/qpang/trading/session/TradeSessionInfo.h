@@ -13,9 +13,17 @@ public:
 	}
 
 	uint32_t getBuddyId();
+
 	bool isPending();
+
+	bool hasLockedIn();
 
 private:
 	uint32_t m_buddyId;
+
 	bool m_isPending;
+	
+	bool m_hasLockedIn;
+
+	std::vector<InventoryCard> cards{};
 };

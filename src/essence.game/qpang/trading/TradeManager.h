@@ -27,6 +27,8 @@ public:
 	/// Ends the trading session for a player.
 	/// </summary>
 	void endTradeSession(const uint32_t playerId);
+
+	TradeSessionInfo getTradeSessionInfo(const uint32_t playerId);
 #pragma endregion
 
 #pragma region TradingBuddy

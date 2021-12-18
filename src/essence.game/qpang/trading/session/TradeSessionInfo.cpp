@@ -9,3 +9,8 @@ bool TradeSessionInfo::isPending()
 {
     return m_isPending;
 }
+
+bool TradeSessionInfo::hasLockedIn()
+{
+    return m_hasLockedIn;
+}
