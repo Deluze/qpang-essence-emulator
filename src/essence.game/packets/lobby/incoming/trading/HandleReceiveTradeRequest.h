@@ -4,6 +4,7 @@
 #include <packets/lobby/outgoing/trading/SendReceiveTradeRequestResponse.h>
 #include <packets/lobby/outgoing/trading/SendReceiveTradeRequestError.h>
 #include <packets/lobby/outgoing/trading/SendOpenTradeWindow.h>
+#include <packets/lobby/incoming/trading/HandleUpdateTradeStateRequest.h>
 
 class HandleReceiveTradeRequest final : public PacketEvent
 {

@@ -4,6 +4,7 @@
 #include <packets/lobby/outgoing/trading/SendTradeCancelSelf.h>
 #include <packets/lobby/outgoing/trading/SendTradeCancelOther.h>
 #include <packets/lobby/outgoing/trading/SendTradeFinished.h>
+#include <packets/lobby/outgoing/trading/SendTradeRequestCancel.h>
 
 class HandleUpdateTradeStateRequest final : public PacketEvent
 {
@@ -25,92 +26,110 @@ public:
 		const auto targetPlayerId = packet.readInt();
 		const auto state = packet.readByte();
 
-		// Are we trading?
-		if (tradeManager->isTrading(playerId))
+		// Are we trading (or is our trade pending)?
+		if (tradeManager->isTrading(playerId, true))
 		{
 			auto& myTradeSession = tradeManager->getTradeSessionInfo(playerId);
 			const auto tradingBuddyId = myTradeSession.getBuddyId();
 
-			// Is the target trading?
-			if (tradeManager->isTrading(tradingBuddyId))
+			if (!myTradeSession.isPending())
 			{
-				auto& targetTradeSession = tradeManager->getTradeSessionInfo(tradingBuddyId);
-
-				const auto targetPlayer = Game::instance()->getOnlinePlayer(tradingBuddyId);
-				if (targetPlayer != nullptr)
+				// Is the target trading?
+				if (tradeManager->isTrading(tradingBuddyId))
 				{
-					if (state == CANCEL_TRADE)
-					{
-						tradeManager->endTradeSession(playerId);
-						tradeManager->endTradeSession(tradingBuddyId);
+					auto& targetTradeSession = tradeManager->getTradeSessionInfo(tradingBuddyId);
 
-						conn->send(SendTradeCancelSelf(tradingBuddyId, state));
-						targetPlayer->send(SendTradeCancelOther(playerId, state));
-					}
-					else if (state == CONFIRM_AND_LOCK_TRADE)
+					const auto targetPlayer = Game::instance()->getOnlinePlayer(tradingBuddyId);
+					if (targetPlayer != nullptr)
 					{
-						// Client pressed confirm, notify client and other client
-						conn->send(SendTradeCancelSelf(tradingBuddyId, state));
-						targetPlayer->send(SendTradeCancelOther(playerId, state));
-					}
-					else if (state == ACCEPT_AND_FINISH_TRADE)
-					{
-						if (!targetTradeSession.isFinished()) 
+						if (state == CANCEL_TRADE)
 						{
-							// The target player didn't finish yet, so mark this client finished
-							// and then wait for the target player to also finish.
-							myTradeSession.setFinished(true);
-							return;
+							tradeManager->endTradeSession(playerId);
+							tradeManager->endTradeSession(tradingBuddyId);
+
+							conn->send(SendTradeCancelSelf(tradingBuddyId, state));
+							targetPlayer->send(SendTradeCancelOther(playerId, state));
 						}
-
-						auto myProposedCards = myTradeSession.getProposedCards();
-						auto targetProposedCards = targetTradeSession.getProposedCards();
-
-						// The stored sessions are not important anymore
-						tradeManager->endTradeSession(playerId);
-						tradeManager->endTradeSession(tradingBuddyId);
-
-						// Trade client cards to target player
-						for (const auto cardId : myProposedCards)
+						else if (state == CONFIRM_AND_LOCK_TRADE)
 						{
-							if (!player->getInventoryManager()->hasCard(cardId))
+							// Client pressed confirm, notify client and other client
+							conn->send(SendTradeCancelSelf(tradingBuddyId, state));
+							targetPlayer->send(SendTradeCancelOther(playerId, state));
+						}
+						else if (state == ACCEPT_AND_FINISH_TRADE)
+						{
+							if (!targetTradeSession.isFinished())
 							{
-								// Pfff, this guy is beyond simple trade scamming.
-								// He added a card to the trade he doesn't even have in his inventory.
-								// Let's cancel this trade to not make the other player upset :)
-								conn->send(SendTradeCancelSelf(tradingBuddyId, CANCEL_TRADE));
-								targetPlayer->send(SendTradeCancelOther(playerId, CANCEL_TRADE));
+								// The target player didn't finish yet, so mark this client finished
+								// and then wait for the target player to also finish.
+								myTradeSession.setFinished(true);
 								return;
 							}
 
-							auto card = player->getInventoryManager()->get(cardId);
-							player->getInventoryManager()->tradeCard(card, targetPlayer);
-						}
+							auto myProposedCards = myTradeSession.getProposedCards();
+							auto targetProposedCards = targetTradeSession.getProposedCards();
 
-						// Trade target player cards to client
-						for (const auto cardId : targetProposedCards)
-						{
-							if (!targetPlayer->getInventoryManager()->hasCard(cardId))
+							// The stored sessions are not important anymore
+							tradeManager->endTradeSession(playerId);
+							tradeManager->endTradeSession(tradingBuddyId);
+
+							// Trade client cards to target player
+							for (const auto cardId : myProposedCards)
 							{
-								// Pfff, this guy is beyond simple trade scamming.
-								// He added a card to the trade he doesn't even have in his inventory.
-								// Let's cancel this trade to not make the other player upset :)
-								conn->send(SendTradeCancelSelf(tradingBuddyId, CANCEL_TRADE));
-								targetPlayer->send(SendTradeCancelOther(playerId, CANCEL_TRADE));
-								return;
+								if (!player->getInventoryManager()->hasCard(cardId))
+								{
+									// Pfff, this guy is beyond simple trade scamming.
+									// He added a card to the trade he doesn't even have in his inventory.
+									// Let's cancel this trade to not make the other player upset :)
+									conn->send(SendTradeCancelSelf(tradingBuddyId, CANCEL_TRADE));
+									targetPlayer->send(SendTradeCancelOther(playerId, CANCEL_TRADE));
+									return;
+								}
+
+								auto card = player->getInventoryManager()->get(cardId);
+								player->getInventoryManager()->tradeCard(card, targetPlayer);
 							}
 
-							auto card = targetPlayer->getInventoryManager()->get(cardId);
-							targetPlayer->getInventoryManager()->tradeCard(card, player);
+							// Trade target player cards to client
+							for (const auto cardId : targetProposedCards)
+							{
+								if (!targetPlayer->getInventoryManager()->hasCard(cardId))
+								{
+									// Pfff, this guy is beyond simple trade scamming.
+									// He added a card to the trade he doesn't even have in his inventory.
+									// Let's cancel this trade to not make the other player upset :)
+									conn->send(SendTradeCancelSelf(tradingBuddyId, CANCEL_TRADE));
+									targetPlayer->send(SendTradeCancelOther(playerId, CANCEL_TRADE));
+									return;
+								}
+
+								auto card = targetPlayer->getInventoryManager()->get(cardId);
+								targetPlayer->getInventoryManager()->tradeCard(card, player);
+							}
+
+							// Update both players their inventories
+							player->getInventoryManager()->sendCards();
+							targetPlayer->getInventoryManager()->sendCards();
+
+							// Notify both players that the trade has succesfully ended
+							conn->send(SendTradeFinished(tradingBuddyId));
+							targetPlayer->send(SendTradeFinished(playerId));
 						}
+					}
+				}
+			}
+			else
+			{
+				// It's still pending
+				if (state == CANCEL_TRADE)
+				{
+					tradeManager->endTradeSession(playerId);
+					tradeManager->endTradeSession(tradingBuddyId);
 
-						// Update both players their inventories
-						player->getInventoryManager()->sendCards();
-						targetPlayer->getInventoryManager()->sendCards();
-
-						// Notify both players that the trade has succesfully ended
-						conn->send(SendTradeFinished(tradingBuddyId));
-						targetPlayer->send(SendTradeFinished(playerId));
+					const auto targetPlayer = Game::instance()->getOnlinePlayer(tradingBuddyId);
+					if (targetPlayer != nullptr)
+					{
+						targetPlayer->send(SendTradeRequestCancel());
 					}
 				}
 			}

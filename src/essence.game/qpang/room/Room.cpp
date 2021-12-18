@@ -49,6 +49,11 @@ void Room::addPlayer(GameConnection* conn)
 		return;
 	}
 
+	auto playerId = conn->getPlayer()->getId();
+
+	auto tradeManager = Game::instance()->getTradeManager();
+	tradeManager->cancelActiveTrades(playerId);
+
 	conn->incRef();
 
 	const auto roomPlayer = std::make_shared<RoomPlayer>(conn, shared_from_this());
