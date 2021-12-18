@@ -4,6 +4,9 @@
 #include <any>
 
 #include "packets/lobby/outgoing/account/SendAccountDuplicateLogin.h"
+#include "packets/lobby/outgoing/trading/SendTradeCancelOther.h"
+
+#include "packets/lobby/incoming/trading/HandleUpdateTradeStateRequest.h"
 
 #include "utils/StringConverter.h"
 
@@ -15,14 +18,14 @@ void thread1()
 {
 	std::vector<Player::Ptr> players;
 
-	
+
 }
 
 void thread2()
 {
 	std::vector<Player::Ptr> players;
 
-	
+
 }
 
 void Game::test()
@@ -90,7 +93,7 @@ void Game::tick()
 void Game::removeClient(Player::Ptr player)
 {
 	assert(player != nullptr);
-	
+
 	m_playerMx.lock();
 	m_players.erase(player->getId());
 	m_playersByNickname.erase(player->getName());
@@ -100,14 +103,14 @@ void Game::removeClient(Player::Ptr player)
 }
 
 void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
-{	
+{
 	auto player = std::make_shared<Player>(playerId);
 
 	player->setLobbyConn(conn);
 	conn->setPlayer(player);
 
 	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
-	
+
 	const auto it = m_players.find(playerId);
 	const auto playerFound = it != m_players.cend();
 
@@ -298,10 +301,30 @@ void Game::onLobbyConnection(QpangConnection::Ptr conn)
 
 void Game::onSquareConnectionClosed(QpangConnection::Ptr conn)
 {
-	m_squareServer->removeConnection(conn);
-
 	if (auto player = conn->getPlayer(); player != nullptr)
 	{
+		auto playerId = player->getId();
+
+		auto tradeManager = Game::instance()->getTradeManager();
+		if (tradeManager->isTrading(playerId))
+		{
+			auto tradingSessionInfo = tradeManager->getTradeSessionInfo(playerId);
+			auto buddyId = tradingSessionInfo.getBuddyId();
+
+			// End trade sessions
+			tradeManager->endTradeSession(playerId);
+			tradeManager->endTradeSession(buddyId);
+
+			const auto targetPlayer = Game::instance()->getOnlinePlayer(buddyId);
+			if (targetPlayer)
+			{
+				targetPlayer->send(SendTradeCancelOther(playerId, HandleUpdateTradeStateRequest::State::CANCEL_TRADE));
+			}
+		}
+
+		m_squareServer->removeConnection(conn);
+
+
 		if (player->isClosed())
 			return;
 

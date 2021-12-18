@@ -59,11 +59,13 @@ public:
 		std::string revisionStr = std::to_string(revision);
 		std::string revisionConf = CONFIG_MANAGER->getString("GAME_REVISION");
 
+#ifdef NDEBUG
 		if (revisionStr != revisionConf)
 		{
 			invalidVersion(conn);
 			return;
 		}
+#endif
 
 		const tcp::socket& socket = conn->getSocket();
 		const auto ipAddress = socket.remote_endpoint().address().to_string();
@@ -86,6 +88,7 @@ public:
 			}
 		}
 
+#ifdef NDEBUG
 		if (!Authenticator::verify(username, password))
 		{
 			const auto attempts = failInfo.first + 1;
@@ -102,6 +105,7 @@ public:
 			invalidUsername(conn);
 			return;
 		} // ban check happens on lobby server
+#endif
 
 		auto needsWhitelist = CONFIG_MANAGER->getString("GAME_WHITELIST") == "1";
 
