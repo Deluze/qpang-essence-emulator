@@ -31,6 +31,8 @@ public:
 	bool hasSpace(uint32_t space) const;
 	bool hasSpace() const;
 
+	void tradeCard(InventoryCard& card, const std::shared_ptr<Player>& player);
+
 	void giftCard(InventoryCard& card, const std::shared_ptr<Player>& player);
 	void receiveGift(InventoryCard& card, const std::u16string& sender);
 	void openGift(uint64_t cardId);

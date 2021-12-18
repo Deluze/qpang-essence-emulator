@@ -27,7 +27,6 @@ public:
 		if (targetPlayer == nullptr)
 		{
 			conn->send(SendReceiveTradeRequestError(0));
-
 			return;
 		}
 
@@ -37,17 +36,9 @@ public:
 		const auto hasAcceptedTradeRequestValue = packet.readByte();
 		const auto hasAcceptedTradeRequest = (hasAcceptedTradeRequestValue == 1);
 
-		if (!tradeManager->isPendingTradeSession(playerId))
-		{
-			player->send(SendReceiveTradeRequestError(0));
-
-			return;
-		}
-
 		if (!hasAcceptedTradeRequest)
 		{
 			targetPlayer->send(SendReceiveTradeRequestResponse(playerId, hasAcceptedTradeRequestValue));
-
 			return;
 		}
 
@@ -55,21 +46,41 @@ public:
 		if (tradeManager->isTrading(targetPlayerId))
 		{
 			conn->send(SendReceiveTradeRequestError(ALREADY_TRADING));
-
 			return;
 		}
 
 		// Start the trading session.
-		tradeManager->startTradeSession(targetPlayerId, playerId, false);
+		if (tradeManager->acceptTradeSession(playerId, targetPlayerId)) 
+		{
+			// If this player also has other people requesting a trade to him, cancel those
+			auto tradeRequests = tradeManager->getUsersRequestingTrade(playerId);
+			for (const auto requestUserId : tradeRequests)
+			{
+				if (requestUserId != targetPlayerId)
+				{
+					// Someone else is also requesting a trade, cancel that trade
+					tradeManager->endTradeSession(requestUserId);
 
-		// Send the accept trade and open trade window packet to the trading buddy.
-		targetPlayer->send(SendReceiveTradeRequestResponse(playerId, hasAcceptedTradeRequestValue));
-		targetPlayer->send(SendOpenTradeWindow(playerId, hasAcceptedTradeRequestValue));
+					const auto requestPlayer = Game::instance()->getOnlinePlayer(requestUserId);
+					if (requestPlayer)
+					{
+						requestPlayer->send(SendTradeCancelOther(playerId, HandleUpdateTradeStateRequest::State::CANCEL_TRADE));
+					}
+				}
+			}
 
-		tradeManager->startTradeSession(playerId, targetPlayerId, false);
+			// Send the accept trade and open trade window packet to the trading buddy.
+			targetPlayer->send(SendReceiveTradeRequestResponse(playerId, hasAcceptedTradeRequestValue));
+			targetPlayer->send(SendOpenTradeWindow(playerId, hasAcceptedTradeRequestValue));
 
-		// Send the accept trade and open trade window to the player.
-		conn->send(SendReceiveTradeRequestResponse(targetPlayerId, hasAcceptedTradeRequestValue));
-		conn->send(SendOpenTradeWindow(targetPlayerId, hasAcceptedTradeRequestValue));
+			// Send the accept trade and open trade window to the player.
+			conn->send(SendReceiveTradeRequestResponse(targetPlayerId, hasAcceptedTradeRequestValue));
+			conn->send(SendOpenTradeWindow(targetPlayerId, hasAcceptedTradeRequestValue));
+		}
+		else
+		{
+			conn->send(SendReceiveTradeRequestError(0));
+			return;
+		}
 	}
 };

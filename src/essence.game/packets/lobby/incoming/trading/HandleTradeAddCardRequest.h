@@ -53,23 +53,42 @@ public:
 
 		TradeManager* tradeManager = Game::instance()->getTradeManager();
 
-		auto& tradeSessionInfo = tradeManager->getTradeSessionInfo(playerId);
-
-		// TODO: Save added cards server side.
-
-		conn->send(SendTradeAddCardSelf(targetPlayerId));
-
-		const auto targetPlayer = Game::instance()->getOnlinePlayer(targetPlayerId);
-
-		if (targetPlayer != nullptr)
+		if (tradeManager->isTrading(playerId))
 		{
-			targetPlayer->send(SendTradeAddCardOther(playerId, state, unk_03, cardInfo));
-		}
+			auto& tradeSessionInfo = tradeManager->getTradeSessionInfo(playerId);
 
-		std::cout << "HandleTradeAddCardRequest::handle >> TargetPlayerId: " << targetPlayerId 
-			<< ", State: " << (int)state 
-			<< ", Unk03: " << unk_03 
-			<< ", CardId: " << cardId
-			<< std::endl;
+			// If the client is trading with the player that the client thinks he is
+			if (tradeSessionInfo.getBuddyId() == targetPlayerId)
+			{
+				if (tradeSessionInfo.isFinished())
+				{
+					// This guy just tried to to de trade bug, what a lovely person! https://www.youtube.com/watch?v=VuCp8gVZ2XU
+					// Yeah, let's not do that.
+					return;
+				}
+
+				if (state == ADD_CARD)
+				{
+					tradeSessionInfo.addCard(cardId);
+				}
+				else if (state == REMOVE_CARD)
+				{
+					if (!tradeSessionInfo.removeCard(cardId))
+					{
+						// The card wasn't proposed in the first place?
+						// Let's not go through with this
+						return;
+					}
+				}
+
+				conn->send(SendTradeAddCardSelf(targetPlayerId));
+
+				const auto targetPlayer = Game::instance()->getOnlinePlayer(targetPlayerId);
+				if (targetPlayer != nullptr)
+				{
+					targetPlayer->send(SendTradeAddCardOther(playerId, state, unk_03, cardInfo));
+				}
+			}
+		}
 	}
 };

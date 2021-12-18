@@ -1,47 +1,50 @@
 #include "TradeManager.h"
 
-bool TradeManager::isTrading(const uint32_t playerId)
+bool TradeManager::isTrading(uint32_t userId) 
 {
-	const auto it = m_tradeSessions.find(playerId);
-
-	return (it != m_tradeSessions.end() && !it->second->isPending());
+	return m_tradeSessions.count(userId) && !m_tradeSessions[userId].isPending();
 }
 
-bool TradeManager::isPendingTradeSession(const uint32_t playerId)
+void TradeManager::startTradeSession(uint32_t userId, uint32_t targetUserId, bool isPending)
 {
-	const auto it = m_tradeSessions.find(playerId);
+	m_tradeSessions[userId] = TradeSessionInfo(targetUserId, isPending);
+}
 
-	if (it != m_tradeSessions.end())
+void TradeManager::endTradeSession(uint32_t userId)
+{
+	if (m_tradeSessions.count(userId))
 	{
-		return (it->second->isPending());
+		m_tradeSessions.erase(userId);
+	}
+}
+
+bool TradeManager::acceptTradeSession(uint32_t userId, uint32_t targetUserId)
+{
+	if (!m_tradeSessions.count(targetUserId))
+	{
+		return false;
 	}
 
-	return false;
+	// Update requester trade session to not be pending anymore
+	m_tradeSessions[targetUserId].setPending(false);
+
+	// Add trade session to requestor for the current userid
+	m_tradeSessions[userId] = TradeSessionInfo(targetUserId, false);
 }
 
-void TradeManager::startTradeSession(const uint32_t playerId, const uint32_t buddyId, const bool isPending)
+std::vector<uint32_t> TradeManager::getUsersRequestingTrade(uint32_t targetUserId)
 {
-	m_tradeSessions[playerId] = new TradeSessionInfo(buddyId, isPending);
-}
-
-void TradeManager::endTradeSession(const uint32_t playerId)
-{
-	m_tradeSessions.erase(playerId);
-}
-
-TradeSessionInfo TradeManager::getTradeSessionInfo(const uint32_t playerId)
-{
-	return *m_tradeSessions[playerId];
-}
-
-uint32_t TradeManager::findTradingBuddyId(const uint32_t playerId)
-{
-	const auto it = m_tradeSessions.find(playerId);
-
-	if (it != m_tradeSessions.end())
+	std::vector<uint32_t> requests = {};
+	for (auto tradeSession : m_tradeSessions)
 	{
-		return it->second->getBuddyId();
+		if (tradeSession.second.getBuddyId() == targetUserId && tradeSession.second.isPending())
+			requests.push_back(tradeSession.first);
 	}
 
-	return 0;
+	return requests;
+}
+
+TradeSessionInfo& TradeManager::getTradeSessionInfo(uint32_t userId)
+{
+	return m_tradeSessions[userId];
 }

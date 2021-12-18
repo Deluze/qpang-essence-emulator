@@ -39,15 +39,12 @@ public:
 		if (tradeManager->isTrading(targetPlayerId))
 		{
 			conn->send(SendReceiveTradeRequestError(ALREADY_TRADING));
-
 			return;
 		}
 
 		tradeManager->startTradeSession(playerId, targetPlayerId, true);
 
 		conn->send(SendTradeRequestSuccess());
-		
-		//tradeManager->startTradeSession(targetPlayerId, playerId, true);
 		targetPlayer->send(SendDeliverTradeRequest(playerId));
 	}
 };
