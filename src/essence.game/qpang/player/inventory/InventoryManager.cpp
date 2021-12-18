@@ -511,6 +511,10 @@ void InventoryManager::tradeCard(InventoryCard& card, const std::shared_ptr<Play
 	);
 
 	our->getEquipmentManager()->save();
+
+	card.isOpened = false;
+	card.playerOwnerId = player->getId();
+	player->getInventoryManager()->addCard(card);
 }
 
 void InventoryManager::giftCard(InventoryCard& card, const std::shared_ptr<Player>& player)
