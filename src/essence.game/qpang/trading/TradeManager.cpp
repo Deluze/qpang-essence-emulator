@@ -1,8 +1,8 @@
 #include "TradeManager.h"
 
-bool TradeManager::isTrading(uint32_t userId) 
+bool TradeManager::isTrading(uint32_t userId, bool ignorePending) 
 {
-	return m_tradeSessions.count(userId) && !m_tradeSessions[userId].isPending();
+	return m_tradeSessions.count(userId) && (ignorePending || !m_tradeSessions[userId].isPending());
 }
 
 void TradeManager::startTradeSession(uint32_t userId, uint32_t targetUserId, bool isPending)
