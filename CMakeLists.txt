@@ -14,6 +14,12 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/macros/")
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	set(CMAKE_CXX_FLAGS_DEBUG "/ZI")
+	set(CMAKE_SHARED_LINKER_FLAGS "/SAFESEH:NO")
+	set(CMAKE_EXE_LINKER_FLAGS "/SAFESEH:NO")
+endif()
+
 include(GroupSources)
 include(AutoCollect)
 include(FindMySQL)

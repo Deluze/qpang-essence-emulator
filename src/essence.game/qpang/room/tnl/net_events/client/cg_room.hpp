@@ -74,9 +74,10 @@ public:
 				mode == GameMode::Mode::TDM ||
 				mode == GameMode::Mode::PTE ||
 				mode == GameMode::Mode::VIP ||
-				mode == GameMode::Mode::PREY;
+				mode == GameMode::Mode::PREY ||
+				mode == GameMode::Mode::PVE;
 
-			if (!isValidMode || map > 12)
+			if (!isValidMode)
 			{
 				conn->disconnect("Invalid gamemode");
 
@@ -167,7 +168,8 @@ public:
 					mode == GameMode::Mode::TDM ||
 					mode == GameMode::Mode::PTE ||
 					mode == GameMode::Mode::VIP ||
-					mode == GameMode::Mode::PREY;
+					mode == GameMode::Mode::PREY ||
+					mode == GameMode::Mode::PVE;
 
 				if (!isValidMode)
 				{
