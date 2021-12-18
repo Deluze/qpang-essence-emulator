@@ -43,12 +43,12 @@ It conists out of:
 - **Daily login bonus (bunny in park)**
 - **Automatic square generation so they don't get overcrowded** (50 players max, configurable)
 - **Full working machine guns in the bunker/ground zero map**
+- **Trading**, trading allows you to trade your items with someone else
 
 Missing features:
 
 - PvE gamemode
 - Memos (Not a priority at the moment)
-- Trading (WIP)
 - Registration in-game (WIP)
 - Card boosting/enhancing (WIP)
 - In-game quests
