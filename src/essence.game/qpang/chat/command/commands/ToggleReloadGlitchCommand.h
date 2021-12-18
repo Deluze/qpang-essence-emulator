@@ -9,7 +9,7 @@
 class ToggleReloadGlitchCommand : public Command
 {
 public:
-	ToggleReloadGlitchCommand() : Command(3)
+	ToggleReloadGlitchCommand() : Command(4)
 	{
 
 	}

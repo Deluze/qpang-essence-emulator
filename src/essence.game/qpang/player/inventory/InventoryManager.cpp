@@ -476,6 +476,47 @@ bool InventoryManager::hasSpace() const
 	return m_cards.size() + m_gifts.size() < 200;
 }
 
+void InventoryManager::tradeCard(InventoryCard& card, const std::shared_ptr<Player>& player)
+{
+	const auto our = m_player.lock();
+
+	if (our == nullptr)
+		return;
+
+	std::lock_guard lg(m_mx);
+
+	auto cardOwnerPlayer = Game::instance()->getPlayer(card.playerOwnerId);
+
+	m_cards.erase(card.id);
+	card.timeCreated = time(nullptr);
+
+	DATABASE_DISPATCHER->dispatch(
+		"UPDATE player_items SET player_id = ?, opened = 0, time = ? WHERE id = ?",
+		{
+			player->getId(),
+			card.timeCreated,
+			card.id
+		}
+	);
+
+	DATABASE_DISPATCHER->dispatch(
+		"INSERT INTO player_gifts (player_from_id, player_from_name, player_to_id, player_to_name, card_id) VALUES(?, ?, ?, ?, ?)",
+		{
+			cardOwnerPlayer->getId(),
+			cardOwnerPlayer->getName(),
+			player->getId(),
+			player->getName(),
+			card.id,
+		}
+	);
+
+	our->getEquipmentManager()->save();
+
+	card.isOpened = false;
+	card.playerOwnerId = player->getId();
+	player->getInventoryManager()->addCard(card);
+}
+
 void InventoryManager::giftCard(InventoryCard& card, const std::shared_ptr<Player>& player)
 {
 	const auto our = m_player.lock();

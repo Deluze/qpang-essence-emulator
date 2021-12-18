@@ -1,34 +1,50 @@
 #pragma once
 
 #include "core/communication/packet/PacketEvent.h"
+#include <packets/lobby/outgoing/trading/SendReceiveTradeRequestError.h>
+#include <packets/lobby/outgoing/trading/SendDeliverTradeRequest.h>
+#include <packets/lobby/outgoing/trading/SendTradeRequestSuccess.h>
 
 class HandleTradeRequest final : public PacketEvent
 {
 public:
-	// Trade cancel 884
+	enum TradeRequestErrorCode {
+		ALREADY_TRADING = 380,
+		DOES_NOT_WANT_TRADE_OFFERS = 877
+	};
+
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
 		const auto player = conn->getPlayer();
+		const auto playerId = player->getId();
 
-		const auto targetPlayerId = packet.readInt();
-		const auto targetPlayer = Game::instance()->getPlayer(targetPlayerId);
+		TradeManager* tradeManager = Game::instance()->getTradeManager();
 
-		if (targetPlayer == nullptr)
+		// Check if the player that has sent the request is already trading, if so do not allow them to send a trade request to another player.
+		if (tradeManager->isTrading(playerId))
 		{
-			// TODO: Send trade fail?
-			// 877 - Trade error "The trading process has stopped because of error caused in the system internally"?
-			conn->send(LobbyServerPacket(877));
-
 			return;
 		}
 
-		std::cout << "HandleTradeRequest::handle >> Player " << player->getId() << " has requested to trade with " << targetPlayerId << std::endl;
+		const auto targetPlayerId = packet.readInt();
+		const auto targetPlayer = Game::instance()->getOnlinePlayer(targetPlayerId);
 
-		// 876 - Shows trade request menu.
-		//conn->send(LobbyServerPacket(876));
+		// Check to see if the target player is still online.
+		if (targetPlayer == nullptr)
+		{
+			return;
+		}
 
-		conn->send(LobbyServerPacket(877));
+		// Check if the targetted player is already trading, if they are, send an error response.
+		if (tradeManager->isTrading(targetPlayerId))
+		{
+			conn->send(SendReceiveTradeRequestError(ALREADY_TRADING));
+			return;
+		}
 
-		//targetPlayer->send(LobbyServerPacket(881)); // The other side has cancelled the request.
+		tradeManager->startTradeSession(playerId, targetPlayerId, true);
+
+		conn->send(SendTradeRequestSuccess());
+		targetPlayer->send(SendDeliverTradeRequest(playerId));
 	}
 };

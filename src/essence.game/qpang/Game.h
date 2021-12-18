@@ -23,6 +23,7 @@
 #include "qpang/level/LevelManager.h"
 #include "qpang/crane/CraneManager.h"
 #include "qpang/leaderboard/Leaderboard.h"
+#include "qpang/trading/TradeManager.h"
 
 #include "qpang/room/RoomServer.h"
 
@@ -78,6 +79,7 @@ public:
 	LevelManager* getLevelManager();
 	Leaderboard* getLeaderboard();
 	CraneManager* getCraneManager();
+	TradeManager* getTradeManager();
 
 	DatabaseDispatcher* getDatabaseDispatcher();
 
@@ -110,6 +112,7 @@ private:
 	AchievementManager m_achievementManager;
 	LevelManager m_levelManager;
 	CraneManager m_craneManager;
+	TradeManager m_tradeManager;
 
 	Leaderboard m_leaderboard;
 

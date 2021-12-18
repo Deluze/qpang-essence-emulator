@@ -12,6 +12,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/macros/")
 
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+
 include(GroupSources)
 include(AutoCollect)
 include(FindMySQL)
