@@ -7,8 +7,31 @@ class GCPvEStart : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvEStart() : GameNetEvent{ GC_PVE_START, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
-	void pack(EventConnection* conn, BitStream* bstream) {};
+	U32 playerId;
+
+	U32 unk_01 = 2;
+	U32 unk_02 = 0;
+
+	U16 map;
+	U16 mode;
+
+	GCPvEStart() : GameNetEvent{ GC_PVE_START, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient } {};
+	GCPvEStart(Room::Ptr room, uint32_t playerId) : GameNetEvent{ GC_PVE_START, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
+	{
+		this->playerId = playerId;
+		this->map = room->getMap();
+		this->mode = room->getMode();
+	};
+
+	void pack(EventConnection* conn, BitStream* bstream) 
+	{
+		bstream->write(playerId);
+		bstream->write(unk_01);  // 2, 3 or 5
+		bstream->write(unk_02);
+		bstream->write(map);
+		bstream->write(mode);
+	};
+
 	void unpack(EventConnection* conn, BitStream* bstream) {};
 	void process(EventConnection* ps) {};
 

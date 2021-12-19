@@ -7,7 +7,7 @@ class GCPvENewRound : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvENewRound() : GameNetEvent{ GC_PVE_NEW_ROUND, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
+	GCPvENewRound() : GameNetEvent{ GC_PVE_NEW_ROUND, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {};
 
 	void pack(EventConnection* conn, BitStream* bstream) {};
 	void unpack(EventConnection* conn, BitStream* bstream) {};

@@ -168,7 +168,12 @@ void Room::start()
 		{
 			player->setReady(true); // room master can't ready up.
 			player->setPlaying(true);
-			player->getConnection()->startLoading(curr, player);
+
+			if (m_mode == GameMode::Mode::PVE)
+				player->getConnection()->startLoadingPve(curr, player);
+			else
+				player->getConnection()->startLoading(curr, player);
+
 			player->onStart();
 		}
 		else
@@ -337,13 +342,7 @@ uint8_t Room::getMap() const
 
 void Room::setMap(const uint8_t map)
 {
-	if (map > 12)
-	{
-		return;
-	}
-
 	m_map = map;
-
 	update(CGRoom::Command::MAP_ROOM, map);
 }
 
