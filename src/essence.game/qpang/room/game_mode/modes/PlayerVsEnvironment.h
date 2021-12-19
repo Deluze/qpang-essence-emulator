@@ -7,4 +7,5 @@ class PlayerVsEnvironment : public GameMode
 public:
 	bool isMissionMode() override;
 	bool isTeamMode() override;
+	void onApply(std::shared_ptr<Room> room) override;
 };
