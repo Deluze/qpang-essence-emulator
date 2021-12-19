@@ -7,11 +7,41 @@ class GCPvENpcInit : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
+	U32 npcType; // 88
+	U32 npcUid; // 92
+	F32 xPos; // 96
+	F32 yPos; // 100
+	F32 zPos; // 104
+	U16 unk_06;  // 108
+	U8 unk_07; // 110
+	U32 unk_08; // 112
 
-	void pack(EventConnection* conn, BitStream* bstream) {};
-	void unpack(EventConnection* conn, BitStream* bstream) {};
-	void process(EventConnection* ps) {};
+	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny } {}
+	GCPvENpcInit(const uint32_t npcType, const uint32_t npcUid, const float xPos, const float yPos, const float zPos)
+		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny }
+	{
+		this->npcType = npcType;
+		this->npcUid = npcUid;
+
+		this->xPos = xPos;
+		this->yPos = yPos;
+		this->zPos = zPos;
+	}
+
+	void pack(EventConnection* conn, BitStream* bstream)
+	{
+		bstream->write(npcType);
+		bstream->write(npcUid);
+		bstream->write(xPos);
+		bstream->write(3);
+		bstream->write(zPos);
+		bstream->write(unk_06);
+		bstream->write(unk_07);
+		bstream->write(unk_08);
+	}
+
+	void unpack(EventConnection* conn, BitStream* bstream) {}
+	void process(EventConnection* ps) {}
 
 	TNL_DECLARE_CLASS(GCPvENpcInit);
 };
