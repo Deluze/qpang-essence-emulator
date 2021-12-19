@@ -24,11 +24,11 @@ Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, cons
 	m_map(map),
 	m_mode(mode),
 	m_state(2),
-	m_maxPlayers(16),
+	m_maxPlayers(mode == 9 ? 4 : 16),
 	m_masterPlayerId(0),
 	m_isLevelLimited(false),
 	m_isTeamSorting(false),
-	m_isSkillsEnabled(true),
+	m_isSkillsEnabled(mode == 9 ? false : true),
 	m_isMeleeOnly(false),
 	m_scorePoints(40),
 	m_scoreTime(10),
@@ -364,7 +364,7 @@ void Room::setMode(const uint8_t mode)
 
 	// after changing game modes, these reset.
 
-	if (m_isPointsGame)
+	if (m_isPointsGame && m_mode != 9)
 	{
 		update(CGRoom::Command::SET_POINTS, m_scorePoints);
 	}
@@ -439,7 +439,8 @@ bool Room::isSkillsEnabled() const
 
 void Room::setSkillsEnabled(const bool skillEnabled)
 {
-	m_isSkillsEnabled = skillEnabled;
+	if (m_mode != 9)
+		m_isSkillsEnabled = skillEnabled;
 
 	unreadyAll(true);
 	update(CGRoom::Command::TOGGLE_SKILL, skillEnabled);

@@ -19,9 +19,9 @@ public:
 
 	std::u16string nickname;
 
-	U8 unk_01 = 1;
-	U32 unk_02 = 1;
-	U16 unk_03 = 1;
+	U8 unk_01 = 0;
+	U32 unk_02 = 1000;
+	U16 unk_03 = 0;
 
 	GCPvEUserInit() : GameNetEvent{ GC_PVE_USER_INIT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient } {};
 	GCPvEUserInit(RoomPlayer::Ptr roomPlayer, bool spectatorMode = false) : GameNetEvent{ GC_PVE_USER_INIT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
@@ -62,6 +62,7 @@ public:
 		bstream->write(characterId); //130
 		bstream->write(selectedWeapon); //168
 		bstream->write(weaponCount); //172
+
 		for (U32 item : armor)
 			bstream->write(item);
 

@@ -10,5 +10,5 @@ bool PlayerVsEnvironment::isMissionMode()
 
 bool PlayerVsEnvironment::isTeamMode()
 {
-    return false;
+    return true;
 }
