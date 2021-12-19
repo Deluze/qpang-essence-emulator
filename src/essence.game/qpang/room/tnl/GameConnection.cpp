@@ -125,19 +125,14 @@ void GameConnection::startLoadingPve(std::shared_ptr<Room> room, RoomPlayer::Ptr
 	postNetEvent(new GCJoin(roomPlayer));
 	postNetEvent(new GCGameState(m_player->getId(), 12));*/
 
-	postNetEvent(new GCPvEStart(room, m_player->getId()));
-	postNetEvent(new GCPvEUserInit(roomPlayer));
-	postNetEvent(new GCGameState(m_player->getId(), 13));
-
 	//postNetEvent(new GCJoin(roomPlayer));
 //	postNetEvent(new GCPvENewRound(m_player->getId()));
 
-	/*postNetEvent(new GCPvEStart(room, m_player->getId()));
-	postNetEvent(new GCPvEUserInit(roomPlayer));
-	postNetEvent(new GCGameState(m_player->getId(), 12));
-	postNetEvent(new GCPvENewRound());*/
+	//postNetEvent(new GCPvEStart(room, m_player->getId()));
+	//postNetEvent(new GCPvEUserInit(roomPlayer));
+	//postNetEvent(new GCGameState(m_player->getId(), 12));
 
-	//startLoading(room, roomPlayer);
+	startLoading(room, roomPlayer);
 }
 
 void GameConnection::startLoading(std::shared_ptr<Room> room, RoomPlayer::Ptr roomPlayer)
