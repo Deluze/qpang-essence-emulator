@@ -14,9 +14,9 @@ public:
 	F32 zPos; // 104
 
 	GCPvEItemInit() : GameNetEvent{ GC_PVE_ITEM_INIT, GuaranteedOrdered, DirServerToClient } {}
-	GCPvEItemInit(const uint32_t itemId, const uint32_t itemUid, const Position position)
+	GCPvEItemInit(const eItemType type, const uint32_t itemUid, const Position position)
 		: GameNetEvent{ GC_PVE_ITEM_INIT, GuaranteedOrdered, DirServerToClient },
-		itemId(itemId),
+		itemId(static_cast<U32>(type)),
 		itemUid(itemUid),
 		xPos(position.x),
 		yPos(position.y),
