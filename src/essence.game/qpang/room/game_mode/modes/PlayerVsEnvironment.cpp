@@ -1,14 +1,17 @@
 #include "PlayerVsEnvironment.h"
+
 #include "Room.h"
+#include "RoomSession.h"
+
 
 bool PlayerVsEnvironment::isMissionMode()
 {
-    return true;
+	return true;
 }
 
 bool PlayerVsEnvironment::isTeamMode()
 {
-    return true;
+	return true;
 }
 
 void PlayerVsEnvironment::onApply(std::shared_ptr<Room> room)
@@ -21,4 +24,9 @@ void PlayerVsEnvironment::onApply(std::shared_ptr<Room> room)
 	room->setSkillsEnabled(false);
 
 	GameMode::onApply(room);
+}
+
+void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
+{
+	GameMode::tick(roomSession);
 }
