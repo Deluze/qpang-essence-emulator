@@ -13,7 +13,7 @@ void RoomSessionObjectManager::initialize(const std::shared_ptr<RoomSession>& ro
 	m_roomSession = roomSession;
 }
 
-uint32_t RoomSessionObjectManager::spawnObject(const Object object)
+uint32_t RoomSessionObjectManager::spawnObject(std::unique_ptr<PveObject> object)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -24,9 +24,10 @@ uint32_t RoomSessionObjectManager::spawnObject(const Object object)
 
 	const auto objectUid = (m_objects.size() + 1);
 
-	roomSession->relayPlaying<GCPvEObjectInit>(object.type, objectUid, object.position.x, object.position.y, object.position.z, 0);
+	object->setUid(objectUid);
+	roomSession->relayPlaying<GCPvEObjectInit>((U32)object->getType(), objectUid, object->getPosition().x, object->getPosition().y, object->getPosition().z, 0);
 
-	m_objects[objectUid] = object;
+	m_objects[objectUid] = std::move(object);
 	return objectUid;
 }
 
@@ -46,12 +47,12 @@ void RoomSessionObjectManager::despawnObject(const uint32_t uid)
 		return;
 	}
 
-	roomSession->relayPlaying<GCPvEObjectInit>(0, uid, object->position.x, object->position.y, object->position.z, 0);
+	roomSession->relayPlaying<GCPvEObjectInit>(0, uid, object->getPosition().x, object->getPosition().y, object->getPosition().z, 0);
 
 	m_objects.erase(uid);
 }
 
-RoomSessionObjectManager::Object* RoomSessionObjectManager::findObjectByUid(const uint32_t uid)
+std::unique_ptr<PveObject> RoomSessionObjectManager::findObjectByUid(const uint32_t uid)
 {
 	const auto it = m_objects.find(uid);
 
@@ -60,24 +61,21 @@ RoomSessionObjectManager::Object* RoomSessionObjectManager::findObjectByUid(cons
 		return nullptr;
 	}
 
-	return &it->second;
+	return std::move(it->second);
 }
 
 void RoomSessionObjectManager::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 {
 	for (auto& object : m_objects)
 	{
-		session->send<GCPvEObjectInit>(object.second.type, object.first, object.second.position.x, object.second.position.y, object.second.position.z, 0);
+		session->send<GCPvEObjectInit>((U32)object.second->getType(), object.first, object.second->getPosition().x, object.second->getPosition().y, object.second->getPosition().z, 0);
 	}
 }
 
-void RoomSessionObjectManager::tick()
+void RoomSessionObjectManager::tick(std::shared_ptr<RoomSession> roomSession)
 {
-	// TODO: Implement object logic somewhere here.
-	// BOARD NOTES:
-	// 1, from:
-	// { -13.64f, -0.5f, -22.64f }
-
-	// 1, to:
-	// { -1.4f, -0.5f, -22.64f }
+	for (auto& object : m_objects)
+	{
+		object.second->tick(roomSession);
+	}
 }
