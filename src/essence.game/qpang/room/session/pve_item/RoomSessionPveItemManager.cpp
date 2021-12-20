@@ -77,7 +77,7 @@ void RoomSessionPveItemManager::onPlayerSync(std::shared_ptr<RoomSessionPlayer> 
 	}
 }
 
-void RoomSessionPveItemManager::tick()
+void RoomSessionPveItemManager::tick(std::shared_ptr<RoomSession> roomSession)
 {
 
 }

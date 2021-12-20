@@ -72,7 +72,7 @@ void RoomSessionNpcManager::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sess
 	}
 }
 
-void RoomSessionNpcManager::tick()
+void RoomSessionNpcManager::tick(std::shared_ptr<RoomSession> roomSession)
 {
 
 }

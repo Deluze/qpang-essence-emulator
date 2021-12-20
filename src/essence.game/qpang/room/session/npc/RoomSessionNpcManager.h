@@ -46,7 +46,7 @@ public:
 
 	void onPlayerSync(std::shared_ptr<RoomSessionPlayer> session);
 
-	void tick();
+	void tick(std::shared_ptr<RoomSession> roomSession);
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::map<uint32_t, Npc> m_npcs{};
