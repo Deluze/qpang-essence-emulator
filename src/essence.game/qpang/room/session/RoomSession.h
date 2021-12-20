@@ -9,6 +9,7 @@
 #include "ConfigManager.h"
 #include "RoomSessionNpcManager.h"
 #include "RoomSessionPveItemManager.h"
+#include "RoomSessionPveRoundManager.h"
 
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 #include "qpang/room/session/game_item/GameItemManager.h"
@@ -65,6 +66,7 @@ public:
 
 	RoomSessionNpcManager* getNpcManager();
 	RoomSessionPveItemManager* getPveItemManager();
+	RoomSessionPveRoundManager* getPveRoundManager();
 
 	std::shared_ptr<Room> getRoom();
 
@@ -212,8 +214,10 @@ private:
 	GameMode* m_gameMode;
 	GameItemManager m_itemManager;
 	RoomSessionSkillManager m_skillManager;
+
 	RoomSessionNpcManager m_npcManager;
 	RoomSessionPveItemManager m_pveItemManager;
+	RoomSessionPveRoundManager m_pveRoundManager;
 
 	std::recursive_mutex m_playerMx;
 	std::unordered_map<uint32_t, RoomSessionPlayer::Ptr> m_players;
