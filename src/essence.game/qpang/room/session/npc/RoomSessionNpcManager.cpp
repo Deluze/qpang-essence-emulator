@@ -22,9 +22,9 @@ uint32_t RoomSessionNpcManager::spawnNpc(PveNpc npc)
 		return 0;
 	}
 
-	npc.setUid((m_npcs.size() + 1));
+	npc.setUid(m_npcs.size() + 1);
 
-	roomSession->relayPlaying<GCPvENpcInit>(static_cast<U32>(npc.getType()), npc.getUid(), npc.getPosition());
+	roomSession->relayPlaying<GCPvENpcInit>(npc.getType(), npc.getUid(), npc.getPosition());
 
 	m_npcs[npc.getUid()] = npc;
 
