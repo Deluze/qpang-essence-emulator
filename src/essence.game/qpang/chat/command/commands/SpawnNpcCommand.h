@@ -40,14 +40,8 @@ public:
 
 		const auto roomSession = roomSessionPlayer->getRoomSession();
 
-		const auto npcType = convertToInteger(args.at(0));
-		constexpr auto npcPosition = Position{ 32.00, 0.00, -30.00 };
-
-		const auto npc = RoomSessionNpcManager::Npc
-		{
-			npcType,
-			npcPosition
-		};
+		constexpr auto position = Position{ 32.00, 0.00, -30.00 };
+		const auto npc = PveNpc(eNpcType::ABANDONED_DOLL, position);
 
 		/*const auto spawnedNpcUid = */roomSession->getNpcManager()->spawnNpc(npc);
 		//const auto spawnedNpc = roomSession->getNpcManager()->findNpcByUid(spawnedNpcUid);
