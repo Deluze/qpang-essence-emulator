@@ -2,7 +2,6 @@
 #define CG_PVE_ROUND_START_H
 
 #include "GameNetEvent.h"
-#include "gc_pve_new_round.hpp"
 
 class CGPvERoundStart : public GameNetEvent
 {
@@ -15,8 +14,33 @@ public:
 
 	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		// TODO: More checks need to happen here, but for now.. relay the new round event.
-		player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession()->relayPlaying<GCPvENewRound>();
+		const auto roomPlayer = player->getRoomPlayer();
+
+		if (roomPlayer == nullptr)
+		{
+			return;
+		}
+
+		if (roomPlayer->isSpectating())
+		{
+			return;
+		}
+
+		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
+
+		if (roomSessionPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSession = roomSessionPlayer->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		roomSession->getPveRoundManager()->onStartNewRound();
 	}
 
 	void process(EventConnection* ps) override

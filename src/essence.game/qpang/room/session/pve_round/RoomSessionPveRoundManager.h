@@ -12,8 +12,18 @@ public:
 	 * \param roomSession The given room session.
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
+
+	/**
+	 * \brief Handles the CGPvERoundStart event by relaying the CGPvENewRound event.
+	 */
+	void onStartNewRound();
+
+	/**
+	 * \brief Ends the current round which causes the client to send a start new round packet/event.
+	 */
+	void endRound() const;
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 
-	/*uint8_t m_currentRound = 0;*/
+	uint8_t m_currentRound = 0;
 };
