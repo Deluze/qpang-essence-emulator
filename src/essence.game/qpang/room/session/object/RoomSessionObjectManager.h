@@ -38,9 +38,9 @@ public:
 	 */
 	std::unique_ptr<PveObject> findObjectByUid(uint32_t uid);
 
-	void onPlayerSync(std::shared_ptr<RoomSessionPlayer> session);
+	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const;
 
-	void tick(std::shared_ptr<RoomSession> roomSession);
+	void tick(const std::shared_ptr<RoomSession>& roomSession) const;
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::unordered_map<uint32_t, std::unique_ptr<PveObject>> m_objects{};
