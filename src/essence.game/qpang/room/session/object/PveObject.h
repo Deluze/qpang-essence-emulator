@@ -6,8 +6,8 @@
 enum class eObjectType : uint32_t {
 	GATE = 1,
 	DOOR = 2,
-	MOVING_RED_BOARD = 3,
-	RED_BOARD = 4,
+	MOVING_ESCALATOR = 3,
+	STATIC_ESCALATOR = 4,
 	SWITCH = 5,
 	ESSENCE = 6
 };
