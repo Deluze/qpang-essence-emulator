@@ -6,31 +6,41 @@
 class CCCharm : public GameNetEvent
 {
 public:
-	CCCharm() : GameNetEvent{ CC_CHARM, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
+	CCCharm() : GameNetEvent{ CC_CHARM, GuaranteedOrdered, DirAny} {}
 
-	TNL::U32 unk_01;
-	TNL::U32 unk_02;
-	TNL::U32 unk_03;
-	TNL::U32 unk_04;
-	TNL::U8 unk_05;
+	U32 unk_01; // 92
+	U32 unk_02; // 96
+	U32 unk_03; // 100
+	U32 unk_04; // 104
+	U8 unk_05;	// 88
 
-	void pack(EventConnection* conn, BitStream* bstream)
+	void pack(EventConnection* conn, BitStream* bstream) override
 	{
+		bstream->write(&unk_01);
+		bstream->write(&unk_02);
+		bstream->write(&unk_03);
+		bstream->write(&unk_04);
+		bstream->write(&unk_05);
+	}
 
-	};
-
-	void unpack(EventConnection* conn, BitStream* bstream)
+	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->read(&unk_01);
 		bstream->read(&unk_02);
 		bstream->read(&unk_03);
 		bstream->read(&unk_04);
 		bstream->read(&unk_05);
-	};
+	}
 
-	void process(EventConnection* ps)
+	void handle(GameConnection* conn, Player::Ptr player) override
 	{
-	};
+
+	}
+
+	void process(EventConnection* ps) override
+	{
+		post<CCCharm>(ps);
+	}
 
 	TNL_DECLARE_CLASS(CCCharm);
 };
