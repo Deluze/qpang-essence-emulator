@@ -8,6 +8,7 @@
 #include "ReloadCommand.h"
 #include "UnlimitedCommand.h"
 #include "AddSkillPointsCommand.h"
+#include "SpawnNpcCommand.h"
 #include "ToggleReloadGlitchCommand.h"
 #include "qpang/chat/command/Command.h"
 #include "qpang/chat/command/commands/NameChangeCommand.h"
@@ -60,6 +61,7 @@ void CommandManager::initialize()
 		{u"fakedeath", new FakeDeathCommand()},
 		{u"fakedeathall", new FakeDeathAllCommand()},
 		{u"debug", new DebugCommand()},
+		{u"spawnnpc", new SpawnNpcCommand()},
 	};
 }
 
