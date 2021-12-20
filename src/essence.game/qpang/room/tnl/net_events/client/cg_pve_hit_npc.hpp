@@ -10,8 +10,8 @@ public:
 	enum HitLocation : uint8_t
 	{
 		FRONT = 1,
-		BACK_SIDE = 2,
-		BACK = 3
+		BACK_SIDE = 3,
+		BACK = 2
 	};
 
 	// TODO: Create enum for weaponType
