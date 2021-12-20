@@ -34,7 +34,7 @@ public:
 	 * \brief De-spawns an from the game and removes it from the npcs vector.
 	 * \param uid The uid of the npc to de-spawn.
 	 */
-	void despawnNpc(uint32_t uid);
+	void killNpcByUid(uint32_t uid);
 
 	/**
 	 * \brief Looks up the npc by uid.

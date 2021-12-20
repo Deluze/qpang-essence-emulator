@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "gc_pve_die_npc.hpp"
 #include "gc_pve_npc_init.hpp"
 
 std::vector<uint32_t> npcs{};
@@ -32,7 +33,7 @@ uint32_t RoomSessionNpcManager::spawnNpc(const Npc npc)
 	return npcUid;
 }
 
-void RoomSessionNpcManager::despawnNpc(const uint32_t uid)
+void RoomSessionNpcManager::killNpcByUid(const uint32_t uid)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -41,14 +42,12 @@ void RoomSessionNpcManager::despawnNpc(const uint32_t uid)
 		return;
 	}
 
-	const auto npc = findNpcByUid(uid);
-
-	if (npc == nullptr)
+	if (const auto npc = findNpcByUid(uid); npc == nullptr)
 	{
 		return;
 	}
 
-	roomSession->relayPlaying<GCPvENpcInit>(0, uid, npc->position.x, npc->position.y, npc->position.z);
+	roomSession->relayPlaying<GCPvEDieNpc>(uid);
 
 	m_npcs.erase(uid);
 }
