@@ -9,7 +9,7 @@
 #include "UnlimitedCommand.h"
 #include "AddSkillPointsCommand.h"
 #include "KillNpcCommand.h"
-#include "PveNextRoundCommand.h"
+#include "PveEndRoundCommand.h"
 #include "SpawnNpcCommand.h"
 #include "ToggleReloadGlitchCommand.h"
 #include "qpang/chat/command/Command.h"
@@ -64,7 +64,7 @@ void CommandManager::initialize()
 		{u"debug", new DebugCommand()},
 		{u"spawnnpc", new SpawnNpcCommand()},
 		{u"killnpc", new KillNpcCommand()},
-		{u"pvenextround", new PveNextRoundCommand()},
+		{u"endround", new PveEndRoundCommand()},
 	};
 }
 

@@ -3,10 +3,10 @@
 #include "qpang/chat/command/Command.h"
 #include "qpang/room/RoomPlayer.h"
 
-class PveNextRoundCommand final : public Command
+class PveEndRoundCommand final : public Command
 {
 public:
-	PveNextRoundCommand() : Command(3)
+	PveEndRoundCommand() : Command(3)
 	{
 	}
 
@@ -32,6 +32,6 @@ public:
 
 		const auto roomSession = roomSessionPlayer->getRoomSession();
 
-		roomSession->relayPlaying<GCPvERoundEnd>();
+		roomSession->getPveRoundManager()->endRound();
 	}
 };
