@@ -52,6 +52,8 @@ void RoomSession::initialize()
 	m_itemManager.initialize(shared_from_this());
 	m_skillManager.initialize(shared_from_this());
 
+	m_npcManager.initialize(shared_from_this());
+
 	m_gameMode->onStart(shared_from_this());
 
 	m_essencePosition = Game::instance()->getSpawnManager()->getEssenceSpawn(m_room->getMap());
@@ -986,6 +988,11 @@ GameItemManager* RoomSession::getItemManager()
 RoomSessionSkillManager* RoomSession::getSkillManager()
 {
 	return &m_skillManager;
+}
+
+RoomSessionNpcManager* RoomSession::getNpcManager()
+{
+	return &m_npcManager;
 }
 
 Room::Ptr RoomSession::getRoom()
