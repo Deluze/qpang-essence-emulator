@@ -3,10 +3,10 @@
 #include "qpang/chat/command/Command.h"
 #include "qpang/room/RoomPlayer.h"
 
-class DespawnNpcCommand final : public Command
+class KillNpcCommand final : public Command
 {
 public:
-	DespawnNpcCommand() : Command(3)
+	KillNpcCommand() : Command(3)
 	{
 	}
 
@@ -41,6 +41,6 @@ public:
 
 		const auto npcUidToDespawn = convertToInteger(args.at(0));
 
-		roomSession->getNpcManager()->despawnNpc(npcUidToDespawn);
+		roomSession->getNpcManager()->killNpcByUid(npcUidToDespawn);
 	}
 };

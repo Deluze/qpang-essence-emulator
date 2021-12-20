@@ -49,11 +49,7 @@ public:
 			npcPosition
 		};
 
-		const auto spawnedNpcUid = roomSession->getNpcManager()->spawnNpc(npc);
-		const auto spawnedNpc = roomSession->getNpcManager()->findNpcByUid(spawnedNpcUid);
-
-		std::cout << "Spawned in npc of type " << spawnedNpc->type << std::endl;
-
-		//roomSession->getNpcManager()->despawnNpc(spawnedNpcUid);
+		/*const auto spawnedNpcUid = */roomSession->getNpcManager()->spawnNpc(npc);
+		//const auto spawnedNpc = roomSession->getNpcManager()->findNpcByUid(spawnedNpcUid);
 	}
 };
