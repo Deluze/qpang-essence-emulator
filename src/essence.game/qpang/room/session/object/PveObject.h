@@ -17,8 +17,10 @@ class RoomSession;
 class PveObject
 {
 public:
-	PveObject() {}
+	PveObject() = default;
 	PveObject(eObjectType type, const Position& position);
+
+	virtual ~PveObject() = default;
 
 	void setUid(uint32_t uid);
 
@@ -28,7 +30,7 @@ public:
 	Position getPosition();
 
 protected:
-	uint32_t m_uid;
+	uint32_t m_uid{};
 	eObjectType m_type;
-	Position m_position;
+	Position m_position{};
 };

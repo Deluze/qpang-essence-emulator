@@ -3,7 +3,7 @@
 #include <memory>
 #include <map>
 
-#include "Position.h"
+#include "PveNpc.h"
 
 class RoomSession;
 class RoomSessionPlayer;
@@ -11,13 +11,6 @@ class RoomSessionPlayer;
 class RoomSessionNpcManager
 {
 public:
-	// TODO: Move to separate/own file.
-	struct Npc
-	{
-		uint32_t type;
-		Position position;
-	};
-
 	/**
 	 * \brief Initializes the npc manager with the room session.
 	 * \param roomSession The given room session.
@@ -29,7 +22,7 @@ public:
 	 * \param npc The npc you want to spawn in.
 	 * \returns The uid of the spawned in npc.
 	 */
-	uint32_t spawnNpc(Npc npc);
+	uint32_t spawnNpc(PveNpc npc);
 
 	/**
 	 * \brief De-spawns an from the game and removes it from the npcs vector.
@@ -42,12 +35,12 @@ public:
 	 * \param uid The uid of the npc you want to find.
 	 * \return The found npc or null.
 	 */
-	Npc* findNpcByUid(uint32_t uid);
+	PveNpc* findNpcByUid(uint32_t uid);
 
-	void onPlayerSync(std::shared_ptr<RoomSessionPlayer> session);
+	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const;
 
-	void tick(std::shared_ptr<RoomSession> roomSession);
+	void tick(const std::shared_ptr<RoomSession>& roomSession) const;
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
-	std::map<uint32_t, Npc> m_npcs{};
+	std::map<uint32_t, PveNpc> m_npcs{};
 };

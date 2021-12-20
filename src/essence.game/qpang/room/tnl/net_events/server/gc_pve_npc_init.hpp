@@ -18,13 +18,13 @@ public:
 
 	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny } {}
 
-	GCPvENpcInit(const uint32_t npcType, const uint32_t npcUid, const float xPos, const float yPos, const float zPos)
+	GCPvENpcInit(const eNpcType npcType, const uint32_t npcUid, const Position position)
 		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny },
-		npcType(npcType),
+		npcType(static_cast<U32>(npcType)),
 		npcUid(npcUid),
-		xPos(xPos),
-		yPos(yPos),
-		zPos(zPos)
+		xPos(position.x),
+		yPos(position.y),
+		zPos(position.z)
 	{
 
 	}

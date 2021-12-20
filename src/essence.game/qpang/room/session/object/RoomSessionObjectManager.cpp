@@ -4,8 +4,6 @@
 #include "RoomSession.h"
 #include "RoomSessionPlayer.h"
 
-#include <vector>
-
 #include "gc_pve_object_init.hpp"
 
 void RoomSessionObjectManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
@@ -64,17 +62,17 @@ std::unique_ptr<PveObject> RoomSessionObjectManager::findObjectByUid(const uint3
 	return std::move(it->second);
 }
 
-void RoomSessionObjectManager::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
+void RoomSessionObjectManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const
 {
-	for (auto& object : m_objects)
+	for (const auto& object : m_objects)
 	{
-		session->send<GCPvEObjectInit>((U32)object.second->getType(), object.first, object.second->getPosition().x, object.second->getPosition().y, object.second->getPosition().z, 0);
+		session->send<GCPvEObjectInit>(static_cast<U32>(object.second->getType()), object.first, object.second->getPosition().x, object.second->getPosition().y, object.second->getPosition().z, 0);
 	}
 }
 
-void RoomSessionObjectManager::tick(std::shared_ptr<RoomSession> roomSession)
+void RoomSessionObjectManager::tick(const std::shared_ptr<RoomSession>& roomSession) const
 {
-	for (auto& object : m_objects)
+	for (const auto& object : m_objects)
 	{
 		object.second->tick(roomSession);
 	}

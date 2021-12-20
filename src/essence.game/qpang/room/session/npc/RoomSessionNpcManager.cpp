@@ -1,22 +1,19 @@
 #include "RoomSessionNpcManager.h"
 
-#include "Position.h"
 #include "RoomSession.h"
 #include "RoomSessionPlayer.h"
-
-#include <vector>
 
 #include "gc_pve_die_npc.hpp"
 #include "gc_pve_npc_init.hpp"
 
-std::vector<uint32_t> npcs{};
+#include "PveNpc.h"
 
 void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
 }
 
-uint32_t RoomSessionNpcManager::spawnNpc(const Npc npc)
+uint32_t RoomSessionNpcManager::spawnNpc(PveNpc npc)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -25,12 +22,13 @@ uint32_t RoomSessionNpcManager::spawnNpc(const Npc npc)
 		return 0;
 	}
 
-	const auto npcUid = (m_npcs.size() + 1);
+	npc.setUid(m_npcs.size() + 1);
 
-	roomSession->relayPlaying<GCPvENpcInit>(npc.type, npcUid, npc.position.x, npc.position.y, npc.position.z);
+	roomSession->relayPlaying<GCPvENpcInit>(npc.getType(), npc.getUid(), npc.getPosition());
 
-	m_npcs[npcUid] = npc;
-	return npcUid;
+	m_npcs[npc.getUid()] = npc;
+
+	return npc.getUid();
 }
 
 void RoomSessionNpcManager::killNpcByUid(const uint32_t uid)
@@ -52,7 +50,7 @@ void RoomSessionNpcManager::killNpcByUid(const uint32_t uid)
 	m_npcs.erase(uid);
 }
 
-RoomSessionNpcManager::Npc* RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
+PveNpc* RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
 {
 	const auto it = m_npcs.find(uid);
 
@@ -64,15 +62,15 @@ RoomSessionNpcManager::Npc* RoomSessionNpcManager::findNpcByUid(const uint32_t u
 	return &it->second;
 }
 
-void RoomSessionNpcManager::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
+void RoomSessionNpcManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const
 {
-	for (auto& npc : m_npcs)
+	for (const auto& npc : m_npcs)
 	{
-		session->send<GCPvENpcInit>(npc.second.type, npc.first, npc.second.position.x, npc.second.position.y, npc.second.position.z);
+		session->send<GCPvENpcInit>(npc.second.getType(), npc.second.getUid(), npc.second.getPosition());
 	}
 }
 
-void RoomSessionNpcManager::tick(std::shared_ptr<RoomSession> roomSession)
+void RoomSessionNpcManager::tick(const std::shared_ptr<RoomSession>& roomSession) const
 {
 
 }
