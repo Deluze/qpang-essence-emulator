@@ -27,6 +27,7 @@ class PveNpc final
 {
 public:
 	PveNpc() = default;
+
 	PveNpc(eNpcType type, const Position& position);
 
 	~PveNpc() = default;

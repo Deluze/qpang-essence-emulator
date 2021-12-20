@@ -18,6 +18,11 @@ public:
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
 	/**
+	 * \brief Temporary function for spawning initial npcs.
+	 */
+	void spawnInitialNpcs();
+
+	/**
 	 * \brief Spawns in an npc.
 	 * \param npc The npc you want to spawn in.
 	 * \returns The uid of the spawned in npc.

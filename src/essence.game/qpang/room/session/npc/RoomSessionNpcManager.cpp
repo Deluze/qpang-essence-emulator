@@ -11,6 +11,25 @@
 void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
+
+	spawnInitialNpcs();
+}
+
+void RoomSessionNpcManager::spawnInitialNpcs()
+{
+	// Stage 1.
+	const std::vector npcs
+	{
+		PveNpc(eNpcType::VIOLENT_RABBIT, Position{23.8f, 0.02f, -36.36f}),
+		PveNpc(eNpcType::VIOLENT_RABBIT, Position{18.69f, 0.02f, -36.36f}),
+		PveNpc(eNpcType::VIOLENT_RABBIT, Position{18.69f, 0.02f, -33.85f}),
+		PveNpc(eNpcType::VIOLENT_RABBIT, Position{22.57f, 0.02f, -33.22f}),
+	};
+
+	for (const auto& npc : npcs)
+	{
+		spawnNpc(npc);
+	}
 }
 
 uint32_t RoomSessionNpcManager::spawnNpc(PveNpc npc)
