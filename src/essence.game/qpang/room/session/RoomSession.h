@@ -8,6 +8,7 @@
 
 #include "ConfigManager.h"
 #include "RoomSessionNpcManager.h"
+#include "RoomSessionObjectManager.h"
 #include "RoomSessionPveItemManager.h"
 #include "RoomSessionPveRoundManager.h"
 
@@ -65,6 +66,7 @@ public:
 	RoomSessionSkillManager* getSkillManager();
 
 	RoomSessionNpcManager* getNpcManager();
+	RoomSessionObjectManager* getObjectManager();
 	RoomSessionPveItemManager* getPveItemManager();
 	RoomSessionPveRoundManager* getPveRoundManager();
 
@@ -216,6 +218,7 @@ private:
 	RoomSessionSkillManager m_skillManager;
 
 	RoomSessionNpcManager m_npcManager;
+	RoomSessionObjectManager m_objectManager;
 	RoomSessionPveItemManager m_pveItemManager;
 	RoomSessionPveRoundManager m_pveRoundManager;
 

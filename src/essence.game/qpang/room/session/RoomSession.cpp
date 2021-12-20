@@ -55,6 +55,7 @@ void RoomSession::initialize()
 	if (m_room->getMode() == GameMode::Mode::PVE)
 	{
 		m_npcManager.initialize(shared_from_this());
+		m_objectManager.initialize(shared_from_this());
 		m_pveItemManager.initialize(shared_from_this());
 		m_pveRoundManager.initialize(shared_from_this());
 	}
@@ -998,6 +999,11 @@ RoomSessionSkillManager* RoomSession::getSkillManager()
 RoomSessionNpcManager* RoomSession::getNpcManager()
 {
 	return &m_npcManager;
+}
+
+RoomSessionObjectManager* RoomSession::getObjectManager()
+{
+	return &m_objectManager;
 }
 
 RoomSessionPveItemManager* RoomSession::getPveItemManager()
