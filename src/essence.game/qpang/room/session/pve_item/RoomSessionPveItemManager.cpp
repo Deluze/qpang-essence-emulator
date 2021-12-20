@@ -50,18 +50,11 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 		return;
 	}
 
-	/*const auto distance = AABBHelper::getDistanceBetweenPositions(roomSessionPlayer->getPosition(), item->position);
-
-	// TODO: Determine the best distance value.
-
-	if (distance > 5)
-	{
-		return;
-	}*/
-
 	// TODO: Increase player coin count based on coin type (if it even is a coin).
 
 	roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, playerId, item->id, itemUid, 0);
+
+	m_items.erase(itemUid);
 }
 
 RoomSessionPveItemManager::Item* RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
