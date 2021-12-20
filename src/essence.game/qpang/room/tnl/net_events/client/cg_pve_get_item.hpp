@@ -10,24 +10,51 @@ class CGPvEGetItem : public GameNetEvent
 public:
 	CGPvEGetItem() : GameNetEvent{ CG_PVE_GET_ITEM, GuaranteedOrdered, DirClientToServer} {}
 
-	U32 unk_01; // 88
+	U32 playerId; // 88
 	U32 itemUid; // 92
 
 	void pack(EventConnection* conn, BitStream* bstream) {}
 
 	void unpack(EventConnection* conn, BitStream* bstream) 
 	{
-		bstream->read(&unk_01);
+		bstream->read(&playerId);
 		bstream->read(&itemUid);
 	}
 
-	void handle(GameConnection* conn, Player::Ptr player) override
+	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		std::cout << "CGPvEGetItem pickup item unk_01: " << unk_01 << ", ItemUid: " << itemUid << std::endl;
+		const auto roomPlayer = player->getRoomPlayer();
 
-		const auto roomSession = player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession();
+		if (roomPlayer == nullptr)
+		{
+			return;
+		}
 
-		roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, player->getId(), 1191182352, itemUid, 0);
+		if (roomPlayer->isSpectating())
+		{
+			return;
+		}
+
+		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
+
+		if (roomSessionPlayer == nullptr)
+		{
+			return;
+		}
+
+		if (roomSessionPlayer->isDead())
+		{
+			return;
+		}
+
+		const auto roomSession = roomSessionPlayer->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		roomSession->getPveItemManager()->onItemPickup(playerId, itemUid);
 	}
 
 	void process(EventConnection* ps) 
