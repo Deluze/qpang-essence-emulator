@@ -17,15 +17,16 @@ public:
 	U32 unk_08; // 112
 
 	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny } {}
-	GCPvENpcInit(const uint32_t npcType, const uint32_t npcUid, const float xPos, const float yPos, const float zPos)
-		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny }
-	{
-		this->npcType = npcType;
-		this->npcUid = npcUid;
 
-		this->xPos = xPos;
-		this->yPos = yPos;
-		this->zPos = zPos;
+	GCPvENpcInit(const uint32_t npcType, const uint32_t npcUid, const float xPos, const float yPos, const float zPos)
+		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny },
+		npcType(npcType),
+		npcUid(npcUid),
+		xPos(xPos),
+		yPos(yPos),
+		zPos(zPos)
+	{
+
 	}
 
 	void pack(EventConnection* conn, BitStream* bstream)
@@ -33,7 +34,7 @@ public:
 		bstream->write(npcType);
 		bstream->write(npcUid);
 		bstream->write(xPos);
-		bstream->write(3);
+		bstream->write(yPos);
 		bstream->write(zPos);
 		bstream->write(unk_06);
 		bstream->write(unk_07);
