@@ -6,6 +6,7 @@
 #include "Position.h"
 
 class RoomSession;
+class RoomSessionPlayer;
 
 class RoomSessionPveItemManager
 {
@@ -42,6 +43,10 @@ public:
 	 * \return The item if it was found otherwise null.
 	 */
 	Item* findItemByUid(uint32_t itemUid);
+
+	void onPlayerSync(std::shared_ptr<RoomSessionPlayer> session);
+
+	void tick();
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::map<uint32_t, Item> m_items;

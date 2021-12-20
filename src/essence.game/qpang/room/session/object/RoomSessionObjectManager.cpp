@@ -2,6 +2,7 @@
 
 #include "Position.h"
 #include "RoomSession.h"
+#include "RoomSessionPlayer.h"
 
 #include <vector>
 
@@ -22,6 +23,9 @@ uint32_t RoomSessionObjectManager::spawnObject(const Object object)
 	}
 
 	const auto objectUid = (m_objects.size() + 1);
+
+	roomSession->relayPlaying<GCPvEObjectInit>(object.type, objectUid, object.position.x, object.position.y, object.position.z, 0);
+
 	m_objects[objectUid] = object;
 	return objectUid;
 }
@@ -59,7 +63,21 @@ RoomSessionObjectManager::Object* RoomSessionObjectManager::findObjectByUid(cons
 	return &it->second;
 }
 
-std::unordered_map<uint32_t, RoomSessionObjectManager::Object> RoomSessionObjectManager::getObjects()
+void RoomSessionObjectManager::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 {
-	return m_objects;
+	for (auto& object : m_objects)
+	{
+		session->send<GCPvEObjectInit>(object.second.type, object.first, object.second.position.x, object.second.position.y, object.second.position.z, 0);
+	}
+}
+
+void RoomSessionObjectManager::tick()
+{
+	// TODO: Implement object logic somewhere here.
+	// BOARD NOTES:
+	// 1, from:
+	// { -13.64f, -0.5f, -22.64f }
+
+	// 1, to:
+	// { -1.4f, -0.5f, -22.64f }
 }

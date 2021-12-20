@@ -1,5 +1,7 @@
 #include "RoomSessionPveItemManager.h"
 
+#include "RoomSessionPlayer.h"
+
 #include "AABBHelper.h"
 #include "gc_game_item.hpp"
 #include "gc_pve_item_init.hpp"
@@ -23,7 +25,6 @@ uint32_t RoomSessionPveItemManager::spawnItem(const Item item)
 	roomSession->relayPlaying<GCPvEItemInit>(item.id, itemUid, item.position);
 
 	m_items[itemUid] = item;
-
 	return itemUid;
 }
 
@@ -73,4 +74,17 @@ RoomSessionPveItemManager::Item* RoomSessionPveItemManager::findItemByUid(const 
 	}
 
 	return &it->second;
+}
+
+void RoomSessionPveItemManager::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
+{
+	for (auto& item : m_items)
+	{
+		session->send<GCPvEItemInit>(item.second.id, item.first, item.second.position);
+	}
+}
+
+void RoomSessionPveItemManager::tick()
+{
+
 }

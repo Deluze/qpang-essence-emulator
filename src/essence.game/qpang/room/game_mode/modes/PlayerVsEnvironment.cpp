@@ -39,23 +39,18 @@ void PlayerVsEnvironment::onStart(std::shared_ptr<RoomSession> roomSession)
 void PlayerVsEnvironment::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
 {
 	// Send all spawned objects/npc/items
-	for (auto& object : session->getRoomSession()->getObjectManager()->getObjects())
-	{
-		session->send<GCPvEObjectInit>(object.second.type, object.first, object.second.position.x, object.second.position.y, object.second.position.z, 0);
-	}
+	session->getRoomSession()->getObjectManager()->onPlayerSync(session);
+	session->getRoomSession()->getNpcManager()->onPlayerSync(session);
+	session->getRoomSession()->getPveItemManager()->onPlayerSync(session);
 
 	GameMode::onPlayerSync(session);
 }
 
 void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 {
-	// TODO: Implement object logic somewhere here.
-	// BOARD NOTES:
-	// 1, from:
-	// { -13.64f, -0.5f, -22.64f }
-
-	// 1, to:
-	// { -1.4f, -0.5f, -22.64f }
+	roomSession->getObjectManager()->tick();
+	roomSession->getNpcManager()->tick();
+	roomSession->getPveItemManager()->tick();
 
 	GameMode::tick(roomSession);
 }

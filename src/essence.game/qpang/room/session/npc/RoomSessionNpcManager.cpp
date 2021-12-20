@@ -2,6 +2,7 @@
 
 #include "Position.h"
 #include "RoomSession.h"
+#include "RoomSessionPlayer.h"
 
 #include <vector>
 
@@ -29,7 +30,6 @@ uint32_t RoomSessionNpcManager::spawnNpc(const Npc npc)
 	roomSession->relayPlaying<GCPvENpcInit>(npc.type, npcUid, npc.position.x, npc.position.y, npc.position.z);
 
 	m_npcs[npcUid] = npc;
-
 	return npcUid;
 }
 
@@ -62,4 +62,17 @@ RoomSessionNpcManager::Npc* RoomSessionNpcManager::findNpcByUid(const uint32_t u
 	}
 
 	return &it->second;
+}
+
+void RoomSessionNpcManager::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
+{
+	for (auto& npc : m_npcs)
+	{
+		session->send<GCPvENpcInit>(npc.second.type, npc.first, npc.second.position.x, npc.second.position.y, npc.second.position.z);
+	}
+}
+
+void RoomSessionNpcManager::tick()
+{
+
 }

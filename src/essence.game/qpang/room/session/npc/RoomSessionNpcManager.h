@@ -6,6 +6,7 @@
 #include "Position.h"
 
 class RoomSession;
+class RoomSessionPlayer;
 
 class RoomSessionNpcManager
 {
@@ -42,6 +43,10 @@ public:
 	 * \return The found npc or null.
 	 */
 	Npc* findNpcByUid(uint32_t uid);
+
+	void onPlayerSync(std::shared_ptr<RoomSessionPlayer> session);
+
+	void tick();
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::map<uint32_t, Npc> m_npcs{};

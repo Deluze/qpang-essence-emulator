@@ -7,6 +7,7 @@
 #include "Position.h"
 
 class RoomSession;
+class RoomSessionPlayer;
 
 class RoomSessionObjectManager
 {
@@ -44,11 +45,9 @@ public:
 	 */
 	Object* findObjectByUid(uint32_t uid);
 
-	/**
-	 * \brief Gets the map of all objects.
-	 * \return The map of objects.
-	 */
-	std::unordered_map<uint32_t, Object> getObjects();
+	void onPlayerSync(std::shared_ptr<RoomSessionPlayer> session);
+
+	void tick();
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::unordered_map<uint32_t, Object> m_objects{};
