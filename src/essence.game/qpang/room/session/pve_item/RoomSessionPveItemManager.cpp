@@ -10,7 +10,7 @@ void RoomSessionPveItemManager::initialize(const std::shared_ptr<RoomSession>& r
 	m_roomSession = roomSession;
 }
 
-uint32_t RoomSessionPveItemManager::spawnItem(const Item item)
+uint32_t RoomSessionPveItemManager::spawnItem(PveItem item)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -19,13 +19,13 @@ uint32_t RoomSessionPveItemManager::spawnItem(const Item item)
 		return 0;
 	}
 
-	const auto itemUid = (m_items.size() + 1);
+	item.setUid((m_items.size() + 1));
 
-	roomSession->relayPlaying<GCPvEItemInit>(item.id, itemUid, item.position);
+	roomSession->relayPlaying<GCPvEItemInit>(item.getType(), item.getUid(), item.getPosition());
 
-	m_items[itemUid] = item;
+	m_items[item.getUid()] = item;
 
-	return itemUid;
+	return item.getUid();
 }
 
 void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint32_t itemUid)
@@ -52,12 +52,12 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 
 	// TODO: Increase player coin count based on coin type (if it even is a coin).
 
-	roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, playerId, item->id, itemUid, 0);
+	roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, playerId, static_cast<U32>(item->getType()), itemUid, 0);
 
 	m_items.erase(itemUid);
 }
 
-RoomSessionPveItemManager::Item* RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
+PveItem* RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
 {
 	const auto it = m_items.find(itemUid);
 
@@ -73,7 +73,7 @@ void RoomSessionPveItemManager::onPlayerSync(const std::shared_ptr<RoomSessionPl
 {
 	for (const auto& item : m_items)
 	{
-		session->send<GCPvEItemInit>(item.second.id, item.first, item.second.position);
+		session->send<GCPvEItemInit>(item.second.getType(), item.first, item.second.getPosition());
 	}
 }
 

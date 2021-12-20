@@ -3,7 +3,7 @@
 #include <memory>
 #include <map>
 
-#include "Position.h"
+#include "PveItem.h"
 
 class RoomSession;
 class RoomSessionPlayer;
@@ -11,12 +11,6 @@ class RoomSessionPlayer;
 class RoomSessionPveItemManager
 {
 public:
-	struct Item
-	{
-		uint32_t id;
-		Position position;
-	};
-
 	/**
 	 * \brief Initializes the pve item manager with the room session.
 	 * \param roomSession The given room session.
@@ -28,7 +22,7 @@ public:
 	 * \param item The item you want to spawn in.
 	 * \returns The uid of the spawned in item.
 	 */
-	uint32_t spawnItem(Item item);
+	uint32_t spawnItem(PveItem item);
 
 	/**
 	 * \brief Handles the CGPveGetItem event (item pickup).
@@ -42,12 +36,12 @@ public:
 	 * \param itemUid The uid of the item you are looking for.
 	 * \return The item if it was found otherwise null.
 	 */
-	Item* findItemByUid(uint32_t itemUid);
+	PveItem* findItemByUid(uint32_t itemUid);
 
 	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const;
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession) const;
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
-	std::map<uint32_t, Item> m_items;
+	std::map<uint32_t, PveItem> m_items;
 };
