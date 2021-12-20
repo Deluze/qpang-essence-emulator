@@ -49,14 +49,14 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 		return;
 	}
 
-	const auto distance = AABBHelper::getDistanceBetweenPositions(roomSessionPlayer->getPosition(), item->position);
+	/*const auto distance = AABBHelper::getDistanceBetweenPositions(roomSessionPlayer->getPosition(), item->position);
 
 	// TODO: Determine the best distance value.
 
 	if (distance > 5)
 	{
 		return;
-	}
+	}*/
 
 	// TODO: Increase player coin count based on coin type (if it even is a coin).
 
