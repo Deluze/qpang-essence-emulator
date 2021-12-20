@@ -3,6 +3,8 @@
 #include "Room.h"
 #include "RoomSession.h"
 
+#include "RedBoardObject.h"
+
 #include <qpang/room/tnl/net_events/server/gc_pve_object_init.hpp>
 #include <qpang/room/tnl/net_events/server/gc_pve_object_move.hpp>
 
@@ -31,7 +33,7 @@ void PlayerVsEnvironment::onApply(std::shared_ptr<Room> room)
 void PlayerVsEnvironment::onStart(std::shared_ptr<RoomSession> roomSession)
 {
 	// 1st red board
-	roomSession->getObjectManager()->spawnObject({ 3, { -13.64f, -0.5f, -22.64f } });
+	roomSession->getObjectManager()->spawnObject(std::make_unique<RedBoardObject>(eRedBoardActionId::STAGE0_PIT1_BOARD1, Position { -13.64f, -0.5f, -22.64f }));
 
 	GameMode::onStart(roomSession);
 }
@@ -46,11 +48,11 @@ void PlayerVsEnvironment::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessio
 	GameMode::onPlayerSync(session);
 }
 
-void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
+void PlayerVsEnvironment::tick(std::shared_ptr<RoomSession> roomSession)
 {
-	roomSession->getObjectManager()->tick();
-	roomSession->getNpcManager()->tick();
-	roomSession->getPveItemManager()->tick();
+	roomSession->getObjectManager()->tick(roomSession);
+	roomSession->getNpcManager()->tick(roomSession);
+	roomSession->getPveItemManager()->tick(roomSession);
 
 	GameMode::tick(roomSession);
 }
