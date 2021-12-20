@@ -7,14 +7,19 @@ class GCPvEDestroyObject : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvEDestroyObject() : GameNetEvent{ GC_PVE_DESTROY_OBJECT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {};
+	U32 objectUid;
 
-	U32 playerId;
-
+	GCPvEDestroyObject() : GameNetEvent{ GC_PVE_DESTROY_OBJECT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient } {};
+	GCPvEDestroyObject(U32 objectUid) : GameNetEvent{ GC_PVE_DESTROY_OBJECT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient }
+	{
+		this->objectUid = objectUid;
+	}
+	
 	void pack(EventConnection* conn, BitStream* bstream) 
 	{
-		bstream->write(playerId);
+		bstream->write(objectUid);
 	};
+
 	void unpack(EventConnection* conn, BitStream* bstream) {};
 	void process(EventConnection* ps) {};
 
