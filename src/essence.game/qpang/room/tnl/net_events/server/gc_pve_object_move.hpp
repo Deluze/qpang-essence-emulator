@@ -12,17 +12,17 @@ public:
 	F32 positionX;
 	F32 positionY;
 	F32 positionZ;
-	U32 unk_01;
+	U32 durationMs;
 
 	GCPvEObjectMove() : GameNetEvent{ GC_PVE_OBJECT_MOVE, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient } {};
 
-	GCPvEObjectMove(U32 objectUid, F32 positionX, F32 positionY, F32 positionZ, U32 speed) : GameNetEvent{ GC_PVE_OBJECT_MOVE, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient }
+	GCPvEObjectMove(U32 objectUid, F32 positionX, F32 positionY, F32 positionZ, U32 durationMs) : GameNetEvent{ GC_PVE_OBJECT_MOVE, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient }
 	{
 		this->objectUid = objectUid;
 		this->positionX = positionX;
 		this->positionY = positionY;
 		this->positionZ = positionZ;
-		this->unk_01 = speed;
+		this->durationMs = durationMs;
 	};
 
 	void pack(EventConnection* conn, BitStream* bstream) 
@@ -31,7 +31,7 @@ public:
 		bstream->write(positionX);
 		bstream->write(positionY);
 		bstream->write(positionZ);
-		bstream->write(unk_01);
+		bstream->write(durationMs);
 	};
 
 	void unpack(EventConnection* conn, BitStream* bstream) {};
