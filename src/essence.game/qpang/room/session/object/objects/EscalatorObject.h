@@ -2,7 +2,7 @@
 
 #include "PveObject.h"
 
-enum class eRedBoardActionId {
+enum class eEscalatorActionId {
 	STAGE0_PIT1_ESCALATOR1,
 	STAGE0_PIT2_ESCALATOR1
 };
@@ -10,9 +10,9 @@ enum class eRedBoardActionId {
 class EscalatorObject : public PveObject
 {
 public:
-	EscalatorObject(eRedBoardActionId actionId, const Position& position);
+	EscalatorObject(eEscalatorActionId actionId, const Position& position);
 
 	void tick(std::shared_ptr<RoomSession> roomSession) override;
 private:
-	eRedBoardActionId m_actionId;
+	eEscalatorActionId m_actionId;
 };

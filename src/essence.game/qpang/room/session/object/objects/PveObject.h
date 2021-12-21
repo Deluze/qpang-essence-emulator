@@ -4,8 +4,8 @@
 #include "Position.h"
 
 enum class eObjectType : uint32_t {
-	GATE = 1,
-	DOOR = 2,
+	SMALL_GATE = 1,
+	BIG_GATE = 2,
 	MOVING_ESCALATOR = 3,
 	STATIC_ESCALATOR = 4,
 	SWITCH = 5,

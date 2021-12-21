@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <qpang/room/session/object/PveObject.h>
+#include <qpang/room/session/object/objects/PveObject.h>
 
 class RoomSession;
 class RoomSessionPlayer;
