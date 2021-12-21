@@ -2,6 +2,7 @@
 #define CG_PVE_HIT_NPC_H
 
 #include "GameNetEvent.h"
+#include "gc_pve_hit_npc.hpp"
 
 class CGPvEHitNpc : public GameNetEvent
 {
@@ -27,7 +28,7 @@ public:
 	F32 impactOffsetPosZ; // 136
 	U32 unk_10; // 92
 	U8 unk_11; // 148 
-	U8 bodyPartId; // 149 # differs per npc
+	U8 bodyPartId; // 149 differs per npc
 	U32 weaponItemId; // 96
 	U64 weaponCardId; // 108 104
 	U8 weaponType; // 112
@@ -98,6 +99,16 @@ public:
 		std::cout << "unk_18: " << (int)unk_18 << std::endl;
 		std::cout << "unk_19: " << (int)unk_19 << std::endl;
 		std::cout << "============================================" << std::endl;
+
+		const auto roomSession = player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession();
+
+		constexpr auto damage = 1;
+		constexpr auto hasNpcDied = 1; // true
+
+		roomSession->relayPlaying<GCPvEHitNpc>(playerId, targetNpcUid, unk_03, 
+			impactPosX, impactPosY, impactPosZ, impactOffsetPosX, impactOffsetPosY, impactPosZ,
+			unk_10, unk_11, bodyPartId, weaponItemId, weaponCardId, weaponType, hitLocation, 
+			unk_18, unk_19, damage, hasNpcDied, 0);
 	}
 
 	void process(EventConnection* ps) override
