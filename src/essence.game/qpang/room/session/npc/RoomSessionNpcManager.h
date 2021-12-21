@@ -36,7 +36,7 @@ public:
 	 * \brief Kills the npc.
 	 * \param uid The uid of the npc to de-spawn.
 	 */
-	void killNpcByUid(uint32_t uid);
+	void killNpc(uint32_t uid);
 
 	/**
 	 * \brief Looks up the npc by uid.
@@ -46,10 +46,16 @@ public:
 	std::shared_ptr<PveNpc> findNpcByUid(uint32_t uid);
 
 	/**
+	 * \brief Retrieves all alive npcs.
+	 * \return A vector containing all alive npcs.
+	 */
+	std::vector<std::shared_ptr<PveNpc>> getAliveNpcs();
+
+	/**
 	 * \brief Handles npc synchronization upon joining a match.
 	 * \param session The player in session.
 	 */
-	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const;
+	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session);
 
 	/**
 	 * \brief Handles the onCGPvEHitNpc which occurs when a player hits/damages an npc.
