@@ -12,7 +12,7 @@ public:
 	F32 xPos; // 96
 	F32 yPos; // 100
 	F32 zPos; // 104
-	U16 unk_06;  // 108
+	U16 unk_06 = 1;  // 108
 	U8 unk_07; // 110
 	U32 unk_08; // 112
 
