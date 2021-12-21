@@ -9,6 +9,7 @@ class CGPvEEventObject : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 	U32 objectUid;
+	bool flag;
 
 	CGPvEEventObject() : GameNetEvent { CG_PVE_EVENT_OBJECT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer } {};
 
@@ -17,6 +18,7 @@ public:
 	void unpack(EventConnection* conn, BitStream* bstream) 
 	{
 		bstream->read(&objectUid);
+		flag = bstream->readFlag();
 	};
 
 	void handle(GameConnection* conn, const Player::Ptr player) override
@@ -52,11 +54,11 @@ public:
 			return;
 		}
 
-		auto objectPtr = roomSession->getObjectManager()->findObjectByUid(objectUid);
-		if (objectPtr)
+		//auto objectPtr = roomSession->getObjectManager()->findObjectByUid(objectUid);
+		//if (objectPtr)
 		{
-			objectPtr->onEvent(roomSession);
-			roomSession->relayPlaying<GCPvEEventObject>(2);
+			//objectPtr->onEvent(roomSession);
+			roomSession->relayPlaying<GCPvEEventObject>(objectUid, flag);
 		}
 	}
 
