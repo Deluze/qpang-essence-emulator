@@ -30,6 +30,9 @@ public:
 	Position getPosition();
 
 protected:
+	void move(std::shared_ptr<RoomSession> roomSession, const Position& from, const Position& to, int ticks);
+
+	int m_moveTickCount;
 	uint32_t m_uid{};
 	eObjectType m_type;
 	Position m_position{};

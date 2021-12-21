@@ -14,8 +14,5 @@ public:
 
 	void tick(std::shared_ptr<RoomSession> roomSession) override;
 private:
-	void move(std::shared_ptr<RoomSession> roomSession, const Position& from, const Position& to, int ticks);
-
 	eRedBoardActionId m_actionId;
-	int m_tickCount = 0;
 };
