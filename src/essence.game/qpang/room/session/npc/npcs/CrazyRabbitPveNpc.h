@@ -5,5 +5,5 @@
 class CrazyRabbitPveNpc : public PveNpc
 {
 public:
-	CrazyRabbitPveNpc(Position position, uint16_t baseHealth);
+	CrazyRabbitPveNpc(eNpcType type, Position position, uint16_t baseHealth);
 };

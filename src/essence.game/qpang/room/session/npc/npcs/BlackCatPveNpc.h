@@ -5,5 +5,5 @@
 class BlackCatPveNpc : public PveNpc
 {
 public:
-	BlackCatPveNpc(Position position, uint16_t baseHealth);
+	BlackCatPveNpc(eNpcType type, Position position, uint16_t baseHealth);
 };
