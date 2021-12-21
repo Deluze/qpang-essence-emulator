@@ -13,7 +13,7 @@ class CGRoom : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 
-	CGRoom() : GameNetEvent{ CG_ROOM, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer }
+	CGRoom() : GameNetEvent{ CG_ROOM, GuaranteedOrdered, DirClientToServer }
 	{
 		titleBuffer = new ByteBuffer();
 	};
@@ -56,15 +56,15 @@ public:
 		//std::cout << "CGRoom::unpack >> _160: " << (int)_160 << ", _161: " << (int)_161 << ", _162: " << (int)_162 << ", _163: " << (int)_163 << std::endl;
 	};
 
-	void handle(GameConnection* conn, Player::Ptr player)
+	void handle(GameConnection* conn, const Player::Ptr player)
 	{
-		std::u16string title = byteBufferToString(titleBuffer, 30);
+		const std::u16string title = byteBufferToString(titleBuffer, 30);
 
 		delete titleBuffer;
 
-		if (cmd == Command::CREATE_ROOM || cmd == Command::CREATE_EVENT_ROOM)
+		if (cmd == CREATE_ROOM || cmd == CREATE_EVENT_ROOM)
 		{
-			if (cmd == Command::CREATE_EVENT_ROOM && player->getRank() != 3)
+			if (cmd == CREATE_EVENT_ROOM && player->getRank() != 3)
 			{
 				return conn->disconnect("Cannot create event room");
 			}
@@ -95,10 +95,10 @@ public:
 
 			const auto room = Game::instance()->getRoomManager()->create(title, static_cast<uint8_t>(map), mode);
 
-			room->setEventRoom(cmd == Command::CREATE_EVENT_ROOM);
+			room->setEventRoom(cmd == CREATE_EVENT_ROOM);
 			room->addPlayer(conn);
 		}
-		else if (cmd == Command::JOIN_ROOM)
+		else if (cmd == JOIN_ROOM)
 		{
 			const auto room = Game::instance()->getRoomManager()->get(roomId);
 
@@ -156,12 +156,15 @@ public:
 
 			switch (cmd)
 			{
-			case Command::MAP_ROOM:
+			case MAP_ROOM:
 			{
-				room->setMap(value);
+				if (mode != GameMode::Mode::PVE)
+				{
+					room->setMap(value);
+				}
 			}
 			break;
-			case Command::MODE_ROOM:
+			case MODE_ROOM:
 			{
 				const auto isValidMode =
 					mode == GameMode::Mode::DM ||
@@ -173,7 +176,7 @@ public:
 
 				if (!isValidMode)
 				{
-					conn->postNetEvent(new GCRoom(player->getId(), Command::MODE_ROOM, room));
+					conn->postNetEvent(new GCRoom(player->getId(), MODE_ROOM, room));
 
 					player->broadcast(u"Sorry, but this game mode has not been implemented yet");
 
@@ -194,7 +197,7 @@ public:
 				}
 			}
 			break;
-			case Command::SET_POINTS:
+			case SET_POINTS:
 			{
 				if (value == 10 || value == 15 || value == 20 || value == 25 || value == 30 || value == 35 || value == 40)
 				{
@@ -203,7 +206,7 @@ public:
 				}
 			}
 			break;
-			case Command::SET_TIME:
+			case SET_TIME:
 			{
 				if (value == 5 || value == 10 || value == 15 || value == 20)
 				{
@@ -212,7 +215,7 @@ public:
 				}
 			}
 			break;
-			case Command::PLAYERS_ROOM:
+			case PLAYERS_ROOM:
 			{
 				if (value == 4 || value == 8 || value == 12 || value == 16)
 				{
@@ -220,23 +223,23 @@ public:
 				}
 			}
 			break;
-			case Command::PASS_ROOM:
+			case PASS_ROOM:
 			{
 				room->setPassword(password);
 			}
 			break;
-			case Command::LEVEL_ROOM:
+			case LEVEL_ROOM:
 			{
 				room->setLevelLimited(value);
 			}
 			break;
-			case Command::TOGGLE_MELEE:
+			case TOGGLE_MELEE:
 			{
 				room->setMeleeOnly(value);
 				room->setSkillsEnabled(false);
 			}
 			break;
-			case Command::TOGGLE_SKILL:
+			case TOGGLE_SKILL:
 			{
 				if (room->getMode() == GameMode::PREY)
 				{
@@ -250,7 +253,7 @@ public:
 				break;
 			}
 			break;
-			case Command::TEAM_ROOM:
+			case TEAM_ROOM:
 			{
 				room->setTeamSorting(value);
 			}
@@ -286,7 +289,7 @@ public:
 	};
 
 	U32 playerId = 0; //92
-	U32 cmd = Command::CREATE_ROOM; //96
+	U32 cmd = CREATE_ROOM; //96
 
 	union {
 		U32 value = 0; //100

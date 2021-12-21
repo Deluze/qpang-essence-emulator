@@ -41,6 +41,6 @@ public:
 
 		const auto npcUidToDespawn = convertToInteger(args.at(0));
 
-		roomSession->getNpcManager()->killNpcByUid(npcUidToDespawn);
+		roomSession->getNpcManager()->killNpc(npcUidToDespawn);
 	}
 };

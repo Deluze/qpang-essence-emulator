@@ -8,25 +8,24 @@ class GCPvEMoveNpc : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 	U32 npcUid;
-	U16 unk_02;
-	U16 unk_03;
+	U16 xCoord;
+	U16 zCoord;
 
 	GCPvEMoveNpc() : GameNetEvent{ GC_PVE_MOVE_NPC, GuaranteedOrdered, DirServerToClient } {}
 
-	GCPvEMoveNpc(const uint32_t npcUid, const uint16_t unk_02, const uint16_t unk_03)
+	GCPvEMoveNpc(const uint32_t npcUid, const uint16_t xCoord, const uint16_t zCoord)
 		: GameNetEvent{ GC_PVE_MOVE_NPC, GuaranteedOrdered, DirServerToClient },
 		npcUid(npcUid),
-		unk_02(unk_02),
-		unk_03(unk_03)
+		xCoord(xCoord),
+		zCoord(zCoord)
 	{
 	}
 
 	void pack(EventConnection* conn, BitStream* bstream)
 	{
 		bstream->write(npcUid);
-
-		bstream->write(unk_02);
-		bstream->write(unk_03);
+		bstream->write(xCoord);
+		bstream->write(zCoord);
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) {}

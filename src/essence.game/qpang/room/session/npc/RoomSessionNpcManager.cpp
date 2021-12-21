@@ -1,15 +1,13 @@
 #include "RoomSessionNpcManager.h"
 
 #include "GCPvEHitNpcData.h"
-#include "RoomSession.h"
-#include "RoomSessionPlayer.h"
-
 #include "gc_pve_die_npc.hpp"
 #include "gc_pve_hit_npc.hpp"
 #include "gc_pve_npc_init.hpp"
-
+#include "PatternedCatPveNpc.h"
 #include "PveNpc.h"
-#include "ViolentRabbitPveNpc.h"
+#include "RoomSession.h"
+#include "RoomSessionPlayer.h"
 
 void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -28,10 +26,7 @@ void RoomSessionNpcManager::spawnInitialNpcs()
 	// Stage 1.
 	const std::vector<std::shared_ptr<PveNpc>> npcs
 	{
-		std::make_shared<ViolentRabbitPveNpc>(Position{23.8f, 0.02f, -36.36f}, 80),
-		std::make_shared<ViolentRabbitPveNpc>(Position{18.69f, 0.02f, -36.36f}, 140),
-		std::make_shared<ViolentRabbitPveNpc>(Position{18.69f, 0.02f, -33.85f}, 160),
-		std::make_shared<ViolentRabbitPveNpc>(Position{22.57f, 0.02f, -33.22f}, 200),
+		std::make_shared<PatternedCatPveNpc>(eNpcType::EASY_PATTERNED_CAT, Position{12.00f, 5.00f, -30.00}, 100),
 	};
 
 	for (auto& npc : npcs)
@@ -60,7 +55,7 @@ uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 	return npcUid;
 }
 
-void RoomSessionNpcManager::killNpcByUid(const uint32_t uid)
+void RoomSessionNpcManager::killNpc(const uint32_t uid)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -89,16 +84,28 @@ std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
 	return it->second;
 }
 
+std::vector<std::shared_ptr<PveNpc>> RoomSessionNpcManager::getAliveNpcs()
+{
+	std::vector<std::shared_ptr<PveNpc>> aliveNpcs{};
+
+	for (const auto& [id, npc] : m_npcs)
+	{
+		if (!npc->isDead())
+		{
+			aliveNpcs.push_back(npc);
+		}
+	}
+
+	return aliveNpcs;
+}
+
 #pragma region Event handlers
 
-void RoomSessionNpcManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const
+void RoomSessionNpcManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session)
 {
-	for (const auto& npc : m_npcs)
+	for (const auto& npc : getAliveNpcs())
 	{
-		if (!npc.second->isDead())
-		{
-			session->send<GCPvENpcInit>(npc.second->getType(), npc.second->getUid(), npc.second->getPosition());
-		}
+		session->send<GCPvENpcInit>(npc->getType(), npc->getUid(), npc->getPosition());
 	}
 }
 
@@ -119,7 +126,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 
 	if (hasTargetDied)
 	{
-		killNpcByUid(targetNpcUid);
+		killNpc(targetNpcUid);
 	}
 
 	const auto gcPvEHitNpcData = GCPvEHitNpcData

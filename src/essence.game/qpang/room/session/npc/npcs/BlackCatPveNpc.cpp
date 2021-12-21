@@ -1,6 +1,6 @@
 #include "BlackCatPveNpc.h"
 
-BlackCatPveNpc::BlackCatPveNpc(const Position position, const uint16_t baseHealth)
-	: PveNpc(eNpcType::BLACK_CAT, position, baseHealth)
+BlackCatPveNpc::BlackCatPveNpc(const eNpcType type, const Position position, const uint16_t baseHealth)
+	: PveNpc(type, position, baseHealth)
 {
 }

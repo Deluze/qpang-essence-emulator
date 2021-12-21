@@ -5,5 +5,5 @@
 class BrokenUfoPveNpc : public PveNpc
 {
 public:
-	BrokenUfoPveNpc(Position position, uint16_t baseHealth);
+	BrokenUfoPveNpc(eNpcType type, Position position, uint16_t baseHealth);
 };

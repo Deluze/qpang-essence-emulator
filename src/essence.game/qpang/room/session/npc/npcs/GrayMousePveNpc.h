@@ -5,5 +5,5 @@
 class GrayMousePveNpc : public PveNpc
 {
 public:
-	GrayMousePveNpc(Position position, uint16_t baseHealth);
+	GrayMousePveNpc(eNpcType type, Position position, uint16_t baseHealth);
 };
