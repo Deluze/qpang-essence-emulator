@@ -2,6 +2,7 @@
 #define GC_PVE_HIT_NPC_HPP
 
 #include "GameNetEvent.h"
+#include "GCPvEHitNpcData.h"
 
 class GCPvEHitNpc : public GameNetEvent
 {
@@ -31,34 +32,30 @@ public:
 
 	GCPvEHitNpc() : GameNetEvent{ GC_PVE_HIT_NPC, GuaranteedOrdered, DirServerToClient } {}
 
-	GCPvEHitNpc(
-		const uint32_t playerId, const uint32_t targetNpcUid, const uint32_t unk_03,
-		const float impactPosX, const float impactPosY, const float impactPosZ, const float impactOffsetPosX, const float impactOffsetPosY, const float impactOffsetPosZ,
-		const uint32_t unk_10, const uint8_t unk_11, const uint8_t bodyPartId, const uint32_t weaponItemId, const uint64_t weaponCardId, const uint8_t weaponType, const uint8_t hitLocation,
-		const uint8_t unk_17, const uint32_t unk_18, const uint16_t damageDealt, const uint8_t hasTargetDied, const uint32_t unk_21)
-		: GameNetEvent{ GC_PVE_HIT_NPC, GuaranteedOrdered, DirServerToClient },
-		playerId(playerId),
-		targetNpcUid(targetNpcUid),
-		unk_03(unk_03),
-		impactPosX(impactPosX),
-		impactPosY(impactPosY),
-		impactPosZ(impactPosZ),
-		impactOffsetPosX(impactOffsetPosX),
-		impactOffsetPosY(impactOffsetPosY),
-		impactOffsetPosZ(impactOffsetPosZ),
-		unk_10(unk_10),
-		unk_11(unk_11),
-		bodyPartId(bodyPartId),
-		weaponItemId(weaponItemId),
-		weaponCardId(weaponCardId),
-		weaponType(weaponType),
-		hitLocation(hitLocation),
-		unk_17(unk_17),
-		unk_18(unk_18),
-		damageDealt(damageDealt),
-		hasTargetDied(hasTargetDied),
-		unk_21(unk_21)
+	GCPvEHitNpc(GCPvEHitNpcData data) : GameNetEvent{ GC_PVE_HIT_NPC, GuaranteedOrdered, DirServerToClient },
+		playerId(data.playerId),
+		targetNpcUid(data.targetNpcUid),
+		unk_03(data.unk_03),
+		impactPosX(data.impactPos.x),
+		impactPosY(data.impactPos.y),
+		impactPosZ(data.impactPos.z),
+		impactOffsetPosX(data.impactPosOffset.x),
+		impactOffsetPosY(data.impactPosOffset.y),
+		impactOffsetPosZ(data.impactPosOffset.z),
+		unk_10(data.unk_10),
+		unk_11(data.unk_11),
+		bodyPartId(data.bodyPartId),
+		weaponItemId(data.weaponItemId),
+		weaponCardId(data.weaponCardId),
+		weaponType(static_cast<uint8_t>(data.weaponType)),
+		hitLocation(static_cast<uint8_t>(data.hitLocation)),
+		unk_17(data.unk_17),
+		unk_18(data.unk_18),
+		damageDealt(data.damageDealt),
+		hasTargetDied(static_cast<uint8_t>(data.hasTargetDied)),
+		unk_21(data.unk_21)
 	{
+
 	}
 
 	void pack(EventConnection* conn, BitStream* bstream) override

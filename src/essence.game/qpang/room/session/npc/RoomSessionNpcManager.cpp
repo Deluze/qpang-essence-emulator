@@ -1,12 +1,15 @@
 #include "RoomSessionNpcManager.h"
 
+#include "GCPvEHitNpcData.h"
 #include "RoomSession.h"
 #include "RoomSessionPlayer.h"
 
 #include "gc_pve_die_npc.hpp"
+#include "gc_pve_hit_npc.hpp"
 #include "gc_pve_npc_init.hpp"
 
 #include "PveNpc.h"
+#include "ViolentRabbitPveNpc.h"
 
 void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -15,24 +18,29 @@ void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomS
 	spawnInitialNpcs();
 }
 
+void RoomSessionNpcManager::tick(const std::shared_ptr<RoomSession>& roomSession) const
+{
+
+}
+
 void RoomSessionNpcManager::spawnInitialNpcs()
 {
 	// Stage 1.
-	const std::vector npcs
+	const std::vector<std::shared_ptr<PveNpc>> npcs
 	{
-		PveNpc(eNpcType::VIOLENT_RABBIT, Position{23.8f, 0.02f, -36.36f}),
-		PveNpc(eNpcType::NASTY_RABBIT, Position{18.69f, 0.02f, -36.36f}),
-		PveNpc(eNpcType::CRAZY_RABBIT, Position{18.69f, 0.02f, -33.85f}),
-		PveNpc(eNpcType::BLACK_CAT, Position{22.57f, 0.02f, -33.22f}),
+		std::make_shared<ViolentRabbitPveNpc>(Position{23.8f, 0.02f, -36.36f}, 80),
+		std::make_shared<ViolentRabbitPveNpc>(Position{18.69f, 0.02f, -36.36f}, 140),
+		std::make_shared<ViolentRabbitPveNpc>(Position{18.69f, 0.02f, -33.85f}, 160),
+		std::make_shared<ViolentRabbitPveNpc>(Position{22.57f, 0.02f, -33.22f}, 200),
 	};
 
-	for (const auto& npc : npcs)
+	for (auto& npc : npcs)
 	{
 		spawnNpc(npc);
 	}
 }
 
-uint32_t RoomSessionNpcManager::spawnNpc(PveNpc npc)
+uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -41,13 +49,15 @@ uint32_t RoomSessionNpcManager::spawnNpc(PveNpc npc)
 		return 0;
 	}
 
-	npc.setUid(m_npcs.size() + 1);
+	const auto npcUid = (m_npcs.size() + 1);
 
-	roomSession->relayPlaying<GCPvENpcInit>(npc.getType(), npc.getUid(), npc.getPosition());
+	npc->setUid(npcUid);
 
-	m_npcs[npc.getUid()] = npc;
+	roomSession->relayPlaying<GCPvENpcInit>(npc->getType(), npcUid, npc->getPosition());
 
-	return npc.getUid();
+	m_npcs[npcUid] = npc;
+
+	return npcUid;
 }
 
 void RoomSessionNpcManager::killNpcByUid(const uint32_t uid)
@@ -65,31 +75,75 @@ void RoomSessionNpcManager::killNpcByUid(const uint32_t uid)
 	}
 
 	roomSession->relayPlaying<GCPvEDieNpc>(uid);
-
-	m_npcs.erase(uid);
 }
 
-PveNpc* RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
+std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
 {
-	const auto it = m_npcs.find(uid);
+	const auto& it = m_npcs.find(uid);
 
 	if (it == m_npcs.end())
 	{
 		return nullptr;
 	}
 
-	return &it->second;
+	return it->second;
 }
+
+#pragma region Event handlers
 
 void RoomSessionNpcManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const
 {
 	for (const auto& npc : m_npcs)
 	{
-		session->send<GCPvENpcInit>(npc.second.getType(), npc.second.getUid(), npc.second.getPosition());
+		if (!npc.second->isDead())
+		{
+			session->send<GCPvENpcInit>(npc.second->getType(), npc.second->getUid(), npc.second->getPosition());
+		}
 	}
 }
 
-void RoomSessionNpcManager::tick(const std::shared_ptr<RoomSession>& roomSession) const
+void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 {
+	const auto roomSession = m_roomSession.lock();
 
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	const auto playerId = data.roomSessionPlayer->getPlayer()->getId();
+	const auto targetNpcUid = data.targetNpc->getUid();
+
+	const auto damageDealt = data.targetNpc->takeDamage(data.weaponUsed.damage);
+	const auto hasTargetDied = data.targetNpc->isDead();
+
+	if (hasTargetDied)
+	{
+		killNpcByUid(targetNpcUid);
+	}
+
+	const auto gcPvEHitNpcData = GCPvEHitNpcData
+	{
+		playerId,
+		targetNpcUid,
+		data.unk_03,
+		data.impactPos,
+		data.impactPosOffset,
+		data.unk_10,
+		data.unk_11,
+		data.bodyPartId,
+		data.weaponUsed.itemId,
+		data.weaponCardId,
+		data.weaponType,
+		data.hitLocation,
+		data.unk_18,
+		data.unk_19,
+		damageDealt,
+		hasTargetDied,
+		0
+	};
+
+	roomSession->relayPlaying<GCPvEHitNpc>(gcPvEHitNpcData);
 }
+
+#pragma endregion

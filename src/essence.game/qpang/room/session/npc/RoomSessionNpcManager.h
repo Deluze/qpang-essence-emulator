@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 
+#include "CGPvEHitNpcData.h"
 #include "PveNpc.h"
 
 class RoomSession;
@@ -17,6 +18,8 @@ public:
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
+	void tick(const std::shared_ptr<RoomSession>& roomSession) const;
+
 	/**
 	 * \brief Temporary function for spawning initial npcs.
 	 */
@@ -27,10 +30,10 @@ public:
 	 * \param npc The npc you want to spawn in.
 	 * \returns The uid of the spawned in npc.
 	 */
-	uint32_t spawnNpc(PveNpc npc);
+	uint32_t spawnNpc(const std::shared_ptr<PveNpc>& npc);
 
 	/**
-	 * \brief De-spawns an from the game and removes it from the npcs vector.
+	 * \brief Kills the npc.
 	 * \param uid The uid of the npc to de-spawn.
 	 */
 	void killNpcByUid(uint32_t uid);
@@ -40,12 +43,20 @@ public:
 	 * \param uid The uid of the npc you want to find.
 	 * \return The found npc or null.
 	 */
-	PveNpc* findNpcByUid(uint32_t uid);
+	std::shared_ptr<PveNpc> findNpcByUid(uint32_t uid);
 
+	/**
+	 * \brief Handles npc synchronization upon joining a match.
+	 * \param session The player in session.
+	 */
 	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const;
 
-	void tick(const std::shared_ptr<RoomSession>& roomSession) const;
+	/**
+	 * \brief Handles the onCGPvEHitNpc which occurs when a player hits/damages an npc.
+	 * \param data The corresponding data struct for this net event.
+	 */
+	void onCGPvEHitNpc(const CGPvEHitNpcData& data);
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
-	std::map<uint32_t, PveNpc> m_npcs{};
+	std::unordered_map<uint32_t, std::shared_ptr<PveNpc>> m_npcs{};
 };

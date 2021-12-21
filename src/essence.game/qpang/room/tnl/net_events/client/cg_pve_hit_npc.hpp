@@ -8,15 +8,6 @@ class CGPvEHitNpc : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	enum HitLocation : uint8_t
-	{
-		FRONT = 1,
-		BACK_SIDE = 3,
-		BACK = 2
-	};
-
-	// TODO: Create enum for weaponType
-
 	U32 playerId; // 140
 	U32 targetNpcUid; // 144
 	U32 unk_03; // 88
@@ -63,9 +54,9 @@ public:
 		bstream->read(&unk_19);
 	}
 
-	void handle(GameConnection* conn, Player::Ptr player) override
+	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		std::cout << std::endl;
+		/*std::cout << std::endl;
 		std::cout << "============ CGPvEHitNpc Report ============" << std::endl;
 		std::cout << "playerId: " << (int)playerId << std::endl;
 		std::cout << "targetNpcUid: " << (int)targetNpcUid << std::endl;
@@ -98,17 +89,91 @@ public:
 		std::cout << std::endl;
 		std::cout << "unk_18: " << (int)unk_18 << std::endl;
 		std::cout << "unk_19: " << (int)unk_19 << std::endl;
-		std::cout << "============================================" << std::endl;
+		std::cout << "============================================" << std::endl;*/
 
-		const auto roomSession = player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession();
+		const auto roomPlayer = player->getRoomPlayer();
 
-		constexpr auto damage = 1;
-		constexpr auto hasNpcDied = 1; // true
+		if (roomPlayer == nullptr)
+		{
+			return;
+		}
 
-		roomSession->relayPlaying<GCPvEHitNpc>(playerId, targetNpcUid, unk_03, 
-			impactPosX, impactPosY, impactPosZ, impactOffsetPosX, impactOffsetPosY, impactPosZ,
-			unk_10, unk_11, bodyPartId, weaponItemId, weaponCardId, weaponType, hitLocation, 
-			unk_18, unk_19, damage, hasNpcDied, 0);
+		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
+
+		if (roomSessionPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSession = roomSessionPlayer->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		// Check if player is dead, you can not deal damage when you're dead.
+		if (roomSessionPlayer->isDead())
+		{
+			return;
+		}
+
+		const auto targetNpc = roomSession->getNpcManager()->findNpcByUid(targetNpcUid);
+
+		// Check if npc exists.
+		if (targetNpc == nullptr)
+		{
+			return;
+		}
+
+		// Check if the hit npc is dead, dead npc's can not take MORE damage.
+		if (targetNpc->isDead())
+		{
+			return;
+		}
+
+		// Make sure the player has the weapon that is used.
+		if (const auto hasWeapon = roomSessionPlayer->getWeaponManager()->hasWeapon(weaponItemId); !hasWeapon)
+		{
+			return;
+		}
+
+		// Make sure the player owns the actual weapon card.
+		if (const auto hasWeaponCard = player->getInventoryManager()->hasCard(weaponCardId); !hasWeaponCard)
+		{
+			return;
+		}
+
+		// TODO: Check if weaponType matches with the used weapon.
+		// TODO: Check if the npc contains the given body part id.
+
+		// TODO: At this point we know the player & npc exists and both are not dead,
+		// TODO: more checks probably need to happen but for now we can relay the damage.
+
+		const auto impactPos = Position{ impactPosX, impactPosY, impactPosZ };
+		const auto impactOffsetPos = Position{ impactOffsetPosX, impactOffsetPosY, impactOffsetPosZ };
+
+		const auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponItemId);
+
+		const auto cgPvEHitNpcData = CGPvEHitNpcData
+		{
+			roomSessionPlayer,
+			targetNpc,
+			unk_03,
+			impactPos,
+			impactOffsetPos,
+			unk_10,
+			unk_11,
+			bodyPartId,
+			weaponUsed,
+			weaponCardId,
+			static_cast<eWeaponType>(weaponType),
+			static_cast<eHitLocation>(hitLocation),
+			unk_18,
+			unk_19
+		};
+
+		roomSession->getNpcManager()->onCGPvEHitNpc(cgPvEHitNpcData);
 	}
 
 	void process(EventConnection* ps) override
