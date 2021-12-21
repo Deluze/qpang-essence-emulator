@@ -10,5 +10,6 @@ BigGateObject::BigGateObject(eBigGateActionId actionId, const Position& startPos
 
 void BigGateObject::tick(std::shared_ptr<RoomSession> roomSession)
 {
+	m_shouldMove = true;
 	move(roomSession, m_position, m_endPosition, 1);
 }
