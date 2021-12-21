@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gc_game_item.hpp"
+#include "gc_pve_item_init.hpp"
 #include "qpang/chat/command/Command.h"
 #include "qpang/room/RoomPlayer.h"
 
@@ -21,15 +23,15 @@ public:
 			return;
 		}
 
-		const auto roomSessionPlayer= roomPlayer->getRoomSessionPlayer();
+		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
 
 		if (roomSessionPlayer == nullptr)
 		{
 			player->broadcast(u"You need to be in a game in order to use this command.");
 
-			return; 
+			return;
 		}
 
-
+		const auto roomSession = roomSessionPlayer->getRoomSession();
 	}
 };
