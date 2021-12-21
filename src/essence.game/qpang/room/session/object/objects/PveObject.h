@@ -23,8 +23,10 @@ public:
 	virtual ~PveObject() = default;
 
 	void setUid(uint32_t uid);
+	void setShouldMove(bool shouldMove);
 
 	virtual void tick(std::shared_ptr<RoomSession> roomSession);
+	virtual void onEvent(std::shared_ptr<RoomSession> roomSession);
 
 	eObjectType getType();
 	Position getPosition();
@@ -32,6 +34,7 @@ public:
 protected:
 	void move(std::shared_ptr<RoomSession> roomSession, const Position& from, const Position& to, int ticks);
 
+	bool m_shouldMove;
 	int m_moveTickCount;
 	uint32_t m_uid{};
 	eObjectType m_type;

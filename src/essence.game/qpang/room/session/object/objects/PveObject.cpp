@@ -7,6 +7,7 @@
 
 PveObject::PveObject(eObjectType type, const Position& position)
 {
+	m_shouldMove = false;
 	m_moveTickCount = 0;
 	m_uid = 0;
 	m_type = type;
@@ -28,9 +29,17 @@ void PveObject::setUid(uint32_t uid)
 	m_uid = uid;
 }
 
+void PveObject::setShouldMove(bool shouldMove)
+{
+	m_shouldMove = shouldMove;
+}
+
 void PveObject::move(std::shared_ptr<RoomSession> roomSession, const Position& from, const Position& to, int ticks)
 {
 	// Using inits to minimize desyncs between players
+	if (!m_shouldMove)
+		return;
+
 	if (m_moveTickCount == 0)
 		roomSession->relayPlaying<GCPvEObjectInit>((U32)m_type, m_uid, from.x, from.y, from.z, 0);
 	else if (m_moveTickCount == 1)
@@ -46,6 +55,11 @@ void PveObject::move(std::shared_ptr<RoomSession> roomSession, const Position& f
 }
 
 void PveObject::tick(std::shared_ptr<RoomSession> roomSession)
+{
+
+}
+
+void PveObject::onEvent(std::shared_ptr<RoomSession> roomSession)
 {
 
 }

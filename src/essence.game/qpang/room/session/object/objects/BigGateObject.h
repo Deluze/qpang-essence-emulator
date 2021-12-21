@@ -9,9 +9,10 @@ enum class eBigGateActionId {
 class BigGateObject : public PveObject
 {
 public:
-	BigGateObject(eBigGateActionId actionId, const Position& position);
+	BigGateObject(eBigGateActionId actionId, const Position& startPos, const Position& endPos);
 
 	void tick(std::shared_ptr<RoomSession> roomSession) override;
 private:
+	Position m_endPosition;
 	eBigGateActionId m_actionId;
 };
