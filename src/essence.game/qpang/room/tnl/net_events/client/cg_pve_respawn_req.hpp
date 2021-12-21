@@ -6,6 +6,8 @@ class CGPvERespawnReq : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
+	bool flag;
+
 	CGPvERespawnReq() : GameNetEvent{ CG_PVE_RESPAWN_REQ, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer } {};
 
 	void pack(EventConnection* conn, BitStream* bstream) {};
@@ -19,7 +21,7 @@ public:
 
 	void unpack(EventConnection* conn, BitStream* bstream) 
 	{
-
+		flag = bstream->readFlag();
 	};
 
 	void process(EventConnection* ps) 
