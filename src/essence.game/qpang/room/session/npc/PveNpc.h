@@ -23,22 +23,23 @@ enum class eNpcType : uint32_t
 	ABANDONED_DOLL = 13,
 };
 
-class PveNpc final
+class PveNpc
 {
 public:
-	PveNpc() = default;
-
-	PveNpc(eNpcType type, const Position& position);
-
-	~PveNpc() = default;
-
-	void tick(const std::shared_ptr<RoomSession>& roomSession);
+	/*static void tick(const std::shared_ptr<RoomSession>& roomSession);*/
 
 	/**
 	 * \brief Sets the uid of the npc.
 	 * \param uid The uid of the npc.
 	 */
 	void setUid(uint32_t uid);
+
+	/**
+	 * \brief Subtracts the damage value from the health value.
+	 * \param damage The damage to subtract from the health.
+	 * \return The amount of damage taken.
+	 */
+	uint16_t takeDamage(uint16_t damage);
 
 	/**
 	 * \brief Gets the uid of the npc.
@@ -60,8 +61,29 @@ public:
 	 */
 	[[nodiscard]]
 	Position getPosition() const;
+
+	/**
+	 * \brief Gets the health of the npc.
+	 * \return The health of the npc.
+	 */
+	[[nodiscard]]
+	uint16_t getHealth() const;
+
+	/**
+	 * \brief Whether or not the npc is dead.
+	 * \return true if the npc is dead otherwise false.
+	 */
+	[[nodiscard]]
+	bool isDead() const;
 protected:
+	PveNpc() = default;
+	~PveNpc() = default;
+
+	PveNpc(eNpcType type, const Position & position, uint16_t baseHealth);
+
 	uint32_t m_uid{};
-	eNpcType m_type;
+	eNpcType m_type{};
 	Position m_position{};
+
+	uint16_t m_health{};
 };
