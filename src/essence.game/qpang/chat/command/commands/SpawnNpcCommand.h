@@ -11,13 +11,6 @@ public:
 	{
 	}
 
-	std::vector<CommandArgument*> getArguments() override
-	{
-		return {
-			argTypes[INTEGER]
-		};
-	}
-
 	void handle(const std::shared_ptr<Player> player, const std::vector<std::u16string>& args) override
 	{
 		const auto roomPlayer = player->getRoomPlayer();
