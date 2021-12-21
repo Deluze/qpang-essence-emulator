@@ -28,27 +28,33 @@ public:
 
 	void handle(GameConnection* conn, Player::Ptr player)
 	{
-		if (cmd == CMD::CHARACTER)
+		if (cmd == CHARACTER)
 		{
 			if (value != 333 && value != 343 && value != 578 && value != 579 && value != 850 && value != 851)
+			{
 				return;
+			}
 
 			player->setCharacter(value);
 
-			if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
+			if (const auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
+			{
 				roomPlayer->getRoom()->broadcastWaiting<GCPlayerChange>(player, cmd, value);
+			}
 		}
-		else if (cmd == CMD::TEAM)
+		else if (cmd == TEAM)
 		{
-			if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
+			if (const auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 			{
 				if (roomPlayer->isPlaying())
+				{
 					return;
+				}
 
-				auto room = roomPlayer->getRoom();
-
-				if (room->isTeamAvailable(value))
+				if (const auto room = roomPlayer->getRoom(); room->isTeamAvailable(value) && room->getMode() != GameMode::PVE)
+				{
 					roomPlayer->setTeam(value);
+				}
 			}
 		}
 	}
