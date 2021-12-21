@@ -5,6 +5,7 @@
 
 #include "EscalatorObject.h"
 #include "BigGateObject.h"
+#include "SwitchObject.h"
 
 #include <qpang/room/tnl/net_events/server/gc_pve_object_init.hpp>
 #include <qpang/room/tnl/net_events/server/gc_pve_object_move.hpp>
@@ -36,7 +37,8 @@ void PlayerVsEnvironment::onStart(std::shared_ptr<RoomSession> roomSession)
 	roomSession->getObjectManager()->spawnObject(std::make_unique<EscalatorObject>(eEscalatorActionId::STAGE0_PIT1_ESCALATOR1, Position { -13.64f, -0.5f, -22.64f }));
 	roomSession->getObjectManager()->spawnObject(std::make_unique<EscalatorObject>(eEscalatorActionId::STAGE0_PIT2_ESCALATOR1, Position { 14.39f, -0.5f, -23.45f }));
 
-	roomSession->getObjectManager()->spawnObject(std::make_unique<BigGateObject>(eBigGateActionId::STAGE0_TUNNEL_BIG_GATE1, Position{ 39.1f, 0.f, -5.1f }));
+	uint32_t gateUid = roomSession->getObjectManager()->spawnObject(std::make_unique<BigGateObject>(eBigGateActionId::STAGE0_TUNNEL_BIG_GATE1, Position{ 39.1f, 0.f, -5.1f }, Position{ 39.1f, 2.f, -5.1f }));
+	roomSession->getObjectManager()->spawnObject(std::make_unique<SwitchObject>(gateUid, Position{ 25.2f, -6.3f, 37.f }));
 
 	GameMode::onStart(roomSession);
 }
