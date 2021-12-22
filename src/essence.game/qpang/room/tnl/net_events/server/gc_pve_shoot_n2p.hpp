@@ -8,12 +8,14 @@ class GCPvEShootN2P : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 	U32 npcUid; // 88
-	U32 playerId; // 92 possible playerId?
+	U32 playerId; // 92
+
 	// What are the following floats for?
 	F32 xPos; // 96 
 	F32 yPos; // 100
 	F32 zPos; // 104
-	U64 unk_06 = 1095368724; // 112 possible weaponId, can not be 0 or crash.
+
+	U64 unk_06 = 0; // 112 possible weaponId, can not be 0 or crash.
 
 	GCPvEShootN2P() : GameNetEvent{ GC_PVE_SHOOT_N2P, GuaranteedOrdered, DirServerToClient } {}
 
@@ -27,7 +29,7 @@ public:
 	{
 	}
 
-	void pack(EventConnection* conn, BitStream* bstream)
+	void pack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->write(npcUid);
 		bstream->write(playerId);
@@ -37,8 +39,8 @@ public:
 		bstream->write(unk_06);
 	}
 
-	void unpack(EventConnection* conn, BitStream* bstream) {}
-	void process(EventConnection* ps) {}
+	void unpack(EventConnection* conn, BitStream* bstream) override {}
+	void process(EventConnection* ps) override {}
 
 	TNL_DECLARE_CLASS(GCPvEShootN2P);
 };
