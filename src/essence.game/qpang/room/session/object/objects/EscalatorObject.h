@@ -7,12 +7,12 @@ enum class eEscalatorActionId {
 	STAGE0_PIT2_ESCALATOR1
 };
 
-class EscalatorObject : public PveObject
+class EscalatorObject final : public PveObject
 {
 public:
 	EscalatorObject(eEscalatorActionId actionId, const Position& position);
 
-	void tick(std::shared_ptr<RoomSession> roomSession) override;
+	void tick(const std::shared_ptr<RoomSession>& roomSession) override;
 private:
 	eEscalatorActionId m_actionId;
 };

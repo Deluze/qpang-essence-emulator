@@ -2,13 +2,13 @@
 
 #include "RoomSession.h"
 
-EscalatorObject::EscalatorObject(eEscalatorActionId actionId, const Position& position) : PveObject(eObjectType::MOVING_ESCALATOR, position)
+EscalatorObject::EscalatorObject(const eEscalatorActionId actionId, const Position& position) : PveObject(eObjectType::MOVING_ESCALATOR, position)
 {
 	m_shouldMove = true;
 	m_actionId = actionId;
 }
 
-void EscalatorObject::tick(std::shared_ptr<RoomSession> roomSession)
+void EscalatorObject::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
 	if (m_actionId == eEscalatorActionId::STAGE0_PIT1_ESCALATOR1)
 		move(roomSession, m_position, { -1.4f, -0.5f, -22.64f }, 5);

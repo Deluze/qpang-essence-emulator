@@ -7,7 +7,6 @@
 #include "BigGateObject.h"
 #include "SwitchObject.h"
 
-#include <qpang/room/tnl/net_events/server/gc_pve_object_init.hpp>
 #include <qpang/room/tnl/net_events/server/gc_pve_object_move.hpp>
 
 bool PlayerVsEnvironment::isMissionMode()
@@ -20,7 +19,7 @@ bool PlayerVsEnvironment::isTeamMode()
 	return true;
 }
 
-void PlayerVsEnvironment::onApply(std::shared_ptr<Room> room)
+void PlayerVsEnvironment::onApply(const std::shared_ptr<Room> room)
 {
 	room->setIsPointsGame(false);
 	room->setScoreTime(10);
@@ -32,7 +31,7 @@ void PlayerVsEnvironment::onApply(std::shared_ptr<Room> room)
 	GameMode::onApply(room);
 }
 
-void PlayerVsEnvironment::onStart(std::shared_ptr<RoomSession> roomSession)
+void PlayerVsEnvironment::onStart(const std::shared_ptr<RoomSession> roomSession)
 {
 	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(eEscalatorActionId::STAGE0_PIT1_ESCALATOR1, Position { -13.64f, -0.5f, -22.64f }));
 	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(eEscalatorActionId::STAGE0_PIT2_ESCALATOR1, Position { 14.39f, -0.5f, -23.45f }));
@@ -45,7 +44,7 @@ void PlayerVsEnvironment::onStart(std::shared_ptr<RoomSession> roomSession)
 	GameMode::onStart(roomSession);
 }
 
-void PlayerVsEnvironment::onPlayerSync(std::shared_ptr<RoomSessionPlayer> session)
+void PlayerVsEnvironment::onPlayerSync(const std::shared_ptr<RoomSessionPlayer> session)
 {
 	// Send all spawned objects/npc/items
 	session->getRoomSession()->getObjectManager()->onPlayerSync(session);
@@ -55,7 +54,7 @@ void PlayerVsEnvironment::onPlayerSync(std::shared_ptr<RoomSessionPlayer> sessio
 	GameMode::onPlayerSync(session);
 }
 
-void PlayerVsEnvironment::tick(std::shared_ptr<RoomSession> roomSession)
+void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 {
 	roomSession->getObjectManager()->tick(roomSession);
 	roomSession->getNpcManager()->tick(roomSession);

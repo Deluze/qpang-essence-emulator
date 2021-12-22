@@ -25,14 +25,14 @@ public:
 	void setUid(uint32_t uid);
 	void setShouldMove(bool shouldMove);
 
-	virtual void tick(std::shared_ptr<RoomSession> roomSession);
-	virtual void onEvent(std::shared_ptr<RoomSession> roomSession);
+	virtual void tick(const std::shared_ptr<RoomSession>& roomSession);
+	virtual void onEvent(const std::shared_ptr<RoomSession>& roomSession);
 
-	eObjectType getType();
-	Position getPosition();
+	eObjectType getType() const;
+	Position getPosition() const;
 
 protected:
-	void move(std::shared_ptr<RoomSession> roomSession, const Position& from, const Position& to, int ticks);
+	void move(const std::shared_ptr<RoomSession>& roomSession, const Position& from, const Position& to, int ticks);
 
 	bool m_shouldMove;
 	int m_moveTickCount;
