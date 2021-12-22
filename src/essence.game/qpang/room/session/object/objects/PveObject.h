@@ -32,7 +32,7 @@ public:
 	Position getPosition() const;
 
 protected:
-	void move(const std::shared_ptr<RoomSession>& roomSession, const Position& from, const Position& to, int ticks);
+	void move(const std::shared_ptr<RoomSession>& roomSession, const Position& from, const Position& to, int ticks, int waitTicks);
 
 	bool m_shouldMove;
 	int m_moveTickCount;
