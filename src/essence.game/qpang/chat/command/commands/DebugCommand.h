@@ -52,10 +52,6 @@ public:
 		auto a3 = std::stof(std::string(args[2].begin(), args[2].end()));
 
 		roomSessionPlayer->send<GCPvEObjectInit>(5, 50, a1, a2, a3, 0);*/
-
-		roomSession->relayPlaying<GCPvEDoor>(3); // 3 = gate id.
-		//roomSessionPlayer->send<GCPvEEventObject>(convertToInteger(args[0]), (U8)convertToInteger(args[1]));
-
 		//roomSessionPlayer->send<GCPvEObjectMove>(3, 39.1f, 0.f + convertToInteger(args[0]), -5.1f, 1000);
 	}
 };

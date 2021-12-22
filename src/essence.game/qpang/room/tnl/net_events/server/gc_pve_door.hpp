@@ -11,7 +11,7 @@ public:
 	bool shouldOpen; // probably a flag for opening / closing?
 
 	GCPvEDoor() : GameNetEvent{ GC_PVE_DOOR, GuaranteedOrdered, DirServerToClient } {}
-	GCPvEDoor(const uint32_t objectUid, const bool shouldOpen)
+	GCPvEDoor(uint32_t objectUid, bool shouldOpen)
 		: GameNetEvent{ GC_PVE_DOOR, GuaranteedOrdered, DirServerToClient },
 		objectUid(objectUid),
 		shouldOpen(shouldOpen)
