@@ -39,6 +39,11 @@ enum class eNpcType : uint32_t
 class PveNpc
 {
 public:
+	PveNpc() = default;
+	~PveNpc() = default;
+
+	PveNpc(eNpcType type, const Position & position, uint16_t baseHealth, uint16_t initialSpawnRotation);
+
 	/*static void tick(const std::shared_ptr<RoomSession>& roomSession);*/
 
 	/**
@@ -86,6 +91,7 @@ public:
 	 * \brief Gets the initial spawn rotation of the npc.
 	 * \return The initial spawn rotation.
 	 */
+	[[nodiscard]]
 	uint16_t getInitialSpawnRotation() const;
 
 	/**
@@ -95,16 +101,11 @@ public:
 	[[nodiscard]]
 	bool isDead() const;
 protected:
-	PveNpc() = default;
-	~PveNpc() = default;
-
-	PveNpc(eNpcType type, const Position & position, uint16_t baseHealth, uint16_t initialSpawnRotation);
-
 	uint32_t m_uid{};
 	eNpcType m_type{};
 	Position m_position{};
 
 	uint16_t m_health{};
 
-	uint16_t m_initialSpawnRotation;
+	uint16_t m_initialSpawnRotation{};
 };
