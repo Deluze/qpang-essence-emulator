@@ -1,11 +1,9 @@
 #pragma once
 
-#include "gc_game_item.hpp"
-#include "gc_pve_item_init.hpp"
 #include "qpang/chat/command/Command.h"
 #include "qpang/room/RoomPlayer.h"
 
-#include "gc_pve_door.hpp"
+#include <qpang/room/tnl/net_events/server/gc_pve_object_init.hpp>
 
 class DebugCommand final : public Command
 {
@@ -19,9 +17,10 @@ public:
 		return {
 			//Command::argTypes[Command::Validation::INTEGER],
 			//Command::argTypes[Command::Validation::INTEGER]
-			/*Command::argTypes[Command::Validation::STRING],
 			Command::argTypes[Command::Validation::STRING],
-			Command::argTypes[Command::Validation::STRING]*/
+			Command::argTypes[Command::Validation::STRING],
+			Command::argTypes[Command::Validation::STRING],
+			Command::argTypes[Command::Validation::STRING]
 		};
 	}
 
@@ -47,11 +46,12 @@ public:
 
 		const auto roomSession = roomSessionPlayer->getRoomSession();
 
-		/*auto a1 = std::stof(std::string(args[0].begin(), args[0].end()));
+		auto a1 = std::stof(std::string(args[0].begin(), args[0].end()));
 		auto a2 = std::stof(std::string(args[1].begin(), args[1].end()));
 		auto a3 = std::stof(std::string(args[2].begin(), args[2].end()));
+		auto a4 = std::stof(std::string(args[3].begin(), args[3].end()));
 
-		roomSessionPlayer->send<GCPvEObjectInit>(5, 50, a1, a2, a3, 0);*/
+		roomSessionPlayer->send<GCPvEObjectInit>(a1, 50, a2, a3, a4, 0);
 		//roomSessionPlayer->send<GCPvEObjectMove>(3, 39.1f, 0.f + convertToInteger(args[0]), -5.1f, 1000);
 	}
 };
