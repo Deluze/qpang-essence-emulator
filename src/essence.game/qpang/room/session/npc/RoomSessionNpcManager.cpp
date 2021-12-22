@@ -7,8 +7,6 @@
 #include "PveNpc.h"
 #include "RoomSession.h"
 #include "RoomSessionPlayer.h"
-#include "SpyCamPveNpc.h"
-#include "ViolentPlantPveNpc.h"
 
 void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -25,27 +23,27 @@ void RoomSessionNpcManager::tick(const std::shared_ptr<RoomSession>& roomSession
 void RoomSessionNpcManager::spawnInitialNpcs()
 {
 	// Stage 1.
-	const std::vector<std::shared_ptr<PveNpc>> npcs
+	const std::vector npcs
 	{
 		// Wall 1 left, first spy cam.
-		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{-11.99f, 3.12f, -20.30f}, 60, 90),
+		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{-11.99f, 3.12f, -20.30f}, 60, 90),
 		// Wall 1 left, last spy cam.
-		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{-3.91f, 3.12f, -20.30f}, 60, 90),
+		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{-3.91f, 3.12f, -20.30f}, 60, 90),
 
 		// Wall 2 left, first spy cam.
-		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{17.70f, 3.155f, -20.0f}, 60, 90),
+		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{17.70f, 3.155f, -20.0f}, 60, 90),
 		// Wall 2 right, first middle spy cam.
-		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{23.65f, 3.155f, -26.80f}, 60, 270),
+		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{23.65f, 3.155f, -26.80f}, 60, 270),
 		// Wall 2 left, last spy cam.
-		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{33.30f, 3.155f, -20.0f}, 60, 90),
+		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{33.30f, 3.155f, -20.0f}, 60, 90),
 
 		// Wall 3 right, first spy cam.
-		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{25.04f, 3.10f, 9.85f}, 60, 270),
+		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{25.04f, 3.10f, 9.85f}, 60, 270),
 		// Wall 3 right, last spy cam.
-		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{32.37f, 3.15f, 8.40f}, 60, 90),
+		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{32.37f, 3.15f, 8.40f}, 60, 90),
 
 		// First violent plant.
-		std::make_shared<ViolentPlantPveNpc>(eNpcType::EASY_VIOLENT_PLANT, Position{-3.62f, 0.00f, -32.86f }, 60, 270),
+		std::make_shared<PveNpc>(eNpcType::EASY_VIOLENT_PLANT, Position{-3.62f, 0.00f, -32.86f }, 60, 270),
 	};
 
 	for (auto& npc : npcs)
