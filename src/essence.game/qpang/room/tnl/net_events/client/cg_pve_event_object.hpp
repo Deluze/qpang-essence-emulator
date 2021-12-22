@@ -54,13 +54,8 @@ public:
 			return;
 		}
 
-		//if (const auto objectPtr = roomSession->getObjectManager()->findObjectByUid(objectUid); objectPtr != nullptr)
-		{
-			//objectPtr->onEvent(roomSession);
-
-			// TODO: Move to onEvent?
-			roomSession->relayPlaying<GCPvEEventObject>(objectUid, flag);
-		}
+		if (const auto objectPtr = roomSession->getObjectManager()->findObjectByUid(objectUid); objectPtr != nullptr)
+			objectPtr->onEvent(roomSession);
 	}
 
 	void process(EventConnection* ps) override
