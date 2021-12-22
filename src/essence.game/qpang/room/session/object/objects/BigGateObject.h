@@ -5,7 +5,7 @@
 class BigGateObject final : public PveObject
 {
 public:
-	BigGateObject(const Position& startPos);
+	BigGateObject(const Position& position);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession) override;
 private:
