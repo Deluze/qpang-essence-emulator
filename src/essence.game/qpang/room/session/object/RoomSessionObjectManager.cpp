@@ -14,8 +14,6 @@ void RoomSessionObjectManager::initialize(const std::shared_ptr<RoomSession>& ro
 
 uint32_t RoomSessionObjectManager::spawnObject(std::shared_ptr<PveObject> object)
 {
-	std::lock_guard lg(mutex);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -29,15 +27,13 @@ uint32_t RoomSessionObjectManager::spawnObject(std::shared_ptr<PveObject> object
 
 	roomSession->relayPlaying<GCPvEObjectInit>(static_cast<U32>(object->getType()), objectUid, object->getPosition().x, object->getPosition().y, object->getPosition().z, 0);
 
-	m_objects[objectUid] = std::move(object);
+	m_objects[objectUid] = object;
 
 	return objectUid;
 }
 
 void RoomSessionObjectManager::despawnObject(const uint32_t uid)
 {
-	std::lock_guard lg(mutex);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -59,8 +55,6 @@ void RoomSessionObjectManager::despawnObject(const uint32_t uid)
 
 void RoomSessionObjectManager::destroyObject(const uint32_t uid)
 {
-	//std::lock_guard lg(mutex);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -80,8 +74,6 @@ void RoomSessionObjectManager::destroyObject(const uint32_t uid)
 
 void RoomSessionObjectManager::openGate(const uint32_t uid) const
 {
-	//std::lock_guard lg(mutex);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -96,8 +88,6 @@ void RoomSessionObjectManager::openGate(const uint32_t uid) const
 
 void RoomSessionObjectManager::closeGate(const uint32_t uid) const
 {
-	//std::lock_guard lg(mutex);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -112,8 +102,6 @@ void RoomSessionObjectManager::closeGate(const uint32_t uid) const
 
 std::shared_ptr<PveObject> RoomSessionObjectManager::findObjectByUid(const uint32_t uid)
 {
-	std::lock_guard lg(mutex);
-
 	const auto it = m_objects.find(uid);
 
 	if (it == m_objects.end())
@@ -121,13 +109,11 @@ std::shared_ptr<PveObject> RoomSessionObjectManager::findObjectByUid(const uint3
 		return nullptr;
 	}
 
-	return std::move(it->second);
+	return it->second;
 }
 
 void RoomSessionObjectManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session)
 {
-	std::lock_guard lg(mutex);
-
 	for (const auto& object : m_objects)
 	{
 		session->send<GCPvEObjectInit>(static_cast<U32>(object.second->getType()), object.first, object.second->getPosition().x, object.second->getPosition().y, object.second->getPosition().z, 0);
@@ -136,8 +122,6 @@ void RoomSessionObjectManager::onPlayerSync(const std::shared_ptr<RoomSessionPla
 
 void RoomSessionObjectManager::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
-	std::lock_guard lg(mutex);
-
 	for (const auto& object : m_objects)
 	{
 		object.second->tick(roomSession);
