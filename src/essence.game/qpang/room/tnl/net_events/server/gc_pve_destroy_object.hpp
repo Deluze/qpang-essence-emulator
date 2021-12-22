@@ -3,25 +3,27 @@
 
 #include "GameNetEvent.h"
 
-class GCPvEDestroyObject : public GameNetEvent
+class GCPvEDestroyObject final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
 	U32 objectUid;
 
-	GCPvEDestroyObject() : GameNetEvent{ GC_PVE_DESTROY_OBJECT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient } {};
-	GCPvEDestroyObject(U32 objectUid) : GameNetEvent{ GC_PVE_DESTROY_OBJECT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient }
+	GCPvEDestroyObject() : GameNetEvent{ GC_PVE_DESTROY_OBJECT, GuaranteedOrdered, DirServerToClient } {}
+
+	explicit GCPvEDestroyObject(const U32 objectUid)
+		: GameNetEvent{ GC_PVE_DESTROY_OBJECT, GuaranteedOrdered, DirServerToClient },
+		objectUid(objectUid)
 	{
-		this->objectUid = objectUid;
 	}
-	
-	void pack(EventConnection* conn, BitStream* bstream) 
+
+	void pack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->write(objectUid);
-	};
+	}
 
-	void unpack(EventConnection* conn, BitStream* bstream) {};
-	void process(EventConnection* ps) {};
+	void unpack(EventConnection* conn, BitStream* bstream) override {}
+	void process(EventConnection* ps) override {}
 
 	TNL_DECLARE_CLASS(GCPvEDestroyObject);
 };

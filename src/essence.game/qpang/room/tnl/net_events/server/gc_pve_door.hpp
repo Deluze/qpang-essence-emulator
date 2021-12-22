@@ -8,18 +8,20 @@ class GCPvEDoor : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 	U32 objectUid; // gate uid/ gate id.
-	bool flag = true; // probably a flag for opening / closing?
+	bool shouldOpen; // probably a flag for opening / closing?
 
 	GCPvEDoor() : GameNetEvent{ GC_PVE_DOOR, GuaranteedOrdered, DirServerToClient } {}
-	GCPvEDoor(const uint32_t objectUid) : GameNetEvent{ GC_PVE_DOOR, GuaranteedOrdered, DirServerToClient }
+	GCPvEDoor(const uint32_t objectUid, const bool shouldOpen)
+		: GameNetEvent{ GC_PVE_DOOR, GuaranteedOrdered, DirServerToClient },
+		objectUid(objectUid),
+		shouldOpen(shouldOpen)
 	{
-		this->objectUid = objectUid;
 	}
 
 	void pack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->write(objectUid);
-		bstream->writeFlag(flag);
+		bstream->writeFlag(shouldOpen);
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override {}

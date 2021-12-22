@@ -1,10 +1,11 @@
 #include "RoomSessionObjectManager.h"
 
+#include "gc_pve_destroy_object.hpp"
+#include "gc_pve_door.hpp"
+#include "gc_pve_object_init.hpp"
 #include "Position.h"
 #include "RoomSession.h"
 #include "RoomSessionPlayer.h"
-
-#include "gc_pve_object_init.hpp"
 
 void RoomSessionObjectManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -25,9 +26,11 @@ uint32_t RoomSessionObjectManager::spawnObject(std::shared_ptr<PveObject> object
 	const auto objectUid = (m_objects.size() + 1);
 
 	object->setUid(objectUid);
-	roomSession->relayPlaying<GCPvEObjectInit>((U32)object->getType(), objectUid, object->getPosition().x, object->getPosition().y, object->getPosition().z, 0);
+
+	roomSession->relayPlaying<GCPvEObjectInit>(static_cast<U32>(object->getType()), objectUid, object->getPosition().x, object->getPosition().y, object->getPosition().z, 0);
 
 	m_objects[objectUid] = std::move(object);
+
 	return objectUid;
 }
 
@@ -52,6 +55,59 @@ void RoomSessionObjectManager::despawnObject(const uint32_t uid)
 	roomSession->relayPlaying<GCPvEObjectInit>(0, uid, object->getPosition().x, object->getPosition().y, object->getPosition().z, 0);
 
 	m_objects.erase(uid);
+}
+
+void RoomSessionObjectManager::destroyObject(const uint32_t uid)
+{
+	//std::lock_guard lg(mutex);
+
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	if (const auto object = findObjectByUid(uid); object == nullptr)
+	{
+		return;
+	}
+
+	roomSession->relayPlaying<GCPvEDestroyObject>(uid);
+
+	m_objects.erase(uid);
+}
+
+void RoomSessionObjectManager::openGate(const uint32_t uid) const
+{
+	//std::lock_guard lg(mutex);
+
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	// TODO: Check if object uid exists on server side?
+
+	roomSession->relayPlaying<GCPvEDoor>(uid, true);
+}
+
+void RoomSessionObjectManager::closeGate(const uint32_t uid) const
+{
+	//std::lock_guard lg(mutex);
+
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	// TODO: Check if object uid exists on server side?
+
+	roomSession->relayPlaying<GCPvEDoor>(uid, false);
 }
 
 std::shared_ptr<PveObject> RoomSessionObjectManager::findObjectByUid(const uint32_t uid)

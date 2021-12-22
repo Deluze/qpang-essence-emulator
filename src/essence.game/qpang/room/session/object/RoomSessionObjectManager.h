@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <unordered_map>
-#include <vector>
 
 #include <mutex>
 
@@ -32,6 +31,24 @@ public:
 	 * \param uid The uid of the object to de-spawn.
 	 */
 	void despawnObject(uint32_t uid);
+
+	/**
+	 * \brief Destroys the object and removes it from the map.
+	 * \param uid The uid of the object to destroy.
+	 */
+	void destroyObject(uint32_t uid);
+
+	/**
+	 * \brief Relays a gc_pve_door event to everyone to open the door/gate.
+	 * \param uid The uid of the object/gate you want to open.
+	 */
+	void openGate(uint32_t uid) const;
+
+	/**
+	 * \brief Relays a gc_pve_door event to everyone to close the door/gate.
+	 * \param uid The uid of the object/gate you want to close.
+	 */
+	void closeGate(uint32_t uid) const;
 
 	/**
 	 * \brief Looks up the object by uid.
