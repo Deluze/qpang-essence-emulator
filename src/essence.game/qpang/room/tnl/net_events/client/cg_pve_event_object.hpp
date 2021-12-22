@@ -4,14 +4,14 @@
 #include "GameNetEvent.h"
 #include "gc_pve_event_object.hpp"
 
-class CGPvEEventObject : public GameNetEvent
+class CGPvEEventObject final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
 	U32 objectUid;
-	bool flag;
+	bool flag; // should move?
 
-	CGPvEEventObject() : GameNetEvent { CG_PVE_EVENT_OBJECT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer } {}
+	CGPvEEventObject() : GameNetEvent { CG_PVE_EVENT_OBJECT, GuaranteedOrdered, DirClientToServer} {}
 
 	void pack(EventConnection* conn, BitStream* bstream) override {}
 
@@ -54,10 +54,11 @@ public:
 			return;
 		}
 
-		//auto objectPtr = roomSession->getObjectManager()->findObjectByUid(objectUid);
-		//if (objectPtr)
+		//if (const auto objectPtr = roomSession->getObjectManager()->findObjectByUid(objectUid); objectPtr != nullptr)
 		{
 			//objectPtr->onEvent(roomSession);
+
+			// TODO: Move to onEvent?
 			roomSession->relayPlaying<GCPvEEventObject>(objectUid, flag);
 		}
 	}
