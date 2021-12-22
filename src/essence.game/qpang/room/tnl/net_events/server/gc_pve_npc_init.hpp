@@ -13,7 +13,7 @@ public:
 	F32 yPos; // 100
 	F32 zPos; // 104
 	U16 rotation = 0; // 108
-	U8 unk_07 = 0; // 110
+	U8 unk_07 = 1; // 110
 	U32 unk_08 = 0; // 112
 
 	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient } {}
