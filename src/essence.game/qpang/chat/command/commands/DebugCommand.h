@@ -5,6 +5,7 @@
 
 #include <qpang/room/tnl/net_events/server/gc_pve_object_init.hpp>
 #include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
+#include <qpang/room/tnl/net_events/server/gc_pve_shoot_n2p.hpp>
 
 class DebugCommand final : public Command
 {
@@ -20,7 +21,7 @@ public:
 			//Command::argTypes[Command::Validation::INTEGER]
 			Command::argTypes[Command::Validation::STRING],
 			Command::argTypes[Command::Validation::STRING],
-			Command::argTypes[Command::Validation::STRING]
+			//Command::argTypes[Command::Validation::STRING]
 		};
 	}
 
@@ -48,10 +49,11 @@ public:
 
 		auto a1 = std::stof(std::string(args[0].begin(), args[0].end()));
 		auto a2 = std::stof(std::string(args[1].begin(), args[1].end()));
-		auto a3 = std::stof(std::string(args[2].begin(), args[2].end()));
+		//auto a3 = std::stof(std::string(args[2].begin(), args[2].end()));
 
 		//roomSessionPlayer->send<GCPvEObjectInit>(a1, 50, a2, a3, a4, 0);
 		//roomSessionPlayer->send<GCPvEObjectMove>(3, 39.1f, 0.f + convertToInteger(args[0]), -5.1f, 1000);
-		roomSession->relayPlaying<GCPvENpcInit>(eNpcType::EASY_SPY_CAM, 50, Position { 36, 0, -30 }, (U16)a1, (U8)a2, (U32)a3);
+		//roomSession->relayPlaying<GCPvENpcInit>(eNpcType::EASY_SPY_CAM, 50, Position { 36, 0, -30 }, (U16)a1, (U8)a2, (U32)a3);
+		roomSession->relayPlaying<GCPvEShootN2P>((U32)a1, (U32)a2, Position{ 30, 1, -30 });
 	}
 };
