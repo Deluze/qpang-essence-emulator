@@ -12,19 +12,20 @@ public:
 	F32 xPos; // 96
 	F32 yPos; // 100
 	F32 zPos; // 104
-	U16 rotation = 0; // 108
+	U16 rotation; // 108
 	U8 unk_07 = 0; // 110
 	U32 unk_08 = 0; // 112
 
 	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient } {}
 
-	GCPvENpcInit(const eNpcType npcType, const uint32_t npcUid, const Position position)
+	GCPvENpcInit(const eNpcType npcType, const uint32_t npcUid, const Position position, const uint16_t rotation)
 		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient },
 		npcType(static_cast<U32>(npcType)),
 		npcUid(npcUid),
 		xPos(position.x),
 		yPos(position.y),
-		zPos(position.z)
+		zPos(position.z),
+		rotation(rotation)
 	{
 
 	}
