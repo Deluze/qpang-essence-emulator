@@ -5,9 +5,7 @@
 #include "qpang/chat/command/Command.h"
 #include "qpang/room/RoomPlayer.h"
 
-#include "qpang/room/tnl/net_events/server/gc_pve_object_init.hpp"
-#include <qpang/room/tnl/net_events/server/gc_pve_object_move.hpp>
-#include <qpang/room/tnl/net_events/server/gc_pve_event_object.hpp>
+#include "gc_pve_door.hpp"
 
 class DebugCommand final : public Command
 {
@@ -19,8 +17,8 @@ public:
 	std::vector<CommandArgument*> getArguments() override
 	{
 		return {
-			Command::argTypes[Command::Validation::INTEGER],
-			Command::argTypes[Command::Validation::INTEGER]
+			//Command::argTypes[Command::Validation::INTEGER],
+			//Command::argTypes[Command::Validation::INTEGER]
 			/*Command::argTypes[Command::Validation::STRING],
 			Command::argTypes[Command::Validation::STRING],
 			Command::argTypes[Command::Validation::STRING]*/
@@ -55,7 +53,8 @@ public:
 
 		roomSessionPlayer->send<GCPvEObjectInit>(5, 50, a1, a2, a3, 0);*/
 
-		roomSessionPlayer->send<GCPvEEventObject>(convertToInteger(args[0]), (U8)convertToInteger(args[1]));
+		roomSession->relayPlaying<GCPvEDoor>(3); // 3 = gate id.
+		//roomSessionPlayer->send<GCPvEEventObject>(convertToInteger(args[0]), (U8)convertToInteger(args[1]));
 
 		//roomSessionPlayer->send<GCPvEObjectMove>(3, 39.1f, 0.f + convertToInteger(args[0]), -5.1f, 1000);
 	}
