@@ -3,7 +3,7 @@
 
 #include "GameNetEvent.h"
 
-class GCPvENpcInit : public GameNetEvent
+class GCPvENpcInit final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
@@ -13,13 +13,13 @@ public:
 	F32 yPos; // 100
 	F32 zPos; // 104
 	U16 unk_06 = 1;  // 108
-	U8 unk_07; // 110
-	U32 unk_08; // 112
+	U8 unk_07 = 1; // 110
+	U32 unk_08 = 1; // 112
 
-	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny } {}
+	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient } {}
 
 	GCPvENpcInit(const eNpcType npcType, const uint32_t npcUid, const Position position)
-		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirAny },
+		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient },
 		npcType(static_cast<U32>(npcType)),
 		npcUid(npcUid),
 		xPos(position.x),
@@ -29,7 +29,7 @@ public:
 
 	}
 
-	void pack(EventConnection* conn, BitStream* bstream)
+	void pack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->write(npcType);
 		bstream->write(npcUid);
@@ -41,8 +41,8 @@ public:
 		bstream->write(unk_08);
 	}
 
-	void unpack(EventConnection* conn, BitStream* bstream) {}
-	void process(EventConnection* ps) {}
+	void unpack(EventConnection* conn, BitStream* bstream) override {}
+	void process(EventConnection* ps) override {}
 
 	TNL_DECLARE_CLASS(GCPvENpcInit);
 };
