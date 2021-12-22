@@ -39,6 +39,11 @@ void RoomSessionNpcManager::spawnInitialNpcs()
 		// Wall 2 left, last spy cam.
 		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{33.30f, 3.155f, -20.0f}, 60, 90),
 
+		// Wall 3 right, first spy cam.
+		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{25.04f, 3.10f, 9.85f}, 60, 270),
+		// Wall 3 right, last spy cam.
+		std::make_shared<SpyCamPveNpc>(eNpcType::EASY_SPY_CAM, Position{32.37f, 3.15f, 8.40f}, 60, 90),
+
 		// First violent plant.
 		std::make_shared<ViolentPlantPveNpc>(eNpcType::EASY_VIOLENT_PLANT, Position{-3.62f, 0.00f, -32.86f }, 60, 270),
 	};
