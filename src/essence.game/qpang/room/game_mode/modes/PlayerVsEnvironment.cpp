@@ -68,7 +68,7 @@ void PlayerVsEnvironment::onStart(const std::shared_ptr<RoomSession> roomSession
 	uint32_t bigGateUid = roomSession->getObjectManager()->spawnObject(std::make_shared<BigGateObject>(Position{ 39.1f, 0.f, -5.1f }));
 	roomSession->getObjectManager()->spawnObject(std::make_unique<SwitchObject>(bigGateUid, Position{ 25.2f, -6.3f, 37.f }));
 
-	uint32_t smallGateUid = roomSession->getObjectManager()->spawnObject(std::make_shared<SmallGateObject>(Position{ 24.61f, -6.3f, 7.17f }));
+	uint32_t smallGateUid = roomSession->getObjectManager()->spawnObject(std::make_shared<SmallGateObject>(Position{ 24.61f, -6.5f, 7.17f }));
 	roomSession->getObjectManager()->spawnObject(std::make_unique<SwitchObject>(smallGateUid, Position{ 19.62f, -6.31f, 9.08f }));
 
 	GameMode::onStart(roomSession);
