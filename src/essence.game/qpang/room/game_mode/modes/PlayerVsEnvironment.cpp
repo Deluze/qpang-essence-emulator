@@ -40,16 +40,28 @@ void PlayerVsEnvironment::onStart(const std::shared_ptr<RoomSession> roomSession
 	moveInfo = EscalatorMoveInfo{ Position { 14.39f, -0.5f, -23.45f }, Position { 36.56f, -0.5f, -23.45f }, 8, 1 };
 	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
 
-	moveInfo = EscalatorMoveInfo{ Position { -37.7f, -1.f, -3.4f }, Position { -37.7f, 1.6f, -3.4f }, 4, 0 };
+	moveInfo = EscalatorMoveInfo{ Position { -37.7f, -1.2f, -3.4f }, Position { -37.7f, 1.6f, -3.4f }, 4, 0 };
 	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
 
-	moveInfo = EscalatorMoveInfo{ Position { -37.7f, 1.6f, -3.4f + 3.56f }, Position { -37.7f, -1.f, -3.4f + 3.56f }, 3, 0 };
+	moveInfo = EscalatorMoveInfo{ Position { -37.7f, 1.6f, -3.4f + 3.56f }, Position { -37.7f, -1.2f, -3.4f + 3.56f }, 3, 0 };
 	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
 
-	moveInfo = EscalatorMoveInfo{ Position { -37.7f, -1.f, -3.4f + 3.56f * 2}, Position {-37.7f, 1.6f, -3.4f + 3.56f * 2}, 3, 0};
+	moveInfo = EscalatorMoveInfo{ Position { -37.7f, -1.2f, -3.4f + 3.56f * 2.f }, Position { -37.7f, 1.6f, -3.4f + 3.56f * 2.f }, 3, 0};
 	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
 
-	moveInfo = EscalatorMoveInfo{ Position { -37.7f, 1.6f, -3.4f + 3.56f * 3 }, Position { -37.7f, -1.f, -3.4f + 3.56f * 3 }, 2, 0 };
+	moveInfo = EscalatorMoveInfo{ Position { -37.7f, 1.6f, -3.4f + 3.56f * 3.f }, Position { -37.7f, -1.2f, -3.4f + 3.56f * 3.f }, 2, 0 };
+	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
+
+	moveInfo = EscalatorMoveInfo{ Position { 23.3f, -1.2f, 13.22f }, Position { 23.3f, 1.6f, 13.22f }, 4, 0 };
+	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
+
+	moveInfo = EscalatorMoveInfo{ Position { 23.3f + 3.3f, 1.6f, 13.22f }, Position { 23.3f + 3.3f, -1.2f, 13.22f }, 3, 0 };
+	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
+
+	moveInfo = EscalatorMoveInfo{ Position { 23.3f + 3.3f * 2.f, -1.2f, 13.22f }, Position { 23.3f + 3.3f * 2.f, 1.6f, 13.22f }, 3, 0 };
+	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
+
+	moveInfo = EscalatorMoveInfo{ Position { 23.3f + 3.3f * 3.f, 1.6f, 13.22f }, Position { 23.3f + 3.3f * 3.f, -1.2f, 13.22f }, 2, 0 };
 	roomSession->getObjectManager()->spawnObject(std::make_shared<EscalatorObject>(moveInfo));
 
 	uint32_t bigGateUid = roomSession->getObjectManager()->spawnObject(std::make_shared<BigGateObject>(Position{ 39.1f, 0.f, -5.1f }));
