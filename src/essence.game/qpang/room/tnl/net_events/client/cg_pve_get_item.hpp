@@ -2,9 +2,8 @@
 #define CG_PVE_GET_ITEM_H
 
 #include "GameNetEvent.h"
-#include "gc_game_item.hpp"
 
-class CGPvEGetItem : public GameNetEvent
+class CGPvEGetItem final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
@@ -13,9 +12,9 @@ public:
 	U32 playerId; // 88
 	U32 itemUid; // 92
 
-	void pack(EventConnection* conn, BitStream* bstream) {}
+	void pack(EventConnection* conn, BitStream* bstream) override {}
 
-	void unpack(EventConnection* conn, BitStream* bstream) 
+	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->read(&playerId);
 		bstream->read(&itemUid);
@@ -57,7 +56,7 @@ public:
 		roomSession->getPveItemManager()->onItemPickup(playerId, itemUid);
 	}
 
-	void process(EventConnection* ps) 
+	void process(EventConnection* ps) override
 	{
 		post<CGPvEGetItem>(ps);
 	}

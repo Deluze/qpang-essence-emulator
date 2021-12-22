@@ -4,7 +4,7 @@
 #include "GameNetEvent.h"
 #include "gc_pve_hit_npc.hpp"
 
-class CGPvEHitNpc : public GameNetEvent
+class CGPvEHitNpc final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:

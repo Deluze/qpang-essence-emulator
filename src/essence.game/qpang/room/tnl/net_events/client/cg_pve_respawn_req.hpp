@@ -2,32 +2,31 @@
 #define CG_PVE_RESPAWN_REQ_H
 
 #include "GameNetEvent.h"
-class CGPvERespawnReq : public GameNetEvent
+class CGPvERespawnReq final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	bool flag;
+	bool flag; // 44
 
-	CGPvERespawnReq() : GameNetEvent{ CG_PVE_RESPAWN_REQ, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer } {};
+	CGPvERespawnReq() : GameNetEvent{ CG_PVE_RESPAWN_REQ, GuaranteedOrdered, DirClientToServer} {}
 
-	void pack(EventConnection* conn, BitStream* bstream) {};
+	void pack(EventConnection* conn, BitStream* bstream) override {}
 
-	void handle(GameConnection* conn, Player::Ptr player)
+	void handle(GameConnection* conn, Player::Ptr player) override
 	{
-		// TODO: Send packet back, asking for respawn.
-		/*int userId = player->getUserId();
-		player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession()->relayPlaying<GCGameState>(userId, 16);*/
+		// TODO: Handle CGPvERespawnReq.
+		std::cout << "Reveived an unhandled CGPvERespawnReq event." << std::endl;
 	}
 
-	void unpack(EventConnection* conn, BitStream* bstream) 
+	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
 		flag = bstream->readFlag();
-	};
+	}
 
-	void process(EventConnection* ps) 
+	void process(EventConnection* ps) override
 	{
 		post<CGPvERespawnReq>(ps);
-	};
+	}
 
 	TNL_DECLARE_CLASS(CGPvERespawnReq);
 };

@@ -11,11 +11,11 @@ public:
 	U32 objectUid;
 	bool flag;
 
-	CGPvEEventObject() : GameNetEvent { CG_PVE_EVENT_OBJECT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer } {};
+	CGPvEEventObject() : GameNetEvent { CG_PVE_EVENT_OBJECT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer } {}
 
-	void pack(EventConnection* conn, BitStream* bstream) {};
+	void pack(EventConnection* conn, BitStream* bstream) override {}
 
-	void unpack(EventConnection* conn, BitStream* bstream) 
+	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->read(&objectUid);
 		flag = bstream->readFlag();
@@ -62,10 +62,10 @@ public:
 		}
 	}
 
-	void process(EventConnection* ps) 
+	void process(EventConnection* ps) override
 	{
 		post<CGPvEEventObject>(ps);
-	};
+	}
 
 	TNL_DECLARE_CLASS(CGPvEEventObject);
 };
