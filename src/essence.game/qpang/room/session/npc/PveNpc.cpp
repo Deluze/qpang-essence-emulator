@@ -2,10 +2,12 @@
 
 #include <iostream>
 
-PveNpc::PveNpc(const eNpcType type, const Position& position, const uint16_t baseHealth) :
+PveNpc::PveNpc(const eNpcType type, const Position& position, const uint16_t baseHealth,
+               const uint16_t initialSpawnRotation) :
 	m_type(type),
 	m_position(position),
-	m_health(baseHealth)
+	m_health(baseHealth),
+	m_initialSpawnRotation(initialSpawnRotation)
 {
 }
 
@@ -51,6 +53,11 @@ Position PveNpc::getPosition() const
 uint16_t PveNpc::getHealth() const
 {
 	return m_health;
+}
+
+uint16_t PveNpc::getInitialSpawnRotation() const
+{
+	return m_initialSpawnRotation;
 }
 
 bool PveNpc::isDead() const

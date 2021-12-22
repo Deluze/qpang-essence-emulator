@@ -5,5 +5,5 @@
 class ChessPawnPveNpc : public PveNpc
 {
 public:
-	ChessPawnPveNpc(eNpcType type, Position position, uint16_t baseHealth);
+	ChessPawnPveNpc(eNpcType type, Position position, uint16_t baseHealth, uint16_t initialSpawnRotation);
 };

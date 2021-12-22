@@ -5,5 +5,5 @@
 class AbandonedDollPveNpc : public PveNpc
 {
 public:
-	AbandonedDollPveNpc(eNpcType type, Position position, uint16_t baseHealth);
+	AbandonedDollPveNpc(eNpcType type, Position position, uint16_t baseHealth, uint16_t initialSpawnRotation);
 };

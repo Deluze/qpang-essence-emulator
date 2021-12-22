@@ -83,6 +83,12 @@ public:
 	uint16_t getHealth() const;
 
 	/**
+	 * \brief Gets the initial spawn rotation of the npc.
+	 * \return The initial spawn rotation.
+	 */
+	uint16_t getInitialSpawnRotation() const;
+
+	/**
 	 * \brief Whether or not the npc is dead.
 	 * \return true if the npc is dead otherwise false.
 	 */
@@ -92,11 +98,13 @@ protected:
 	PveNpc() = default;
 	~PveNpc() = default;
 
-	PveNpc(eNpcType type, const Position & position, uint16_t baseHealth);
+	PveNpc(eNpcType type, const Position & position, uint16_t baseHealth, uint16_t initialSpawnRotation);
 
 	uint32_t m_uid{};
 	eNpcType m_type{};
 	Position m_position{};
 
 	uint16_t m_health{};
+
+	uint16_t m_initialSpawnRotation;
 };
