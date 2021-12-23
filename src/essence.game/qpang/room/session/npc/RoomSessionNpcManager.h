@@ -18,7 +18,10 @@ public:
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
-	void tick(const std::shared_ptr<RoomSession>& roomSession) const;
+	/**
+	 * \brief For updating npc related stuff every tick.
+	 */
+	void tick() const;
 
 	/**
 	 * \brief Temporary function for spawning initial npcs.
@@ -31,6 +34,12 @@ public:
 	 * \returns The uid of the spawned in npc.
 	 */
 	uint32_t spawnNpc(const std::shared_ptr<PveNpc>& npc);
+
+	/**
+	 * \brief Re-spawns the npc.
+	 * \param npc The npc you want to re-spawn.
+	 */
+	void respawnNpc(const std::shared_ptr<PveNpc>& npc) const;
 
 	/**
 	 * \brief Kills the npc.

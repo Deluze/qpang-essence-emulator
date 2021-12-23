@@ -42,9 +42,9 @@ public:
 	PveNpc() = default;
 	~PveNpc() = default;
 
-	PveNpc(eNpcType type, const Position & position, uint16_t baseHealth, uint16_t initialSpawnRotation);
+	PveNpc(eNpcType type, const Position& initialSpawnPosition, uint16_t baseHealth, uint16_t initialSpawnRotation, bool shouldRespawn);
 
-	/*static void tick(const std::shared_ptr<RoomSession>& roomSession);*/
+	/*void tick(const std::shared_ptr<RoomSession>& roomSession);*/
 
 	/**
 	 * \brief Sets the uid of the npc.
@@ -53,46 +53,74 @@ public:
 	void setUid(uint32_t uid);
 
 	/**
+	 * \brief Resets the health to the base health.
+	 */
+	void resetHealth();
+
+	/**
 	 * \brief Subtracts the damage value from the health value.
 	 * \param damage The damage to subtract from the health.
 	 * \return The amount of damage taken.
 	 */
 	uint16_t takeDamage(uint16_t damage);
 
+#pragma region Getters
+
 	/**
-	 * \brief Gets the uid of the npc.
-	 * \return The uid of the npc.
+	 * \brief Gets the uid for the npc.
+	 * \return The uid (spawnId).
 	 */
 	[[nodiscard]]
 	uint32_t getUid() const;
 
 	/**
-	 * \brief Gets the type of the npc.
-	 * \return The type of the npc.
+	 * \brief Gets the type for the npc.
+	 * \return The type (id).
 	 */
 	[[nodiscard]]
 	eNpcType getType() const;
 
 	/**
-	 * \brief Gets the position of the npc.
-	 * \return The position of the npc.
+	 * \brief Gets the position for the npc.
+	 * \return The position.
 	 */
 	[[nodiscard]]
 	Position getPosition() const;
 
 	/**
-	 * \brief Gets the health of the npc.
-	 * \return The health of the npc.
+	 * \brief Gets the initial spawn position for the npc.
+	 * \return The spawn position.
+	 */
+	[[nodiscard]]
+	Position getInitialSpawnPosition() const;
+
+	/**
+	 * \brief Gets the health for the npc.
+	 * \return The current health.
 	 */
 	[[nodiscard]]
 	uint16_t getHealth() const;
 
 	/**
-	 * \brief Gets the initial spawn rotation of the npc.
+	 * \brief Gets the base health for the npc.
+	 * \return The base health.
+	 */
+	[[nodiscard]]
+	uint16_t getBaseHealth() const;
+
+	/**
+	 * \brief Gets the initial spawn rotation for the npc.
 	 * \return The initial spawn rotation.
 	 */
 	[[nodiscard]]
 	uint16_t getInitialSpawnRotation() const;
+
+	/**
+	 * \brief Indicates whether or not the npc should re-spawn upon death.
+	 * \return true if the npc should respawn otherwise false.
+	 */
+	[[nodiscard]]
+	bool shouldRespawn() const;
 
 	/**
 	 * \brief Whether or not the npc is dead.
@@ -100,12 +128,20 @@ public:
 	 */
 	[[nodiscard]]
 	bool isDead() const;
+
+#pragma endregion
+
 protected:
 	uint32_t m_uid{};
 	eNpcType m_type{};
+
 	Position m_position{};
+	Position m_initialSpawnPosition{};
 
 	uint16_t m_health{};
+	uint16_t m_baseHealth{};
 
 	uint16_t m_initialSpawnRotation{};
+
+	bool m_shouldRespawn{};
 };
