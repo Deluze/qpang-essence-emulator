@@ -42,9 +42,9 @@ public:
 	PveNpc() = default;
 	~PveNpc() = default;
 
-	PveNpc(eNpcType type, const Position& initialSpawnPosition, uint16_t baseHealth, uint16_t initialSpawnRotation, bool shouldRespawn);
+	PveNpc(eNpcType type, const Position& initialSpawnPosition, uint16_t baseHealth, uint16_t initialSpawnRotation, bool shouldRespawn, uint64_t respawnTime = 0);
 
-	/*void tick(const std::shared_ptr<RoomSession>& roomSession);*/
+	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
 	/**
 	 * \brief Sets the uid of the npc.
@@ -63,6 +63,15 @@ public:
 	 * \return The amount of damage taken.
 	 */
 	uint16_t takeDamage(uint16_t damage);
+
+#pragma region Event handlers
+
+	/**
+	 * \brief Handles the on death event for an npc.
+	 */
+	void onDeath();
+
+#pragma endregion
 
 #pragma region Getters
 
@@ -144,4 +153,7 @@ protected:
 	uint16_t m_initialSpawnRotation{};
 
 	bool m_shouldRespawn{};
+
+	uint64_t m_timeOfDeath = NULL;
+	uint64_t m_respawnTime = NULL;
 };

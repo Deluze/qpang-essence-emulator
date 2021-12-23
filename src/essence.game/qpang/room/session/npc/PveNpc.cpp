@@ -3,20 +3,38 @@
 #include "RoomSession.h"
 
 PveNpc::PveNpc(const eNpcType type, const Position& initialSpawnPosition, const uint16_t baseHealth,
-	const uint16_t initialSpawnRotation, const bool shouldRespawn) :
+	const uint16_t initialSpawnRotation, const bool shouldRespawn, const uint64_t respawnTime) :
 	m_type(type),
 	m_position(initialSpawnPosition),
 	m_initialSpawnPosition(initialSpawnPosition),
 	m_health(baseHealth),
 	m_baseHealth(baseHealth),
 	m_initialSpawnRotation(initialSpawnRotation),
-	m_shouldRespawn(shouldRespawn)
+	m_shouldRespawn(shouldRespawn),
+	m_respawnTime(respawnTime)
 {
 }
 
-/*void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
+void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
-}*/
+	if (isDead() && m_shouldRespawn)
+	{
+		const auto currentTime = time(nullptr);
+
+		if (m_timeOfDeath == NULL)
+		{
+			return;
+		}
+
+		if ((m_timeOfDeath + m_respawnTime) < currentTime)
+		{
+			// Reset time of death.
+			m_timeOfDeath = NULL;
+
+			roomSession->getNpcManager()->respawnNpcByUid(m_uid);
+		}
+	}
+}
 
 void PveNpc::setUid(const uint32_t uid)
 {
@@ -40,6 +58,14 @@ uint16_t PveNpc::takeDamage(const uint16_t damage)
 	m_health = m_health - damage;
 
 	return damage;
+}
+
+void PveNpc::onDeath()
+{
+	if (m_shouldRespawn)
+	{
+		m_timeOfDeath = time(nullptr);
+	}
 }
 
 uint32_t PveNpc::getUid() const

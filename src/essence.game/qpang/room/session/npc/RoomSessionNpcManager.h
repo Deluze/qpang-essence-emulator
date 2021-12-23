@@ -37,9 +37,9 @@ public:
 
 	/**
 	 * \brief Re-spawns the npc.
-	 * \param npc The npc you want to re-spawn.
+	 * \param uid The uid of the npc you want to re-spawn.
 	 */
-	void respawnNpc(const std::shared_ptr<PveNpc>& npc) const;
+	void respawnNpcByUid(uint32_t uid);
 
 	/**
 	 * \brief Kills the npc.
