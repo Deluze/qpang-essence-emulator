@@ -2,31 +2,37 @@
 #define CG_PVE_HIT_OBJECT_H
 
 #include "GameNetEvent.h"
+#include "gc_pve_hit_object.hpp"
+
 class CGPvEHitObject final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	U32 unk_01;
-	U32 unk_02;
-	U32 unk_03;
+	U32 playerId;
+	U32 objectUid;
+	U32 weaponItemId;
 	U8 cmd;
 
-	CGPvEHitObject() : GameNetEvent{ CG_PVE_HIT_OBJECT, GuaranteedOrdered, DirClientToServer} {}
+	CGPvEHitObject() : GameNetEvent{ CG_PVE_HIT_OBJECT, GuaranteedOrdered, DirClientToServer } {}
 
 	void pack(EventConnection* conn, BitStream* bstream) override {}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
-		bstream->read(&unk_01);
-		bstream->read(&unk_02);
-		bstream->read(&unk_03);
+		bstream->read(&playerId);
+		bstream->read(&objectUid);
+		bstream->read(&weaponItemId);
 		bstream->read(&cmd);
 	}
 
-	void handle(GameConnection* conn, Player::Ptr player) override
+	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		// TODO: Handle CGPvEHitObject.
-		std::cout << "Reveived an unhandled CGPvEHitObject event." << std::endl;
+		std::cout << "Received a CGPvEHitObject event:" << std::endl;
+		std::cout << "PlayerId: " << playerId << ", ObjectUid: " << objectUid << ", WeaponItemId: " << weaponItemId
+			<< ", Cmd: " << static_cast<int>(cmd) << std::endl;
+
+		// TODO: This works but, we need to look at the object type and stuff to properly handle this event.
+		//player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession()->relayPlaying<GCPvEHitObject>(playerId, objectUid, weaponItemId, cmd, 10);
 	}
 
 	void process(EventConnection* ps) override
