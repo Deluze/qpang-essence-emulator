@@ -8,21 +8,41 @@ class GCMasterLog : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 	GCMasterLog() : GameNetEvent{ GC_MASTERLOG, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {};
+	GCMasterLog(U32 a1, U32 a2, Position a3, U64 a4) : GameNetEvent{ GC_MASTERLOG, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny }
+	{
+		unk_01 = a1;
+		unk_02 = a2;
+		unk_07 = *(U32*)&a3.x;
+		unk_08 = *(U32*)&a3.y;
+		unk_09 = *(U32*)&a3.z;
+		unk_10 = (U32)((a4 & 0xFFFFFFFF00000000LL) >> 32);
+		unk_11 = (U32)(a4 & 0xFFFFFFFFLL);
+	};
 
-	U32 unk_01;
-	U32 unk_02;
-	U32 unk_03;
-	U16 unk_04;
-	U16 unk_05;
-	U8 unk_06;
-	U32 unk_07;
-	U32 unk_08;
-	U32 unk_09;
-	U32 unk_10;
-	U32 unk_11;
-	U32 unk_12;
-	U8 unk_13;
-	ByteBuffer* buffer;
+	//U32 npcUid; // 88
+	//U32 playerId; // 92
+
+	//// What are the following floats for?
+	//F32 xPos; // 96 
+	//F32 yPos; // 100
+	//F32 zPos; // 104
+
+	//U64 unk_06 = 0;
+
+	U32 unk_01; // 88
+	U32 unk_02; // 92
+	U32 unk_03; // 96
+	U16 unk_04; // 100
+	U16 unk_05; // 102
+	U8 unk_06; // 104
+	U32 unk_07; // 108
+	U32 unk_08; // 112
+	U32 unk_09; // 116
+	U32 unk_10; // 120
+	U32 unk_11; // 124
+	U32 unk_12; // 128
+	U8 unk_13; // 132
+	ByteBuffer buffer = ByteBuffer(0);
 
 	void pack(EventConnection* conn, BitStream* bstream) 
 	{
