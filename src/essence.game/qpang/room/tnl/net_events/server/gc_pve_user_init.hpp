@@ -19,11 +19,11 @@ public:
 
 	std::u16string nickname;
 
-	U8 unk_01 = 0;
-	U32 unk_02 = 1000;
-	U16 unk_03 = 0;
+	U8 playerRank = 1; // 240
+	U32 unk_02 = 1000; // 244 game sets player + 2772 to this, perhaps coins?
+	U16 unk_03 = 0; // 248 game sets player + 2776 to (packet + 248 != 0)
 
-	GCPvEUserInit() : GameNetEvent{ GC_PVE_USER_INIT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient } {};
+	GCPvEUserInit() : GameNetEvent{ GC_PVE_USER_INIT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient } {};
 	GCPvEUserInit(RoomPlayer::Ptr roomPlayer, bool spectatorMode = false) : GameNetEvent{ GC_PVE_USER_INIT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
 	{
 		auto player = roomPlayer->getPlayer();
@@ -37,6 +37,7 @@ public:
 		this->weaponCount = player->getEquipmentManager()->getWeaponsByCharacter(this->characterId).size();
 		this->weapons = player->getEquipmentManager()->getWeaponItemIdsByCharacter(this->characterId);
 		this->armor = player->getEquipmentManager()->getArmorItemIdsByCharacter(this->characterId);
+		this->playerRank = spectatorMode ? 3 : player->getRank();
 	}
 
 	GCPvEUserInit(RoomSessionPlayer::Ptr session, bool spectatorMode = false) : GameNetEvent{ GC_PVE_USER_INIT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
@@ -70,7 +71,7 @@ public:
 			bstream->write(U32(item));
 
 		writeByteBuffer(bstream, nickname, 16);
-		bstream->write(unk_01); //240
+		bstream->write(playerRank); //240
 		bstream->write(unk_02); //244
 		bstream->write(unk_03); //248
 	};

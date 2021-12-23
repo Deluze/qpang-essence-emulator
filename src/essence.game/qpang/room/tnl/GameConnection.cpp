@@ -121,16 +121,9 @@ void GameConnection::updateRoom(std::shared_ptr<Room> room, TNL::U32 cmd, TNL::U
 
 void GameConnection::startLoadingPve(std::shared_ptr<Room> room, RoomPlayer::Ptr roomPlayer)
 {
-	/*postNetEvent(new GCStart(room, m_player->getId()));
-	postNetEvent(new GCJoin(roomPlayer));
+	/*postNetEvent(new GCPvEStart(room, m_player->getId()));
+	postNetEvent(new GCPvEUserInit(roomPlayer));
 	postNetEvent(new GCGameState(m_player->getId(), 12));*/
-
-	//postNetEvent(new GCJoin(roomPlayer));
-//	postNetEvent(new GCPvENewRound(m_player->getId()));
-
-	//postNetEvent(new GCPvEStart(room, m_player->getId()));
-	//postNetEvent(new GCPvEUserInit(roomPlayer));
-	//postNetEvent(new GCGameState(m_player->getId(), 12));
 
 	startLoading(room, roomPlayer);
 }

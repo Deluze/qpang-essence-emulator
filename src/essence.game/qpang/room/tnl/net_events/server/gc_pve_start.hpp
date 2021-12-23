@@ -7,16 +7,16 @@ class GCPvEStart : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	U32 playerId;
+	U32 playerId; // 96
 
-	U32 unk_01 = 2;
-	U32 unk_02 = 0;
+	S32 unk_01 = 2; // 92 Has to be 2, otherwise game simply returns
+	U32 unk_02; // 100
 
-	U16 map;
-	U16 mode;
+	U16 map; // 104
+	U16 mode; // 106
 
-	GCPvEStart() : GameNetEvent{ GC_PVE_START, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient } {};
-	GCPvEStart(Room::Ptr room, uint32_t playerId) : GameNetEvent{ GC_PVE_START, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
+	GCPvEStart() : GameNetEvent{ GC_PVE_START, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {};
+	GCPvEStart(Room::Ptr room, uint32_t playerId) : GameNetEvent{ GC_PVE_START, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny }
 	{
 		this->playerId = playerId;
 		this->map = room->getMap();
@@ -26,7 +26,7 @@ public:
 	void pack(EventConnection* conn, BitStream* bstream) 
 	{
 		bstream->write(playerId);
-		bstream->write(unk_01);  // 2, 3 or 5
+		bstream->write(unk_01);
 		bstream->write(unk_02);
 		bstream->write(map);
 		bstream->write(mode);
