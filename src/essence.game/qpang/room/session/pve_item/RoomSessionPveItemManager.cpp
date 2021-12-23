@@ -50,7 +50,7 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 		return;
 	}
 
-	// TODO: Increase player coin count based on coin type (if it even is a coin).
+	// TODO: Perform certain actions based on the item type (ammo, medkit, coins etcetera)..
 
 	roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, playerId, static_cast<U32>(item->getType()), itemUid, 0);
 
