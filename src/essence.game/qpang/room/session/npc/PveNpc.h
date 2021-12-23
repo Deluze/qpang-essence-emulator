@@ -155,5 +155,6 @@ protected:
 	bool m_shouldRespawn{};
 
 	uint64_t m_timeOfDeath = NULL;
+	// Respawn time in seconds.
 	uint64_t m_respawnTime = NULL;
 };
