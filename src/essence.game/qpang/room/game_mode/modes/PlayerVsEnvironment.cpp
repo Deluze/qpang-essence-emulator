@@ -88,9 +88,9 @@ void PlayerVsEnvironment::onPlayerSync(const std::shared_ptr<RoomSessionPlayer> 
 
 void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 {
-	roomSession->getObjectManager()->tick(roomSession);
-	roomSession->getNpcManager()->tick(roomSession);
-	roomSession->getPveItemManager()->tick(roomSession);
+	roomSession->getObjectManager()->tick();
+	roomSession->getNpcManager()->tick();
+	roomSession->getPveItemManager()->tick();
 
 	GameMode::tick(roomSession);
 }

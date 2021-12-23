@@ -59,7 +59,7 @@ public:
 
 	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session);
 
-	void tick(const std::shared_ptr<RoomSession>& roomSession);
+	void tick() const;
 private:
 	std::mutex mutex;
 	std::weak_ptr<RoomSession> m_roomSession;

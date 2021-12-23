@@ -40,7 +40,7 @@ public:
 
 	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const;
 
-	void tick(const std::shared_ptr<RoomSession>& roomSession) const;
+	void tick() const;
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::map<uint32_t, PveItem> m_items;

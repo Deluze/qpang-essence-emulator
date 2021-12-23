@@ -120,10 +120,17 @@ void RoomSessionObjectManager::onPlayerSync(const std::shared_ptr<RoomSessionPla
 	}
 }
 
-void RoomSessionObjectManager::tick(const std::shared_ptr<RoomSession>& roomSession)
+void RoomSessionObjectManager::tick() const
 {
-	for (const auto& object : m_objects)
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
 	{
-		object.second->tick(roomSession);
+		return;
+	}
+
+	for (const auto& [uid, object] : m_objects)
+	{
+		object->tick(roomSession);
 	}
 }
