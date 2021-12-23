@@ -78,7 +78,7 @@ public:
 		writeByteBuffer(bstream, nickname, 16);
 		bstream->write(playerRank); //240
 		bstream->write(coins); //244
-		bstream->write(unk_03); //248
+		bstream->write(doubleCoins); //248
 	};
 
 	void unpack(EventConnection* conn, BitStream* bstream) {};
