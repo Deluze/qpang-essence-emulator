@@ -13,7 +13,7 @@ public:
 	F32 yPos; // 100
 	F32 zPos; // 104
 	U16 rotation; // 108
-	U8 unk_07 = 0; // 110
+	U8 shouldExplode = 1; // 110 bool
 	U32 unk_08 = 0; // 112
 
 	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient } {}
@@ -38,7 +38,7 @@ public:
 		yPos(position.y),
 		zPos(position.z),
 		rotation(rotation),
-		unk_07(unk_07),
+		shouldExplode(unk_07),
 		unk_08(unk_08)
 	{
 
@@ -52,7 +52,7 @@ public:
 		bstream->write(yPos);
 		bstream->write(zPos);
 		bstream->write(rotation);
-		bstream->write(unk_07);
+		bstream->write(shouldExplode);
 		bstream->write(unk_08);
 	}
 
