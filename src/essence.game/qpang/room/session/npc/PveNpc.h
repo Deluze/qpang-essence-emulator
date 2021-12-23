@@ -153,7 +153,7 @@ private:
 	 * \brief Picks a random item from the loot table and drops it.
 	 * \param roomSession The current room session.
 	 */
-	void dropLoot(const std::shared_ptr<RoomSession>& roomSession) const;
+	void dropLoot(const std::shared_ptr<RoomSession>& roomSession);
 
 	uint32_t m_uid{};
 	eNpcType m_type{};

@@ -121,7 +121,7 @@ bool PveNpc::isDead() const
 	return m_health <= 0;
 }
 
-void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession) const
+void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 {
 	std::vector availableItemDrops
 	{
@@ -154,4 +154,6 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession) const
 	};
 
 	roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(randomPveItem));
+
+	m_canDropLootOnDeath = false;
 }
