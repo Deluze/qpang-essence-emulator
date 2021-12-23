@@ -49,15 +49,17 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 
 void RoomSession::initialize()
 {
-	m_itemManager.initialize(shared_from_this());
-	m_skillManager.initialize(shared_from_this());
-
 	if (m_room->getMode() == GameMode::Mode::PVE)
 	{
 		m_npcManager.initialize(shared_from_this());
 		m_objectManager.initialize(shared_from_this());
 		m_pveItemManager.initialize(shared_from_this());
 		m_pveRoundManager.initialize(shared_from_this());
+	}
+	else
+	{
+		m_itemManager.initialize(shared_from_this());
+		m_skillManager.initialize(shared_from_this());
 	}
 
 	m_gameMode->onStart(shared_from_this());
