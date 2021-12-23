@@ -10,7 +10,12 @@ void RoomSessionPveItemManager::initialize(const std::shared_ptr<RoomSession>& r
 	m_roomSession = roomSession;
 }
 
-uint32_t RoomSessionPveItemManager::spawnItem(PveItem item)
+void RoomSessionPveItemManager::tick() const
+{
+
+}
+
+uint32_t RoomSessionPveItemManager::spawnItem(const std::shared_ptr<PveItem>& item)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -19,16 +24,16 @@ uint32_t RoomSessionPveItemManager::spawnItem(PveItem item)
 		return 0;
 	}
 
-	item.setUid((m_items.size() + 1));
+	item->setUid((m_items.size() + 1));
 
-	roomSession->relayPlaying<GCPvEItemInit>(item.getType(), item.getUid(), item.getPosition());
+	roomSession->relayPlaying<GCPvEItemInit>(item->getType(), item->getUid(), item->getPosition());
 
-	m_items[item.getUid()] = item;
+	m_items[item->getUid()] = item;
 
-	return item.getUid();
+	return item->getUid();
 }
 
-void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint32_t itemUid)
+void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint32_t uid)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -38,26 +43,41 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 	}
 	const auto roomSessionPlayer = roomSession->find(playerId);
 
-	if ( roomSessionPlayer == nullptr)
+	if (roomSessionPlayer == nullptr)
 	{
 		return;
 	}
 
-	const auto item = findItemByUid(itemUid);
+	const auto& item = findItemByUid(uid);
 
 	if (item == nullptr)
 	{
 		return;
 	}
 
-	// TODO: Perform certain actions based on the item type (ammo, medkit, coins etcetera)..
+	switch (const auto itemType = item->getType())
+	{
+	case eItemType::AMMO_CLIP:
+		handleAmmoPickup(roomSessionPlayer);
+		break;
+	case eItemType::RED_MEDKIT:
+		handleMedkitPickup(roomSessionPlayer);
+		break;
+	case eItemType::BRONZE_COIN:
+	case eItemType::SILVER_COIN:
+	case eItemType::GOLDEN_COIN:
+		handleCoinPickup(roomSessionPlayer, itemType);
+		break;
+	case eItemType::NONE:
+		return;
+	}
 
-	roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, playerId, static_cast<U32>(item->getType()), itemUid, 0);
+	roomSession->relayPlaying<GCGameItem>(1, playerId, static_cast<U32>(item->getType()), uid, 0);
 
-	m_items.erase(itemUid);
+	m_items.erase(uid);
 }
 
-PveItem* RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
+std::shared_ptr<PveItem> RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
 {
 	const auto it = m_items.find(itemUid);
 
@@ -66,18 +86,48 @@ PveItem* RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
 		return nullptr;
 	}
 
-	return &it->second;
+	return it->second;
 }
 
 void RoomSessionPveItemManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const
 {
-	for (const auto& item : m_items)
+	for (const auto& [fst, snd] : m_items)
 	{
-		session->send<GCPvEItemInit>(item.second.getType(), item.first, item.second.getPosition());
+		session->send<GCPvEItemInit>(snd->getType(), fst, snd->getPosition());
 	}
 }
 
-void RoomSessionPveItemManager::tick() const
+void RoomSessionPveItemManager::handleAmmoPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer)
 {
+	roomSessionPlayer->getWeaponManager()->refillCurrentWeapon();
+}
 
+void RoomSessionPveItemManager::handleMedkitPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer)
+{
+	roomSessionPlayer->addHealth(50, true);
+}
+
+// TODO: Double check if the amount of coins u get is equal to the item type.
+void RoomSessionPveItemManager::handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, const eItemType itemType)
+{
+	auto coins = 0;
+
+	switch (itemType)
+	{
+	case eItemType::BRONZE_COIN:
+		coins = 5;
+		break;
+	case eItemType::SILVER_COIN:
+		coins = 20;
+		break;
+	case eItemType::GOLDEN_COIN:
+		coins = 100;
+		break;
+	case eItemType::NONE:
+	case eItemType::AMMO_CLIP:
+	case eItemType::RED_MEDKIT:
+		return;
+	}
+
+	roomSessionPlayer->getPlayer()->addCoins(coins);
 }
