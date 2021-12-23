@@ -21,7 +21,7 @@ public:
 
 	U8 playerRank = 1; // 240
 	U32 coins = 0; // 244
-	U16 unk_03 = 0; // 248 game sets player + 2776 to (packet + 248 != 0)
+	U16 doubleCoins = 0; // 248 anything else than 0 enables double coins for when the person picks up coins
 
 	GCPvEUserInit() : GameNetEvent{ GC_PVE_USER_INIT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient } {};
 	GCPvEUserInit(RoomPlayer::Ptr roomPlayer, bool spectatorMode = false) : GameNetEvent{ GC_PVE_USER_INIT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
@@ -56,6 +56,9 @@ public:
 		this->weaponCount = session->getWeaponManager()->getWeapons().size();
 		this->weapons = session->getWeaponManager()->getWeaponIds();
 		this->armor = session->getArmor();
+		this->playerRank = spectatorMode && player->getRank() == 3 && !player->getRoomPlayer()->getRoom()->isEventRoom() ? 4 : player->getRank();
+	
+		this->coins = player->getCoins();
 	}
 
 	void pack(EventConnection* conn, BitStream* bstream)
