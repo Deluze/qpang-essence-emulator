@@ -153,5 +153,5 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession) const
 		m_position
 	};
 
-	roomSession->getPveItemManager()->spawnItem(randomPveItem);
+	roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(randomPveItem));
 }
