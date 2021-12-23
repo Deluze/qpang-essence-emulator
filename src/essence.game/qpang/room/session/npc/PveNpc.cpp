@@ -2,14 +2,17 @@
 
 #include "RoomSession.h"
 
+// TODO: Create a more user-friendly constructor by making structs for the parameters.
+// TODO: Add item drops parameter to the constructor so every npc can have custom loot & probability.
 PveNpc::PveNpc(const eNpcType type, const Position& initialSpawnPosition, const uint16_t baseHealth,
-	const uint16_t initialSpawnRotation, const bool shouldRespawn, const uint64_t respawnTime) :
+	const uint16_t initialSpawnRotation, const bool canDropLootOnDeath, const bool shouldRespawn, const uint64_t respawnTime) :
 	m_type(type),
 	m_position(initialSpawnPosition),
 	m_initialSpawnPosition(initialSpawnPosition),
 	m_health(baseHealth),
 	m_baseHealth(baseHealth),
 	m_initialSpawnRotation(initialSpawnRotation),
+	m_canDropLootOnDeath(canDropLootOnDeath),
 	m_shouldRespawn(shouldRespawn),
 	m_respawnTime(respawnTime)
 {
@@ -60,11 +63,16 @@ uint16_t PveNpc::takeDamage(const uint16_t damage)
 	return damage;
 }
 
-void PveNpc::onDeath()
+void PveNpc::onDeath(const std::shared_ptr<RoomSession>& roomSession)
 {
 	if (m_shouldRespawn)
 	{
 		m_timeOfDeath = time(nullptr);
+	}
+
+	if (m_canDropLootOnDeath)
+	{
+		dropLoot(roomSession);
 	}
 }
 
@@ -111,4 +119,39 @@ bool PveNpc::shouldRespawn() const
 bool PveNpc::isDead() const
 {
 	return m_health <= 0;
+}
+
+void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession) const
+{
+	std::vector availableItemDrops
+	{
+		ItemDrop{ eItemType::NONE, 45 },
+		ItemDrop{ eItemType::AMMO_CLIP, 20 },
+		ItemDrop{ eItemType::GOLDEN_COIN, 5 },
+		ItemDrop{ eItemType::SILVER_COIN, 10 },
+		ItemDrop{ eItemType::BRONZE_COIN, 20 }
+	};
+
+	std::vector<eItemType> itemDrops{};
+
+	for (const auto [itemType, probability] : availableItemDrops)
+	{
+		for (size_t i = 0; i < probability; i++)
+		{
+			itemDrops.push_back(itemType);
+		}
+	}
+
+	// TODO: Properly create a random seed.
+	// See: https://stackoverflow.com/questions/50662280/c-need-a-good-technique-for-seeding-rand-that-does-not-use-time
+	srand(time(nullptr));
+
+	const auto randomItemType = itemDrops[rand() % itemDrops.size()];
+	const auto randomPveItem = PveItem
+	{
+		randomItemType,
+		m_position
+	};
+
+	roomSession->getPveItemManager()->spawnItem(randomPveItem);
 }

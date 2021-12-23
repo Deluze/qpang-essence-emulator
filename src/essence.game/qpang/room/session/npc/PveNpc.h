@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Position.h"
+#include "PveItem.h"
 
 class RoomSession;
 
@@ -36,13 +37,20 @@ enum class eNpcType : uint32_t
 	NORMAL_ABANDONED_DOLL = 38,
 };
 
+// TODO: Move to separate class.
+struct ItemDrop
+{
+	eItemType itemType;
+	uint8_t probability;
+};
+
 class PveNpc
 {
 public:
 	PveNpc() = default;
 	~PveNpc() = default;
 
-	PveNpc(eNpcType type, const Position& initialSpawnPosition, uint16_t baseHealth, uint16_t initialSpawnRotation, bool shouldRespawn, uint64_t respawnTime = 0);
+	PveNpc(eNpcType type, const Position& initialSpawnPosition, uint16_t baseHealth, uint16_t initialSpawnRotation, bool canDropLootOnDeath, bool shouldRespawn, uint64_t respawnTime = 0);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -69,7 +77,7 @@ public:
 	/**
 	 * \brief Handles the on death event for an npc.
 	 */
-	void onDeath();
+	void onDeath(const std::shared_ptr<RoomSession>& roomSession);
 
 #pragma endregion
 
@@ -140,7 +148,13 @@ public:
 
 #pragma endregion
 
-protected:
+private:
+	/**
+	 * \brief Picks a random item from the loot table and drops it.
+	 * \param roomSession The current room session.
+	 */
+	void dropLoot(const std::shared_ptr<RoomSession>& roomSession) const;
+
 	uint32_t m_uid{};
 	eNpcType m_type{};
 
@@ -151,6 +165,8 @@ protected:
 	uint16_t m_baseHealth{};
 
 	uint16_t m_initialSpawnRotation{};
+
+	bool m_canDropLootOnDeath;
 
 	bool m_shouldRespawn{};
 
