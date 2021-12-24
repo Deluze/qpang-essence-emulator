@@ -2,6 +2,9 @@
 #define CG_PVE_RESPAWN_REQ_H
 
 #include "GameNetEvent.h"
+
+#include "qpang/Game.h"
+
 class CGPvERespawnReq final : public GameNetEvent
 {
 	typedef NetEvent Parent;
@@ -14,7 +17,27 @@ public:
 
 	void handle(GameConnection* conn, Player::Ptr player) override
 	{
-		std::cout << "Reveived an unhandled CGPvERespawnReq event." << std::endl;
+		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
+		{
+			if (auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
+			{
+				if (canRespawn)
+				{
+					// The client told us it can respawn...
+					// Yeah, and I am the kerstman, let's check that, before making it the cat wise
+
+					if (player->getCoins() >= 100)
+					{
+						session->setCanRespawn(true);
+						player->removeCoins(100);
+					}
+				}
+				else
+				{
+					session->setCanRespawn(false);
+				}
+			}
+		}
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override
