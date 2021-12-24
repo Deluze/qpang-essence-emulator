@@ -152,10 +152,12 @@ void RoomSessionPlayer::tick()
 	if (needsToRemoveInvincibility)
 		removeInvincibility();
 
-	const auto needsToRespawn = m_respawnTime <= time(NULL) && m_isRespawning;
-
-	if (needsToRespawn)
-		respawn();
+	if (m_canRespawn)
+	{
+		const auto needsToRespawn = m_respawnTime <= time(NULL) && m_isRespawning;
+		if (needsToRespawn)
+			respawn();
+	}
 }
 
 void RoomSessionPlayer::start()
