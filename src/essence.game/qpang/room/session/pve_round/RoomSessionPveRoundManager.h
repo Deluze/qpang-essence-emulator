@@ -21,7 +21,11 @@ public:
 	/**
 	 * \brief Ends the current round which causes the client to send a start new round packet/event.
 	 */
-	void endRound() const;
+	void endRound();
+
+	void tick();
+
+	void checkRoundZeroFinished();
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 
