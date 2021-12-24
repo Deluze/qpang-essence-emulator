@@ -81,8 +81,6 @@ void PlayerVsEnvironment::onPlayerSync(const std::shared_ptr<RoomSessionPlayer> 
 	session->getRoomSession()->getNpcManager()->onPlayerSync(session);
 	session->getRoomSession()->getPveItemManager()->onPlayerSync(session);
 
-	session->getRoomSession()->relayPlaying<GCPvENpcInit>(eNpcType::EASY_SPY_CAM, 50, Position{ 36, 0, -30 }, (U16)90, (U8)0, (U32)0);
-
 	GameMode::onPlayerSync(session);
 }
 
