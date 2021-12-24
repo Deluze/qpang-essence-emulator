@@ -29,5 +29,6 @@ public:
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
 
+	bool m_roundEnded = false;
 	uint8_t m_currentRound = 0;
 };

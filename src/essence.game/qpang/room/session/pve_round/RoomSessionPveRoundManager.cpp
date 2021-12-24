@@ -20,6 +20,10 @@ void RoomSessionPveRoundManager::onStartNewRound()
 		return;
 	}
 
+	m_currentRound++;
+
+	roomSession->resetTime();
+
 	// Relay the new round to all players.
 	roomSession->relayPlaying<GCPvENewRound>();
 }
@@ -39,7 +43,11 @@ void RoomSessionPveRoundManager::endRound()
 		return;
 	}
 
-	m_currentRound++;
+	m_roundEnded = true;
+
+	roomSession->getObjectManager()->removeAll();
+	roomSession->getNpcManager()->removeAll();
+	roomSession->getPveItemManager()->removeAll();
 
 	// Relay the round ending to all players.
 	roomSession->relayPlaying<GCPvERoundEnd>();
@@ -47,6 +55,9 @@ void RoomSessionPveRoundManager::endRound()
 
 void RoomSessionPveRoundManager::tick()
 {
+	if (m_roundEnded)
+		return;
+
 	switch (m_currentRound)
 	{
 	case 0:
