@@ -66,6 +66,10 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_armor = equipManager->getArmorItemIdsByCharacter(m_character);
 
 	m_hasQuickRevive = equipManager->hasFunctionCard(QUICK_REVIVE);
+	m_respawnCooldown = m_hasQuickRevive ? 5 : 7;
+
+	if (auto room = roomSession->getRoom(); room->getMode() == GameMode::PVE)
+		m_respawnCooldown = 10;
 
 	m_expRate += equipManager->hasFunctionCard(EXP_MAKER_25) ? 25 : 0;
 	m_expRate += equipManager->hasFunctionCard(EXP_MAKER_50) ? 50 : 0;
@@ -375,7 +379,7 @@ uint16_t RoomSessionPlayer::getDefaultHealth()
 
 uint8_t RoomSessionPlayer::getRespawnCooldown()
 {
-	return m_hasQuickRevive ? 5 : 7;
+	return m_respawnCooldown;
 }
 
 std::array<uint32_t, 9> RoomSessionPlayer::getArmor()

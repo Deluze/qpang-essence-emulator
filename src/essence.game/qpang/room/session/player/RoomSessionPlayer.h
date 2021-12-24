@@ -166,6 +166,8 @@ private:
 	std::array<uint32_t, 9> m_armor;
 
 	std::mutex m_bulletMx;
+
+	uint8_t m_respawnCooldown;
 	
 	bool m_hasQuickRevive;
 	bool m_isInvincible;
