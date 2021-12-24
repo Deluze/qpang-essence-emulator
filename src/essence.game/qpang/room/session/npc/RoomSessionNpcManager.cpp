@@ -124,6 +124,11 @@ void RoomSessionNpcManager::killNpc(const uint32_t uid)
 	npc->onDeath(roomSession);
 }
 
+void RoomSessionNpcManager::removeAll()
+{
+	m_npcs.clear();
+}
+
 std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
 {
 	const auto& it = m_npcs.find(uid);

@@ -72,6 +72,11 @@ void RoomSessionObjectManager::destroyObject(const uint32_t uid)
 	m_objects.erase(uid);
 }
 
+void RoomSessionObjectManager::removeAll()
+{
+	m_objects.clear();
+}
+
 void RoomSessionObjectManager::openGate(const uint32_t uid) const
 {
 	const auto roomSession = m_roomSession.lock();

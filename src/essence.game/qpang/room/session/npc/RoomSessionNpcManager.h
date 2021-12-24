@@ -48,6 +48,11 @@ public:
 	void killNpc(uint32_t uid);
 
 	/**
+	 * \brief Removes all npcs from the map.
+	 */
+	void removeAll();
+
+	/**
 	 * \brief Looks up the npc by uid.
 	 * \param uid The uid of the npc you want to find.
 	 * \return The found npc or null.

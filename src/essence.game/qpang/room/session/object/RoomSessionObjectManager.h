@@ -39,6 +39,11 @@ public:
 	void destroyObject(uint32_t uid);
 
 	/**
+	 * \brief Removes all objects from the map.
+	 */
+	void removeAll();
+
+	/**
 	 * \brief Relays a gc_pve_door event to everyone to open the door/gate.
 	 * \param uid The uid of the object/gate you want to open.
 	 */

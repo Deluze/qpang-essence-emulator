@@ -35,6 +35,11 @@ public:
 	void onItemPickup(uint32_t playerId, uint32_t uid);
 
 	/**
+	 * \brief Removes all items from the map.
+	 */
+	void removeAll();
+
+	/**
 	 * \brief Looks up the item by uid.
 	 * \param itemUid The uid of the item you are looking for.
 	 * \return The item if it was found otherwise null.

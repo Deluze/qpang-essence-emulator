@@ -77,6 +77,11 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 	m_items.erase(uid);
 }
 
+void RoomSessionPveItemManager::removeAll()
+{
+	m_items.clear();
+}
+
 std::shared_ptr<PveItem> RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
 {
 	const auto it = m_items.find(itemUid);
