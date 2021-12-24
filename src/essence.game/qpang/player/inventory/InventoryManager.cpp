@@ -118,7 +118,14 @@ void InventoryManager::sendCards()
 	}
 
 	// the amount of elements after which the packet will be divided. can be configured
-	constexpr uint16_t partitionSize = 50;
+	constexpr uint16_t partitionSize = 200;
+
+	if (inventoryCards.size() <= partitionSize)
+	{
+		player->send(SendInventoryCards(inventoryCards, inventoryCards.size(), inventoryCards.size(), inventoryCards.size()));
+
+		return;
+	}
 
 	// the amount of partitions to send
 	const auto partitionCount = static_cast<uint32_t>(ceil(inventoryCards.size() / static_cast<double>(partitionSize)));
