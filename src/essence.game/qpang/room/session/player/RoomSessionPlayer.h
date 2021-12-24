@@ -53,7 +53,11 @@ public:
 	void addHealth(uint16_t health, bool updateOnClient = false);
 	void takeHealth(uint16_t health, bool updateOnClient = false);
 	void setHealth(uint16_t health, bool updateOnClient = false);
+
+	void setPermanentlyDead(bool permanentlyDead);
+
 	bool isDead();
+	bool isPermanentlyDead();
 
 	bool canRespawn();
 	void setCanRespawn(bool canRespawn);
@@ -151,6 +155,7 @@ private:
 	time_t m_respawnTime;
 
 	bool m_isPlaying; // true if waiting for players is over
+	bool m_permanentlyDead;
 
 	bool m_canRespawn;
 	bool m_isRespawning;

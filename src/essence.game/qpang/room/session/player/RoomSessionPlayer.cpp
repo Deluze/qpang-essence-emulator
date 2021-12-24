@@ -42,6 +42,7 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_damageDealtToTag(0),
 	m_damageDealtAsTag(0),
 	m_canRespawn(true),
+	m_permanentlyDead(false),
 	m_conn(conn),
 	m_roomSession(roomSession)
 {
@@ -322,14 +323,24 @@ bool RoomSessionPlayer::isDead()
 	return m_health <= 0;
 }
 
+bool RoomSessionPlayer::isPermanentlyDead()
+{
+	return isDead() && m_permanentlyDead;
+}
+
 bool RoomSessionPlayer::canRespawn()
 {
-	return m_canRespawn;
+	return m_canRespawn && !m_permanentlyDead;
 }
 
 void RoomSessionPlayer::setCanRespawn(bool canRespawn) 
 {
 	m_canRespawn = canRespawn;
+}
+
+void RoomSessionPlayer::setPermanentlyDead(bool permanentlyDead)
+{
+	m_permanentlyDead = permanentlyDead;
 }
 
 void RoomSessionPlayer::respawn()
