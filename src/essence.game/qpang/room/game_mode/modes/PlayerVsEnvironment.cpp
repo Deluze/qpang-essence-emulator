@@ -94,3 +94,12 @@ void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 
 	GameMode::tick(roomSession);
 }
+
+void PlayerVsEnvironment::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)
+{
+	// Set can respawn to false, as the player should not suddenly respawn when not selecting a respawn option.
+	// This will be overridden in the CGPvERespawnReq packet, when the target makes a choise.
+	target->setCanRespawn(false);
+
+	GameMode::onPlayerKill(killer, target, weapon, hitLocation);
+}

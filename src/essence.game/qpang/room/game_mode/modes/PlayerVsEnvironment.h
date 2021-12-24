@@ -13,4 +13,5 @@ public:
 	void onStart(std::shared_ptr<RoomSession> roomSession) override;
 
 	void tick(std::shared_ptr<RoomSession> roomSession) override;
+	void onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation) override;
 };
