@@ -6,7 +6,7 @@ class CGPvERespawnReq final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	bool flag; // 44
+	bool canRespawn; // 44
 
 	CGPvERespawnReq() : GameNetEvent{ CG_PVE_RESPAWN_REQ, GuaranteedOrdered, DirClientToServer} {}
 
@@ -14,13 +14,12 @@ public:
 
 	void handle(GameConnection* conn, Player::Ptr player) override
 	{
-		// TODO: Handle CGPvERespawnReq.
 		std::cout << "Reveived an unhandled CGPvERespawnReq event." << std::endl;
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
-		flag = bstream->readFlag();
+		canRespawn = bstream->readFlag();
 	}
 
 	void process(EventConnection* ps) override
