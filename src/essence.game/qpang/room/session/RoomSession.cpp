@@ -590,6 +590,12 @@ uint32_t RoomSession::getTopScore()
 	return topScore;
 }
 
+void RoomSession::resetTime()
+{
+	m_startTime = time(NULL);
+	m_endTime = m_startTime + m_goal * 60;
+}
+
 void RoomSession::resetEssence()
 {
 	m_isEssenceReset = true;

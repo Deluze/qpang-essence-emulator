@@ -80,6 +80,8 @@ public:
 	uint32_t getPointsForTeam(uint8_t team);
 	uint32_t getTopScore();
 
+	void resetTime();
+
 #pragma region Essence
 
 	void resetEssence();
@@ -128,7 +130,7 @@ public:
 	bool hasTagCountdownEnded();
 	void initiateTagCountdown(uint32_t countdownTime = 5000);
 	void decreaseTagCountdown(uint32_t countdownTime = 1000);
-	
+
 	uint32_t getInitialWaitTime();
 
 	bool hasInitialWaitTimeElapsed();
