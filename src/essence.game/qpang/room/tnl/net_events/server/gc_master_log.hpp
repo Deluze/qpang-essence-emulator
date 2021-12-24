@@ -8,13 +8,13 @@ class GCMasterLog : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 	GCMasterLog() : GameNetEvent{ GC_MASTERLOG, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {};
-	GCMasterLog(U32 a1, U32 a2, Position a3, U64 a4) : GameNetEvent{ GC_MASTERLOG, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny }
+	GCMasterLog(U32 npcUid, U32 npcWeaponBodyPartId, Position shootTargetPosition, U64 a4) : GameNetEvent{ GC_MASTERLOG, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny }
 	{
-		unk_01 = a1;
-		unk_02 = a2;
-		unk_07 = *(U32*)&a3.x;
-		unk_08 = *(U32*)&a3.y;
-		unk_09 = *(U32*)&a3.z;
+		unk_01 = npcUid;
+		unk_02 = npcWeaponBodyPartId;
+		unk_07 = *(U32*)&shootTargetPosition.x;
+		unk_08 = *(U32*)&shootTargetPosition.y;
+		unk_09 = *(U32*)&shootTargetPosition.z;
 		unk_10 = (U32)((a4 & 0xFFFFFFFF00000000LL) >> 32);
 		unk_11 = (U32)(a4 & 0xFFFFFFFFLL);
 	};
