@@ -315,6 +315,16 @@ bool RoomSessionPlayer::isDead()
 	return m_health <= 0;
 }
 
+bool RoomSessionPlayer::canRespawn()
+{
+	return m_canRespawn;
+}
+
+void RoomSessionPlayer::setCanRespawn(bool canRespawn) 
+{
+	m_canRespawn = canRespawn;
+}
+
 void RoomSessionPlayer::respawn()
 {
 	m_isRespawning = false;

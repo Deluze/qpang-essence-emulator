@@ -55,6 +55,9 @@ public:
 	void setHealth(uint16_t health, bool updateOnClient = false);
 	bool isDead();
 
+	bool canRespawn();
+	void setCanRespawn(bool canRespawn);
+
 	void respawn();
 	void startRespawnCooldown(bool hasCooldown = true);
 
@@ -148,6 +151,8 @@ private:
 	time_t m_respawnTime;
 
 	bool m_isPlaying; // true if waiting for players is over
+
+	bool m_canRespawn;
 	bool m_isRespawning;
 
 	bool m_isSpectating;
