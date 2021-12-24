@@ -34,7 +34,7 @@ public:
 				}
 				else
 				{
-					session->setCanRespawn(false);
+					session->setPermanentlyDead(true);
 				}
 			}
 		}
