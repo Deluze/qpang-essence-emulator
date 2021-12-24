@@ -41,6 +41,7 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_timeAliveAsTag(0),
 	m_damageDealtToTag(0),
 	m_damageDealtAsTag(0),
+	m_canRespawn(true),
 	m_conn(conn),
 	m_roomSession(roomSession)
 {
