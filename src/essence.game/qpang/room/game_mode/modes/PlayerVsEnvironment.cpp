@@ -90,6 +90,8 @@ void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 	roomSession->getNpcManager()->tick();
 	roomSession->getPveItemManager()->tick();
 
+	roomSession->getPveRoundManager()->tick();
+
 	GameMode::tick(roomSession);
 }
 
