@@ -102,6 +102,30 @@ void RoomSessionNpcManager::initializeNpcs()
 			lootDropResult->next();
 		}
 
+		const auto getBodyPartsStatement = DATABASE->prepare("SELECT * FROM pve_npc_body_parts WHERE npc_id = ?");
+
+		getBodyPartsStatement->bindInteger(npcId);
+
+		const auto bodyPartResult = getBodyPartsStatement->fetch();
+
+		std::vector<NpcBodyPart> bodyParts{};
+
+		while (bodyPartResult->hasNext())
+		{
+			auto bodyPart = NpcBodyPart
+			{
+				bodyPartResult->getInt("body_part_id"),
+				bodyPartResult->getShort("health"),
+				bodyPartResult->getInt("weapon_item_id"),
+				bodyPartResult->getInt("item_box_id"),
+				bodyPartResult->getFlag("is_dual_gun")
+			};
+
+			bodyParts.push_back(bodyPart);
+
+			bodyPartResult->next();
+		}
+
 		auto npc = PveNpc(
 			npcResult->getTiny("Type"),
 			npcResult->getShort("BaseHealth"),
@@ -122,7 +146,9 @@ void RoomSessionNpcManager::initializeNpcs()
 			static_cast<eNpcGradeType>(npcResult->getTiny("MovementType")),
 			static_cast<eNpcMovementType>(npcResult->getTiny("GradeType")),
 			static_cast<eNpcTargetType>(npcResult->getTiny("TargetType")),
-			lootDrops);
+			lootDrops,
+			bodyParts
+			);
 
 		m_npcs.push_back(npc);
 

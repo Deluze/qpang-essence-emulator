@@ -4,13 +4,11 @@
 #include "gc_pve_npc_init.hpp"
 #include "RoomSession.h"
 
-// TODO: Create a more user-friendly constructor by making structs for the parameters.
-// TODO: Add item drops parameter to the constructor so every npc can have custom loot & probability.
 PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
 	const uint32_t attackTimeInMillis, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
 	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
 	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType,
-	const std::vector<NpcLootDrop>& lootDrops) :
+	const std::vector<NpcLootDrop>& lootDrops, const std::vector<NpcBodyPart>& bodyParts) :
 	m_type(type),
 	m_baseHealth(baseHealth),
 	m_health(baseHealth),
@@ -28,9 +26,9 @@ PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const uint32_t we
 	m_gradeType(gradeType),
 	m_movementType(movementType),
 	m_targetType(targetType),
-	m_lootDrops(lootDrops)
+	m_lootDrops(lootDrops),
+	m_bodyParts(bodyParts)
 {
-	// TODO: Body parts.
 }
 
 void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
@@ -152,6 +150,11 @@ uint16_t PveNpc::getInitialRotation() const
 bool PveNpc::shouldRespawn() const
 {
 	return m_shouldRespawn;
+}
+
+std::vector<NpcBodyPart> PveNpc::getBodyParts()
+{
+	return m_bodyParts;
 }
 
 bool PveNpc::isDead() const

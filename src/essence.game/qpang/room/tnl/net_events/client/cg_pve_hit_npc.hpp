@@ -145,7 +145,22 @@ public:
 		}
 
 		// TODO: Check if weaponType matches with the used weapon.
-		// TODO: Check if the npc contains the given body part id.
+
+		auto isValidNpcBodyPart = false;
+
+		for (const auto& bodyPart : targetNpc->getBodyParts())
+		{
+			if (bodyPart.id == bodyPartId)
+			{
+				isValidNpcBodyPart = true;
+			}
+		}
+
+		// The body part that was hit must be valid (in other words, the npc must actually have that body part).
+		if (!isValidNpcBodyPart)
+		{
+			return;
+		}
 
 		// TODO: At this point we know the player & npc exists and both are not dead,
 		// TODO: more checks probably need to happen but for now we can relay the damage.

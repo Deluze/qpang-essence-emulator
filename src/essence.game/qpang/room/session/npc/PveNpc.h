@@ -40,6 +40,15 @@ struct NpcLootDrop
 	uint32_t probability;
 };
 
+struct NpcBodyPart
+{
+	uint32_t id;
+	uint16_t health;
+	uint32_t weaponItemId;
+	uint32_t itemBoxId;
+	bool isDualGun;
+};
+
 class PveNpc
 {
 public:
@@ -49,7 +58,7 @@ public:
 	PveNpc(uint32_t type, uint16_t baseHealth, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t attackTimeInMillis,
 		float attackWidth, float attackHeight, bool shouldRespawn, uint32_t respawnTime, bool canDropLoot,
 		uint16_t initialRotation, Position initialPosition, eNpcGradeType gradeType, eNpcMovementType movementType,
-		eNpcTargetType targetType, const std::vector<NpcLootDrop>& lootDrops);
+		eNpcTargetType targetType, const std::vector<NpcLootDrop>& lootDrops, const std::vector<NpcBodyPart>& bodyParts);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -161,6 +170,12 @@ public:
 	bool shouldRespawn() const;
 
 	/**
+	 * \brief The body parts of the npc.
+	 * \return The body parts.
+	 */
+	std::vector<NpcBodyPart> getBodyParts();
+
+	/**
 	 * \brief Whether or not the npc is dead.
 	 * \return true if the npc is dead otherwise false.
 	 */
@@ -214,6 +229,5 @@ private:
 	eNpcTargetType m_targetType;
 
 	std::vector<NpcLootDrop> m_lootDrops{};
-	// TODO: Bodyparts
-	// TODO: Loot
+	std::vector<NpcBodyPart> m_bodyParts{};
 };
