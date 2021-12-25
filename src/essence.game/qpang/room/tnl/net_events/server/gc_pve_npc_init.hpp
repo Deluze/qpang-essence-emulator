@@ -18,28 +18,14 @@ public:
 
 	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient } {}
 
-	GCPvENpcInit(const eNpcType npcType, const uint32_t npcUid, const Position position, const uint16_t rotation)
+	GCPvENpcInit(const uint32_t type, const uint32_t npcUid, const Position position, const uint16_t rotation)
 		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient },
-		npcType(static_cast<U32>(npcType)),
+		npcType(type),
 		npcUid(npcUid),
 		xPos(position.x),
 		yPos(position.y),
 		zPos(position.z),
 		rotation(rotation)
-	{
-
-	}
-
-	GCPvENpcInit(const eNpcType npcType, const uint32_t npcUid, const Position position, U16 rotation, U8 shouldExplode, U32 unk_08)
-		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient },
-		npcType(static_cast<U32>(npcType)),
-		npcUid(npcUid),
-		xPos(position.x),
-		yPos(position.y),
-		zPos(position.z),
-		rotation(rotation),
-		shouldExplode(shouldExplode),
-		unk_08(unk_08)
 	{
 
 	}
