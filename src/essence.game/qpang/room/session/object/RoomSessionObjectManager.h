@@ -19,6 +19,12 @@ public:
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
+
+	/**
+	 * \brief Retrieves all objects for the current map.
+	 */
+	void initializeObjects();
+
 	/**
 	 * \brief Spawns in an object.
 	 * \param object The object you want to spawn in.
