@@ -34,10 +34,10 @@ enum class eNpcTargetType : uint8_t
 	T_DAMAGE = 6
 };
 
-struct LootDrop
+struct NpcLootDrop
 {
-	eItemType itemType;
-	uint8_t probability;
+	uint32_t itemId;
+	uint32_t probability;
 };
 
 class PveNpc
@@ -49,7 +49,7 @@ public:
 	PveNpc(uint32_t type, uint16_t baseHealth, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t attackTimeInMillis,
 		float attackWidth, float attackHeight, bool shouldRespawn, uint32_t respawnTime, bool canDropLoot,
 		uint16_t initialRotation, Position initialPosition, eNpcGradeType gradeType, eNpcMovementType movementType,
-		eNpcTargetType targetType);
+		eNpcTargetType targetType, const std::vector<NpcLootDrop>& lootDrops);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -213,6 +213,7 @@ private:
 	eNpcMovementType m_movementType;
 	eNpcTargetType m_targetType;
 
+	std::vector<NpcLootDrop> m_lootDrops{};
 	// TODO: Bodyparts
 	// TODO: Loot
 };

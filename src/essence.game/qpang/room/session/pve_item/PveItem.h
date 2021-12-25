@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Position.h"
+#include "RoomSessionPlayer.h"
 
 class RoomSession;
 
@@ -20,12 +21,19 @@ class PveItem final
 {
 public:
 	PveItem() = default;
-	PveItem(eItemType type, const Position& position);
+	PveItem(uint32_t itemId, const Position& position);
 
 	~PveItem() = default;
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
+	/**
+	 * \brief Relays the item init event.
+	 * \param roomSession The room in session.
+	 */
+	void spawn(const std::shared_ptr<RoomSession>& roomSession) const;
+	void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const;
+	
 	/**
 	 * \brief Sets the uid of the item.
 	 * \param uid The uid of the item.
@@ -40,11 +48,11 @@ public:
 	uint32_t getUid() const;
 
 	/**
-	 * \brief Gets the type of the item.
-	 * \return The type of the item.
+	 * \brief Gets the item id.
+	 * \return The id of the item.
 	 */
 	[[nodiscard]]
-	eItemType getType() const;
+	uint32_t getItemId() const;
 
 	/**
 	 * \brief Gets the position of the item.
@@ -54,6 +62,6 @@ public:
 	Position getPosition() const;
 protected:
 	uint32_t m_uid{};
-	eItemType m_type;
+	uint32_t m_itemId;
 	Position m_position{};
 };

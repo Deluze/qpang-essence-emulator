@@ -9,7 +9,8 @@
 PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
 	const uint32_t attackTimeInMillis, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
 	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
-	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType) :
+	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType,
+	const std::vector<NpcLootDrop>& lootDrops) :
 	m_type(type),
 	m_baseHealth(baseHealth),
 	m_health(baseHealth),
@@ -26,9 +27,9 @@ PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const uint32_t we
 	m_position(initialPosition),
 	m_gradeType(gradeType),
 	m_movementType(movementType),
-	m_targetType(targetType)
+	m_targetType(targetType),
+	m_lootDrops(lootDrops)
 {
-	// TODO: Loot
 	// TODO: Body parts.
 }
 
@@ -160,22 +161,13 @@ bool PveNpc::isDead() const
 
 void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 {
-	std::vector availableItemDrops
-	{
-		LootDrop{ eItemType::NONE, 45 },
-		LootDrop{ eItemType::AMMO_CLIP, 20 },
-		LootDrop{ eItemType::GOLDEN_COIN, 5 },
-		LootDrop{ eItemType::SILVER_COIN, 10 },
-		LootDrop{ eItemType::BRONZE_COIN, 20 }
-	};
+	std::vector<uint32_t> itemDrops{};
 
-	std::vector<eItemType> itemDrops{};
-
-	for (const auto [itemType, probability] : availableItemDrops)
+	for (const auto [itemId, probability] : m_lootDrops)
 	{
 		for (size_t i = 0; i < probability; i++)
 		{
-			itemDrops.push_back(itemType);
+			itemDrops.push_back(itemId);
 		}
 	}
 
@@ -184,6 +176,7 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 	srand(time(nullptr));
 
 	const auto randomItemType = itemDrops[rand() % itemDrops.size()];
+
 	const auto randomPveItem = PveItem
 	{
 		randomItemType,
