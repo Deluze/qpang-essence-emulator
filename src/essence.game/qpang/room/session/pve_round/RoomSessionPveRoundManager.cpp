@@ -23,7 +23,10 @@ void RoomSessionPveRoundManager::onStartNewRound()
 	m_currentRound++;
 
 	roomSession->resetTime();
+
 	roomSession->getRoom()->setMap(roomSession->getRoom()->getMap() + 1);
+
+	roomSession->getObjectManager()->initializeObjects();
 	roomSession->getNpcManager()->initializeNpcs();
 
 	// Relay the new round to all players.
