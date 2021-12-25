@@ -23,6 +23,8 @@ void RoomSessionPveRoundManager::onStartNewRound()
 	m_currentRound++;
 
 	roomSession->resetTime();
+	roomSession->getRoom()->setMap(roomSession->getRoom()->getMap() + 1);
+	roomSession->getNpcManager()->initializeNpcs();
 
 	// Relay the new round to all players.
 	roomSession->relayPlaying<GCPvENewRound>();
@@ -63,36 +65,49 @@ void RoomSessionPveRoundManager::tick()
 	case 0:
 		checkRoundZeroFinished();
 		break;
+	default:
+		break;
 	}
 }
 
 void RoomSessionPveRoundManager::checkRoundZeroFinished()
 {
 	const auto roomSession = m_roomSession.lock();
+
 	if (roomSession == nullptr)
+	{
 		return;
+	}
 
 	const auto players = roomSession->getPlayingPlayers();
 
-	const int finishesNeeded = players.size();
+	const int finishesNeeded = static_cast<int>(players.size());
+
 	int deadFinishes = 0;
 	int actualFinishes = 0;
 
-	const auto boundsMin = Position{ 24.37f, 0.f, 25.8f };
-	const auto boundsMax = Position{ 40.92f, 50.f, 38.54f };
+	constexpr auto boundsMin = Position{ 24.37f, 0.f, 25.8f };
+	constexpr auto boundsMax = Position{ 40.92f, 50.f, 38.54f };
 
 	for (const auto& player : players)
 	{
 		if (AABBHelper::isPositionInBetweenBounds(player->getPosition(), boundsMin, boundsMax))
+		{
 			actualFinishes++;
+		}
 		else if (player->isPermanentlyDead())
+		{
 			deadFinishes++;
+		}
 	}
 
 	if (actualFinishes == 0)
+	{
 		return;
+	}
 
-	bool finishedStage = actualFinishes + deadFinishes == finishesNeeded;
-	if (finishedStage)
+	if (const bool finishedStage = actualFinishes + deadFinishes == finishesNeeded)
+	{
 		endRound();
+	}
 }

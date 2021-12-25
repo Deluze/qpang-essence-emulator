@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <map>
+#include <vector>
 
 #include "CGPvEHitNpcData.h"
 #include "PveNpc.h"
@@ -19,14 +20,19 @@ public:
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
 	/**
-	 * \brief For updating npc related stuff every tick.
+	 * \brief Updates npc related stuff every tick.
 	 */
 	void tick() const;
 
 	/**
-	 * \brief Temporary function for spawning initial npcs.
+	 * \brief Retrieves all npcs for the current map.
 	 */
-	void spawnInitialNpcs();
+	void initializeNpcs();
+
+	/**
+	 * \brief Spawns in all of the initialized npcs.
+	 */	
+	void spawnInitializedNpcs();
 
 	/**
 	 * \brief Spawns in an npc.
@@ -48,7 +54,7 @@ public:
 	void killNpc(uint32_t uid);
 
 	/**
-	 * \brief Removes all npcs from the map.
+	 * \brief Removes all npcs from memory.
 	 */
 	void removeAll();
 
@@ -78,5 +84,7 @@ public:
 	void onCGPvEHitNpc(const CGPvEHitNpcData& data);
 private:
 	std::weak_ptr<RoomSession> m_roomSession;
-	std::unordered_map<uint32_t, std::shared_ptr<PveNpc>> m_npcs{};
+
+	std::vector<PveNpc> m_npcs{};
+	std::unordered_map<uint32_t, std::shared_ptr<PveNpc>> m_spawnedNpcs{};
 };

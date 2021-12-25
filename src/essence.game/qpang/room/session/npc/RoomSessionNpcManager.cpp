@@ -12,7 +12,9 @@ void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomS
 {
 	m_roomSession = roomSession;
 
-	spawnInitialNpcs();
+	initializeNpcs();
+
+	spawnInitializedNpcs();
 }
 
 void RoomSessionNpcManager::tick() const
@@ -24,41 +26,96 @@ void RoomSessionNpcManager::tick() const
 		return;
 	}
 
-	for (const auto& [uid, npc] : m_npcs)
+	for (const auto& [uid, npc] : m_spawnedNpcs)
 	{
 		npc->tick(roomSession);
 	}
 }
 
-void RoomSessionNpcManager::spawnInitialNpcs()
+void RoomSessionNpcManager::initializeNpcs()
 {
-	// Stage 1.
-	const std::vector npcs
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
 	{
-		// Wall 1 left, first spy cam.
-		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{-11.99f, 3.12f, -20.30f}, 60, 90, false, true, 5),
-		// Wall 1 left, last spy cam.
-		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{-3.91f, 3.12f, -20.30f}, 60, 90, false, true, 5),
+		return;
+	}
 
-		// Wall 2 left, first spy cam.
-		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{17.70f, 3.155f, -20.0f}, 60, 90, false, true, 5),
-		// Wall 2 right, first middle spy cam.
-		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{23.65f, 3.155f, -26.80f}, 60, 270, false, true, 5),
-		// Wall 2 left, last spy cam.
-		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{33.30f, 3.155f, -20.0f}, 60, 90, false, true, 5),
+	const auto statement = DATABASE->prepare(
+		"SELECT "
+		"pve_npcs.id AS Id "
+		",pve_npcs.type AS Type "
+		",pve_npcs.base_health AS BaseHealth "
+		",pve_npcs.weapon_item_id AS WeaponItemId "
+		",pve_npcs.weapon_body_part_id AS WeaponBodyPartId "
+		",pve_npcs.attack_time_millis AS AttackTimeInMillis "
+		",pve_npcs.attack_width AS AttackWidth "
+		",pve_npcs.attack_height AS AttackHeight "
+		",pve_npcs.can_drop_loot AS CanDropLoot "
+		",pve_npc_spawns.should_respawn AS ShouldRespawn "
+		",pve_npc_spawns.respawn_time AS RespawnTime "
+		",pve_npc_spawns.initial_rotation AS InitialRotation "
+		",pve_npc_spawns.spawn_position_x AS SpawnPositionX "
+		",pve_npc_spawns.spawn_position_y AS SpawnPositionY "
+		",pve_npc_spawns.spawn_position_z AS SpawnPositionZ "
+		",pve_npc_movement_types.type AS MovementType "
+		",pve_npc_target_types.type AS TargetType "
+		",pve_npc_grade_types.type AS GradeType "
+		"FROM pve_npc_spawns "
+		"INNER JOIN pve_npcs ON pve_npcs.id = pve_npc_spawns.npc_id "
+		"INNER JOIN pve_npc_movement_types ON pve_npc_movement_types.id = pve_npcs.movement_type_id "
+		"INNER JOIN pve_npc_target_types ON pve_npc_target_types.id = pve_npcs.target_type_id "
+		"INNER JOIN pve_npc_grade_types ON pve_npc_grade_types.id = pve_npcs.grade_type_id "
+		"INNER JOIN maps on maps.id = pve_npc_spawns.map_id "
+		"WHERE maps.map_id = ?;"
+	);
 
-		// Wall 3 right, first spy cam.
-		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{25.04f, 3.10f, 9.85f}, 60, 270, false, true, 5),
-		// Wall 3 right, last spy cam.
-		std::make_shared<PveNpc>(eNpcType::EASY_SPY_CAM, Position{32.37f, 3.15f, 8.40f}, 60, 270, false, true, 5),
+	statement->bindInteger(roomSession->getRoom()->getMap());
 
-		// First violent plant.
-		std::make_shared<PveNpc>(eNpcType::EASY_VIOLENT_PLANT, Position{-3.62f, 0.00f, -32.86f }, 60, 270, true, true, 5),
-	};
+	const auto result = statement->fetch();
 
-	for (auto& npc : npcs)
+	m_npcs.clear();
+	m_spawnedNpcs.clear();
+
+	while (result->hasNext())
 	{
-		spawnNpc(npc);
+		// Primary key
+		result->getInt("Id");
+
+		// TODO: Get the drops and bodyparts.
+
+		auto npc = PveNpc(
+			result->getTiny("Type"),
+			result->getShort("BaseHealth"),
+			result->getInt("WeaponItemId"),
+			result->getTiny("WeaponBodyPartId"),
+			result->getInt("AttackTimeInMillis"),
+			result->getFloat("AttackWidth"),
+			result->getFloat("AttackHeight"),
+			result->getInt("ShouldRespawn"),
+			result->getInt("RespawnTime"),
+			result->getFlag("CanDropLoot"),
+			result->getShort("InitialRotation"),
+			Position{
+				result->getFloat("SpawnPositionX"),
+				result->getFloat("SpawnPositionY"),
+				result->getFloat("SpawnPositionZ"),
+			},
+			static_cast<eNpcGradeType>(result->getTiny("MovementType")),
+			static_cast<eNpcMovementType>(result->getTiny("GradeType")),
+			static_cast<eNpcTargetType>(result->getTiny("TargetType")));
+
+		m_npcs.push_back(npc);
+
+		result->next();
+	}
+}
+
+void RoomSessionNpcManager::spawnInitializedNpcs()
+{
+	for (const auto& npc : m_npcs)
+	{
+		spawnNpc(std::make_shared<PveNpc>(npc));
 	}
 }
 
@@ -71,15 +128,12 @@ uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 		return 0;
 	}
 
-	const auto npcUid = (m_npcs.size() + 1);
+	npc->setUid(m_spawnedNpcs.size() + 1);
+	npc->spawn(roomSession);
 
-	npc->setUid(npcUid);
+	m_spawnedNpcs[npc->getUid()] = npc;
 
-	roomSession->relayPlaying<GCPvENpcInit>(npc->getType(), npcUid, npc->getInitialSpawnPosition(), npc->getInitialSpawnRotation());
-
-	m_npcs[npcUid] = npc;
-
-	return npcUid;
+	return npc->getUid();
 }
 
 void RoomSessionNpcManager::respawnNpcByUid(const uint32_t uid)
@@ -98,9 +152,7 @@ void RoomSessionNpcManager::respawnNpcByUid(const uint32_t uid)
 		return;
 	}
 
-	npc->resetHealth();
-
-	roomSession->relayPlaying<GCPvENpcInit>(npc->getType(), npc->getUid(), npc->getInitialSpawnPosition(), npc->getInitialSpawnRotation());
+	npc->respawn(roomSession);
 }
 
 void RoomSessionNpcManager::killNpc(const uint32_t uid)
@@ -119,21 +171,20 @@ void RoomSessionNpcManager::killNpc(const uint32_t uid)
 		return;
 	}
 
-	roomSession->relayPlaying<GCPvEDieNpc>(uid);
-
-	npc->onDeath(roomSession);
+	npc->die(roomSession);
 }
 
 void RoomSessionNpcManager::removeAll()
 {
 	m_npcs.clear();
+	m_spawnedNpcs.clear();
 }
 
 std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
 {
-	const auto& it = m_npcs.find(uid);
+	const auto& it = m_spawnedNpcs.find(uid);
 
-	if (it == m_npcs.end())
+	if (it == m_spawnedNpcs.end())
 	{
 		return nullptr;
 	}
@@ -145,7 +196,7 @@ std::vector<std::shared_ptr<PveNpc>> RoomSessionNpcManager::getAliveNpcs()
 {
 	std::vector<std::shared_ptr<PveNpc>> aliveNpcs{};
 
-	for (const auto& [id, npc] : m_npcs)
+	for (const auto& [id, npc] : m_spawnedNpcs)
 	{
 		if (!npc->isDead())
 		{
@@ -162,7 +213,7 @@ void RoomSessionNpcManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer
 {
 	for (const auto& npc : getAliveNpcs())
 	{
-		session->send<GCPvENpcInit>(npc->getType(), npc->getUid(), npc->getPosition(), npc->getInitialSpawnRotation());
+		npc->spawn(session);
 	}
 }
 

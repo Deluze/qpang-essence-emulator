@@ -1,6 +1,5 @@
 #pragma once
 
-#include "gc_pve_npc_init.hpp"
 #include "qpang/chat/command/Command.h"
 #include "qpang/room/RoomPlayer.h"
 
@@ -33,6 +32,6 @@ public:
 
 		const auto roomSession = roomSessionPlayer->getRoomSession();
 
-		roomSession->getNpcManager()->spawnInitialNpcs();
+		roomSession->getNpcManager()->spawnInitializedNpcs();
 	}
 };

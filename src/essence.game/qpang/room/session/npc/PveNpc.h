@@ -4,41 +4,37 @@
 
 #include "Position.h"
 #include "PveItem.h"
+#include "RoomSessionPlayer.h"
 
 class RoomSession;
 
-enum class eNpcType : uint32_t
+enum class eNpcGradeType : uint8_t
 {
-	EASY_VIOLENT_RABBIT = 1,
-	EASY_NASTY_RABBIT = 2,
-	EASY_CRAZY_RABBIT = 3,
-	EASY_BLACK_CAT = 4,
-	EASY_PATTERNED_CAT = 5,
-	EASY_BLUE_MOUSE = 6,
-	EASY_GRAY_MOUSE = 7,
-	EASY_BROKEN_UFO = 8,
-	EASY_VIOLENT_PLANT = 9,
-	EASY_SPY_CAM = 10,
-	EASY_CHESS_PAWN = 11,
-	EASY_CHESS_BISHOP = 12,
-	EASY_ABANDONED_DOLL = 13,
-	NORMAL_VIOLENT_RABBIT = 14,
-	NORMAL_NASTY_RABBIT = 16,
-	NORMAL_CRAZY_RABBIT = 18,
-	NORMAL_BLACK_CAT = 20,
-	NORMAL_PATTERNED_CAT = 22,
-	NORMAL_BLUE_MOUSE = 24,
-	NORMAL_GRAY_MOUSE = 26,
-	NORMAL_BROKEN_UFO = 28,
-	NORMAL_VIOLENT_PLANT = 30,
-	NORMAL_SPY_CAM = 32,
-	NORMAL_CHESS_PAWN = 34,
-	NORMAL_CHESS_BISHOP = 36,
-	NORMAL_ABANDONED_DOLL = 38,
+	G_EASY = 0,
+	G_NORMAL = 1,
+	G_HARD = 2
 };
 
-// TODO: Move to separate class.
-struct ItemDrop
+enum class eNpcMovementType : uint8_t
+{
+	M_NONE = 0,
+	M_PATH_FINDING = 1,
+	M_PATH_NODES = 2,
+	M_MAX = 8
+};
+
+enum class eNpcTargetType : uint8_t
+{
+	T_NONE = 0,
+	T_STATIC = 1,
+	T_STATIC_REVENGE = 2,
+	T_NEAR = 3,
+	T_NEAR_REVENGE = 4,
+	T_ESSENCE_PRIORITY = 5,
+	T_DAMAGE = 6
+};
+
+struct LootDrop
 {
 	eItemType itemType;
 	uint8_t probability;
@@ -50,15 +46,30 @@ public:
 	PveNpc() = default;
 	~PveNpc() = default;
 
-	PveNpc(eNpcType type, const Position& initialSpawnPosition, uint16_t baseHealth, uint16_t initialSpawnRotation, bool canDropLootOnDeath, bool shouldRespawn, uint64_t respawnTime = 0);
+	PveNpc(uint32_t type, uint16_t baseHealth, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t attackTimeInMillis,
+		float attackWidth, float attackHeight, bool shouldRespawn, uint32_t respawnTime, bool canDropLoot,
+		uint16_t initialRotation, Position initialPosition, eNpcGradeType gradeType, eNpcMovementType movementType,
+		eNpcTargetType targetType);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
 	/**
-	 * \brief Sets the uid of the npc.
-	 * \param uid The uid of the npc.
+	 * \brief Spawns in the npc by relaying the init event.
 	 */
-	void setUid(uint32_t uid);
+	void spawn(const std::shared_ptr<RoomSession>& roomSession) const;
+	void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const;
+
+	/**
+	 * \brief Resets the npc health and spawns it in at its initial position.
+	 * \param roomSession The room in session.
+	 */
+	void respawn(const std::shared_ptr<RoomSession>& roomSession);
+
+	/**
+	 * \brief The npcs dies.
+	 * \param roomSession The room in session.
+	 */
+	void die(const std::shared_ptr<RoomSession>& roomSession);
 
 	/**
 	 * \brief Resets the health to the base health.
@@ -81,6 +92,16 @@ public:
 
 #pragma endregion
 
+#pragma region Setters
+
+	/**
+	 * \brief Sets the uid of the npc.
+	 * \param uid The uid of the npc.
+	 */
+	void setUid(uint32_t uid);
+
+#pragma endregion
+
 #pragma region Getters
 
 	/**
@@ -91,11 +112,18 @@ public:
 	uint32_t getUid() const;
 
 	/**
-	 * \brief Gets the type for the npc.
-	 * \return The type (id).
+	 * \brief Gets the type of the npc.
+	 * \return The type of the npc.
 	 */
 	[[nodiscard]]
-	eNpcType getType() const;
+	uint32_t getType() const;
+
+	/**
+	 * \brief Gets the initial spawn position for the npc.
+	 * \return The spawn position.
+	 */
+	[[nodiscard]]
+	Position getInitialPosition() const;
 
 	/**
 	 * \brief Gets the position for the npc.
@@ -103,13 +131,6 @@ public:
 	 */
 	[[nodiscard]]
 	Position getPosition() const;
-
-	/**
-	 * \brief Gets the initial spawn position for the npc.
-	 * \return The spawn position.
-	 */
-	[[nodiscard]]
-	Position getInitialSpawnPosition() const;
 
 	/**
 	 * \brief Gets the health for the npc.
@@ -130,7 +151,7 @@ public:
 	 * \return The initial spawn rotation.
 	 */
 	[[nodiscard]]
-	uint16_t getInitialSpawnRotation() const;
+	uint16_t getInitialRotation() const;
 
 	/**
 	 * \brief Indicates whether or not the npc should re-spawn upon death.
@@ -155,22 +176,43 @@ private:
 	 */
 	void dropLoot(const std::shared_ptr<RoomSession>& roomSession);
 
+	uint32_t m_type{};
 	uint32_t m_uid{};
-	eNpcType m_type{};
 
-	Position m_position{};
-	Position m_initialSpawnPosition{};
+	uint16_t m_baseHealth;
+	uint16_t m_health;
 
-	uint16_t m_health{};
-	uint16_t m_baseHealth{};
+	// These two are used for shooting/attacking.
+	uint32_t m_weaponItemId;
+	uint8_t m_weaponBodyPartId;
 
-	uint16_t m_initialSpawnRotation{};
+	// How often the npcs attacks.
+	uint32_t m_attackTimeInMillis;
 
-	bool m_canDropLootOnDeath;
+	// The range in width and height for the npc.
+	float m_attackWidth;
+	float m_attackHeight;
 
+	// Whether or not the npc should respawn.
 	bool m_shouldRespawn{};
-
+	// The amount of time in seconds before the npcs respawns after death.
+	uint32_t m_respawnTime = NULL;
+	// The time at which the npc has died.
 	uint64_t m_timeOfDeath = NULL;
-	// Respawn time in seconds.
-	uint64_t m_respawnTime = NULL;
+
+	// Whether or not the npc can drop loot on death.
+	bool m_canDropLoot;
+
+	// Initial rotation on spawn.
+	uint16_t m_initialRotation;
+
+	Position m_initialPosition;
+	Position m_position;
+
+	eNpcGradeType m_gradeType;
+	eNpcMovementType m_movementType;
+	eNpcTargetType m_targetType;
+
+	// TODO: Bodyparts
+	// TODO: Loot
 };

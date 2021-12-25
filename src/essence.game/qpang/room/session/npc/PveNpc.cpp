@@ -1,21 +1,35 @@
 #include "PveNpc.h"
 
+#include "gc_pve_die_npc.hpp"
+#include "gc_pve_npc_init.hpp"
 #include "RoomSession.h"
 
 // TODO: Create a more user-friendly constructor by making structs for the parameters.
 // TODO: Add item drops parameter to the constructor so every npc can have custom loot & probability.
-PveNpc::PveNpc(const eNpcType type, const Position& initialSpawnPosition, const uint16_t baseHealth,
-	const uint16_t initialSpawnRotation, const bool canDropLootOnDeath, const bool shouldRespawn, const uint64_t respawnTime) :
+PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
+	const uint32_t attackTimeInMillis, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
+	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
+	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType) :
 	m_type(type),
-	m_position(initialSpawnPosition),
-	m_initialSpawnPosition(initialSpawnPosition),
-	m_health(baseHealth),
 	m_baseHealth(baseHealth),
-	m_initialSpawnRotation(initialSpawnRotation),
-	m_canDropLootOnDeath(canDropLootOnDeath),
+	m_health(baseHealth),
+	m_weaponItemId(weaponItemId),
+	m_weaponBodyPartId(weaponBodyPartId),
+	m_attackTimeInMillis(attackTimeInMillis),
+	m_attackWidth(attackWidth),
+	m_attackHeight(attackHeight),
 	m_shouldRespawn(shouldRespawn),
-	m_respawnTime(respawnTime)
+	m_respawnTime(respawnTime),
+	m_canDropLoot(canDropLoot),
+	m_initialRotation(initialRotation),
+	m_initialPosition(initialPosition),
+	m_position(initialPosition),
+	m_gradeType(gradeType),
+	m_movementType(movementType),
+	m_targetType(targetType)
 {
+	// TODO: Loot
+	// TODO: Body parts.
 }
 
 void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
@@ -39,9 +53,27 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 	}
 }
 
-void PveNpc::setUid(const uint32_t uid)
+void PveNpc::spawn(const std::shared_ptr<RoomSession>& roomSession) const
 {
-	m_uid = uid;
+	roomSession->relayPlaying<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation);
+}
+
+void PveNpc::spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const
+{
+	roomSessionPlayer->send<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation);
+}
+
+void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
+{
+	resetHealth();
+	spawn(roomSession);
+}
+
+void PveNpc::die(const std::shared_ptr<RoomSession>& roomSession)
+{
+	roomSession->relayPlaying<GCPvEDieNpc>(m_uid);
+
+	onDeath(roomSession);
 }
 
 void PveNpc::resetHealth()
@@ -70,10 +102,15 @@ void PveNpc::onDeath(const std::shared_ptr<RoomSession>& roomSession)
 		m_timeOfDeath = time(nullptr);
 	}
 
-	if (m_canDropLootOnDeath)
+	if (m_canDropLoot)
 	{
 		dropLoot(roomSession);
 	}
+}
+
+void PveNpc::setUid(const uint32_t uid)
+{
+	m_uid = uid;
 }
 
 uint32_t PveNpc::getUid() const
@@ -81,19 +118,19 @@ uint32_t PveNpc::getUid() const
 	return m_uid;
 }
 
-eNpcType PveNpc::getType() const
+uint32_t PveNpc::getType() const
 {
 	return m_type;
+}
+
+Position PveNpc::getInitialPosition() const
+{
+	return m_initialPosition;
 }
 
 Position PveNpc::getPosition() const
 {
 	return m_position;
-}
-
-Position PveNpc::getInitialSpawnPosition() const
-{
-	return m_initialSpawnPosition;
 }
 
 uint16_t PveNpc::getHealth() const
@@ -106,9 +143,9 @@ uint16_t PveNpc::getBaseHealth() const
 	return m_baseHealth;
 }
 
-uint16_t PveNpc::getInitialSpawnRotation() const
+uint16_t PveNpc::getInitialRotation() const
 {
-	return m_initialSpawnRotation;
+	return m_initialRotation;
 }
 
 bool PveNpc::shouldRespawn() const
@@ -125,11 +162,11 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 {
 	std::vector availableItemDrops
 	{
-		ItemDrop{ eItemType::NONE, 45 },
-		ItemDrop{ eItemType::AMMO_CLIP, 20 },
-		ItemDrop{ eItemType::GOLDEN_COIN, 5 },
-		ItemDrop{ eItemType::SILVER_COIN, 10 },
-		ItemDrop{ eItemType::BRONZE_COIN, 20 }
+		LootDrop{ eItemType::NONE, 45 },
+		LootDrop{ eItemType::AMMO_CLIP, 20 },
+		LootDrop{ eItemType::GOLDEN_COIN, 5 },
+		LootDrop{ eItemType::SILVER_COIN, 10 },
+		LootDrop{ eItemType::BRONZE_COIN, 20 }
 	};
 
 	std::vector<eItemType> itemDrops{};
@@ -155,5 +192,5 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 
 	roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(randomPveItem));
 
-	m_canDropLootOnDeath = false;
+	m_canDropLoot = false;
 }
