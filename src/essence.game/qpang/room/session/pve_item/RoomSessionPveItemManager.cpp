@@ -24,9 +24,8 @@ uint32_t RoomSessionPveItemManager::spawnItem(const std::shared_ptr<PveItem>& it
 		return 0;
 	}
 
-	item->setUid((m_items.size() + 1));
-
-	roomSession->relayPlaying<GCPvEItemInit>(item->getType(), item->getUid(), item->getPosition());
+	item->setUid(m_items.size() + 1);
+	item->spawn(roomSession);
 
 	m_items[item->getUid()] = item;
 
@@ -41,6 +40,7 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 	{
 		return;
 	}
+
 	const auto roomSessionPlayer = roomSession->find(playerId);
 
 	if (roomSessionPlayer == nullptr)
@@ -55,7 +55,7 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 		return;
 	}
 
-	switch (const auto itemType = item->getType())
+	switch (const auto itemType = static_cast<eItemType>(item->getItemId()))
 	{
 	case eItemType::AMMO_CLIP:
 		handleAmmoPickup(roomSessionPlayer);
@@ -72,7 +72,7 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 		return;
 	}
 
-	roomSession->relayPlaying<GCGameItem>(1, playerId, static_cast<U32>(item->getType()), uid, 0);
+	roomSession->relayPlaying<GCGameItem>(1, playerId, item->getItemId(), uid, 0);
 
 	m_items.erase(uid);
 }
@@ -96,9 +96,9 @@ std::shared_ptr<PveItem> RoomSessionPveItemManager::findItemByUid(const uint32_t
 
 void RoomSessionPveItemManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const
 {
-	for (const auto& [fst, snd] : m_items)
+	for (const auto& [uid, item] : m_items)
 	{
-		session->send<GCPvEItemInit>(snd->getType(), fst, snd->getPosition());
+		item->spawn(session);
 	}
 }
 
@@ -112,7 +112,6 @@ void RoomSessionPveItemManager::handleMedkitPickup(const RoomSessionPlayer::Ptr&
 	roomSessionPlayer->addHealth(50, true);
 }
 
-// TODO: Double check if the amount of coins u get is equal to the item type.
 void RoomSessionPveItemManager::handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, const eItemType itemType)
 {
 	auto coins = 0;
@@ -120,10 +119,10 @@ void RoomSessionPveItemManager::handleCoinPickup(const RoomSessionPlayer::Ptr& r
 	switch (itemType)
 	{
 	case eItemType::BRONZE_COIN:
-		coins = 5;
+		coins = 1;
 		break;
 	case eItemType::SILVER_COIN:
-		coins = 20;
+		coins = 10;
 		break;
 	case eItemType::GOLDEN_COIN:
 		coins = 100;

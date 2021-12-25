@@ -3,7 +3,7 @@
 
 #include "GameNetEvent.h"
 
-class GCPvEItemInit : public GameNetEvent
+class GCPvEItemInit final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
@@ -14,9 +14,9 @@ public:
 	F32 zPos; // 104
 
 	GCPvEItemInit() : GameNetEvent{ GC_PVE_ITEM_INIT, GuaranteedOrdered, DirServerToClient } {}
-	GCPvEItemInit(const eItemType type, const uint32_t itemUid, const Position position)
+	GCPvEItemInit(const uint32_t itemId, const uint32_t itemUid, const Position position)
 		: GameNetEvent{ GC_PVE_ITEM_INIT, GuaranteedOrdered, DirServerToClient },
-		itemId(static_cast<U32>(type)),
+		itemId(itemId),
 		itemUid(itemUid),
 		xPos(position.x),
 		yPos(position.y),
@@ -24,7 +24,7 @@ public:
 	{
 	}
 
-	void pack(EventConnection* conn, BitStream* bstream)
+	void pack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->write(itemId);
 		bstream->write(itemUid);
@@ -33,8 +33,8 @@ public:
 		bstream->write(zPos);
 	}
 
-	void unpack(EventConnection* conn, BitStream* bstream) {}
-	void process(EventConnection* ps) {}
+	void unpack(EventConnection* conn, BitStream* bstream) override {}
+	void process(EventConnection* ps) override {}
 
 	TNL_DECLARE_CLASS(GCPvEItemInit);
 };

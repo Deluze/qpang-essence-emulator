@@ -41,7 +41,7 @@ void RoomSessionNpcManager::initializeNpcs()
 		return;
 	}
 
-	const auto statement = DATABASE->prepare(
+	const auto getNpcsStatement = DATABASE->prepare(
 		"SELECT "
 		"pve_npcs.id AS Id "
 		",pve_npcs.type AS Type "
@@ -70,44 +70,63 @@ void RoomSessionNpcManager::initializeNpcs()
 		"WHERE maps.map_id = ?;"
 	);
 
-	statement->bindInteger(roomSession->getRoom()->getMap());
+	getNpcsStatement->bindInteger(roomSession->getRoom()->getMap());
 
-	const auto result = statement->fetch();
+	const auto npcResult = getNpcsStatement->fetch();
 
 	m_npcs.clear();
 	m_spawnedNpcs.clear();
 
-	while (result->hasNext())
+	while (npcResult->hasNext())
 	{
-		// Primary key
-		result->getInt("Id");
+		const auto npcId = npcResult->getInt("Id");
 
-		// TODO: Get the drops and bodyparts.
+		const auto getLootDropsStatement = DATABASE->prepare("SELECT * FROM pve_npc_loot_drops WHERE npc_id = ?");
+
+		getLootDropsStatement->bindInteger(npcId);
+
+		const auto lootDropResult = getLootDropsStatement->fetch();
+
+		std::vector<NpcLootDrop> lootDrops{};
+
+		while (lootDropResult->hasNext())
+		{
+			auto lootDrop = NpcLootDrop
+			{
+				lootDropResult->getInt("item_id"),
+				lootDropResult->getInt("probability")
+			};
+
+			lootDrops.push_back(lootDrop);
+
+			lootDropResult->next();
+		}
 
 		auto npc = PveNpc(
-			result->getTiny("Type"),
-			result->getShort("BaseHealth"),
-			result->getInt("WeaponItemId"),
-			result->getTiny("WeaponBodyPartId"),
-			result->getInt("AttackTimeInMillis"),
-			result->getFloat("AttackWidth"),
-			result->getFloat("AttackHeight"),
-			result->getInt("ShouldRespawn"),
-			result->getInt("RespawnTime"),
-			result->getFlag("CanDropLoot"),
-			result->getShort("InitialRotation"),
+			npcResult->getTiny("Type"),
+			npcResult->getShort("BaseHealth"),
+			npcResult->getInt("WeaponItemId"),
+			npcResult->getTiny("WeaponBodyPartId"),
+			npcResult->getInt("AttackTimeInMillis"),
+			npcResult->getFloat("AttackWidth"),
+			npcResult->getFloat("AttackHeight"),
+			npcResult->getInt("ShouldRespawn"),
+			npcResult->getInt("RespawnTime"),
+			npcResult->getFlag("CanDropLoot"),
+			npcResult->getShort("InitialRotation"),
 			Position{
-				result->getFloat("SpawnPositionX"),
-				result->getFloat("SpawnPositionY"),
-				result->getFloat("SpawnPositionZ"),
+				npcResult->getFloat("SpawnPositionX"),
+				npcResult->getFloat("SpawnPositionY"),
+				npcResult->getFloat("SpawnPositionZ"),
 			},
-			static_cast<eNpcGradeType>(result->getTiny("MovementType")),
-			static_cast<eNpcMovementType>(result->getTiny("GradeType")),
-			static_cast<eNpcTargetType>(result->getTiny("TargetType")));
+			static_cast<eNpcGradeType>(npcResult->getTiny("MovementType")),
+			static_cast<eNpcMovementType>(npcResult->getTiny("GradeType")),
+			static_cast<eNpcTargetType>(npcResult->getTiny("TargetType")),
+			lootDrops);
 
 		m_npcs.push_back(npc);
 
-		result->next();
+		npcResult->next();
 	}
 }
 

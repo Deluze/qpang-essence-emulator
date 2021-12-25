@@ -61,7 +61,9 @@ void RoomSessionPveRoundManager::endRound()
 void RoomSessionPveRoundManager::tick()
 {
 	if (m_roundEnded)
+	{
 		return;
+	}
 
 	switch (m_currentRound)
 	{
@@ -109,7 +111,10 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 		return;
 	}
 
-	if (const bool finishedStage = actualFinishes + deadFinishes == finishesNeeded)
+	// ReSharper disable once CppTooWideScope
+	const bool finishedStage = actualFinishes + deadFinishes == finishesNeeded;
+
+	if (finishedStage)
 	{
 		endRound();
 	}
