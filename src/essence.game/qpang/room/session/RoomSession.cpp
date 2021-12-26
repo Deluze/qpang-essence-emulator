@@ -56,6 +56,8 @@ void RoomSession::initialize()
 		m_npcManager.initialize(shared_from_this());
 		m_objectManager.initialize(shared_from_this());
 		m_pveItemManager.initialize(shared_from_this());
+		m_aboveGroundPathfinder.initialize(shared_from_this());
+		m_underGroundPathfinder.initialize(shared_from_this());
 	}
 	else
 	{
@@ -1023,6 +1025,16 @@ RoomSessionPveItemManager* RoomSession::getPveItemManager()
 RoomSessionPveRoundManager* RoomSession::getPveRoundManager()
 {
 	return &m_pveRoundManager;
+}
+
+Pathfinder* RoomSession::getAboveGroundPathfinder()
+{
+	return &m_aboveGroundPathfinder;
+}
+
+Pathfinder* RoomSession::getUnderGroundPathfinder()
+{
+	return &m_underGroundPathfinder;
 }
 
 RoomSessionPveAreaManager* RoomSession::getPveAreaManager()

@@ -2,6 +2,9 @@
 #define CG_MOVE_REPORT_H
 
 #include "GameNetEvent.h"
+
+#include "Maps.h"
+
 class CGMoveReport : public GameNetEvent
 {
 	typedef NetEvent Parent;
@@ -57,6 +60,20 @@ public:
 		}
 
 		roomSessionPlayer->setPosition({ xPos, yPos, zPos });
+
+		if (Maps::recordMoves)
+		{
+			// Convert pos to cell pos
+			int cellX = std::abs((xPos - -43.220) / 1.441);
+			int cellZ = std::abs((zPos - 40.823) / 1.399);
+
+			if (Maps::debugWorldLayout[cellX][cellZ] != 0)
+			{
+				// set cell to 0 in worldlayout
+				Maps::debugWorldLayout[cellX][cellZ] = 0;
+				printf("Set { %d, %d } to moveable!\n", cellX, cellZ);
+			}
+		}
 	}
 
 	void process(EventConnection* ps) override
