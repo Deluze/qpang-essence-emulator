@@ -13,7 +13,7 @@ struct GCPvEHitNpcData
 	uint32_t unk_03;
 	Position impactPos;
 	Position impactPosOffset;
-	uint32_t unk_10;
+	uint32_t entityId;
 	uint8_t unk_11;
 	uint8_t bodyPartId;
 	uint32_t weaponItemId;

@@ -17,7 +17,7 @@ public:
 	F32 impactOffsetPosX; // 128
 	F32 impactOffsetPosY; // 132
 	F32 impactOffsetPosZ; // 136
-	U32 unk_10; // 92
+	U32 entityId; // 92
 	U8 unk_11; // 148
 	U8 bodyPartId; // 149
 	U32 weaponItemId; // 96
@@ -42,7 +42,7 @@ public:
 		impactOffsetPosX(data.impactPosOffset.x),
 		impactOffsetPosY(data.impactPosOffset.y),
 		impactOffsetPosZ(data.impactPosOffset.z),
-		unk_10(data.unk_10),
+		entityId(data.entityId),
 		unk_11(data.unk_11),
 		bodyPartId(data.bodyPartId),
 		weaponItemId(data.weaponItemId),
@@ -69,7 +69,7 @@ public:
 		bstream->write(impactOffsetPosX);
 		bstream->write(impactOffsetPosY);
 		bstream->write(impactOffsetPosZ);
-		bstream->write(unk_10);
+		bstream->write(entityId);
 		bstream->write(unk_11);
 		bstream->write(bodyPartId);
 		bstream->write(weaponItemId);

@@ -17,9 +17,9 @@ public:
 	F32 impactOffsetPosX; // 128
 	F32 impactOffsetPosY; // 132
 	F32 impactOffsetPosZ; // 136
-	U32 unk_10; // 92
+	U32 entityId; // 92 possible entity id?
 	U8 unk_11; // 148 
-	U8 bodyPartId; // 149 differs per npc
+	U8 bodyPartId; // 149
 	U32 weaponItemId; // 96
 	U64 weaponCardId; // 108 104
 	U8 weaponType; // 112
@@ -42,7 +42,7 @@ public:
 		bstream->read(&impactOffsetPosX);
 		bstream->read(&impactOffsetPosY);
 		bstream->read(&impactOffsetPosZ);
-		bstream->read(&unk_10);
+		bstream->read(&entityId);
 		bstream->read(&unk_11);
 		bstream->read(&bodyPartId);
 		bstream->read(&weaponItemId);
@@ -71,7 +71,7 @@ public:
 		std::cout << "impactOffsetPosY: " << (float)impactOffsetPosY << std::endl;
 		std::cout << "impactOffsetPosZ: " << (float)impactOffsetPosZ << std::endl;
 		std::cout << std::endl;
-		std::cout << "unk_10: " << (int)unk_10 << std::endl;
+		std::cout << "entityId: " << (int)entityId << std::endl;
 		std::cout << "unk_11: " << (int)unk_11 << std::endl;
 		std::cout << std::endl;
 		std::cout << "bodyPartId: " << (int)bodyPartId << std::endl;
@@ -146,18 +146,7 @@ public:
 
 		// TODO: Check if weaponType matches with the used weapon.
 
-		auto isValidNpcBodyPart = false;
-
-		for (const auto& bodyPart : targetNpc->getBodyParts())
-		{
-			if (bodyPart.id == bodyPartId)
-			{
-				isValidNpcBodyPart = true;
-			}
-		}
-
-		// The body part that was hit must be valid (in other words, the npc must actually have that body part).
-		if (!isValidNpcBodyPart)
+		if (!targetNpc->hasBodyPart(bodyPartId))
 		{
 			return;
 		}
@@ -177,7 +166,7 @@ public:
 			unk_03,
 			impactPos,
 			impactOffsetPos,
-			unk_10,
+			entityId,
 			unk_11,
 			bodyPartId,
 			weaponUsed,

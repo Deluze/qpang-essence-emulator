@@ -3,7 +3,6 @@
 #include "GCPvEHitNpcData.h"
 #include "gc_pve_die_npc.hpp"
 #include "gc_pve_hit_npc.hpp"
-#include "gc_pve_npc_init.hpp"
 #include "PveNpc.h"
 #include "RoomSession.h"
 #include "RoomSessionPlayer.h"
@@ -280,6 +279,8 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	if (hasTargetDied)
 	{
 		killNpc(targetNpcUid);
+
+		// TODO: Relay the kill combo.
 	}
 
 	const auto gcPvEHitNpcData = GCPvEHitNpcData
@@ -289,7 +290,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.unk_03,
 		data.impactPos,
 		data.impactPosOffset,
-		data.unk_10,
+		data.entityId,
 		data.unk_11,
 		data.bodyPartId,
 		data.weaponUsed.itemId,
