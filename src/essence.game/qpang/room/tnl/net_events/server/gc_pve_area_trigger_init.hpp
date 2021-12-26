@@ -7,35 +7,44 @@ class GCPvEAreaTriggerInit final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	U32 unk_01; // 88	# ObjectUid maybe?
-	F32 unk_02; // 92	# PositionX maybe?
-	F32 unk_03; // 96	# PositionY maybe?
-	F32 unk_04; // 100  # PositionZ maybe?
-	F32 unk_05; // 104  # Unknown float.. something with position or direction perhaps?
-	U8 unk_06;  // 108
+	struct PveArea
+	{
+		float beginPositionX;
+		float beginPositionZ;
+		float endPositionX;
+		float endPositionZ;
+	};
+
+	U32 areaId = 0; // 88
+
+	F32 beginPositionX = 0.00f; // 92
+	F32 beginPositionZ = 0.00f; // 96
+
+	F32 endPositionX = 0.00f; // 100
+	F32 endPositionZ = 0.00f; // 104
+
+	U8 cmd = 1;  // 108 Create area = 1
 
 	GCPvEAreaTriggerInit() : GameNetEvent{ GC_PVEA_AREA_TRIGGER_INIT, GuaranteedOrdered, DirServerToClient } {}
 
-	GCPvEAreaTriggerInit(const uint32_t unk_01, const float unk_02, const float unk_03, const float unk_04, const  float unk_05, const uint8_t unk_06)
+	GCPvEAreaTriggerInit(const uint32_t areaId, const PveArea area)
 		: GameNetEvent{ GC_PVEA_AREA_TRIGGER_INIT, GuaranteedOrdered, DirServerToClient },
-		unk_01(unk_01),
-		unk_02(unk_02),
-		unk_03(unk_03),
-		unk_04(unk_04),
-		unk_05(unk_05),
-		unk_06(unk_06)
+		areaId(areaId),
+		beginPositionX(area.beginPositionX),
+		beginPositionZ(area.beginPositionZ),
+		endPositionX(area.endPositionX),
+		endPositionZ(area.endPositionZ)
 	{
 	}
 
-
 	void pack(EventConnection* conn, BitStream* bstream) override
 	{
-		bstream->write(unk_01);
-		bstream->write(unk_02);
-		bstream->write(unk_03);
-		bstream->write(unk_04);
-		bstream->write(unk_05);
-		bstream->write(unk_06);
+		bstream->write(areaId);
+		bstream->write(beginPositionX);
+		bstream->write(beginPositionZ);
+		bstream->write(endPositionX);
+		bstream->write(endPositionZ);
+		bstream->write(cmd);
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override {}

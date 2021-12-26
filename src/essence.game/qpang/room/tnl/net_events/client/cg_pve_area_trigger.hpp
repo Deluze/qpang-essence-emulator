@@ -2,11 +2,12 @@
 #define CG_PVE_AREA_TRIGGER_H
 
 #include "GameNetEvent.h"
+
 class CGPvEAreaTrigger final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	U32 flag;
+	U32 areaId;
 
 	CGPvEAreaTrigger() : GameNetEvent{ CG_PVE_AREA_TRIGGER, GuaranteedOrdered, DirClientToServer } {}
 
@@ -14,13 +15,12 @@ public:
 
 	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
-		bstream->read(&flag);
+		bstream->read(&areaId);
 	}
 
-	void handle(GameConnection* conn, Player::Ptr player) override
+	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		// TODO: Handle CGPvEAreaTrigger.
-		std::cout << "Reveived an unhandled CGPvEAreaTrigger event." << std::endl;
+		std::cout << "Player " << player->getId() << " has triggered area with id " << areaId << std::endl;
 	}
 
 	void process(EventConnection* ps) override
