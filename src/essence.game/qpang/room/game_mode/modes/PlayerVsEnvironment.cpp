@@ -3,16 +3,6 @@
 #include "Room.h"
 #include "RoomSession.h"
 
-bool PlayerVsEnvironment::isMissionMode()
-{
-	return true;
-}
-
-bool PlayerVsEnvironment::isTeamMode()
-{
-	return false;
-}
-
 void PlayerVsEnvironment::onApply(const std::shared_ptr<Room> room)
 {
 	room->setIsPointsGame(false);
@@ -51,11 +41,32 @@ void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 	GameMode::tick(roomSession);
 }
 
-void PlayerVsEnvironment::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation)
+void PlayerVsEnvironment::onPlayerKill(
+	const std::shared_ptr<RoomSessionPlayer> killer, 
+	const std::shared_ptr<RoomSessionPlayer> target, 
+	const Weapon& weapon, const uint8_t hitLocation)
 {
 	// Set can respawn to false, as the player should not suddenly respawn when not selecting a respawn option.
 	// This will be overridden in the CGPvERespawnReq packet, when the target makes a choise.
 	target->setCanRespawn(false);
 
-	GameMode::onPlayerKill(killer, target, weapon, hitLocation);
+	target->resetStreak();
+	target->startRespawnCooldown(true);
+
+	// TODO: Add pve statistics.
+}
+
+void PlayerVsEnvironment::onPlayerDeathByNpc(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer,
+	const std::shared_ptr<PveNpc>& npc)
+{
+	// Set can respawn to false, as the player should not suddenly respawn when not selecting a respawn option.
+	// This will be overridden in the CGPvERespawnReq packet, when the target makes a choise.
+	roomSessionPlayer->setCanRespawn(false);
+
+	roomSessionPlayer->resetStreak();
+	roomSessionPlayer->startRespawnCooldown(true);
+
+	// TODO: Add pve statistics.
+
+	GameMode::onPlayerDeathByNpc(roomSessionPlayer, npc);
 }

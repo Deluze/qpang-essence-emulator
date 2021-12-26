@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "PveNpc.h"
+
 struct Weapon;
 class Room;
 class RoomSession;
@@ -10,6 +12,7 @@ class RoomSessionPlayer;
 class GameMode
 {
 public:
+	virtual ~GameMode() = default;
 
 	enum Mode
 	{
@@ -32,4 +35,5 @@ public:
 	virtual void onStart(std::shared_ptr<RoomSession> roomSession);
 	virtual void onPlayerSync(std::shared_ptr<RoomSessionPlayer> session);
 	virtual void onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shared_ptr<RoomSessionPlayer> target, const Weapon& weapon, uint8_t hitLocation);
+	virtual void onPlayerDeathByNpc(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer, const std::shared_ptr<PveNpc>& npc);
 };
