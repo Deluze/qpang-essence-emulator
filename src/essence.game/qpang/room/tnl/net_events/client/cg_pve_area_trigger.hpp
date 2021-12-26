@@ -20,7 +20,28 @@ public:
 
 	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		std::cout << "Player " << player->getId() << " has triggered area with id " << areaId << std::endl;
+		const auto roomPlayer = player->getRoomPlayer();
+
+		if (roomPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
+
+		if (roomSessionPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSession = roomSessionPlayer->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		roomSession->getPveAreaManager()->onAreaTrigger(areaId, player->getId());
 	}
 
 	void process(EventConnection* ps) override

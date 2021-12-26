@@ -40,7 +40,7 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_initialWaitTime((CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000)
 {
 	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
-
+	
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
 	m_startTime = time(NULL) + waitingForPlayersTime + 5;
@@ -51,10 +51,11 @@ void RoomSession::initialize()
 {
 	if (m_room->getMode() == GameMode::Mode::PVE)
 	{
+		m_pveAreaManager.initialize(shared_from_this());
+		m_pveRoundManager.initialize(shared_from_this());
 		m_npcManager.initialize(shared_from_this());
 		m_objectManager.initialize(shared_from_this());
 		m_pveItemManager.initialize(shared_from_this());
-		m_pveRoundManager.initialize(shared_from_this());
 	}
 	else
 	{
@@ -1022,6 +1023,11 @@ RoomSessionPveItemManager* RoomSession::getPveItemManager()
 RoomSessionPveRoundManager* RoomSession::getPveRoundManager()
 {
 	return &m_pveRoundManager;
+}
+
+RoomSessionPveAreaManager* RoomSession::getPveAreaManager()
+{
+	return &m_pveAreaManager;
 }
 
 Room::Ptr RoomSession::getRoom()

@@ -9,6 +9,7 @@
 #include "ConfigManager.h"
 #include "RoomSessionNpcManager.h"
 #include "RoomSessionObjectManager.h"
+#include "RoomSessionPveAreaManager.h"
 #include "RoomSessionPveItemManager.h"
 #include "RoomSessionPveRoundManager.h"
 
@@ -69,6 +70,7 @@ public:
 	RoomSessionObjectManager* getObjectManager();
 	RoomSessionPveItemManager* getPveItemManager();
 	RoomSessionPveRoundManager* getPveRoundManager();
+	RoomSessionPveAreaManager* getPveAreaManager();
 
 	std::shared_ptr<Room> getRoom();
 
@@ -223,6 +225,7 @@ private:
 	RoomSessionObjectManager m_objectManager;
 	RoomSessionPveItemManager m_pveItemManager;
 	RoomSessionPveRoundManager m_pveRoundManager;
+	RoomSessionPveAreaManager m_pveAreaManager;
 
 	std::recursive_mutex m_playerMx;
 	std::unordered_map<uint32_t, RoomSessionPlayer::Ptr> m_players;
