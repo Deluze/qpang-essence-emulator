@@ -29,6 +29,12 @@ void RoomSessionPveRoundManager::onStartNewRound()
 	roomSession->getObjectManager()->initializeObjects();
 	roomSession->getNpcManager()->initializeNpcs();
 
+	// Update health back to full for all playing players.
+	for (const auto& player : roomSession->getPlayingPlayers())
+	{
+		player->setHealth(player->getDefaultHealth(), true);
+	}
+
 	// Relay the new round to all players.
 	roomSession->relayPlaying<GCPvENewRound>();
 }
@@ -45,6 +51,7 @@ void RoomSessionPveRoundManager::endRound()
 	// Can not end this round since it's the last round.
 	if (m_currentRound == 2)
 	{
+		// TODO: Finish the game and send result screen?
 		return;
 	}
 
