@@ -1,5 +1,7 @@
 #include "PveNpc.h"
 
+#include "AABBHelper.h"
+#include "gc_master_log.hpp"
 #include "gc_pve_die_npc.hpp"
 #include "gc_pve_npc_init.hpp"
 #include "RoomSession.h"
@@ -8,7 +10,7 @@ PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const uint32_t we
 	const uint32_t attackTimeInMillis, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
 	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
 	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType,
-	const std::vector<NpcLootDrop>& lootDrops, const std::vector<NpcBodyPart>& bodyParts) :
+	std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts) :
 	m_type(type),
 	m_baseHealth(baseHealth),
 	m_health(baseHealth),
@@ -26,8 +28,8 @@ PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const uint32_t we
 	m_gradeType(gradeType),
 	m_movementType(movementType),
 	m_targetType(targetType),
-	m_lootDrops(lootDrops),
-	m_bodyParts(bodyParts)
+	m_lootDrops(std::move(lootDrops)),
+	m_bodyParts(std::move(bodyParts))
 {
 }
 
@@ -48,6 +50,30 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 			m_timeOfDeath = NULL;
 
 			roomSession->getNpcManager()->respawnNpcByUid(m_uid);
+		}
+	}
+
+	// Note: temporary piece of code to let npcs shoot a player when the player is in range.
+
+
+	for (const auto& player : roomSession->getPlayingPlayers())
+	{
+		if (player->isDead())
+		{
+			continue;
+		}
+
+		// ReSharper disable once CppTooWideScopeInitStatement
+		const auto distance = AABBHelper::getDistanceBetweenPositions(m_position, player->getPosition());
+
+		if (distance < 7)
+		{
+			auto playerPosition = player->getPosition();
+
+			constexpr auto yCorrection = 1.0f;
+			playerPosition.y += yCorrection;
+
+			attack(roomSession, playerPosition);
 		}
 	}
 }
@@ -92,6 +118,11 @@ uint16_t PveNpc::takeDamage(const uint16_t damage)
 	m_health = m_health - damage;
 
 	return damage;
+}
+
+void PveNpc::attack(const std::shared_ptr<RoomSession>& roomSession, const Position targetPosition) const
+{
+	roomSession->relayPlaying<GCMasterLog>(m_uid, m_weaponBodyPartId, targetPosition, 0);
 }
 
 void PveNpc::onDeath(const std::shared_ptr<RoomSession>& roomSession)
@@ -147,6 +178,11 @@ uint16_t PveNpc::getInitialRotation() const
 	return m_initialRotation;
 }
 
+uint32_t PveNpc::getWeaponItemId() const
+{
+	return m_weaponItemId;
+}
+
 bool PveNpc::shouldRespawn() const
 {
 	return m_shouldRespawn;
@@ -160,6 +196,19 @@ std::vector<NpcBodyPart> PveNpc::getBodyParts()
 bool PveNpc::isDead() const
 {
 	return m_health <= 0;
+}
+
+bool PveNpc::hasBodyPart(const uint32_t bodyPartId)
+{
+	for (const auto& [id, health, weaponItemId, itemBoxId, isDualGun] : m_bodyParts)
+	{
+		if (id == bodyPartId)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)

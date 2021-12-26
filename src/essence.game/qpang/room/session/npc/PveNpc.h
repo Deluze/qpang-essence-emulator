@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "Position.h"
-#include "PveItem.h"
 #include "RoomSessionPlayer.h"
 
 class RoomSession;
@@ -58,7 +57,7 @@ public:
 	PveNpc(uint32_t type, uint16_t baseHealth, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t attackTimeInMillis,
 		float attackWidth, float attackHeight, bool shouldRespawn, uint32_t respawnTime, bool canDropLoot,
 		uint16_t initialRotation, Position initialPosition, eNpcGradeType gradeType, eNpcMovementType movementType,
-		eNpcTargetType targetType, const std::vector<NpcLootDrop>& lootDrops, const std::vector<NpcBodyPart>& bodyParts);
+		eNpcTargetType targetType, std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -91,6 +90,9 @@ public:
 	 * \return The amount of damage taken.
 	 */
 	uint16_t takeDamage(uint16_t damage);
+
+	// NOTE: Temporary attack function for an npc.
+	void attack(const std::shared_ptr<RoomSession>& roomSession, Position targetPosition) const;
 
 #pragma region Event handlers
 
@@ -163,6 +165,13 @@ public:
 	uint16_t getInitialRotation() const;
 
 	/**
+	 * \brief Gets the weapon item id the npc uses to attack.
+	 * \return The weapon item id.
+	 */
+	[[nodiscard]]
+	uint32_t getWeaponItemId() const;
+
+	/**
 	 * \brief Indicates whether or not the npc should re-spawn upon death.
 	 * \return true if the npc should respawn otherwise false.
 	 */
@@ -181,6 +190,14 @@ public:
 	 */
 	[[nodiscard]]
 	bool isDead() const;
+
+	/**
+	 * \brief Checks if the npc possesses the given body part id.
+	 * \param bodyPartId The body part to check
+	 * \return true if the npc has the body part otherwise false.
+	 */
+	[[nodiscard]]
+	bool hasBodyPart(uint32_t bodyPartId);
 
 #pragma endregion
 
