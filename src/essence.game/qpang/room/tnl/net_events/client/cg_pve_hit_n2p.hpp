@@ -1,7 +1,6 @@
 #ifndef CG_PVE_HIT_N2P_H
 #define CG_PVE_HIT_N2P_H
 
-#include "CGPvEHitN2PData.h"
 #include "GameNetEvent.h"
 #include "gc_pve_hit_n2p.hpp"
 
