@@ -41,7 +41,7 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 {
 	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
 
-	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
+	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime() * 10;
 	m_isPoints = m_room->isPointsGame();
 	m_startTime = time(NULL) + waitingForPlayersTime + 5;
 	m_endTime = room->isPointsGame() ? NULL : m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
@@ -55,6 +55,8 @@ void RoomSession::initialize()
 		m_objectManager.initialize(shared_from_this());
 		m_pveItemManager.initialize(shared_from_this());
 		m_pveRoundManager.initialize(shared_from_this());
+		m_aboveGroundPathfinder.initialize(shared_from_this());
+		m_underGroundPathfinder.initialize(shared_from_this());
 	}
 	else
 	{
@@ -364,8 +366,8 @@ void RoomSession::tick()
 			session->tick();
 	}
 
-	if (canFinish())
-		finish();
+	/*if (canFinish())
+		finish();*/
 }
 
 void RoomSession::clear()
@@ -1022,6 +1024,16 @@ RoomSessionPveItemManager* RoomSession::getPveItemManager()
 RoomSessionPveRoundManager* RoomSession::getPveRoundManager()
 {
 	return &m_pveRoundManager;
+}
+
+Pathfinder* RoomSession::getAboveGroundPathfinder()
+{
+	return &m_aboveGroundPathfinder;
+}
+
+Pathfinder* RoomSession::getUnderGroundPathfinder()
+{
+	return &m_underGroundPathfinder;
 }
 
 Room::Ptr RoomSession::getRoom()
