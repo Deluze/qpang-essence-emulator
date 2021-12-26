@@ -10,7 +10,7 @@ bool PlayerVsEnvironment::isMissionMode()
 
 bool PlayerVsEnvironment::isTeamMode()
 {
-	return true;
+	return false;
 }
 
 void PlayerVsEnvironment::onApply(const std::shared_ptr<Room> room)
