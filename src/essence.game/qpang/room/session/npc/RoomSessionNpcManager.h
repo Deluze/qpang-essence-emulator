@@ -19,6 +19,8 @@ public:
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
+	void onStart();
+
 	/**
 	 * \brief Updates npc related stuff every tick.
 	 */

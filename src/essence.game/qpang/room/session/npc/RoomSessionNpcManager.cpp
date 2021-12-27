@@ -10,9 +10,11 @@
 void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
+}
 
+void RoomSessionNpcManager::onStart()
+{
 	initializeNpcs();
-
 	spawnInitializedNpcs();
 }
 
@@ -126,6 +128,15 @@ void RoomSessionNpcManager::initializeNpcs()
 			bodyPartResult->next();
 		}
 
+		auto spawnPosition = Position{
+			npcResult->getFloat("SpawnPositionX"),
+			npcResult->getFloat("SpawnPositionY"),
+			npcResult->getFloat("SpawnPositionZ"),
+		};
+
+		auto pathFinder = spawnPosition.y < 0 ? roomSession->getUnderGroundPathfinder() : roomSession->getAboveGroundPathfinder();
+		PathfinderCell spawnCell = { pathFinder->getCellX(spawnPosition.x),  pathFinder->getCellZ(spawnPosition.z) };
+
 		auto npc = PveNpc(
 			npcResult->getTiny("Type"),
 			npcResult->getShort("BaseHealth"),
@@ -139,16 +150,13 @@ void RoomSessionNpcManager::initializeNpcs()
 			npcResult->getInt("RespawnTime"),
 			npcResult->getFlag("CanDropLoot"),
 			npcResult->getShort("InitialRotation"),
-			Position{
-				npcResult->getFloat("SpawnPositionX"),
-				npcResult->getFloat("SpawnPositionY"),
-				npcResult->getFloat("SpawnPositionZ"),
-			},
-			static_cast<eNpcGradeType>(npcResult->getInt("GradeType")),
-			static_cast<eNpcMovementType>(npcResult->getInt("MovementType")),
-			static_cast<eNpcTargetType>(npcResult->getInt("TargetType")),
+			spawnPosition,
+			static_cast<eNpcGradeType>(npcResult->getTiny("GradeType")),
+			static_cast<eNpcMovementType>(npcResult->getTiny("MovementType")),
+			static_cast<eNpcTargetType>(npcResult->getTiny("TargetType")),
 			lootDrops,
-			bodyParts
+			bodyParts,
+			spawnCell
 			);
 
 		m_npcs.push_back(npc);
