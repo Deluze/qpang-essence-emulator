@@ -50,6 +50,9 @@ public:
 	void setPosition(const Position& position);
 	Position getPosition();
 
+	void setFloorNumber(const uint8_t floorNumber);
+	uint8_t getFloorNumber();
+
 	void addHealth(uint16_t health, bool updateOnClient = false);
 	void takeHealth(uint16_t health, bool updateOnClient = false);
 	void setHealth(uint16_t health, bool updateOnClient = false);
@@ -148,6 +151,8 @@ private:
 	PlayerEntityManager m_entityManager;
 
 	Position m_position;
+
+	bool m_floorNumber;
 
 	time_t m_joinTime;
 	time_t m_startTime;
