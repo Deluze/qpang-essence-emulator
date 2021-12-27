@@ -58,7 +58,7 @@ public:
 	PveNpc(uint32_t type, uint16_t baseHealth, float speed, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t aiTime,
 		float attackWidth, float attackHeight, bool shouldRespawn, uint32_t respawnTime, bool canDropLoot,
 		uint16_t initialRotation, Position initialPosition, eNpcGradeType gradeType, eNpcMovementType movementType,
-		eNpcTargetType targetType, std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts, const PathfinderCell& initialCell);
+		eNpcTargetType targetType, std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -77,6 +77,8 @@ public:
 	void setCurrentCell(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell);
 
 	PathfinderCell getTargetCell();
+
+	void setInitialCell(const PathfinderCell& initialCell);
 
 	std::shared_ptr<RoomSessionPlayer> getTargetPlayer();
 

@@ -12,6 +12,34 @@
 
 std::mutex pathfindingMutex = {};
 
+PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const float speed, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
+	const uint32_t aiTime, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
+	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
+	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType,
+	std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts) :
+	m_type(type),
+	m_baseHealth(baseHealth),
+	m_health(baseHealth),
+	m_speed(speed),
+	m_weaponItemId(weaponItemId),
+	m_weaponBodyPartId(weaponBodyPartId),
+	m_aiTime(aiTime),
+	m_attackWidth(attackWidth),
+	m_attackHeight(attackHeight),
+	m_shouldRespawn(shouldRespawn),
+	m_respawnTime(respawnTime),
+	m_canDropLoot(canDropLoot),
+	m_initialRotation(initialRotation),
+	m_initialPosition(initialPosition),
+	m_position(initialPosition),
+	m_gradeType(gradeType),
+	m_movementType(movementType),
+	m_targetType(targetType),
+	m_lootDrops(std::move(lootDrops)),
+	m_bodyParts(std::move(bodyParts))
+{
+}
+
 std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&)> setNextMove = [&](
 	RoomSession::Ptr roomSession, PveNpc* npc, const PathfinderCell& prevCell, const PathfinderCell& currCell)
 {
@@ -62,37 +90,6 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 	// else
 	// attack, clearpath and return
 };
-
-PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const float speed, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
-	const uint32_t aiTime, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
-	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
-	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType,
-	std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts, const PathfinderCell& initialCell) :
-	m_type(type),
-	m_baseHealth(baseHealth),
-	m_speed(speed),
-	m_health(baseHealth),
-	m_weaponItemId(weaponItemId),
-	m_weaponBodyPartId(weaponBodyPartId),
-	m_aiTime(aiTime),
-	m_attackWidth(attackWidth),
-	m_attackHeight(attackHeight),
-	m_shouldRespawn(shouldRespawn),
-	m_respawnTime(respawnTime),
-	m_canDropLoot(canDropLoot),
-	m_initialRotation(initialRotation),
-	m_initialPosition(initialPosition),
-	m_position(initialPosition),
-	m_gradeType(gradeType),
-	m_movementType(movementType),
-	m_targetType(targetType),
-	m_lootDrops(std::move(lootDrops)),
-	m_bodyParts(std::move(bodyParts)),
-	m_currentCell(initialCell),
-	m_previousCell(initialCell),
-	m_initialCell(initialCell)
-{
-}
 
 void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -224,6 +221,13 @@ void PveNpc::setCurrentCell(std::shared_ptr<RoomSession> roomSession, const Path
 PathfinderCell PveNpc::getTargetCell()
 {
 	return m_targetCell;
+}
+
+void PveNpc::setInitialCell(const PathfinderCell& initialCell)
+{
+	m_initialCell = initialCell;
+	m_previousCell = initialCell;
+	m_currentCell = initialCell;
 }
 
 std::shared_ptr<RoomSessionPlayer> PveNpc::getTargetPlayer()

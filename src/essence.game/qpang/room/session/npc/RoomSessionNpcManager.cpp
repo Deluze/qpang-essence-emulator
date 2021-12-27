@@ -45,10 +45,23 @@ void RoomSessionNpcManager::initializeNpcs()
 	m_npcs.clear();
 	m_spawnedNpcs.clear();
 
-	const auto npcs = Game::instance()->getPveManager()->getNpcsByMapId(roomSession->getRoom()->getMap());
+	auto npcs = Game::instance()->getPveManager()->getNpcsByMapId(roomSession->getRoom()->getMap());
 
-	for (const auto& npc : npcs)
+	for (auto& npc : npcs)
 	{
+		const auto initialPosition = npc.getInitialPosition();
+
+		const auto pathFinder = (initialPosition.y < 0)
+			? roomSession->getUnderGroundPathfinder()
+			: roomSession->getAboveGroundPathfinder();
+
+		PathfinderCell spawnCell = {
+			pathFinder->getCellX(initialPosition.x),
+			pathFinder->getCellZ(initialPosition.z)
+		};
+
+		npc.setInitialCell(spawnCell);
+
 		m_npcs.push_back(npc);
 	}
 }
