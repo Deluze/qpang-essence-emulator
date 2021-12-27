@@ -57,7 +57,7 @@ void RoomSessionNpcManager::initializeNpcs()
 
 		PathfinderCell spawnCell = {
 			pathFinder->getCellX(x),
-			pathFinder->getCellZ(y)
+			pathFinder->getCellZ(z)
 		};
 
 		const auto npc = PveNpc(data, spawnCell);
