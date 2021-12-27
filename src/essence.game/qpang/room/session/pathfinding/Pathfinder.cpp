@@ -46,14 +46,31 @@ float Pathfinder::getCellHeight()
 	return m_mapInfo.m_cellHeight;
 }
 
-float Pathfinder::getCellX(float x)
+int Pathfinder::getCellX(float x)
 {
-	return std::fabsf((x - m_mapInfo.m_mapOffX) / m_mapInfo.m_cellWidth);
+	return ((x - m_mapInfo.m_mapOffX) / m_mapInfo.m_cellWidth);
 }
 
-float Pathfinder::getCellZ(float z)
+int Pathfinder::getCellZ(float z)
 {
-	return std::fabsf((z - m_mapInfo.m_mapOffZ) / m_mapInfo.m_cellHeight);
+	return (((z - m_mapInfo.m_mapOffZ) / m_mapInfo.m_cellHeight) * -1.f);
+}
+
+void Pathfinder::cellToCoords(const PathfinderCell& cell, float& x, float& z)
+{
+	x = cell.x * m_mapInfo.m_cellWidth + m_mapInfo.m_mapOffX;
+	z = (cell.z * -1.f) * m_mapInfo.m_cellHeight + m_mapInfo.m_mapOffZ;
+}
+
+bool Pathfinder::isCellTaken(const PathfinderCell& cell)
+{
+	return m_mapInfo.m_mapGrid[cell.x][cell.z] == 1;
+}
+
+void Pathfinder::setCellTaken(const PathfinderCell& cell, bool taken)
+{
+	m_mapInfo.m_mapGrid[cell.x][cell.z] = taken;
+	m_microPather->Reset();
 }
 
 float Pathfinder::calculateMoveTime(float speed, const PathfinderCell& pos1, const PathfinderCell& pos2)
@@ -98,6 +115,15 @@ bool Pathfinder::canPassThrough(int x, int z)
 
 bool Pathfinder::solve(const PathfinderCell& start, const PathfinderCell& end, std::vector<PathfinderCell>& path)
 {
+	if (start.x == end.x && start.z == end.z)
+		return false;
+
+	if (start.x >= m_numCellsX || start.x < 0 || end.x >= m_numCellsX && end.x < 0)
+		return false;
+
+	if (start.z >= m_numCellsZ || start.z < 0 || end.z >= m_numCellsZ && end.z < 0)
+		return false;
+
 	path.clear();
 
 	float totalCost = 0;
