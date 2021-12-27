@@ -58,7 +58,9 @@ public:
 	void getCoords(void* node, int* x, int* z);
 	void* getNode(int x, int z);
 
-	bool canPassThrough(int x, int z);
+	bool lineOfSightBetween(const PathfinderCell& pos1, const PathfinderCell& pos2);
+
+	bool canPassThrough(int x, int z, bool ignoreTaken = false);
 
 	bool solve(const PathfinderCell& start, const PathfinderCell& end, std::vector<PathfinderCell>& path);
 

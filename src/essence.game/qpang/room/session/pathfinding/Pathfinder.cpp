@@ -58,19 +58,29 @@ int Pathfinder::getCellZ(float z)
 
 void Pathfinder::cellToCoords(const PathfinderCell& cell, float& x, float& z)
 {
-	x = cell.x * m_mapInfo.m_cellWidth + m_mapInfo.m_mapOffX;
-	z = (cell.z * -1.f) * m_mapInfo.m_cellHeight + m_mapInfo.m_mapOffZ;
+	x = (float)(cell.x) * m_mapInfo.m_cellWidth + m_mapInfo.m_mapOffX;
+	z = ((float)(cell.z) * -1.f) * m_mapInfo.m_cellHeight + m_mapInfo.m_mapOffZ;
 }
 
 bool Pathfinder::isCellTaken(const PathfinderCell& cell)
 {
-	return m_mapInfo.m_mapGrid[cell.x][cell.z] == 1;
+	if (cell.x >= 0 && cell.x < m_numCellsX
+		&& cell.z >= 0 && cell.z < m_numCellsZ)
+	{
+		return m_mapInfo.m_mapGrid[cell.x][cell.z] == 2;
+	}
+
+	return true;
 }
 
 void Pathfinder::setCellTaken(const PathfinderCell& cell, bool taken)
 {
-	m_mapInfo.m_mapGrid[cell.x][cell.z] = taken;
-	m_microPather->Reset();
+	if (cell.x >= 0 && cell.x < m_numCellsX
+		&& cell.z >= 0 && cell.z < m_numCellsZ)
+	{
+		m_mapInfo.m_mapGrid[cell.x][cell.z] = taken ? 2 : 0;
+		m_microPather->Reset();
+	}
 }
 
 float Pathfinder::calculateMoveTime(float speed, const PathfinderCell& pos1, const PathfinderCell& pos2)
@@ -101,12 +111,111 @@ void* Pathfinder::getNode(int x, int z)
 	return (void*)(z * m_numCellsX + x);
 }
 
-bool Pathfinder::canPassThrough(int x, int z)
+bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const PathfinderCell& pos2)
+{
+	// We're going to be using Bresenham's line algorithm to get all cells that lie
+	// on the line segment between pos1 and pos2.
+	// Then, we're going to loop all the cells on the line and see if any of them have a wall.
+	// If they do, there's no line of sight between pos1 and pos2.
+
+	int x, z;
+
+	int dx = pos2.x - pos1.x;
+	int dy = pos2.z - pos1.z;
+
+	int dx1 = fabs(dx);
+	int dy1 = fabs(dy);
+
+	int px = 2 * dy1 - dx1;
+	int py = 2 * dx1 - dy1;
+
+	if (dy1 <= dx1)
+	{
+		int xe = 0;
+		if (dx >= 0)
+		{
+			x = pos1.x;
+			z = pos1.z;
+			xe = pos2.x;
+		}
+		else
+		{
+			x = pos2.x;
+			z = pos2.z;
+			xe = pos1.x;
+		}
+
+		if (!canPassThrough(x, z, true))
+			return false;
+
+		for (int i = 0; x < xe; i++)
+		{
+			x = x + 1;
+			if (px < 0)
+				px = px + 2 * dy1;
+			else
+			{
+				if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
+					z = z + 1;
+				else
+					z = z - 1;
+
+				px = px + 2 * (dy1 - dx1);
+			}
+
+			if (!canPassThrough(x, z, true))
+				return false;
+		}
+	}
+	else
+	{
+		int ze = 0;
+		if (dy >= 0)
+		{
+			x = pos1.x;
+			z = pos1.z;
+			ze = pos2.z;
+		}
+		else
+		{
+			x = pos2.x;
+			z = pos2.z;
+			ze = pos1.z;
+		}
+
+		if (!canPassThrough(x, z, true))
+			return false;
+
+		for (int i = 0; z < ze; i++)
+		{
+			z = z + 1;
+
+			if (py <= 0)
+				py = py + 2 * dx1;
+			else
+			{
+				if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
+					x = x + 1;
+				else
+					x = x - 1;
+
+				py = py + 2 * (dx1 - dy1);
+			}
+
+			if (!canPassThrough(x, z, true))
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool Pathfinder::canPassThrough(int x, int z, bool ignoreTaken)
 {
 	if (x >= 0 && x < m_numCellsX
 		&& z >= 0 && z < m_numCellsZ)
 	{
-		if (m_mapInfo.m_mapGrid[x][z] == 0)
+		if (m_mapInfo.m_mapGrid[x][z] == 0 || (ignoreTaken && m_mapInfo.m_mapGrid[x][z] == 2))
 			return true;
 	}
 
