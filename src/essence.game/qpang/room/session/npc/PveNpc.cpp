@@ -3,40 +3,37 @@
 #include "AABBHelper.h"
 #include "gc_master_log.hpp"
 #include "gc_pve_die_npc.hpp"
+#include "gc_pve_move_npc.hpp"
 #include "gc_pve_npc_init.hpp"
 #include "RoomSession.h"
-
 #include "TimeHelper.h"
-
-#include <qpang/room/tnl/net_events/server/gc_pve_move_npc.hpp>
 
 std::mutex pathfindingMutex = {};
 
-PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const float speed, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
-	const uint32_t aiTime, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
-	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
-	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType,
-	std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts) :
-	m_type(type),
-	m_baseHealth(baseHealth),
-	m_health(baseHealth),
-	m_speed(speed),
-	m_weaponItemId(weaponItemId),
-	m_weaponBodyPartId(weaponBodyPartId),
-	m_aiTime(aiTime),
-	m_attackWidth(attackWidth),
-	m_attackHeight(attackHeight),
-	m_shouldRespawn(shouldRespawn),
-	m_respawnTime(respawnTime),
-	m_canDropLoot(canDropLoot),
-	m_initialRotation(initialRotation),
-	m_initialPosition(initialPosition),
-	m_position(initialPosition),
-	m_gradeType(gradeType),
-	m_movementType(movementType),
-	m_targetType(targetType),
-	m_lootDrops(std::move(lootDrops)),
-	m_bodyParts(std::move(bodyParts))
+PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
+	m_type(data.type),
+	m_baseHealth(data.baseHealth),
+	m_health(data.baseHealth),
+	m_speed(data.speed),
+	m_weaponItemId(data.weaponItemId),
+	m_weaponBodyPartId(data.weaponBodyPartId),
+	m_aiTime(data.aiTime),
+	m_attackWidth(data.attackWidth),
+	m_attackHeight(data.attackHeight),
+	m_shouldRespawn(data.shouldRespawn),
+	m_respawnTime(data.respawnTime),
+	m_canDropLoot(data.canDropLoot),
+	m_initialRotation(data.initialRotation),
+	m_initialPosition(data.initialPosition),
+	m_position(data.initialPosition),
+	m_gradeType(data.gradeType),
+	m_movementType(data.movementType),
+	m_targetType(data.targetType),
+	m_initialCell(spawnCell),
+	m_previousCell(spawnCell),
+	m_currentCell(spawnCell),
+	m_lootDrops(std::move(data.lootDrops)),
+	m_bodyParts(std::move(data.bodyParts))
 {
 }
 
@@ -221,13 +218,6 @@ void PveNpc::setCurrentCell(std::shared_ptr<RoomSession> roomSession, const Path
 PathfinderCell PveNpc::getTargetCell()
 {
 	return m_targetCell;
-}
-
-void PveNpc::setInitialCell(const PathfinderCell& initialCell)
-{
-	m_initialCell = initialCell;
-	m_previousCell = initialCell;
-	m_currentCell = initialCell;
 }
 
 std::shared_ptr<RoomSessionPlayer> PveNpc::getTargetPlayer()

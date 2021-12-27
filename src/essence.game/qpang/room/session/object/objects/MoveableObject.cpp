@@ -5,7 +5,9 @@
 #include <qpang/room/tnl/net_events/server/gc_pve_object_move.hpp>
 #include <qpang/room/tnl/net_events/server/gc_pve_object_init.hpp>
 
-MoveableObject::MoveableObject(uint32_t uid, eObjectType type, const Position& position, const Position& endPosition, int moveDuration, int moveWait, uint32_t linkedObjectId) : 
+MoveableObject::MoveableObject(const uint32_t uid, const eObjectType type, const Position& position,
+                               const Position& endPosition, const int moveDuration, const int moveWait,
+                               const uint32_t linkedObjectId) : 
 	PveObject(uid, type, position, linkedObjectId),
 	m_endPosition(endPosition),
 	m_moveDuration(moveDuration),

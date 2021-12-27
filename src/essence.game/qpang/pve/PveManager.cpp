@@ -1,5 +1,6 @@
 #include "PveManager.h"
 
+#include "MoveableObject.h"
 #include "core/Emulator.h"
 #include "core/database/Database.h"
 
@@ -11,11 +12,28 @@ void PveManager::initialize()
 	initializeObjects();
 }
 
-std::vector<PveNpc> PveManager::getNpcsByMapId(const uint8_t mapId)
+std::vector<PveNpcData> PveManager::getNpcDataByMapId(const uint8_t mapId)
 {
-	const auto& it = m_npcs.find(mapId);
+	const auto& it = m_npcData.find(mapId);
 
-	if (it == m_npcs.end())
+	if (it == m_npcData.end())
+	{
+		return {};
+	}
+
+	if (it->second.empty())
+	{
+		return {};
+	}
+
+	return it->second;
+}
+
+std::vector<PveObjectData> PveManager::getObjectDataByMapId(const uint8_t mapId)
+{
+	const auto& it = m_objectData.find(mapId);
+
+	if (it == m_objectData.end())
 	{
 		return {};
 	}
@@ -30,7 +48,7 @@ std::vector<PveNpc> PveManager::getNpcsByMapId(const uint8_t mapId)
 
 void PveManager::initializeNpcs()
 {
-	std::cout << "Initializing the PveManager npcs." << std::endl;
+	std::cout << "Initializing pve npc data." << std::endl;
 
 	// Step 1: Get all npcs from pve_npc_spawns.
 	const auto result = DATABASE->prepare(
@@ -63,9 +81,9 @@ void PveManager::initializeNpcs()
 		"INNER JOIN maps on maps.id = pve_npc_spawns.map_id;"
 	)->fetch();
 
-	m_npcs.clear();
+	m_npcData.clear();
 
-	while(result->hasNext())
+	while (result->hasNext())
 	{
 		const auto npcPrimaryKey = result->getInt("Id");
 
@@ -76,7 +94,7 @@ void PveManager::initializeNpcs()
 		const auto bodyParts = getBodyPartsByNpcPrimaryKey(npcPrimaryKey);
 
 		// Step 4: Construct the npc.
-		auto npc = PveNpc(
+		auto npcData = PveNpcData{
 			result->getTiny("Type"),
 			result->getShort("BaseHealth"),
 			result->getFloat("Speed"),
@@ -85,7 +103,7 @@ void PveManager::initializeNpcs()
 			result->getInt("AITime"),
 			result->getFloat("AttackWidth"),
 			result->getFloat("AttackHeight"),
-			result->getInt("ShouldRespawn"),
+			result->getFlag("ShouldRespawn"),
 			result->getInt("RespawnTime"),
 			result->getFlag("CanDropLoot"),
 			result->getShort("InitialRotation"),
@@ -99,10 +117,12 @@ void PveManager::initializeNpcs()
 			static_cast<eNpcTargetType>(result->getInt("TargetType")),
 			lootDrops,
 			bodyParts
-			);
+		};
+
+		const auto mapId = result->getInt("MapId");
 
 		// Step 5: Save the npcs to the map.
-		m_npcs[result->getInt("MapId")].push_back(npc);
+		m_npcData[mapId].push_back(npcData);
 
 		result->next();
 	}
@@ -118,7 +138,7 @@ std::vector<NpcLootDrop> PveManager::getLootDropsByNpcPrimaryKey(const uint32_t 
 
 	std::vector<NpcLootDrop> lootDrops{};
 
-	while(result->hasNext())
+	while (result->hasNext())
 	{
 		auto lootDrop = NpcLootDrop
 		{
@@ -165,5 +185,55 @@ std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t 
 
 void PveManager::initializeObjects()
 {
+	std::cout << "Initializing pve object data." << std::endl;
 
+	const auto result = DATABASE->prepare(
+		"SELECT "
+		"pve_object_spawns.id AS ObjectUid "
+		",pve_object_spawns.type AS ObjectType "
+		",pve_object_spawns.spawn_position_x AS SpawnPositionX "
+		",pve_object_spawns.spawn_position_y AS SpawnPositionY "
+		",pve_object_spawns.spawn_position_z AS SpawnPositionZ "
+		",pve_object_spawns.end_position_x AS EndPositionX "
+		",pve_object_spawns.end_position_y AS EndPositionY "
+		",pve_object_spawns.end_position_z AS EndPositionZ "
+		",pve_object_spawns.is_moveable AS IsMoveable "
+		",pve_object_spawns.move_duration AS MoveDuration "
+		",pve_object_spawns.move_wait AS MoveWait "
+		",pve_object_spawns.linked_object AS LinkedObject "
+		",maps.map_id AS MapId "
+		"FROM pve_object_spawns "
+		"INNER JOIN maps ON maps.id = pve_object_spawns.map_id;"
+	)->fetch();
+
+	m_objectData.clear();
+
+	while (result->hasNext())
+	{
+		auto objectData = PveObjectData
+		{
+			result->getInt("ObjectUid"),
+			static_cast<eObjectType>(result->getInt("ObjectType")),
+			Position{
+					result->getFloat("SpawnPositionX"),
+					result->getFloat("SpawnPositionY"),
+					result->getFloat("SpawnPositionZ"),
+				},
+			Position{
+					result->getFloat("EndPositionX"),
+					result->getFloat("EndPositionY"),
+					result->getFloat("EndPositionZ"),
+				},
+				result->getFlag("IsMoveable"),
+			result->getInt("MoveDuration"),
+			result->getInt("MoveWait"),
+				result->getInt("LinkedObject")
+		};
+
+		const auto mapId = result->getInt("MapId");
+
+		m_objectData[mapId].push_back(objectData);
+
+		result->next();
+	}
 }

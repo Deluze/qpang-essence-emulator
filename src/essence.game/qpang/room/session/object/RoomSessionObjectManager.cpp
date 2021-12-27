@@ -26,71 +26,15 @@ void RoomSessionObjectManager::initializeObjects()
 		return;
 	}
 
-	const auto statement = DATABASE->prepare(
-		"SELECT "
-		"pve_object_spawns.id as objectUid "
-		",pve_object_spawns.type as objectType "
-		",pve_object_spawns.spawn_position_x as spawnPositionX "
-		",pve_object_spawns.spawn_position_y as spawnPositionY "
-		",pve_object_spawns.spawn_position_z as spawnPositionZ "
-		",pve_object_spawns.end_position_x as endPositionX "
-		",pve_object_spawns.end_position_y as endPositionY "
-		",pve_object_spawns.end_position_z as endPositionZ "
-		",pve_object_spawns.is_moveable as isMoveable "
-		",pve_object_spawns.move_duration as moveDuration "
-		",pve_object_spawns.move_wait as moveWait "
-		",pve_object_spawns.linked_object as linkedObject "
-		"FROM pve_object_spawns "
-		"INNER JOIN maps on maps.id = pve_object_spawns.map_id "
-		"WHERE maps.map_id = ?;"
-	);
-
-	statement->bindInteger(roomSession->getRoom()->getMap());
-
-	const auto result = statement->fetch();
-
 	m_objects.clear();
 
-	while (result->hasNext())
+	const auto objectData = Game::instance()->getPveManager()->getObjectDataByMapId(roomSession->getRoom()->getMap());
+
+	for (const auto& [uid, type, spawnPosition, endPosition, isMoveable, moveDuration, moveWait, linkedObjectId] : objectData)
 	{
-		int objectUid = result->getInt("objectUid");
-		bool isMoveable = result->getTiny("isMoveable");
-
-		if (isMoveable)
-		{
-			m_objects[objectUid] = std::make_shared<MoveableObject>(
-					objectUid,
-					(eObjectType)result->getInt("objectType"),
-					Position{
-						result->getFloat("spawnPositionX"),
-						result->getFloat("spawnPositionY"),
-						result->getFloat("spawnPositionZ"),
-					},
-					Position{
-						result->getFloat("endPositionX"),
-						result->getFloat("endPositionY"),
-						result->getFloat("endPositionZ"),
-					},
-					result->getInt("moveDuration"),
-					result->getInt("moveWait"),
-					result->getInt("linkedObject")
-			);
-		}
-		else
-		{
-			m_objects[objectUid] = std::make_shared<PveObject>(
-				objectUid,
-				(eObjectType)result->getInt("objectType"),
-				Position{
-					result->getFloat("spawnPositionX"),
-					result->getFloat("spawnPositionY"),
-					result->getFloat("spawnPositionZ"),
-				},
-				result->getInt("linkedObject")
-			);
-		}
-
-		result->next();
+		m_objects[uid] = (isMoveable)
+			? std::make_shared<MoveableObject>(uid, type, spawnPosition, endPosition, moveDuration, moveWait, linkedObjectId)
+			: std::make_shared<PveObject>(uid, type, spawnPosition, linkedObjectId);
 	}
 }
 

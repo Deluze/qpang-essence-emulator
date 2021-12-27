@@ -2,7 +2,7 @@
 
 #include "PveObject.h"
 
-class MoveableObject : public PveObject
+class MoveableObject final : public PveObject
 {
 public:
 	MoveableObject(uint32_t uid, eObjectType type, const Position& position, const Position& endPosition, int moveDuration, int moveWait, uint32_t linkedObjectId);
