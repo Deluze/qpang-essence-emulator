@@ -136,9 +136,8 @@ bool PveNpc::canAttackTargetPlayer(Pathfinder* pathFinder)
 	const auto playerPosition = m_targetPlayer->getPosition();
 	const auto playerCell = PathfinderCell{ pathFinder->getCellX(playerPosition.x), pathFinder->getCellZ(playerPosition.z) };
 
-	const auto distance = sqrtf(std::pow(playerCell.x - m_currentCell.x, 2) + std::pow(playerCell.z - m_currentCell.z, 2));
-	const auto distanceDelta = distance - m_attackRange;
-	if (distanceDelta > 0.1f)
+	const float distance = sqrtf(std::pow(playerCell.x - m_currentCell.x, 2) + std::pow(playerCell.z - m_currentCell.z, 2));
+	if (distance > m_attackRange)
 		return false;
 
 	return pathFinder->lineOfSightBetween(m_currentCell, playerCell);
