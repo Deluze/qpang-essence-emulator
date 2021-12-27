@@ -82,7 +82,7 @@ public:
 			Maps::recordMoves = false;
 		else if (a1 == 2)
 		{
-			std::cout << "std::vector<std::vector<uint8_t>> worldLayout = {" << std::endl;
+			std::cout << "inline std::vector<std::vector<uint8_t>> debugWorldLayout = {" << std::endl;
 
 			for (int x = 0; x < 60; ++x)
 			{
@@ -91,9 +91,9 @@ public:
 				for (int z = 0; z < 60; ++z)
 				{
 					if (z == 59)
-						std::cout << Maps::debugWorldLayout[x][z];
+						std::cout << (int)Maps::debugWorldLayout[x][z];
 					else
-						std::cout << Maps::debugWorldLayout[x][z] << ", ";
+						std::cout << (int)Maps::debugWorldLayout[x][z] << ", ";
 				}
 
 				if (x == 59)
