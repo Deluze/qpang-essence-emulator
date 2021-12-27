@@ -8,8 +8,6 @@
 class AABBHelper
 {
 public:
-	static bool isBetweenAreaBounds(PveArea::Bound minBound, PveArea::Bound maxBound, Position position);
-
 	static bool isPositionInBetweenBounds(const Position point, const Position minBound, const Position maxBound);
 	static bool IsPositionWithinSpawnRadius(Position position, Spawn spawn, float radius);
 	static long double getDistanceBetweenPositions(const Position pos1, const Position pos2);

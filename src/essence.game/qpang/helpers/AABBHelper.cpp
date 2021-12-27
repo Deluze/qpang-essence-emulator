@@ -3,19 +3,6 @@
 #include "Spawn.h"
 #include <cmath>
 
-bool AABBHelper::isBetweenAreaBounds(const PveArea::Bound minBound, const PveArea::Bound maxBound, const Position position)
-{
-	const auto xBetweenBounds = (isNegative(position.x)
-		? isInRangeNegative(position.x, minBound.x, maxBound.x)
-		: isInRange(position.x, minBound.x, maxBound.x));
-
-	const auto zBetweenBounds = (isNegative(position.z)
-		? isInRangeNegative(position.z, minBound.z, maxBound.z)
-		: isInRange(position.z, minBound.z, maxBound.z));
-
-	return (xBetweenBounds && zBetweenBounds);
-}
-
 // ReSharper disable once CppInconsistentNaming
 bool AABBHelper::isPositionInBetweenBounds(const Position point, const Position minBound, const Position maxBound)
 {
