@@ -51,6 +51,7 @@ struct PveNpcData
 	uint32_t weaponItemId;
 	uint8_t weaponBodyPartId;
 	uint32_t aiTime;
+	float attackRange;
 	float attackWidth;
 	float attackHeight;
 	bool shouldRespawn;

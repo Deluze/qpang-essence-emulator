@@ -207,6 +207,8 @@ private:
 	// How often the npcs attacks.
 	uint32_t m_aiTime;
 
+	float m_attackRange;
+
 	// The range in width and height for the npc.
 	float m_attackWidth;
 	float m_attackHeight;

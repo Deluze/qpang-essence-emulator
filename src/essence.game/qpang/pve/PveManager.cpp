@@ -60,6 +60,7 @@ void PveManager::initializeNpcs()
 		",pve_npcs.weapon_item_id AS WeaponItemId "
 		",pve_npcs.weapon_body_part_id AS WeaponBodyPartId "
 		",pve_npcs.ai_time AS AITime "
+		",pve_npcs.attack_range AS AttackRange "
 		",pve_npcs.attack_width AS AttackWidth "
 		",pve_npcs.attack_height AS AttackHeight "
 		",pve_npcs.can_drop_loot AS CanDropLoot "
@@ -101,6 +102,7 @@ void PveManager::initializeNpcs()
 			result->getInt("WeaponItemId"),
 			result->getTiny("WeaponBodyPartId"),
 			result->getInt("AITime"),
+			result->getFloat("AttackRange"),
 			result->getFloat("AttackWidth"),
 			result->getFloat("AttackHeight"),
 			result->getFlag("ShouldRespawn"),

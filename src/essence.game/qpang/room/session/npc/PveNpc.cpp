@@ -18,6 +18,7 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_weaponItemId(data.weaponItemId),
 	m_weaponBodyPartId(data.weaponBodyPartId),
 	m_aiTime(data.aiTime),
+	m_attackRange(data.attackRange),
 	m_attackWidth(data.attackWidth),
 	m_attackHeight(data.attackHeight),
 	m_shouldRespawn(data.shouldRespawn),
