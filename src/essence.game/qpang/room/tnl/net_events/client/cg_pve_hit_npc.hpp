@@ -178,6 +178,7 @@ public:
 		};
 
 		roomSession->getNpcManager()->onCGPvEHitNpc(cgPvEHitNpcData);
+		targetNpc->setLastAttackerId(player->getId());
 	}
 
 	void process(EventConnection* ps) override
