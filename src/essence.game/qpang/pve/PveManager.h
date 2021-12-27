@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "PveNpc.h"
+#include "PveItemData.h"
 #include "PveNpcData.h"
 #include "PveObject.h"
 
@@ -27,6 +27,13 @@ public:
 	 * \return A vector filled with objects.
 	 */
 	std::vector<PveObjectData> getObjectDataByMapId(uint8_t mapId);
+
+	/**
+	 * \brief Retrieves the items for the given map.
+	 * \param mapId The map id.
+	 * \return A vector filled with items.
+	 */
+	std::vector<PveItemData> getItemDataByMapId(uint8_t mapId);
 private:
 	/**
 	 * \brief Retrieves all pve_npc_spawns from the database and stores them.
@@ -52,6 +59,9 @@ private:
 	 */
 	void initializeObjects();
 
+	void initializeItems();
+
 	std::unordered_map<uint32_t, std::vector<PveNpcData>> m_npcData{};
 	std::unordered_map<uint32_t, std::vector<PveObjectData>> m_objectData{};
+	std::unordered_map<uint32_t, std::vector<PveItemData>> m_itemData{};
 };

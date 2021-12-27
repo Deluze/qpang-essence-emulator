@@ -20,6 +20,8 @@ void PlayerVsEnvironment::onStart(const std::shared_ptr<RoomSession> roomSession
 {
 	roomSession->getPveRoundManager()->onStart();
 	roomSession->getNpcManager()->onStart();
+	roomSession->getPveItemManager()->onStart();
+	roomSession->getObjectManager()->onStart();
 
 	GameMode::onStart(roomSession);
 }

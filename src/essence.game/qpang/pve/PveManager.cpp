@@ -10,6 +10,7 @@ void PveManager::initialize()
 
 	initializeNpcs();
 	initializeObjects();
+	initializeItems();
 }
 
 std::vector<PveNpcData> PveManager::getNpcDataByMapId(const uint8_t mapId)
@@ -45,6 +46,24 @@ std::vector<PveObjectData> PveManager::getObjectDataByMapId(const uint8_t mapId)
 
 	return it->second;
 }
+
+std::vector<PveItemData> PveManager::getItemDataByMapId(const uint8_t mapId)
+{
+	const auto& it = m_itemData.find(mapId);
+
+	if (it == m_itemData.end())
+	{
+		return {};
+	}
+
+	if (it->second.empty())
+	{
+		return {};
+	}
+
+	return it->second;
+}
+
 
 void PveManager::initializeNpcs()
 {
@@ -243,6 +262,43 @@ void PveManager::initializeObjects()
 		const auto mapId = result->getInt("MapId");
 
 		m_objectData[mapId].push_back(objectData);
+
+		result->next();
+	}
+}
+
+void PveManager::initializeItems()
+{
+	std::cout << "Initializing pve item data." << std::endl;
+
+	const auto result = DATABASE->prepare(
+		"SELECT "
+		"item_id as ItemId "
+		",position_x as PositionX "
+		",position_y as PositionY "
+		",position_z as PositionZ "
+		",maps.map_id AS MapId "
+		"FROM pve_item_spawns "
+		"INNER JOIN maps ON maps.id = pve_item_spawns.map_id;"
+	)->fetch();
+
+	m_itemData.clear();
+
+	while (result->hasNext())
+	{
+		auto itemData = PveItemData
+		{
+			result->getInt("ItemId"),
+			Position{
+				result->getFloat("PositionX"),
+				result->getFloat("PositionY"),
+				result->getFloat("PositionZ")
+			}
+		};
+
+		const auto mapId = result->getInt("MapId");
+
+		m_itemData[mapId].push_back(itemData);
 
 		result->next();
 	}

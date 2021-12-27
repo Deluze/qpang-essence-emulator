@@ -15,6 +15,36 @@ void RoomSessionPveItemManager::tick() const
 
 }
 
+void RoomSessionPveItemManager::initializeItems()
+{
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	m_items.clear();
+	m_spawnedItems.clear();
+
+	const auto itemData = Game::instance()->getPveManager()->getItemDataByMapId(roomSession->getRoom()->getMap());
+
+	for (const auto& [itemId, position] : itemData)
+	{
+		const auto item = PveItem(itemId, position);
+
+		m_items.push_back(item);
+	}
+}
+
+void RoomSessionPveItemManager::spawnInitializedItems()
+{
+	for (const auto& item : m_items)
+	{
+		spawnItem(std::make_shared<PveItem>(item));
+	}
+}
+
 uint32_t RoomSessionPveItemManager::spawnItem(const std::shared_ptr<PveItem>& item)
 {
 	const auto roomSession = m_roomSession.lock();
@@ -24,10 +54,10 @@ uint32_t RoomSessionPveItemManager::spawnItem(const std::shared_ptr<PveItem>& it
 		return 0;
 	}
 
-	item->setUid(m_items.size() + 1);
+	item->setUid(m_spawnedItems.size() + 1);
 	item->spawn(roomSession);
 
-	m_items[item->getUid()] = item;
+	m_spawnedItems[item->getUid()] = item;
 
 	return item->getUid();
 }
@@ -74,19 +104,20 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 
 	roomSession->relayPlaying<GCGameItem>(1, playerId, item->getItemId(), uid, 0);
 
-	m_items.erase(uid);
+	m_spawnedItems.erase(uid);
 }
 
 void RoomSessionPveItemManager::removeAll()
 {
 	m_items.clear();
+	m_spawnedItems.clear();
 }
 
 std::shared_ptr<PveItem> RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
 {
-	const auto it = m_items.find(itemUid);
+	const auto it = m_spawnedItems.find(itemUid);
 
-	if (it == m_items.end())
+	if (it == m_spawnedItems.end())
 	{
 		return nullptr;
 	}
@@ -96,10 +127,16 @@ std::shared_ptr<PveItem> RoomSessionPveItemManager::findItemByUid(const uint32_t
 
 void RoomSessionPveItemManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const
 {
-	for (const auto& [uid, item] : m_items)
+	for (const auto& [uid, item] : m_spawnedItems)
 	{
 		item->spawn(session);
 	}
+}
+
+void RoomSessionPveItemManager::onStart()
+{
+	initializeItems();
+	spawnInitializedItems();
 }
 
 void RoomSessionPveItemManager::handleAmmoPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer)
