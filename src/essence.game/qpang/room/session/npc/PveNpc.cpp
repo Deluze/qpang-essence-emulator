@@ -90,25 +90,15 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 
 void PveNpc::handleNoMovement(const std::shared_ptr<RoomSession>& roomSession)
 {
-	for (const auto& player : roomSession->getPlayingPlayers())
+	if (m_targetType == eNpcTargetType::T_STATIC)
 	{
-		if (player->isDead())
-		{
-			continue;
-		}
+		const auto currentTime = time(nullptr);
+		if ((m_lastAttackTime + std::ceil((float)(m_aiTime) / 1000.f)) > currentTime)
+			return;
 
-		// ReSharper disable once CppTooWideScopeInitStatement
-		const auto distance = AABBHelper::getDistanceBetweenPositions(m_position, player->getPosition());
+		attack(roomSession, m_staticShootingPosition);
 
-		if (distance < 7)
-		{
-			auto playerPosition = player->getPosition();
-
-			constexpr auto yCorrection = 1.0f;
-			playerPosition.y += yCorrection;
-
-			attack(roomSession, playerPosition);
-		}
+		m_lastAttackTime = currentTime;
 	}
 }
 
