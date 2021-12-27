@@ -4,6 +4,7 @@
 
 #include "Position.h"
 #include "RoomSessionPlayer.h"
+#include "Pathfinder.h"
 
 class RoomSession;
 
@@ -57,15 +58,37 @@ public:
 	PveNpc(uint32_t type, uint16_t baseHealth, float speed, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t aiTime,
 		float attackWidth, float attackHeight, bool shouldRespawn, uint32_t respawnTime, bool canDropLoot,
 		uint16_t initialRotation, Position initialPosition, eNpcGradeType gradeType, eNpcMovementType movementType,
-		eNpcTargetType targetType, std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts);
+		eNpcTargetType targetType, std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts, const PathfinderCell& initialCell);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
+
+	bool isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell);
+
+	PathfinderCell getMoveCell();
+
+	void clearPath();
+
+	bool didPathFinish();
+
+	void doPathfindingMove(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell);
+
+	void setPosition(float x, float z);
+
+	void setCurrentCell(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell);
+
+	PathfinderCell getTargetCell();
+
+	std::shared_ptr<RoomSessionPlayer> getTargetPlayer();
+
+	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
 	/**
 	 * \brief Spawns in the npc by relaying the init event.
 	 */
 	void spawn(const std::shared_ptr<RoomSession>& roomSession) const;
 	void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const;
+
+	void resetPosition();
 
 	/**
 	 * \brief Resets the npc health and spawns it in at its initial position.
@@ -253,6 +276,16 @@ private:
 	eNpcGradeType m_gradeType;
 	eNpcMovementType m_movementType;
 	eNpcTargetType m_targetType;
+
+	PathfinderCell m_initialCell = {};
+	PathfinderCell m_previousCell = {};
+	PathfinderCell m_currentCell = {};
+	PathfinderCell m_targetCell = {};
+
+	std::vector<PathfinderCell> m_path = {};
+	int m_pathIdx = 0;
+
+	std::shared_ptr<RoomSessionPlayer> m_targetPlayer = nullptr;
 
 	std::vector<NpcLootDrop> m_lootDrops{};
 	std::vector<NpcBodyPart> m_bodyParts{};

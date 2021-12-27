@@ -6,11 +6,68 @@
 #include "gc_pve_npc_init.hpp"
 #include "RoomSession.h"
 
+#include "TimeHelper.h"
+
+#include <qpang/room/tnl/net_events/server/gc_pve_move_npc.hpp>
+
+std::mutex pathfindingMutex = {};
+
+std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&)> setNextMove = [&](
+	RoomSession::Ptr roomSession, PveNpc* npc, const PathfinderCell& prevCell, const PathfinderCell& currCell)
+{
+	std::lock_guard lg(pathfindingMutex);
+
+	if (npc == nullptr)
+		return;
+
+	auto pathFinder = npc->getPosition().y < 0 ? roomSession->getUnderGroundPathfinder() : roomSession->getAboveGroundPathfinder();
+	if (pathFinder == nullptr)
+	{
+		npc->clearPath();
+		return;
+	}
+
+	pathFinder->setCellTaken(prevCell, false);
+
+	npc->setCurrentCell(roomSession, prevCell);
+
+	float x, z;
+	pathFinder->cellToCoords(prevCell, x, z);
+	npc->setPosition(x, z);
+
+	if (!npc->isNextMoveValid(pathFinder, currCell))
+	{
+		npc->clearPath();
+		return;
+	}
+
+	// if we can't attack
+	npc->doPathfindingMove(roomSession, currCell);
+	pathFinder->setCellTaken(currCell, true);
+
+	if (!npc->didPathFinish())
+	{
+		auto nextCell = npc->getMoveCell();
+
+		// This needs to be npc speed
+		const float speed = npc->getSpeed();
+		float moveTime = roomSession->getAboveGroundPathfinder()->calculateMoveTime(speed, currCell, nextCell);
+
+		int timeMilliseconds = std::round(moveTime * 1000.f);
+		TimeHelper::setTimeOut<RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&>
+			(timeMilliseconds, setNextMove, roomSession, npc, currCell, nextCell);
+	}
+	else
+		npc->clearPath();
+	// else
+	// attack, clearpath and return
+};
+
 PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const float speed, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
 	const uint32_t aiTime, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
 	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
 	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType,
-	std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts) :
+	std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts, const PathfinderCell& initialCell) :
 	m_type(type),
 	m_baseHealth(baseHealth),
 	m_speed(speed),
@@ -30,7 +87,10 @@ PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const float speed
 	m_movementType(movementType),
 	m_targetType(targetType),
 	m_lootDrops(std::move(lootDrops)),
-	m_bodyParts(std::move(bodyParts))
+	m_bodyParts(std::move(bodyParts)),
+	m_currentCell(initialCell),
+	m_previousCell(initialCell),
+	m_initialCell(initialCell)
 {
 }
 
@@ -55,28 +115,142 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 	}
 
 	// Note: temporary piece of code to let npcs shoot a player when the player is in range.
+	if (m_movementType == eNpcMovementType::M_NONE)
+	{
+		for (const auto& player : roomSession->getPlayingPlayers())
+		{
+			if (player->isDead())
+			{
+				continue;
+			}
 
+			// ReSharper disable once CppTooWideScopeInitStatement
+			const auto distance = AABBHelper::getDistanceBetweenPositions(m_position, player->getPosition());
+
+			if (distance < 7)
+			{
+				auto playerPosition = player->getPosition();
+
+				constexpr auto yCorrection = 1.0f;
+				playerPosition.y += yCorrection;
+
+				attack(roomSession, playerPosition);
+			}
+		}
+	}
+	else if (m_movementType == eNpcMovementType::M_PATH_FINDING)
+	{
+		auto pathFinder = m_position.y < 0 ? roomSession->getUnderGroundPathfinder() :
+			roomSession->getAboveGroundPathfinder();
+
+		if (m_path.empty())
+		{
+			// if we can't attack
+			if (m_targetType == eNpcTargetType::T_NEAR)
+			{
+				m_targetPlayer = findClosestValidPlayer(roomSession);
+				if (m_targetPlayer != nullptr)
+				{
+					m_targetCell = { pathFinder->getCellX(m_targetPlayer->getPosition().x), pathFinder->getCellZ(m_targetPlayer->getPosition().z) };
+					if (pathFinder->solve(m_currentCell, m_targetCell, m_path) && m_path.size() > 1)
+					{
+						m_pathIdx = 1;
+
+						// Starting at path[1], as the first pos is the current pos.
+						TimeHelper::setTimeOut<RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&>
+							(0, setNextMove, roomSession, this, m_currentCell, m_path[1]);
+					}
+				}
+			}
+			// else, attack
+		}
+	}
+}
+
+bool PveNpc::isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell)
+{
+	if (m_targetPlayer == nullptr || m_targetPlayer->isDead() || m_targetPlayer->isInvincible() || isDead())
+		return false;
+
+	auto currentPlayerCell = PathfinderCell{ pathFinder->getCellX(m_targetPlayer->getPosition().x), pathFinder->getCellZ(m_targetPlayer->getPosition().z) };
+
+	// The target position is outdated
+	if (m_targetCell.x != currentPlayerCell.x && m_targetCell.z != currentPlayerCell.z || pathFinder->isCellTaken(cell))
+		return false;
+
+	return true;
+}
+
+PathfinderCell PveNpc::getMoveCell()
+{
+	return m_path[m_pathIdx];
+}
+
+void PveNpc::clearPath()
+{
+	m_pathIdx = 0;
+	m_path.clear();
+}
+
+bool PveNpc::didPathFinish()
+{
+	return m_pathIdx >= m_path.size();
+}
+
+void PveNpc::doPathfindingMove(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell)
+{
+	roomSession->relayPlaying<GCPvEMoveNpc>(m_uid, (uint16_t)cell.x, (uint16_t)cell.z);
+	m_pathIdx++;
+}
+
+void PveNpc::setPosition(float x, float z)
+{
+	m_position.x = x;
+	m_position.z = z;
+}
+
+void PveNpc::setCurrentCell(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell)
+{
+	/*auto pathFinder = m_position.y < 0 ? roomSession->getUnderGroundPathfinder() :
+		roomSession->getAboveGroundPathfinder();
+
+	pathFinder->setCellTaken(m_previousCell, false);
+	pathFinder->setCellTaken(m_currentCell, true);*/
+
+	m_previousCell = m_currentCell;
+	m_currentCell = cell;
+}
+
+PathfinderCell PveNpc::getTargetCell()
+{
+	return m_targetCell;
+}
+
+std::shared_ptr<RoomSessionPlayer> PveNpc::getTargetPlayer()
+{
+	return m_targetPlayer;
+}
+
+RoomSessionPlayer::Ptr PveNpc::findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession)
+{
+	RoomSessionPlayer::Ptr target = nullptr;
+	float closestDistance = 40.f;
 
 	for (const auto& player : roomSession->getPlayingPlayers())
 	{
-		if (player->isDead())
-		{
+		if (player->isDead() || player->isInvincible())
 			continue;
-		}
 
-		// ReSharper disable once CppTooWideScopeInitStatement
-		const auto distance = AABBHelper::getDistanceBetweenPositions(m_position, player->getPosition());
-
-		if (distance < 7)
+		const auto position = player->getPosition();
+		const auto distance = AABBHelper::getDistanceBetweenPositions(m_position, position);
+		if (distance < closestDistance)
 		{
-			auto playerPosition = player->getPosition();
-
-			constexpr auto yCorrection = 1.0f;
-			playerPosition.y += yCorrection;
-
-			attack(roomSession, playerPosition);
+			closestDistance = distance;
+			target = player;
 		}
 	}
+
+	return target;
 }
 
 void PveNpc::spawn(const std::shared_ptr<RoomSession>& roomSession) const
@@ -89,8 +263,18 @@ void PveNpc::spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) 
 	roomSessionPlayer->send<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation);
 }
 
+void PveNpc::resetPosition()
+{
+	m_position = m_initialPosition;
+	m_currentCell = m_initialCell;
+	m_previousCell = m_initialCell;
+}
+
 void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 {
+	resetPosition();
+
+	clearPath();
 	resetHealth();
 	spawn(roomSession);
 }
