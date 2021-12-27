@@ -27,6 +27,7 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_initialRotation(data.initialRotation),
 	m_initialPosition(data.initialPosition),
 	m_position(data.initialPosition),
+	m_staticShootingPosition(data.staticShootingPosition),
 	m_gradeType(data.gradeType),
 	m_movementType(data.movementType),
 	m_targetType(data.targetType),

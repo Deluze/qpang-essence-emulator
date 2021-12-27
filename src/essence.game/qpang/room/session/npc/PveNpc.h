@@ -229,6 +229,8 @@ private:
 	Position m_initialPosition;
 	Position m_position;
 
+	Position m_staticShootingPosition;
+
 	eNpcGradeType m_gradeType;
 	eNpcMovementType m_movementType;
 	eNpcTargetType m_targetType;

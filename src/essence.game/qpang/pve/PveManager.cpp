@@ -70,6 +70,9 @@ void PveManager::initializeNpcs()
 		",pve_npc_spawns.spawn_position_x AS SpawnPositionX "
 		",pve_npc_spawns.spawn_position_y AS SpawnPositionY "
 		",pve_npc_spawns.spawn_position_z AS SpawnPositionZ "
+		",pve_npc_spawns.static_shooting_position_x AS StaticShootingPositionX "
+		",pve_npc_spawns.static_shooting_position_y AS StaticShootingPositionY "
+		",pve_npc_spawns.static_shooting_position_z AS StaticShootingPositionZ "
 		",pve_npc_movement_types.type AS MovementType "
 		",pve_npc_target_types.type AS TargetType "
 		",pve_npc_grade_types.type AS GradeType "
@@ -113,6 +116,11 @@ void PveManager::initializeNpcs()
 				result->getFloat("SpawnPositionX"),
 				result->getFloat("SpawnPositionY"),
 				result->getFloat("SpawnPositionZ"),
+			},
+			Position{
+				result->getFloat("StaticShootingPositionX"),
+				result->getFloat("StaticShootingPositionY"),
+				result->getFloat("StaticShootingPositionZ"),
 			},
 			static_cast<eNpcGradeType>(result->getInt("GradeType")),
 			static_cast<eNpcMovementType>(result->getInt("MovementType")),

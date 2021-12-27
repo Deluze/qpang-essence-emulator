@@ -59,6 +59,7 @@ struct PveNpcData
 	bool canDropLoot;
 	uint16_t initialRotation;
 	Position initialPosition;
+	Position staticShootingPosition;
 	eNpcGradeType gradeType;
 	eNpcMovementType movementType;
 	eNpcTargetType targetType;
