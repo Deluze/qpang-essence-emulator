@@ -16,6 +16,10 @@ public:
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
+	void handleDeath(const std::shared_ptr<RoomSession>& roomSession);
+
+	void setLastAttackerId(uint32_t id);
+
 	bool isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell);
 
 	PathfinderCell getMoveCell();
@@ -26,15 +30,11 @@ public:
 
 	void doPathfindingMove(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell);
 
-	void setPosition(float x, float z);
-
-	void setCurrentCell(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell);
+	void setPosition(Pathfinder* pathFinder, const PathfinderCell& cell);
 
 	PathfinderCell getTargetCell();
 
 	std::shared_ptr<RoomSessionPlayer> getTargetPlayer();
-
-	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
 	/**
 	 * \brief Spawns in the npc by relaying the init event.
@@ -186,11 +186,29 @@ public:
 #pragma endregion
 
 private:
+	void handleNoMovement(const std::shared_ptr<RoomSession>& roomSession);
+
+	void startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+
+	void PveNpc::handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+
+	void PveNpc::handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+
+	void handleMovement(const std::shared_ptr<RoomSession>& roomSession);
+
+	bool isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player);
+
+	RoomSessionPlayer::Ptr findValidAttackedByPlayer(const std::shared_ptr<RoomSession>& roomSession);
+
+	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession);
+
 	/**
 	 * \brief Picks a random item from the loot table and drops it.
 	 * \param roomSession The current room session.
 	 */
 	void dropLoot(const std::shared_ptr<RoomSession>& roomSession);
+
+	uint32_t m_lastAttackerId = -1;
 
 	uint32_t m_type{};
 	uint32_t m_uid{};
@@ -236,7 +254,7 @@ private:
 	eNpcTargetType m_targetType;
 
 	PathfinderCell m_initialCell = {};
-	PathfinderCell m_previousCell = {};
+	PathfinderCell m_takenCell = {};
 	PathfinderCell m_currentCell = {};
 	PathfinderCell m_targetCell = {};
 
