@@ -11,6 +11,7 @@ void PveManager::initialize()
 	initializeNpcs();
 	initializeObjects();
 	initializeItems();
+	initializeAreas();
 }
 
 std::vector<PveNpcData> PveManager::getNpcDataByMapId(const uint8_t mapId)
@@ -64,6 +65,22 @@ std::vector<PveItemData> PveManager::getItemDataByMapId(const uint8_t mapId)
 	return it->second;
 }
 
+std::vector<PveAreaData> PveManager::getAreaDataByMapId(const uint8_t mapId)
+{
+	const auto& it = m_areaData.find(mapId);
+
+	if (it == m_areaData.end())
+	{
+		return {};
+	}
+
+	if (it->second.empty())
+	{
+		return {};
+	}
+
+	return it->second;
+}
 
 void PveManager::initializeNpcs()
 {
@@ -299,6 +316,53 @@ void PveManager::initializeItems()
 		const auto mapId = result->getInt("MapId");
 
 		m_itemData[mapId].push_back(itemData);
+
+		result->next();
+	}
+}
+
+void PveManager::initializeAreas()
+{
+	std::cout << "Initializing pve area data." << std::endl;
+
+	const auto result = DATABASE->prepare(
+		"SELECT "
+		"pve_map_areas.area_uid AS AreaUid "
+		",pve_map_areas.min_bound_x as MinBoundX "
+		",pve_map_areas.min_bound_y as MinBoundY "
+		",pve_map_areas.min_bound_z as MinBoundZ "
+		",pve_map_areas.max_bound_x as MaxBoundX "
+		",pve_map_areas.max_bound_y as MaxBoundY "
+		",pve_map_areas.max_bound_z as MaxBoundZ "
+		",pve_map_areas.floor_number as FloorNumber "
+		",maps.map_id AS MapId "
+		"FROM pve_map_areas "
+		"INNER JOIN maps ON maps.id = pve_map_areas.map_id;"
+	)->fetch();
+
+	m_areaData.clear();
+
+	while (result->hasNext())
+	{
+		auto areaData = PveAreaData
+		{
+			result->getInt("AreaUid"),
+			Position{
+				result->getFloat("MinBoundX"),
+				result->getFloat("MinBoundY"),
+				result->getFloat("MinBoundZ")
+			},
+			Position{
+				result->getFloat("MaxBoundX"),
+				result->getFloat("MaxBoundY"),
+				result->getFloat("MaxBoundZ"),
+			},
+			result->getInt("FloorNumber")
+		};
+
+		const auto mapId = result->getInt("MapId");
+
+		m_areaData[mapId].push_back(areaData);
 
 		result->next();
 	}
