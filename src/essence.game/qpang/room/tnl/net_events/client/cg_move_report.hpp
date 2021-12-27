@@ -4,6 +4,7 @@
 #include "GameNetEvent.h"
 
 #include "Maps.h"
+#include "gc_pve_move_npc.hpp"
 
 class CGMoveReport : public GameNetEvent
 {
@@ -61,12 +62,13 @@ public:
 
 		roomSessionPlayer->setPosition({ xPos, yPos, zPos });
 
+		// Convert pos to cell pos
+		int cellX = ((xPos - -43.220) / 1.441);
+		int cellZ = (((zPos - 40.823) / 1.399) * -1.f);
+		//roomSessionPlayer->send<GCPvEMoveNpc>(50, (uint16_t)cellX, (uint16_t)cellZ);
+
 		if (Maps::recordMoves)
 		{
-			// Convert pos to cell pos
-			int cellX = std::abs((xPos - -43.220) / 1.441);
-			int cellZ = std::abs((zPos - 40.823) / 1.399);
-
 			if (Maps::debugWorldLayout[cellX][cellZ] != 0)
 			{
 				// set cell to 0 in worldlayout

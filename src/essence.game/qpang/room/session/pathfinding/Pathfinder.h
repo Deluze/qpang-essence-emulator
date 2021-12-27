@@ -17,6 +17,11 @@ struct MapInfo
 
 struct PathfinderCell
 {
+	PathfinderCell() { x = 0; z = 0; }
+	PathfinderCell(int x, int z) { this->x = x; this->z = z; }
+
+	~PathfinderCell() {}
+
 	int x = 0;
 	int z = 0;
 };
@@ -36,8 +41,13 @@ public:
 	float getCellWidth();
 	float getCellHeight();
 
-	float getCellX(float x);
-	float getCellZ(float z);
+	int getCellX(float x);
+	int getCellZ(float z);
+
+	void cellToCoords(const PathfinderCell& cell, float& x, float& z);
+
+	bool isCellTaken(const PathfinderCell& cell);
+	void setCellTaken(const PathfinderCell& cell, bool taken);
 
 	// Calculates the time needed for one move with specified speed.
 	// This assumes speed means units / second, and that pos1 and pos2 differ one move.
