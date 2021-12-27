@@ -22,6 +22,16 @@ struct PathfinderCell
 
 	~PathfinderCell() {}
 
+	bool operator==(const PathfinderCell& other) const
+	{
+		return this->x == other.x && this->z == other.z;
+	}
+
+	bool operator!=(const PathfinderCell& other) const
+	{
+		return !(*this == other);
+	}
+
 	int x = 0;
 	int z = 0;
 };
