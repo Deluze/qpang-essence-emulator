@@ -6,17 +6,18 @@
 #include "gc_pve_npc_init.hpp"
 #include "RoomSession.h"
 
-PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
-	const uint32_t attackTimeInMillis, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
+PveNpc::PveNpc(const uint32_t type, const uint16_t baseHealth, const float speed, const uint32_t weaponItemId, const uint8_t weaponBodyPartId,
+	const uint32_t aiTime, const float attackWidth, const float attackHeight, const bool shouldRespawn, const uint32_t respawnTime,
 	const bool canDropLoot, const uint16_t initialRotation, const Position initialPosition,
 	const eNpcGradeType gradeType, const eNpcMovementType movementType, const eNpcTargetType targetType,
 	std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts) :
 	m_type(type),
 	m_baseHealth(baseHealth),
+	m_speed(speed),
 	m_health(baseHealth),
 	m_weaponItemId(weaponItemId),
 	m_weaponBodyPartId(weaponBodyPartId),
-	m_attackTimeInMillis(attackTimeInMillis),
+	m_aiTime(aiTime),
 	m_attackWidth(attackWidth),
 	m_attackHeight(attackHeight),
 	m_shouldRespawn(shouldRespawn),
@@ -171,6 +172,11 @@ uint16_t PveNpc::getHealth() const
 uint16_t PveNpc::getBaseHealth() const
 {
 	return m_baseHealth;
+}
+
+float PveNpc::getSpeed() const
+{
+	return m_speed;
 }
 
 uint16_t PveNpc::getInitialRotation() const

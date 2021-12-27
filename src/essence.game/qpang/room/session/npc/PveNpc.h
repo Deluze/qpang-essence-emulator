@@ -54,7 +54,7 @@ public:
 	PveNpc() = default;
 	~PveNpc() = default;
 
-	PveNpc(uint32_t type, uint16_t baseHealth, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t attackTimeInMillis,
+	PveNpc(uint32_t type, uint16_t baseHealth, float speed, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t aiTime,
 		float attackWidth, float attackHeight, bool shouldRespawn, uint32_t respawnTime, bool canDropLoot,
 		uint16_t initialRotation, Position initialPosition, eNpcGradeType gradeType, eNpcMovementType movementType,
 		eNpcTargetType targetType, std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts);
@@ -158,6 +158,13 @@ public:
 	uint16_t getBaseHealth() const;
 
 	/**
+	 * \brief Gets the speed for the npc.
+	 * \return The speed.
+	 */
+	[[nodiscard]]
+	float getSpeed() const;
+
+	/**
 	 * \brief Gets the initial spawn rotation for the npc.
 	 * \return The initial spawn rotation.
 	 */
@@ -214,12 +221,14 @@ private:
 	uint16_t m_baseHealth;
 	uint16_t m_health;
 
+	float m_speed;
+
 	// These two are used for shooting/attacking.
 	uint32_t m_weaponItemId;
 	uint8_t m_weaponBodyPartId;
 
 	// How often the npcs attacks.
-	uint32_t m_attackTimeInMillis;
+	uint32_t m_aiTime;
 
 	// The range in width and height for the npc.
 	float m_attackWidth;

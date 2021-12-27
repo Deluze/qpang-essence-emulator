@@ -45,9 +45,10 @@ void RoomSessionNpcManager::initializeNpcs()
 		"pve_npcs.id AS Id "
 		",pve_npcs.type AS Type "
 		",pve_npcs.base_health AS BaseHealth "
+		",pve_npcs.speed AS Speed "
 		",pve_npcs.weapon_item_id AS WeaponItemId "
 		",pve_npcs.weapon_body_part_id AS WeaponBodyPartId "
-		",pve_npcs.attack_time_millis AS AttackTimeInMillis "
+		",pve_npcs.ai_time AS AITime "
 		",pve_npcs.attack_width AS AttackWidth "
 		",pve_npcs.attack_height AS AttackHeight "
 		",pve_npcs.can_drop_loot AS CanDropLoot "
@@ -128,9 +129,10 @@ void RoomSessionNpcManager::initializeNpcs()
 		auto npc = PveNpc(
 			npcResult->getTiny("Type"),
 			npcResult->getShort("BaseHealth"),
+			npcResult->getFloat("Speed"),
 			npcResult->getInt("WeaponItemId"),
 			npcResult->getTiny("WeaponBodyPartId"),
-			npcResult->getInt("AttackTimeInMillis"),
+			npcResult->getInt("AITime"),
 			npcResult->getFloat("AttackWidth"),
 			npcResult->getFloat("AttackHeight"),
 			npcResult->getInt("ShouldRespawn"),
@@ -142,9 +144,9 @@ void RoomSessionNpcManager::initializeNpcs()
 				npcResult->getFloat("SpawnPositionY"),
 				npcResult->getFloat("SpawnPositionZ"),
 			},
-			static_cast<eNpcGradeType>(npcResult->getTiny("MovementType")),
-			static_cast<eNpcMovementType>(npcResult->getTiny("GradeType")),
-			static_cast<eNpcTargetType>(npcResult->getTiny("TargetType")),
+			static_cast<eNpcGradeType>(npcResult->getInt("GradeType")),
+			static_cast<eNpcMovementType>(npcResult->getInt("MovementType")),
+			static_cast<eNpcTargetType>(npcResult->getInt("TargetType")),
 			lootDrops,
 			bodyParts
 			);
