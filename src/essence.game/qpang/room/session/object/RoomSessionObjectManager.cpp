@@ -35,6 +35,8 @@ void RoomSessionObjectManager::initializeObjects()
 		m_objects[uid] = (isMoveable)
 			? std::make_shared<MoveableObject>(uid, type, spawnPosition, endPosition, moveDuration, moveWait, linkedObjectId)
 			: std::make_shared<PveObject>(uid, type, spawnPosition, linkedObjectId);
+
+		spawnObject(m_objects[uid]);
 	}
 }
 
