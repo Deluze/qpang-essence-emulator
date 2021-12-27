@@ -57,6 +57,7 @@ void Game::initialize()
 	m_levelManager.initialize();
 	m_craneManager.initialize();
 	m_leaderboard.refresh();
+	m_pveManager.initialize();
 
 	m_roomServer.initialize();
 }
@@ -271,6 +272,11 @@ CraneManager* Game::getCraneManager()
 TradeManager* Game::getTradeManager()
 {
 	return &m_tradeManager;
+}
+
+PveManager* Game::getPveManager()
+{
+	return &m_pveManager;
 }
 
 DatabaseDispatcher* Game::getDatabaseDispatcher()
