@@ -36,6 +36,8 @@ public:
 
 	std::shared_ptr<RoomSessionPlayer> getTargetPlayer();
 
+	Pathfinder* getPathFinder(const std::shared_ptr<RoomSession>& roomSession);
+
 	/**
 	 * \brief Spawns in the npc by relaying the init event.
 	 */
@@ -70,6 +72,10 @@ public:
 
 	// NOTE: Temporary attack function for an npc.
 	void attack(const std::shared_ptr<RoomSession>& roomSession, Position targetPosition) const;
+
+	bool canAttackTargetPlayer(Pathfinder* pathFinder);
+
+	void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
 #pragma region Event handlers
 
@@ -190,15 +196,15 @@ private:
 
 	void startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
-	void PveNpc::handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+	void handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
-	void PveNpc::handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+	void handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleMovement(const std::shared_ptr<RoomSession>& roomSession);
 
 	bool isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player);
 
-	RoomSessionPlayer::Ptr findValidAttackedByPlayer(const std::shared_ptr<RoomSession>& roomSession);
+	RoomSessionPlayer::Ptr findValidAttackerPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
 	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -224,6 +230,7 @@ private:
 
 	// How often the npcs attacks.
 	uint32_t m_aiTime;
+	uint32_t m_lastAttackTime = 0;
 
 	float m_attackRange;
 
