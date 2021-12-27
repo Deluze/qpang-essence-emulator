@@ -55,10 +55,13 @@ private:
 	static std::vector<NpcBodyPart> getBodyPartsByNpcPrimaryKey(uint32_t npcPrimaryKey);
 
 	/**
-	 * \brief Retrieves all pve_objects from the database and stores them.
+	 * \brief Retrieves all pve objects from the database and stores them.
 	 */
 	void initializeObjects();
 
+	/**
+	 * \brief Retrieves all pve items from the database and stores them.
+	 */
 	void initializeItems();
 
 	std::unordered_map<uint32_t, std::vector<PveNpcData>> m_npcData{};
