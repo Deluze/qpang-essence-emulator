@@ -377,9 +377,10 @@ void PveNpc::resetPosition()
 void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 {
 	auto pathFinder = getPathFinder(roomSession);
-
 	if (pathFinder)
 		pathFinder->setCellTaken(m_takenCell, false);
+
+	m_lastAttackTime = 0;
 
 	resetPosition();
 
