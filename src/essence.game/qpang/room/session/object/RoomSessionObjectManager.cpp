@@ -13,8 +13,22 @@
 void RoomSessionObjectManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
+}
 
-	initializeObjects();
+
+void RoomSessionObjectManager::tick() const
+{
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	for (const auto& [uid, object] : m_objects)
+	{
+		object->tick(roomSession);
+	}
 }
 
 void RoomSessionObjectManager::initializeObjects()
@@ -150,17 +164,7 @@ void RoomSessionObjectManager::onPlayerSync(const std::shared_ptr<RoomSessionPla
 	}
 }
 
-void RoomSessionObjectManager::tick() const
+void RoomSessionObjectManager::onStart()
 {
-	const auto roomSession = m_roomSession.lock();
-
-	if (roomSession == nullptr)
-	{
-		return;
-	}
-
-	for (const auto& [uid, object] : m_objects)
-	{
-		object->tick(roomSession);
-	}
+	initializeObjects();
 }
