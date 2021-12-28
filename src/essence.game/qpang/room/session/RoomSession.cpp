@@ -590,16 +590,14 @@ void RoomSession::finishPveGame()
 		roomSessionPlayer->post(new GCGameState(roomSessionPlayer, 23));
 
 		// Send PvE end result.
-		// TODO: Create constructor for this
-		auto masterLog = new GCMasterLog();
-		masterLog->unk_01 = player->getId();
-		masterLog->unk_02 = 0; // gold coins earned
-		masterLog->unk_03 = 0; // silver coins earned
-		masterLog->unk_07 = 0; // bronze coins earned
-		masterLog->unk_06 = 0; // 0 = lose, 1 = win
-		masterLog->unk_12 = 1337; // Needs to be 1337, it's an identifier for the tool
+		bool win = true;
+		uint32_t goldCoinsEarned = 3;
+		uint32_t silverCoinsEarned = 2;
+		uint32_t bronzeCoinsEarned = 1;
+		uint32_t bestTimeLeftInMs = 1000;
+		uint32_t currentTimeLeftInMs = 2000;
 
-		roomSessionPlayer->post(masterLog);
+		roomSessionPlayer->post(new GCMasterLog(player->getId(), win, goldCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftInMs));
 	}
 
 	m_room->finish();
