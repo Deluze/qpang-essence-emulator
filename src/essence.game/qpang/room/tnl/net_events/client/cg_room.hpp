@@ -62,6 +62,7 @@ public:
 
 		delete titleBuffer;
 
+		bool usesTweakTool = (unk_19 == 1337 && unk_20 == 1337 && unk_21 == 1337 && unk_22 == 1337);
 		if (cmd == CREATE_ROOM || cmd == CREATE_EVENT_ROOM)
 		{
 			if (cmd == CREATE_EVENT_ROOM && player->getRank() != 3)
@@ -77,19 +78,26 @@ public:
 				mode == GameMode::Mode::PREY ||
 				mode == GameMode::Mode::PVE;
 
+			// FIXME: We should also disconnect the connection, otherwise the second time the player sends this packet
+			// it will fail. It will work after that though.
+			// However, if we disconnect the connection, the client wont see the broadcast message.
+			// Possible, but bad? solution is to disconnect, Sleep for roughly a sec, then call the broadcast and return.
+			if (!usesTweakTool && mode == GameMode::Mode::PVE)
+			{
+				player->broadcast(u"Sorry, but you have to use the tweak tool in order to create a PVE room. You can enable it in the launcher.");
+				return;
+			}
+
 			if (!isValidMode)
 			{
 				conn->disconnect("Invalid gamemode");
-
 				player->broadcast(u"Sorry, but this game mode has not been implemented yet");
-
 				return;
 			}
 
 			if (Game::instance()->getRoomManager()->list().size() >= CONFIG_MANAGER->getInt("GAME_MAX_ROOMS"))
 			{
 				conn->disconnect("Failed to create room");
-
 				return;
 			}
 
@@ -105,7 +113,16 @@ public:
 			if (room == nullptr)
 			{
 				conn->disconnect("Couldn't find room ID");
+				return;
+			}
 
+			// FIXME: We should also disconnect the connection, otherwise the second time the player sends this packet
+			// it will fail. It will work after that though.
+			// However, if we disconnect the connection, the client wont see the broadcast message.
+			// Possible, but bad? solution is to disconnect, Sleep for roughly a sec, then call the broadcast and return.
+			if (!usesTweakTool && room->getMode() == GameMode::Mode::PVE)
+			{
+				player->broadcast(u"Sorry, but you have to use the tweak tool in order to join a PVE room. You can enable it in the launcher.");
 				return;
 			}
 
