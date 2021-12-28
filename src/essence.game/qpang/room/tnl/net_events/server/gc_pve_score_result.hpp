@@ -22,7 +22,7 @@ public:
 	U32 unk_13 = 1; // 136
 	U32 unk_14 = 1; // 140
 
-	U8 unk_15 = 1; // 144
+	U8 didSucceed = 1; // 144
 
 	U16 unk_16 = 1; // 146
 	U16 unk_17 = 1; // 148
@@ -45,7 +45,7 @@ public:
 		bstream->write(unk_12);
 		bstream->write(unk_13);
 		bstream->write(unk_14);
-		bstream->write(unk_15);
+		bstream->write(didSucceed);
 		bstream->write(unk_16);
 		bstream->write(unk_17);
 	}

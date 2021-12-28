@@ -19,6 +19,8 @@
 #include "gc_pve_score_result.hpp"
 #include "SendUpdateSkillSet.h"
 
+#include "gc_master_log.hpp"
+
 constexpr auto TAG_BASE_HEALTH = 500;
 
 RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
@@ -583,10 +585,21 @@ void RoomSession::finishPveGame()
 
 		// Send spectate end?
 		roomSessionPlayer->post(new GCGameState(player->getId(), 1));
+
 		// Send game over.
 		roomSessionPlayer->post(new GCGameState(roomSessionPlayer, 23));
+
 		// Send PvE end result.
-		roomSessionPlayer->post(new GCPvEScoreResult());
+		// TODO: Create constructor for this
+		auto masterLog = new GCMasterLog();
+		masterLog->unk_01 = player->getId();
+		masterLog->unk_02 = 0; // gold coins earned
+		masterLog->unk_03 = 0; // silver coins earned
+		masterLog->unk_07 = 0; // bronze coins earned
+		masterLog->unk_06 = 0; // 0 = lose, 1 = win
+		masterLog->unk_12 = 1337; // Needs to be 1337, it's an identifier for the tool
+
+		roomSessionPlayer->post(masterLog);
 	}
 
 	m_room->finish();
