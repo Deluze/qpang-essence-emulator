@@ -112,9 +112,12 @@ void PveManager::initializeNpcs()
 		",pve_npc_movement_types.type AS MovementType "
 		",pve_npc_target_types.type AS TargetType "
 		",pve_npc_grade_types.type AS GradeType "
+		",pve_map_areas.area_uid AS AreaUid "
 		",maps.map_id AS MapId "
 		"FROM pve_npc_spawns "
 		"INNER JOIN pve_npcs ON pve_npcs.id = pve_npc_spawns.npc_id "
+		// TODO: Maybe check pve_map_areas id and map_id.
+		"INNER JOIN pve_map_areas ON pve_map_areas.id = pve_npc_spawns.area_id "
 		"INNER JOIN pve_npc_movement_types ON pve_npc_movement_types.id = pve_npcs.movement_type_id "
 		"INNER JOIN pve_npc_target_types ON pve_npc_target_types.id = pve_npcs.target_type_id "
 		"INNER JOIN pve_npc_grade_types ON pve_npc_grade_types.id = pve_npcs.grade_type_id "
@@ -135,6 +138,7 @@ void PveManager::initializeNpcs()
 
 		// Step 4: Construct the npc.
 		auto npcData = PveNpcData{
+			result->getInt("AreaUid"),
 			result->getTiny("Type"),
 			result->getShort("BaseHealth"),
 			result->getFloat("Speed"),
@@ -329,10 +333,8 @@ void PveManager::initializeAreas()
 		"SELECT "
 		"pve_map_areas.area_uid AS AreaUid "
 		",pve_map_areas.min_bound_x as MinBoundX "
-		",pve_map_areas.min_bound_y as MinBoundY "
 		",pve_map_areas.min_bound_z as MinBoundZ "
 		",pve_map_areas.max_bound_x as MaxBoundX "
-		",pve_map_areas.max_bound_y as MaxBoundY "
 		",pve_map_areas.max_bound_z as MaxBoundZ "
 		",pve_map_areas.floor_number as FloorNumber "
 		",maps.map_id AS MapId "
@@ -349,12 +351,12 @@ void PveManager::initializeAreas()
 			result->getInt("AreaUid"),
 			Position{
 				result->getFloat("MinBoundX"),
-				result->getFloat("MinBoundY"),
+				0.00f,
 				result->getFloat("MinBoundZ")
 			},
 			Position{
 				result->getFloat("MaxBoundX"),
-				result->getFloat("MaxBoundY"),
+				0.00f,
 				result->getFloat("MaxBoundZ"),
 			},
 			result->getInt("FloorNumber")
