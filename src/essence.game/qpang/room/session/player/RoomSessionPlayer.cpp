@@ -210,6 +210,28 @@ void RoomSessionPlayer::stop()
 	player->send(SendUpdateSkillSet(player->getEquipmentManager()->getEquippedSkillCards()));
 }
 
+void RoomSessionPlayer::stopPveGame()
+{
+	m_entityManager.close();
+
+	const auto player = getPlayer();
+	const auto roomSessionPlayer = shared_from_this();
+
+	player->getEquipmentManager()->finishRound(roomSessionPlayer);
+
+	/* TODO: Once pve stats are worked out, call this to save the stats to the database.
+	player->getStatsManager()->apply(roomSessionPlayer);*/
+
+	/* TODO: Perhaps rework this (level and achievement for pve specificly).
+	Game::instance()->getLevelManager()->onPlayerFinish(roomSessionPlayer);
+	Game::instance()->getAchievementManager()->onPlayerFinish(roomSessionPlayer);*/
+
+	player->update();
+
+	player->send(SendAccountUpdate(player));
+	player->send(SendUpdateSkillSet(player->getEquipmentManager()->getEquippedSkillCards()));
+}
+
 bool RoomSessionPlayer::canStart()
 {
 	const auto currTime = time(NULL);

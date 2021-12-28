@@ -31,7 +31,9 @@ public:
 
 	void tick();
 	void start();
+
 	void stop();
+	void stopPveGame();
 
 	bool canStart();
 	bool isInvincible();
@@ -143,6 +145,7 @@ public:
 
 		post(evt);
 	}
+
 private:
 
 	PlayerEffectManager m_effectManager;

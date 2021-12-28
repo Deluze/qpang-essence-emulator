@@ -14,7 +14,12 @@
 #include "qpang/room/tnl/net_events/server/gc_hit_essence.hpp"
 #include <utils/StringConverter.h>
 
+#include "cg_game_state.hpp"
+#include "gc_pve_round_end.hpp"
+#include "gc_pve_score_result.hpp"
 #include "SendUpdateSkillSet.h"
+
+#include "gc_master_log.hpp"
 
 constexpr auto TAG_BASE_HEALTH = 500;
 
@@ -354,6 +359,12 @@ void RoomSession::handlePlayerFinish(RoomSessionPlayer::Ptr player)
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void RoomSession::handlePlayerPveFinish(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer)
+{
+	// TODO: Handle pve statistics for player (for reference, see handlePlayerFinish).
+}
+
 void RoomSession::tick()
 {
 	if (!m_isFinished)
@@ -380,17 +391,28 @@ void RoomSession::clear()
 	m_leavers.clear();
 }
 
-bool RoomSession::isFinished()
+bool RoomSession::isFinished() const
 {
 	return m_isFinished;
 }
 
 void RoomSession::finish()
 {
-	if (m_isFinished)
+	if (m_room->getMode() == GameMode::PVE)
+	{
+		finishPveGame();
+
 		return;
+	}
+
+	if (m_isFinished)
+	{
+		return;
+	}
 
 	m_isFinished = true;
+
+	// TODO: Reset all pve related managers (items,npcs,objects etcetera).
 
 	m_itemManager.reset();
 	m_essenceHolder.reset();
@@ -415,6 +437,7 @@ void RoomSession::finish()
 	}
 
 	m_leaverMx.lock();
+
 	for (const auto& player : m_leavers)
 	{
 		if (m_gameMode->isMissionMode())
@@ -427,9 +450,10 @@ void RoomSession::finish()
 
 		player->stop();
 	}
+
 	m_leaverMx.unlock();
 
-	auto players = getPlayers();
+	const auto players = getPlayers();
 
 	for (const auto& player : players)
 	{
@@ -441,12 +465,11 @@ void RoomSession::finish()
 	}
 
 	auto playingPlayers = getPlayingPlayers();
-	const auto isPublicEnemyMode = getGameMode()->isPublicEnemyMode();
 
-	if (isPublicEnemyMode)
+	if (const auto isPublicEnemyMode = getGameMode()->isPublicEnemyMode())
 	{
 		std::sort(playingPlayers.begin(), playingPlayers.end(),
-			[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+			[](const RoomSessionPlayer::Ptr& lhs, const RoomSessionPlayer::Ptr& rhs)
 			{
 				return lhs->getTagPoints() > rhs->getTagPoints();
 			}
@@ -455,13 +478,12 @@ void RoomSession::finish()
 	else
 	{
 		std::sort(playingPlayers.begin(), playingPlayers.end(),
-			[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+			[](const RoomSessionPlayer::Ptr& lhs, const RoomSessionPlayer::Ptr& rhs)
 			{
 				return lhs->getScore() > rhs->getScore();
 			}
 		);
 	}
-
 
 	for (const auto& player : players)
 	{
@@ -525,6 +547,66 @@ bool RoomSession::isAlmostFinished()
 
 	return currTime + 60 >= m_endTime;
 
+}
+
+void RoomSession::finishPveGame()
+{
+	if (!canFinishPveGame())
+	{
+		return;
+	}
+
+	m_isFinished = true;
+
+	m_leaverMx.lock();
+
+	for (const auto& player : m_leavers)
+	{
+		player->stopPveGame();
+	}
+
+	m_leaverMx.unlock();
+
+	const auto players = getPlayers();
+
+	for (const auto& player : players)
+	{
+		if (!player->isSpectating())
+		{
+			handlePlayerPveFinish(player);
+
+			player->stopPveGame();
+		}
+	}
+
+	for (const auto& roomSessionPlayer : players)
+	{
+		const auto player = roomSessionPlayer->getPlayer();
+
+		// Send spectate end?
+		roomSessionPlayer->post(new GCGameState(player->getId(), 1));
+
+		// Send game over.
+		roomSessionPlayer->post(new GCGameState(roomSessionPlayer, 23));
+
+		// Send PvE end result.
+		bool win = true;
+		uint32_t goldCoinsEarned = 3;
+		uint32_t silverCoinsEarned = 2;
+		uint32_t bronzeCoinsEarned = 1;
+		uint32_t bestTimeLeftInMs = 1000;
+		uint32_t currentTimeLeftInMs = 2000;
+
+		roomSessionPlayer->post(new GCMasterLog(player->getId(), win, goldCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftInMs));
+	}
+
+	m_room->finish();
+}
+
+bool RoomSession::canFinishPveGame()
+{
+	// TODO: Fill in the proper finish conditions..
+	return true;
 }
 
 void RoomSession::setLastRespawnLocation(Spawn spawn)

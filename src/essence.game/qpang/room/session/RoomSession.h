@@ -4,7 +4,6 @@
 #include <memory>
 #include <unordered_map>
 #include <mutex>
-#include <array>
 
 #include "ConfigManager.h"
 #include "RoomSessionNpcManager.h"
@@ -36,14 +35,19 @@ public:
 	RoomSessionPlayer::Ptr findEligibleVip(uint8_t team, bool noConditions);
 
 	void handlePlayerFinish(RoomSessionPlayer::Ptr player);
+	void handlePlayerPveFinish(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer);
 
 	void tick();
 	void clear();
 
-	bool isFinished();
+	bool isFinished() const;
 	void finish();
 	bool canFinish();
 	bool isAlmostFinished();
+
+	// Note: Pve finish.
+	void finishPveGame();
+	static bool canFinishPveGame();
 
 	void setLastRespawnLocation(Spawn spawn);
 	Spawn getLastRespawnLocation() const;
