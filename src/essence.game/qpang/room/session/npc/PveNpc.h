@@ -221,7 +221,7 @@ private:
 	 */
 	void dropLoot(const std::shared_ptr<RoomSession>& roomSession);
 
-	uint32_t m_lastAttackerId = -1;
+	uint32_t m_lastAttackerId = 0;
 
 	uint32_t m_type{};
 	uint32_t m_uid{};

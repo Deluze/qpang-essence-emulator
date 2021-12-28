@@ -319,7 +319,7 @@ bool PveNpc::isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player)
 
 RoomSessionPlayer::Ptr PveNpc::findValidAttackerPlayer(const std::shared_ptr<RoomSession>& roomSession)
 {
-	if (m_lastAttackerId != -1)
+	if (m_lastAttackerId != 0)
 	{
 		auto player = roomSession->find(m_lastAttackerId);
 		if (!isPlayerValid(player))
