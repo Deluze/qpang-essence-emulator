@@ -61,6 +61,7 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 
 PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_type(data.type),
+	m_areaUid(data.areaUid),
 	m_baseHealth(data.baseHealth),
 	m_health(data.baseHealth),
 	m_speed(data.speed),
@@ -177,7 +178,8 @@ void PveNpc::handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSes
 
 void PveNpc::handleMovement(const std::shared_ptr<RoomSession>& roomSession)
 {
-	auto pathFinder = getPathFinder(roomSession);
+	const auto pathFinder = getPathFinder(roomSession);
+
 	if (pathFinder && m_path.empty())
 	{
 		switch (m_targetType)
@@ -188,22 +190,29 @@ void PveNpc::handleMovement(const std::shared_ptr<RoomSession>& roomSession)
 		case eNpcTargetType::T_NEAR_REVENGE:
 			handleTargetNearRevenge(roomSession, pathFinder);
 			break;
+		default: 
+			break;
 		}
 	}
 }
 
 void PveNpc::handleDeath(const std::shared_ptr<RoomSession>& roomSession)
 {
+	// TODO: Check if the area has players in it, if it doesn't don't respawn the npc.
 	if (isDead() && m_shouldRespawn)
 	{
 		const auto currentTime = time(nullptr);
+
 		if (m_timeOfDeath == NULL)
+		{
 			return;
+		}
 
 		if ((m_timeOfDeath + m_respawnTime) < currentTime)
 		{
 			// Reset time of death.
 			m_timeOfDeath = NULL;
+
 			roomSession->getNpcManager()->respawnNpcByUid(m_uid);
 		}
 	}
@@ -214,7 +223,9 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 	handleDeath(roomSession);
 
 	if (isDead())
+	{
 		return;
+	}
 
 	switch (m_movementType)
 	{
@@ -223,6 +234,8 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 		break;
 	case eNpcMovementType::M_PATH_FINDING:
 		handleMovement(roomSession);
+		break;
+	default: 
 		break;
 	}
 }
@@ -470,6 +483,11 @@ uint16_t PveNpc::getInitialRotation() const
 uint32_t PveNpc::getWeaponItemId() const
 {
 	return m_weaponItemId;
+}
+
+uint32_t PveNpc::getAreaUid() const
+{
+	return m_areaUid;
 }
 
 bool PveNpc::shouldRespawn() const

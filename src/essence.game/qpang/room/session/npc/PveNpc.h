@@ -162,6 +162,13 @@ public:
 	uint32_t getWeaponItemId() const;
 
 	/**
+	 * \brief Gets the spawn area id for the npc.
+	 * \return The spawn area id.
+	 */
+	[[nodiscard]]
+	uint32_t getAreaUid() const;
+
+	/**
 	 * \brief Indicates whether or not the npc should re-spawn upon death.
 	 * \return true if the npc should respawn otherwise false.
 	 */
@@ -218,6 +225,8 @@ private:
 
 	uint32_t m_type{};
 	uint32_t m_uid{};
+
+	uint32_t m_areaUid;
 
 	uint16_t m_baseHealth;
 	uint16_t m_health;
