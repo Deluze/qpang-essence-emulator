@@ -10,6 +10,29 @@
 
 std::mutex pathfindingMutex = {};
 
+// TODO (Perhaps?):
+// 
+// Take this situation:
+// |..|
+// |..|
+// |n.| <- this npc only has melee
+// |nn| <- these have ranged guns, and are in range of the player
+// |..|
+// |..|
+// |..|
+// |..|
+// |p.| <- this is the player
+// |..|
+//
+// Problem:
+// As the npcs with ranged guns are in range of the player, they will stop moving and instead attack.
+// However, the melee npc is not in range, and thus wants to move, but it can't, because there's no path to the player.
+// 
+// Solution:
+// Perhaps make a vector with cells that should be made free, and then check for each npc if their m_takenCell is in the vector.
+// If it is, for that npc, return false in canAttackTargetPlayer, so that it will continue pathfinding.
+// Once it's taken path isn't in the vector anymore, it can stop moving, and continue attacking.
+
 std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&)> npcDoNextMove = [&](
 	const RoomSession::Ptr roomSession, PveNpc* npc, const PathfinderCell& prevCell, const PathfinderCell& currCell)
 {
@@ -358,6 +381,7 @@ RoomSessionPlayer::Ptr PveNpc::findClosestValidPlayer(const std::shared_ptr<Room
 
 Pathfinder* PveNpc::getPathFinder(const std::shared_ptr<RoomSession>& roomSession) const
 {
+	// TODO: Perhaps check m_floorNumber instead
 	return m_position.y < 0 ? roomSession->getUnderGroundPathfinder() :
 		roomSession->getAboveGroundPathfinder();
 }
