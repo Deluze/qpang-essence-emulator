@@ -84,12 +84,6 @@ public:
 			return;
 		}
 
-		// Check if the npc is dead. If the npc is dead they can not deal damage.
-		if (npc->isDead())
-		{
-			return;
-		}
-
 		// Check if player is dead, the player can not be dealt damage if they are dead.
 		if (roomSessionPlayer->isDead() || roomSessionPlayer->isInvincible())
 		{
