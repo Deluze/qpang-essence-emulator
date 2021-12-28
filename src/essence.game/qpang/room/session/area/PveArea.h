@@ -1,43 +1,64 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+
+#include "Position.h"
+#include "PveAreaData.h"
+#include "RoomSessionPlayer.h"
 
 class PveArea
 {
 public:
-	struct Bound
-	{
-		float x;
-		float z;
-	};
+	explicit PveArea(const PveAreaData& pveAreaData);
 
-	PveArea(const Bound& minBound, const Bound& maxBound);
+	/**
+	 * \brief Initializes the area by spawning npcs.
+	 */
+	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
 #pragma region Setters
-	void setId(uint32_t id);
-
-	void setIsInitialized(bool isInitialized);
 #pragma endregion
 
 #pragma region Getters
 	[[nodiscard]]
-	uint32_t getId() const;
+	uint32_t getUid() const;
 
 	[[nodiscard]]
-	Bound getMinBound() const;
+	Position getMinBound() const;
 
 	[[nodiscard]]
-	Bound getMaxBound() const;
+	Position getMaxBound() const;
+
+	[[nodiscard]]
+	uint32_t getFloorNumber() const;
 
 	[[nodiscard]]
 	bool isInitialized() const;
 #pragma endregion
 
-private:
-	uint32_t m_id;
+#pragma region Event handlers
+	/**
+	 * \brief Gets triggered upon a player entering an area.
+	 * \param roomSessionPlayer The player that has triggered the event.
+	 */
+	void onAreaEnter(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer);
 
-	Bound m_minBound;
-	Bound m_maxBound;
+	/**
+	 * \brief Gets triggered upon a player exiting an area.
+	 * \param roomSessionPlayer The player that has triggered the event.
+	 */
+	void onAreaExit(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer);
+#pragma endregion
+private:
+	uint32_t m_uid{};
+
+	Position m_minBound;
+	Position m_maxBound;
+
+	uint32_t m_floorNumber;
 
 	bool m_isInitialized;
+
+	std::vector<uint32_t> m_players{};
 };

@@ -1,38 +1,85 @@
 #include "PveArea.h"
 
-PveArea::PveArea(const Bound& minBound, const Bound& maxBound) :
-	m_minBound(minBound),
-	m_maxBound(maxBound),
+#include "Player.h"
+#include "RoomSession.h"
+#include "StringConverter.h"
+
+PveArea::PveArea(const PveAreaData& pveAreaData) :
+	m_uid(pveAreaData.uid),
+	m_minBound(pveAreaData.minBound),
+	m_maxBound(pveAreaData.maxBound),
+	m_floorNumber(pveAreaData.floorNumber),
 	m_isInitialized(false)
 {
 }
 
-void PveArea::setId(const uint32_t id)
+void PveArea::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
-	m_id = id;
+	m_isInitialized = true;
+
+	roomSession->getNpcManager()->spawnNpcsForArea(m_uid);
 }
 
-void PveArea::setIsInitialized(const bool isInitialized)
+uint32_t PveArea::getUid() const
 {
-	m_isInitialized = isInitialized;
+	return m_uid;
 }
 
-uint32_t PveArea::getId() const
-{
-	return m_id;
-}
-
-PveArea::Bound PveArea::getMinBound() const
+Position PveArea::getMinBound() const
 {
 	return m_minBound;
 }
 
-PveArea::Bound PveArea::getMaxBound() const
+Position PveArea::getMaxBound() const
 {
 	return m_maxBound;
+}
+
+uint32_t PveArea::getFloorNumber() const
+{
+	return m_floorNumber;
 }
 
 bool PveArea::isInitialized() const
 {
 	return m_isInitialized;
+}
+
+void PveArea::onAreaEnter(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer)
+{
+	const auto playerId = roomSessionPlayer->getPlayer()->getId();
+
+	const auto& it = std::find(m_players.begin(), m_players.end(), playerId);
+
+	// Check if player is already in the area.
+	if (it != m_players.end())
+	{
+		return;
+	}
+
+	m_players.push_back(playerId);
+
+	if (!m_isInitialized)
+	{
+		initialize(roomSessionPlayer->getRoomSession());
+	}
+
+	printf("[+] Player %u has entered area %u\n", playerId, m_uid);
+}
+
+void PveArea::onAreaExit(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer)
+{
+	const auto playerId = roomSessionPlayer->getPlayer()->getId();
+
+	const auto& it = std::find(m_players.begin(), m_players.end(), playerId);
+
+	// Player is not in the area.
+	if (it == m_players.end())
+	{
+		return;
+	}
+
+	m_players.erase(it);
+
+	printf("[-] Player %u has exited area %u\n", playerId, m_uid);
 }
