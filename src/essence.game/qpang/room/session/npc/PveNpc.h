@@ -20,13 +20,14 @@ public:
 
 	void setLastAttackerId(uint32_t id);
 
-	bool isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell);
+	bool isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell) const;
 
 	PathfinderCell getMoveCell();
 
 	void clearPath();
 
-	bool didPathFinish();
+	[[nodiscard]]
+	bool didPathFinish() const;
 
 	void doPathfindingMove(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell);
 
@@ -73,7 +74,7 @@ public:
 	// NOTE: Temporary attack function for an npc.
 	void attack(const std::shared_ptr<RoomSession>& roomSession, Position targetPosition) const;
 
-	bool canAttackTargetPlayer(Pathfinder* pathFinder);
+	bool canAttackTargetPlayer(Pathfinder* pathFinder) const;
 
 	void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -211,7 +212,7 @@ private:
 
 	bool isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player) const;
 
-	RoomSessionPlayer::Ptr findValidAttackerPlayer(const std::shared_ptr<RoomSession>& roomSession);
+	RoomSessionPlayer::Ptr findValidAttackerPlayer(const std::shared_ptr<RoomSession>& roomSession) const;
 
 	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession) const;
 
