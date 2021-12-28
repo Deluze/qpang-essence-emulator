@@ -7,35 +7,36 @@ class GCPvEAreaTriggerInit final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	U32 unk_01; // 88	# ObjectUid maybe?
-	F32 unk_02; // 92	# PositionX maybe?
-	F32 unk_03; // 96	# PositionY maybe?
-	F32 unk_04; // 100  # PositionZ maybe?
-	F32 unk_05; // 104  # Unknown float.. something with position or direction perhaps?
-	U8 unk_06;  // 108
+	U32 areaId = 0; // 88
+
+	F32 minBoundX = 0.00f; // 92
+	F32 minBoundZ = 0.00f; // 96
+
+	F32 maxBoundX = 0.00f; // 100
+	F32 maxBoundZ = 0.00f; // 104
+
+	U8 cmd = 1;  // 108 Create area = 1
 
 	GCPvEAreaTriggerInit() : GameNetEvent{ GC_PVEA_AREA_TRIGGER_INIT, GuaranteedOrdered, DirServerToClient } {}
 
-	GCPvEAreaTriggerInit(const uint32_t unk_01, const float unk_02, const float unk_03, const float unk_04, const  float unk_05, const uint8_t unk_06)
+	explicit GCPvEAreaTriggerInit(const std::shared_ptr<PveArea>& pveArea)
 		: GameNetEvent{ GC_PVEA_AREA_TRIGGER_INIT, GuaranteedOrdered, DirServerToClient },
-		unk_01(unk_01),
-		unk_02(unk_02),
-		unk_03(unk_03),
-		unk_04(unk_04),
-		unk_05(unk_05),
-		unk_06(unk_06)
+		areaId(pveArea->getUid()),
+		minBoundX(pveArea->getMinBound().x),
+		minBoundZ(pveArea->getMinBound().z),
+		maxBoundX(pveArea->getMaxBound().x),
+		maxBoundZ(pveArea->getMaxBound().z)
 	{
 	}
 
-
 	void pack(EventConnection* conn, BitStream* bstream) override
 	{
-		bstream->write(unk_01);
-		bstream->write(unk_02);
-		bstream->write(unk_03);
-		bstream->write(unk_04);
-		bstream->write(unk_05);
-		bstream->write(unk_06);
+		bstream->write(areaId);
+		bstream->write(minBoundX);
+		bstream->write(minBoundZ);
+		bstream->write(maxBoundX);
+		bstream->write(maxBoundZ);
+		bstream->write(cmd);
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override {}

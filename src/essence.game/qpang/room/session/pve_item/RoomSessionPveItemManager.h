@@ -4,6 +4,7 @@
 #include <map>
 
 #include "PveItem.h"
+#include "PveItemData.h"
 #include "RoomSessionPlayer.h"
 
 class RoomSession;
@@ -19,6 +20,9 @@ public:
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
 	void tick() const;
+
+	void initializeItems();
+	void spawnInitializedItems();
 
 	/**
 	 * \brief Spawns in an item.
@@ -47,6 +51,8 @@ public:
 	std::shared_ptr<PveItem> findItemByUid(uint32_t itemUid);
 
 	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const;
+
+	void onStart();
 private:
 	/**
 	 * \brief Handles the item pick up event for ammo.
@@ -64,5 +70,7 @@ private:
 	static void handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, eItemType itemType);
 
 	std::weak_ptr<RoomSession> m_roomSession;
-	std::map<uint32_t, std::shared_ptr<PveItem>> m_items;
+
+	std::vector<PveItem> m_items;
+	std::map<uint32_t, std::shared_ptr<PveItem>> m_spawnedItems;
 };

@@ -9,6 +9,39 @@
 #include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 #include <qpang/room/tnl/net_events/server/gc_pve_shoot_n2p.hpp>
 #include <qpang/room/tnl/net_events/server/gc_master_log.hpp>
+#include <qpang/room/tnl/net_events/client/cg_move_report.hpp>
+#include <qpang/room/tnl/net_events/server/gc_pve_move_npc.hpp>
+
+#include "TimeHelper.h"
+#include "Maps.h"
+
+inline std::vector<PathfinderCell> path = {};
+inline int pathIdx = 0;
+
+inline PathfinderCell npcCell = { 56, 51 };
+
+// TODO: Eventually this function would be called something like "nextThink" and should move to the npc object.
+// It should also decide after every step if it should stop moving and shoot, or continue moving.
+inline std::function<void(RoomSession::Ptr, const PathfinderCell&, const PathfinderCell&)> nextMove = [&](RoomSession::Ptr roomSession,
+	const PathfinderCell& prevCell, const PathfinderCell& currCell)
+{
+	npcCell = prevCell;
+
+	roomSession->relayPlaying<GCPvEMoveNpc>(50, (uint16_t)currCell.x, (uint16_t)currCell.z);
+	pathIdx++;
+
+	if (pathIdx < path.size())
+	{
+		auto nextCell = path[pathIdx];
+
+		const float speed = 5.f;
+		float moveTime = roomSession->getAboveGroundPathfinder()->calculateMoveTime(speed, currCell, nextCell);
+
+		int timeMilliseconds = std::round(moveTime * 1000.f);
+		TimeHelper::setTimeOut<RoomSession::Ptr, const PathfinderCell&, const PathfinderCell&>
+			(timeMilliseconds, nextMove, roomSession, currCell, nextCell);
+	}
+};
 
 class DebugCommand final : public Command
 {
@@ -20,47 +53,72 @@ public:
 	std::vector<CommandArgument*> getArguments() override
 	{
 		return {
-			//Command::argTypes[Command::Validation::INTEGER],
-			//Command::argTypes[Command::Validation::INTEGER]
-			Command::argTypes[Command::Validation::STRING],
-			Command::argTypes[Command::Validation::STRING],
-			Command::argTypes[Command::Validation::STRING]
+			Command::argTypes[Command::Validation::INTEGER]
 		};
 	}
 
 	void handle(const std::shared_ptr<Player> player, const std::vector<std::u16string>& args) override
 	{
 		const auto roomPlayer = player->getRoomPlayer();
-
 		if (roomPlayer == nullptr)
 		{
 			player->broadcast(u"You need to be in a room in order to use this command.");
-
 			return;
 		}
 
 		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
-
 		if (roomSessionPlayer == nullptr)
 		{
 			player->broadcast(u"You need to be in a game in order to use this command.");
-
 			return;
 		}
 
 		const auto roomSession = roomSessionPlayer->getRoomSession();
 
-		auto a1 = std::stof(std::string(args[0].begin(), args[0].end()));
-		auto a2 = std::stof(std::string(args[1].begin(), args[1].end()));
-		auto a3 = std::stoull(std::string(args[2].begin(), args[2].end()));
+		auto a1 = convertToInteger(args[0]);
+		if (a1 == 0)
+			Maps::recordMoves = true;
+		else if (a1 == 1)
+			Maps::recordMoves = false;
+		else if (a1 == 2)
+		{
+			std::cout << "inline std::vector<std::vector<uint8_t>> debugWorldLayout = {" << std::endl;
 
-		roomSession->relayPlaying<GCMasterLog>((U32)a1, (U32)a2, Position{ 30, 1, -30 }, a3);
+			for (int x = 0; x < 60; ++x)
+			{
+				std::cout << "	{ ";
 
-		//roomSessionPlayer->send<GCPvEObjectInit>(a1, 50, a2, a3, a4, 0);
-		//roomSessionPlayer->send<GCPvEObjectMove>(3, 39.1f, 0.f + convertToInteger(args[0]), -5.1f, 1000);
-		//roomSession->relayPlaying<GCPvENpcInit>(eNpcType::EASY_SPY_CAM, 50, Position { 36, 0, -30 }, (U16)a1, (U8)a2, (U32)a3);
-		//roomSession->relayPlaying<GCPvEShootN2P>((U32)a1, (U32)a2, Position{ 30, 1, -30 });
+				for (int z = 0; z < 60; ++z)
+				{
+					if (z == 59)
+						std::cout << (int)Maps::debugWorldLayout[x][z];
+					else
+						std::cout << (int)Maps::debugWorldLayout[x][z] << ", ";
+				}
 
-		//roomSession->relayPlaying<GCShoot>(50, 1095368724, 36, 0, -30, 1, 0, 0, 50, false);
+				if (x == 59)
+					std::cout << " }" << std::endl;
+				else
+					std::cout << " }," << std::endl;
+			}
+
+			std::cout << "};";
+		}
+		else if (a1 == 3)
+		{
+			auto pathFinder = roomSession->getAboveGroundPathfinder();
+
+			PathfinderCell targetCell = {	pathFinder->getCellX(roomSessionPlayer->getPosition().x), 
+											pathFinder->getCellZ(roomSessionPlayer->getPosition().z)	};
+
+			if (pathFinder->solve(npcCell, targetCell, path) && path.size() > 1)
+			{
+				pathIdx = 1;
+
+				// Starting at path[1], as the first pos is the current pos.
+				TimeHelper::setTimeOut<RoomSession::Ptr, const PathfinderCell&, const PathfinderCell&>
+					(0, nextMove, roomSession, npcCell, path[1]);
+			}
+		}
 	}
 };

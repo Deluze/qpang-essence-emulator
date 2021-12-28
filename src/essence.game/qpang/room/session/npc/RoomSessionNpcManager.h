@@ -19,6 +19,8 @@ public:
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
+	void onStart();
+
 	/**
 	 * \brief Updates npc related stuff every tick.
 	 */
@@ -30,9 +32,10 @@ public:
 	void initializeNpcs();
 
 	/**
-	 * \brief Spawns in all of the initialized npcs.
-	 */	
-	void spawnInitializedNpcs();
+	 * \brief Spawns all npcs for the given area id.
+	 * \param areaId The id of the area.
+	 */
+	void spawnNpcsForArea(uint32_t areaId);
 
 	/**
 	 * \brief Spawns in an npc.

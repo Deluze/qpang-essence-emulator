@@ -6,26 +6,56 @@
 
 #include <qpang/helpers/AABBHelper.h>
 
+#include "Maps.h"
+
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
 }
 
+void RoomSessionPveRoundManager::onStart() const
+{
+	updatePathfinders();
+}
+
+void RoomSessionPveRoundManager::updatePathfinders() const
+{
+	const auto roomSession = m_roomSession.lock();
+	if (roomSession == nullptr)
+		return;
+
+	switch (m_currentRound)
+	{
+	case 0:
+		roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage1AboveGroundMapInfo);
+		roomSession->getUnderGroundPathfinder()->updateMapInfo(Maps::pveStage1UnderGroundMapInfo);
+		break;
+	case 1:
+		//roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage2MapInfo);
+		roomSession->getUnderGroundPathfinder()->free();
+		break;
+	case 2:
+		//roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage3MapInfo);
+		roomSession->getUnderGroundPathfinder()->free();
+		break;
+	}
+}
+
 void RoomSessionPveRoundManager::onStartNewRound()
 {
 	const auto roomSession = m_roomSession.lock();
-
 	if (roomSession == nullptr)
-	{
 		return;
-	}
 
 	m_currentRound++;
+
+	updatePathfinders();
 
 	roomSession->resetTime();
 
 	roomSession->getRoom()->setMap(roomSession->getRoom()->getMap() + 1);
 
+	roomSession->getPveAreaManager()->initializeAreas();
 	roomSession->getObjectManager()->initializeObjects();
 	roomSession->getNpcManager()->initializeNpcs();
 
@@ -42,11 +72,8 @@ void RoomSessionPveRoundManager::onStartNewRound()
 void RoomSessionPveRoundManager::endRound()
 {
 	const auto roomSession = m_roomSession.lock();
-
 	if (roomSession == nullptr)
-	{
 		return;
-	}
 
 	// Can not end this round since it's the last round.
 	if (m_currentRound == 2)
@@ -57,6 +84,7 @@ void RoomSessionPveRoundManager::endRound()
 
 	m_roundEnded = true;
 
+	roomSession->getPveAreaManager()->removeAll();
 	roomSession->getObjectManager()->removeAll();
 	roomSession->getNpcManager()->removeAll();
 	roomSession->getPveItemManager()->removeAll();

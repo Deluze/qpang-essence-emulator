@@ -8,12 +8,14 @@
 #include "ConfigManager.h"
 #include "RoomSessionNpcManager.h"
 #include "RoomSessionObjectManager.h"
+#include "RoomSessionPveAreaManager.h"
 #include "RoomSessionPveItemManager.h"
 #include "RoomSessionPveRoundManager.h"
 
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 #include "qpang/room/session/game_item/GameItemManager.h"
 #include "qpang/room/session/skill/RoomSessionSkillManager.h"
+#include "qpang/room/session/pathfinding/Pathfinder.h"
 
 class Room;
 class GameMode;
@@ -73,6 +75,10 @@ public:
 	RoomSessionObjectManager* getObjectManager();
 	RoomSessionPveItemManager* getPveItemManager();
 	RoomSessionPveRoundManager* getPveRoundManager();
+	RoomSessionPveAreaManager* getPveAreaManager();
+
+	Pathfinder* getAboveGroundPathfinder();
+	Pathfinder* getUnderGroundPathfinder();
 
 	std::shared_ptr<Room> getRoom();
 
@@ -227,6 +233,10 @@ private:
 	RoomSessionObjectManager m_objectManager;
 	RoomSessionPveItemManager m_pveItemManager;
 	RoomSessionPveRoundManager m_pveRoundManager;
+	RoomSessionPveAreaManager m_pveAreaManager;
+
+	Pathfinder m_aboveGroundPathfinder;
+	Pathfinder m_underGroundPathfinder;
 
 	std::recursive_mutex m_playerMx;
 	std::unordered_map<uint32_t, RoomSessionPlayer::Ptr> m_players;

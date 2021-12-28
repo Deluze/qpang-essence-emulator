@@ -308,6 +308,16 @@ Position RoomSessionPlayer::getPosition()
 	return m_position;
 }
 
+void RoomSessionPlayer::setFloorNumber(const uint8_t floorNumber)
+{
+	m_floorNumber = floorNumber;
+}
+
+uint8_t RoomSessionPlayer::getFloorNumber()
+{
+	return m_floorNumber;
+}
+
 void RoomSessionPlayer::addHealth(uint16_t health, bool updateClient)
 {
 	if (m_health > m_baseHealth + m_bonusHealth)

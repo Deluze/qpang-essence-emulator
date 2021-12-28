@@ -2,6 +2,7 @@
 
 #include "Room.h"
 #include "RoomSession.h"
+#include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 void PlayerVsEnvironment::onApply(const std::shared_ptr<Room> room)
 {
@@ -17,15 +18,23 @@ void PlayerVsEnvironment::onApply(const std::shared_ptr<Room> room)
 
 void PlayerVsEnvironment::onStart(const std::shared_ptr<RoomSession> roomSession)
 {
+	roomSession->getPveRoundManager()->onStart();
+	roomSession->getPveAreaManager()->onStart();
+	roomSession->getNpcManager()->onStart();
+	roomSession->getPveItemManager()->onStart();
+	roomSession->getObjectManager()->onStart();
+
 	GameMode::onStart(roomSession);
 }
 
 void PlayerVsEnvironment::onPlayerSync(const std::shared_ptr<RoomSessionPlayer> session)
 {
-	// Send all spawned objects/npc/items
+	session->getRoomSession()->getPveAreaManager()->onPlayerSync(session);
 	session->getRoomSession()->getObjectManager()->onPlayerSync(session);
 	session->getRoomSession()->getNpcManager()->onPlayerSync(session);
 	session->getRoomSession()->getPveItemManager()->onPlayerSync(session);
+
+	session->send<GCPvENpcInit>(1, 50, Position{ 38.f, 0.f, -30.f }, 0);
 
 	GameMode::onPlayerSync(session);
 }
@@ -37,6 +46,7 @@ void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 	roomSession->getPveItemManager()->tick();
 
 	roomSession->getPveRoundManager()->tick();
+	roomSession->getPveAreaManager()->tick();
 
 	GameMode::tick(roomSession);
 }

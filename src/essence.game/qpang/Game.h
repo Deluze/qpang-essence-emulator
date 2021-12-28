@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <mutex>
 
+#include "PveManager.h"
 #include "core/Emulator.h"
 #include "core/communication/server/QpangServer.h"
 #include "core/database/DatabaseDispatcher.h"
@@ -80,6 +81,7 @@ public:
 	Leaderboard* getLeaderboard();
 	CraneManager* getCraneManager();
 	TradeManager* getTradeManager();
+	PveManager* getPveManager();
 
 	DatabaseDispatcher* getDatabaseDispatcher();
 
@@ -113,6 +115,7 @@ private:
 	LevelManager m_levelManager;
 	CraneManager m_craneManager;
 	TradeManager m_tradeManager;
+	PveManager m_pveManager;
 
 	Leaderboard m_leaderboard;
 

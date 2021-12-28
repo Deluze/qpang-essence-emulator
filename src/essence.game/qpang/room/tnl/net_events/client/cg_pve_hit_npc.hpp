@@ -178,6 +178,13 @@ public:
 		};
 
 		roomSession->getNpcManager()->onCGPvEHitNpc(cgPvEHitNpcData);
+
+		if (roomSessionPlayer->isInvincible())
+		{
+			roomSessionPlayer->removeInvincibility();
+		}
+
+		targetNpc->setLastAttackerId(player->getId());
 	}
 
 	void process(EventConnection* ps) override

@@ -19,6 +19,7 @@ public:
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
+	void tick() const;
 
 	/**
 	 * \brief Retrieves all objects for the current map.
@@ -70,7 +71,7 @@ public:
 
 	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session);
 
-	void tick() const;
+	void onStart();
 private:
 	std::mutex mutex;
 	std::weak_ptr<RoomSession> m_roomSession;

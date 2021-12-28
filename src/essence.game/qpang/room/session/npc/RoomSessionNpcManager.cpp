@@ -10,10 +10,11 @@
 void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
+}
 
+void RoomSessionNpcManager::onStart()
+{
 	initializeNpcs();
-
-	spawnInitializedNpcs();
 }
 
 void RoomSessionNpcManager::tick() const
@@ -40,126 +41,38 @@ void RoomSessionNpcManager::initializeNpcs()
 		return;
 	}
 
-	const auto getNpcsStatement = DATABASE->prepare(
-		"SELECT "
-		"pve_npcs.id AS Id "
-		",pve_npcs.type AS Type "
-		",pve_npcs.base_health AS BaseHealth "
-		",pve_npcs.weapon_item_id AS WeaponItemId "
-		",pve_npcs.weapon_body_part_id AS WeaponBodyPartId "
-		",pve_npcs.attack_time_millis AS AttackTimeInMillis "
-		",pve_npcs.attack_width AS AttackWidth "
-		",pve_npcs.attack_height AS AttackHeight "
-		",pve_npcs.can_drop_loot AS CanDropLoot "
-		",pve_npc_spawns.should_respawn AS ShouldRespawn "
-		",pve_npc_spawns.respawn_time AS RespawnTime "
-		",pve_npc_spawns.initial_rotation AS InitialRotation "
-		",pve_npc_spawns.spawn_position_x AS SpawnPositionX "
-		",pve_npc_spawns.spawn_position_y AS SpawnPositionY "
-		",pve_npc_spawns.spawn_position_z AS SpawnPositionZ "
-		",pve_npc_movement_types.type AS MovementType "
-		",pve_npc_target_types.type AS TargetType "
-		",pve_npc_grade_types.type AS GradeType "
-		"FROM pve_npc_spawns "
-		"INNER JOIN pve_npcs ON pve_npcs.id = pve_npc_spawns.npc_id "
-		"INNER JOIN pve_npc_movement_types ON pve_npc_movement_types.id = pve_npcs.movement_type_id "
-		"INNER JOIN pve_npc_target_types ON pve_npc_target_types.id = pve_npcs.target_type_id "
-		"INNER JOIN pve_npc_grade_types ON pve_npc_grade_types.id = pve_npcs.grade_type_id "
-		"INNER JOIN maps on maps.id = pve_npc_spawns.map_id "
-		"WHERE maps.map_id = ?;"
-	);
-
-	getNpcsStatement->bindInteger(roomSession->getRoom()->getMap());
-
-	const auto npcResult = getNpcsStatement->fetch();
-
 	m_npcs.clear();
 	m_spawnedNpcs.clear();
 
-	while (npcResult->hasNext())
+	const auto npcData = Game::instance()->getPveManager()->getNpcDataByMapId(roomSession->getRoom()->getMap());
+
+	for (auto& data : npcData)
 	{
-		const auto npcId = npcResult->getInt("Id");
+		const auto [x, y, z] = data.initialPosition;
 
-		const auto getLootDropsStatement = DATABASE->prepare("SELECT * FROM pve_npc_loot_drops WHERE npc_id = ?");
+		const auto pathFinder = (y < 0)
+			? roomSession->getUnderGroundPathfinder()
+			: roomSession->getAboveGroundPathfinder();
 
-		getLootDropsStatement->bindInteger(npcId);
+		PathfinderCell spawnCell = {
+			pathFinder->getCellX(x),
+			pathFinder->getCellZ(z)
+		};
 
-		const auto lootDropResult = getLootDropsStatement->fetch();
-
-		std::vector<NpcLootDrop> lootDrops{};
-
-		while (lootDropResult->hasNext())
-		{
-			auto lootDrop = NpcLootDrop
-			{
-				lootDropResult->getInt("item_id"),
-				lootDropResult->getInt("probability")
-			};
-
-			lootDrops.push_back(lootDrop);
-
-			lootDropResult->next();
-		}
-
-		const auto getBodyPartsStatement = DATABASE->prepare("SELECT * FROM pve_npc_body_parts WHERE npc_id = ?");
-
-		getBodyPartsStatement->bindInteger(npcId);
-
-		const auto bodyPartResult = getBodyPartsStatement->fetch();
-
-		std::vector<NpcBodyPart> bodyParts{};
-
-		while (bodyPartResult->hasNext())
-		{
-			auto bodyPart = NpcBodyPart
-			{
-				bodyPartResult->getInt("body_part_id"),
-				bodyPartResult->getShort("health"),
-				bodyPartResult->getInt("weapon_item_id"),
-				bodyPartResult->getInt("item_box_id"),
-				bodyPartResult->getFlag("is_dual_gun")
-			};
-
-			bodyParts.push_back(bodyPart);
-
-			bodyPartResult->next();
-		}
-
-		auto npc = PveNpc(
-			npcResult->getTiny("Type"),
-			npcResult->getShort("BaseHealth"),
-			npcResult->getInt("WeaponItemId"),
-			npcResult->getTiny("WeaponBodyPartId"),
-			npcResult->getInt("AttackTimeInMillis"),
-			npcResult->getFloat("AttackWidth"),
-			npcResult->getFloat("AttackHeight"),
-			npcResult->getInt("ShouldRespawn"),
-			npcResult->getInt("RespawnTime"),
-			npcResult->getFlag("CanDropLoot"),
-			npcResult->getShort("InitialRotation"),
-			Position{
-				npcResult->getFloat("SpawnPositionX"),
-				npcResult->getFloat("SpawnPositionY"),
-				npcResult->getFloat("SpawnPositionZ"),
-			},
-			static_cast<eNpcGradeType>(npcResult->getTiny("MovementType")),
-			static_cast<eNpcMovementType>(npcResult->getTiny("GradeType")),
-			static_cast<eNpcTargetType>(npcResult->getTiny("TargetType")),
-			lootDrops,
-			bodyParts
-			);
+		const auto npc = PveNpc(data, spawnCell);
 
 		m_npcs.push_back(npc);
-
-		npcResult->next();
 	}
 }
 
-void RoomSessionNpcManager::spawnInitializedNpcs()
+void RoomSessionNpcManager::spawnNpcsForArea(const uint32_t areaId)
 {
 	for (const auto& npc : m_npcs)
 	{
-		spawnNpc(std::make_shared<PveNpc>(npc));
+		if (npc.getAreaUid() == areaId)
+		{
+			spawnNpc(std::make_shared<PveNpc>(npc));
+		}
 	}
 }
 

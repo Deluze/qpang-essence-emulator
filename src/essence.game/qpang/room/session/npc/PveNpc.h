@@ -2,51 +2,9 @@
 
 #include <memory>
 
-#include "Position.h"
+#include "Pathfinder.h"
+#include "PveNpcData.h"
 #include "RoomSessionPlayer.h"
-
-class RoomSession;
-
-enum class eNpcGradeType : uint8_t
-{
-	G_EASY = 0,
-	G_NORMAL = 1,
-	G_HARD = 2
-};
-
-enum class eNpcMovementType : uint8_t
-{
-	M_NONE = 0,
-	M_PATH_FINDING = 1,
-	M_PATH_NODES = 2,
-	M_MAX = 8
-};
-
-enum class eNpcTargetType : uint8_t
-{
-	T_NONE = 0,
-	T_STATIC = 1,
-	T_STATIC_REVENGE = 2,
-	T_NEAR = 3,
-	T_NEAR_REVENGE = 4,
-	T_ESSENCE_PRIORITY = 5,
-	T_DAMAGE = 6
-};
-
-struct NpcLootDrop
-{
-	uint32_t itemId;
-	uint32_t probability;
-};
-
-struct NpcBodyPart
-{
-	uint32_t id;
-	uint16_t health;
-	uint32_t weaponItemId;
-	uint32_t itemBoxId;
-	bool isDualGun;
-};
 
 class PveNpc
 {
@@ -54,18 +12,39 @@ public:
 	PveNpc() = default;
 	~PveNpc() = default;
 
-	PveNpc(uint32_t type, uint16_t baseHealth, uint32_t weaponItemId, uint8_t weaponBodyPartId, uint32_t attackTimeInMillis,
-		float attackWidth, float attackHeight, bool shouldRespawn, uint32_t respawnTime, bool canDropLoot,
-		uint16_t initialRotation, Position initialPosition, eNpcGradeType gradeType, eNpcMovementType movementType,
-		eNpcTargetType targetType, std::vector<NpcLootDrop> lootDrops, std::vector<NpcBodyPart> bodyParts);
+	PveNpc(PveNpcData data, const PathfinderCell& spawnCell);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
+
+	void handleDeath(const std::shared_ptr<RoomSession>& roomSession);
+
+	void setLastAttackerId(uint32_t id);
+
+	bool isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell);
+
+	PathfinderCell getMoveCell();
+
+	void clearPath();
+
+	bool didPathFinish();
+
+	void doPathfindingMove(std::shared_ptr<RoomSession> roomSession, const PathfinderCell& cell);
+
+	void setPosition(Pathfinder* pathFinder, const PathfinderCell& cell);
+
+	PathfinderCell getTargetCell();
+
+	std::shared_ptr<RoomSessionPlayer> getTargetPlayer();
+
+	Pathfinder* getPathFinder(const std::shared_ptr<RoomSession>& roomSession) const;
 
 	/**
 	 * \brief Spawns in the npc by relaying the init event.
 	 */
 	void spawn(const std::shared_ptr<RoomSession>& roomSession) const;
 	void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const;
+
+	void resetPosition();
 
 	/**
 	 * \brief Resets the npc health and spawns it in at its initial position.
@@ -93,6 +72,10 @@ public:
 
 	// NOTE: Temporary attack function for an npc.
 	void attack(const std::shared_ptr<RoomSession>& roomSession, Position targetPosition) const;
+
+	bool canAttackTargetPlayer(Pathfinder* pathFinder);
+
+	void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
 #pragma region Event handlers
 
@@ -158,6 +141,13 @@ public:
 	uint16_t getBaseHealth() const;
 
 	/**
+	 * \brief Gets the speed for the npc.
+	 * \return The speed.
+	 */
+	[[nodiscard]]
+	float getSpeed() const;
+
+	/**
 	 * \brief Gets the initial spawn rotation for the npc.
 	 * \return The initial spawn rotation.
 	 */
@@ -170,6 +160,13 @@ public:
 	 */
 	[[nodiscard]]
 	uint32_t getWeaponItemId() const;
+
+	/**
+	 * \brief Gets the spawn area id for the npc.
+	 * \return The spawn area id.
+	 */
+	[[nodiscard]]
+	uint32_t getAreaUid() const;
 
 	/**
 	 * \brief Indicates whether or not the npc should re-spawn upon death.
@@ -202,24 +199,50 @@ public:
 #pragma endregion
 
 private:
+	void handleNoMovement(const std::shared_ptr<RoomSession>& roomSession);
+
+	void startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+
+	void handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+
+	void handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+
+	void handleMovement(const std::shared_ptr<RoomSession>& roomSession);
+
+	bool isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player) const;
+
+	RoomSessionPlayer::Ptr findValidAttackerPlayer(const std::shared_ptr<RoomSession>& roomSession);
+
+	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession) const;
+
 	/**
 	 * \brief Picks a random item from the loot table and drops it.
 	 * \param roomSession The current room session.
 	 */
 	void dropLoot(const std::shared_ptr<RoomSession>& roomSession);
 
+	uint32_t m_lastAttackerId = 0;
+
 	uint32_t m_type{};
 	uint32_t m_uid{};
 
+	uint32_t m_areaUid;
+	uint32_t m_floorNumber;
+
 	uint16_t m_baseHealth;
 	uint16_t m_health;
+
+	float m_speed;
 
 	// These two are used for shooting/attacking.
 	uint32_t m_weaponItemId;
 	uint8_t m_weaponBodyPartId;
 
 	// How often the npcs attacks.
-	uint32_t m_attackTimeInMillis;
+	uint32_t m_aiTime;
+	uint32_t m_lastAttackTime = 0;
+
+	float m_attackRange;
 
 	// The range in width and height for the npc.
 	float m_attackWidth;
@@ -241,9 +264,21 @@ private:
 	Position m_initialPosition;
 	Position m_position;
 
+	Position m_staticShootingPosition;
+
 	eNpcGradeType m_gradeType;
 	eNpcMovementType m_movementType;
 	eNpcTargetType m_targetType;
+
+	PathfinderCell m_initialCell = {};
+	PathfinderCell m_takenCell = {};
+	PathfinderCell m_currentCell = {};
+	PathfinderCell m_targetCell = {};
+
+	std::vector<PathfinderCell> m_path = {};
+	int m_pathIdx = 0;
+
+	std::shared_ptr<RoomSessionPlayer> m_targetPlayer = nullptr;
 
 	std::vector<NpcLootDrop> m_lootDrops{};
 	std::vector<NpcBodyPart> m_bodyParts{};
