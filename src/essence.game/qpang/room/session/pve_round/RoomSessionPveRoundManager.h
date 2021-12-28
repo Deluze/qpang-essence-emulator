@@ -16,7 +16,7 @@ public:
 	/**
 	 * \brief Called from PlayerVsEnvironment::onStart (when the room session starts).
 	 */
-	void onStart();
+	void onStart() const;
 
 	/**
 	 * \brief Handles the CGPvERoundStart event by relaying the CGPvENewRound event.
@@ -32,7 +32,7 @@ public:
 
 	void checkRoundZeroFinished();
 private:
-	void updatePathfinders();
+	void updatePathfinders() const;
 
 	std::weak_ptr<RoomSession> m_roomSession;
 

@@ -13,12 +13,12 @@ void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& 
 	m_roomSession = roomSession;
 }
 
-void RoomSessionPveRoundManager::onStart()
+void RoomSessionPveRoundManager::onStart() const
 {
 	updatePathfinders();
 }
 
-void RoomSessionPveRoundManager::updatePathfinders()
+void RoomSessionPveRoundManager::updatePathfinders() const
 {
 	const auto roomSession = m_roomSession.lock();
 	if (roomSession == nullptr)
@@ -55,6 +55,7 @@ void RoomSessionPveRoundManager::onStartNewRound()
 
 	roomSession->getRoom()->setMap(roomSession->getRoom()->getMap() + 1);
 
+	roomSession->getPveAreaManager()->initializeAreas();
 	roomSession->getObjectManager()->initializeObjects();
 	roomSession->getNpcManager()->initializeNpcs();
 
@@ -83,6 +84,7 @@ void RoomSessionPveRoundManager::endRound()
 
 	m_roundEnded = true;
 
+	roomSession->getPveAreaManager()->removeAll();
 	roomSession->getObjectManager()->removeAll();
 	roomSession->getNpcManager()->removeAll();
 	roomSession->getPveItemManager()->removeAll();
@@ -111,8 +113,11 @@ void RoomSessionPveRoundManager::tick()
 void RoomSessionPveRoundManager::checkRoundZeroFinished()
 {
 	const auto roomSession = m_roomSession.lock();
+
 	if (roomSession == nullptr)
+	{
 		return;
+	}
 
 	const auto players = roomSession->getPlayingPlayers();
 
