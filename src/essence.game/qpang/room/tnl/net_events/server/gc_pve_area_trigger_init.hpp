@@ -21,7 +21,7 @@ public:
 
 	explicit GCPvEAreaTriggerInit(const std::shared_ptr<PveArea>& pveArea)
 		: GameNetEvent{ GC_PVEA_AREA_TRIGGER_INIT, GuaranteedOrdered, DirServerToClient },
-		areaId(pveArea->getId()),
+		areaId(pveArea->getUid()),
 		minBoundX(pveArea->getMinBound().x),
 		minBoundZ(pveArea->getMinBound().z),
 		maxBoundX(pveArea->getMaxBound().x),
