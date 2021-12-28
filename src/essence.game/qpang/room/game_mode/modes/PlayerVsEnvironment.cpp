@@ -19,6 +19,7 @@ void PlayerVsEnvironment::onApply(const std::shared_ptr<Room> room)
 void PlayerVsEnvironment::onStart(const std::shared_ptr<RoomSession> roomSession)
 {
 	roomSession->getPveRoundManager()->onStart();
+	roomSession->getPveAreaManager()->onStart();
 	roomSession->getNpcManager()->onStart();
 	roomSession->getPveItemManager()->onStart();
 	roomSession->getObjectManager()->onStart();
@@ -28,7 +29,6 @@ void PlayerVsEnvironment::onStart(const std::shared_ptr<RoomSession> roomSession
 
 void PlayerVsEnvironment::onPlayerSync(const std::shared_ptr<RoomSessionPlayer> session)
 {
-	// Send all spawned objects/npc/items
 	session->getRoomSession()->getPveAreaManager()->onPlayerSync(session);
 	session->getRoomSession()->getObjectManager()->onPlayerSync(session);
 	session->getRoomSession()->getNpcManager()->onPlayerSync(session);
@@ -46,6 +46,7 @@ void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 	roomSession->getPveItemManager()->tick();
 
 	roomSession->getPveRoundManager()->tick();
+	roomSession->getPveAreaManager()->tick();
 
 	GameMode::tick(roomSession);
 }
