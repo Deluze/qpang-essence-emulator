@@ -2,16 +2,17 @@
 #define CG_MOVE_REPORT_H
 
 #include "GameNetEvent.h"
+#include "AABBHelper.h"
 
 #include "Maps.h"
-#include "gc_pve_move_npc.hpp"
 
-class CGMoveReport : public GameNetEvent
+class CGMoveReport final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
 
 	U32 playerId; //88
+
 	F32 xPos; //92
 	F32 yPos; //96
 	F32 zPos; //100
@@ -22,9 +23,9 @@ public:
 
 	CGMoveReport() : GameNetEvent{ CG_MOVE_REPORT, GuaranteedOrdered, DirClientToServer } {}
 
-	void pack(EventConnection* conn, BitStream* bstream) {}
+	void pack(EventConnection* conn, BitStream* bstream) override {}
 
-	void unpack(EventConnection* conn, BitStream* bstream)
+	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->read(&playerId);
 		bstream->read(&xPos);
@@ -55,16 +56,32 @@ public:
 			return;
 		}
 
-		if (roomSessionPlayer->isDead())
+		const auto roomSession = roomSessionPlayer->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		if (roomSessionPlayer->isDead() || roomSessionPlayer->isPermanentlyDead())
 		{
 			return;
 		}
 
 		roomSessionPlayer->setPosition({ xPos, yPos, zPos });
 
+		// Note: If this checking causes too much lag or whatever, move it back to PveAreaManager::tick method.
+		for (const auto& area : roomSession->getPveAreaManager()->getAreas())
+		{
+			AABBHelper::isPositionInArea(roomSessionPlayer->getPosition(), area->getMinBound(), area->getMaxBound())
+				&& area->getFloorNumber() == roomSessionPlayer->getFloorNumber()
+				? area->onAreaEnter(roomSessionPlayer)
+				: area->onAreaExit(roomSessionPlayer);
+		}
+
 		// Convert pos to cell pos
-		int cellX = ((xPos - -43.220) / 1.441);
-		int cellZ = (((zPos - 40.823) / 1.399) * -1.f);
+		const int cellX = ((xPos - -43.220) / 1.441);
+		const int cellZ = (((zPos - 40.823) / 1.399) * -1.f);
 		//roomSessionPlayer->send<GCPvEMoveNpc>(50, (uint16_t)cellX, (uint16_t)cellZ);
 
 		if (Maps::recordMoves)

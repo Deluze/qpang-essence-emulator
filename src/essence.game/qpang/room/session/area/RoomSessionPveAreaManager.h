@@ -30,6 +30,8 @@ public:
 	 */
 	void createArea(const std::shared_ptr<PveArea>& area);
 
+	std::vector<std::shared_ptr<PveArea>> getAreas();
+
 	void removeAll();
 
 #pragma region NetEvent handlers

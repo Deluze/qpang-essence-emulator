@@ -11,25 +11,10 @@ void RoomSessionPveAreaManager::initialize(const std::shared_ptr<RoomSession>& r
 	m_roomSession = roomSession;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void RoomSessionPveAreaManager::tick() const
 {
-	const auto roomSession = m_roomSession.lock();
-
-	for (const auto& roomSessionPlayer : roomSession->getPlayingPlayers())
-	{
-		if (roomSessionPlayer->isDead() || roomSessionPlayer->isPermanentlyDead())
-		{
-			continue;
-		}
-
-		for (const auto& [id, area] : m_areas)
-		{
-			AABBHelper::isPositionInArea(roomSessionPlayer->getPosition(), area->getMinBound(), area->getMaxBound())
-				&& area->getFloorNumber() == roomSessionPlayer->getFloorNumber()
-				? area->onAreaEnter(roomSessionPlayer)
-				: area->onAreaExit(roomSessionPlayer);
-		}
-	}
+	// Note: See cg_move_report.
 }
 
 void RoomSessionPveAreaManager::initializeAreas()
@@ -65,6 +50,18 @@ void RoomSessionPveAreaManager::createArea(const std::shared_ptr<PveArea>& area)
 	roomSession->relayPlaying<GCPvEAreaTriggerInit>(area);
 
 	m_areas[area->getUid()] = area;
+}
+
+std::vector<std::shared_ptr<PveArea>> RoomSessionPveAreaManager::getAreas()
+{
+	std::vector<std::shared_ptr<PveArea>> areas{};
+
+	for (const auto& [id, area] : m_areas)
+	{
+		areas.push_back(area);
+	}
+
+	return areas;
 }
 
 void RoomSessionPveAreaManager::removeAll()
