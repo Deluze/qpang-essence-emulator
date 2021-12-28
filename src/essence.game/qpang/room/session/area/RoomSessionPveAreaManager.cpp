@@ -1,22 +1,38 @@
 #include "RoomSessionPveAreaManager.h"
 
-#include "AABBHelper.h"
-
 #include <iostream>
 
-#include "RoomSession.h"
-#include "RoomSessionPlayer.h"
+#include "AABBHelper.h"
 
 #include "gc_pve_area_trigger_init.hpp"
 
 void RoomSessionPveAreaManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
-
-	createAreas();
 }
 
-void RoomSessionPveAreaManager::createAreas()
+void RoomSessionPveAreaManager::tick() const
+{
+	const auto roomSession = m_roomSession.lock();
+
+	for (const auto& roomSessionPlayer : roomSession->getPlayingPlayers())
+	{
+		if (roomSessionPlayer->isDead() || roomSessionPlayer->isPermanentlyDead())
+		{
+			continue;
+		}
+
+		for (const auto& [id, area] : m_areas)
+		{
+			AABBHelper::isPositionInArea(roomSessionPlayer->getPosition(), area->getMinBound(), area->getMaxBound())
+				&& area->getFloorNumber() == roomSessionPlayer->getFloorNumber()
+				? area->onAreaEnter(roomSessionPlayer)
+				: area->onAreaExit(roomSessionPlayer);
+		}
+	}
+}
+
+void RoomSessionPveAreaManager::initializeAreas()
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -25,14 +41,14 @@ void RoomSessionPveAreaManager::createAreas()
 		return;
 	}
 
-	const std::vector areas
-	{
-		PveArea(PveArea::Bound{ 16.050f, -38.47f }, PveArea::Bound{ 25.30f, -29.032320f })
-	};
+	m_areas.clear();
 
-	// TODO: Get all areas from the PveManager and create them (pve manager has yet to be made).
-	for (const auto& area : areas)
+	const auto areaData = Game::instance()->getPveManager()->getAreaDataByMapId(roomSession->getRoom()->getMap());
+
+	for (const auto& data : areaData)
 	{
+		const auto area = PveArea(data);
+
 		createArea(std::make_shared<PveArea>(area));
 	}
 }
@@ -46,65 +62,18 @@ void RoomSessionPveAreaManager::createArea(const std::shared_ptr<PveArea>& area)
 		return;
 	}
 
-	area->setId(m_areas.size() + 1);
-
 	roomSession->relayPlaying<GCPvEAreaTriggerInit>(area);
 
-	m_areas[static_cast<uint32_t>(1)] = area;
+	m_areas[area->getUid()] = area;
 }
 
-std::shared_ptr<PveArea> RoomSessionPveAreaManager::findAreaById(const uint32_t id)
+void RoomSessionPveAreaManager::removeAll()
 {
-	const auto& it = m_areas.find(id);
-
-	if (it == m_areas.end())
-	{
-		return nullptr;
-	}
-
-	return it->second;
+	m_areas.clear();
 }
 
 void RoomSessionPveAreaManager::onAreaTrigger(const uint32_t areaId, const uint32_t playerId)
 {
-	const auto roomSession = m_roomSession.lock();
-
-	if (roomSession == nullptr)
-	{
-		return;
-	}
-
-	const auto sessionPlayer = roomSession->find(playerId);
-
-	if (sessionPlayer == nullptr)
-	{
-		return;
-	}
-
-	const auto& area = findAreaById(areaId);
-
-	if (area == nullptr)
-	{
-		return;
-	}
-
-	// If the area has already been initialized, return.
-	if (area->isInitialized())
-	{
-		return;
-	}
-
-	// The client tells us it has triggered the area, but lets check on the server to make sure.
-	if (!AABBHelper::isBetweenAreaBounds(area->getMinBound(), area->getMaxBound(), sessionPlayer->getPosition()))
-	{
-		return;
-	}
-
-	area->setIsInitialized(true);
-
-	std::cout << "Area " << areaId << " has been initialized." << std::endl;
-
-	// TODO: Spawn npcs with this area id.
 }
 
 void RoomSessionPveAreaManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const
@@ -113,4 +82,9 @@ void RoomSessionPveAreaManager::onPlayerSync(const std::shared_ptr<RoomSessionPl
 	{
 		roomSessionPlayer->send<GCPvEAreaTriggerInit>(area);
 	}
+}
+
+void RoomSessionPveAreaManager::onStart()
+{
+	initializeAreas();
 }

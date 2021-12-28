@@ -17,10 +17,12 @@ public:
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
+	void tick() const;
+
 	/**
 	 * \brief Creates all the areas.
 	 */
-	void createAreas();
+	void initializeAreas();
 
 	/**
 	 * \brief Creates an area.
@@ -28,22 +30,14 @@ public:
 	 */
 	void createArea(const std::shared_ptr<PveArea>& area);
 
-	/**
-	 * \brief Looks up the area by id.
-	 * \param id The id of the area.
-	 * \return The found pve area otherwise nullptr.
-	 */
-	std::shared_ptr<PveArea> findAreaById(uint32_t id);
+	void removeAll();
 
 #pragma region NetEvent handlers
-	/**
-	 * \brief Gets called when a player triggers an area by walking into it.
-	 * \param areaId The id of the area that has been triggered.
-	 * \param roomSessionPlayer The player that has triggered the area.
-	 */
 	void onAreaTrigger(uint32_t areaId, uint32_t playerId);
 
 	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const;
+
+	void onStart();
 #pragma endregion
 
 private:
