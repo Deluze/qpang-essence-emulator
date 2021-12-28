@@ -167,7 +167,8 @@ void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
 
 	// We can attack!
 	auto playerPos = m_targetPlayer->getPosition();
-	playerPos.y += 1.f;
+
+	playerPos.y += 0.5f;
 
 	attack(roomSession, playerPos);
 
