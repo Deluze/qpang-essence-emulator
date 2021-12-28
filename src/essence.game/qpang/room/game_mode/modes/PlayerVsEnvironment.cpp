@@ -34,8 +34,6 @@ void PlayerVsEnvironment::onPlayerSync(const std::shared_ptr<RoomSessionPlayer> 
 	session->getRoomSession()->getNpcManager()->onPlayerSync(session);
 	session->getRoomSession()->getPveItemManager()->onPlayerSync(session);
 
-	session->send<GCPvENpcInit>(1, 50, Position{ 38.f, 0.f, -30.f }, 0);
-
 	GameMode::onPlayerSync(session);
 }
 
