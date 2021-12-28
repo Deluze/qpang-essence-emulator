@@ -58,8 +58,11 @@ int Pathfinder::getCellZ(float z)
 
 void Pathfinder::cellToCoords(const PathfinderCell& cell, float& x, float& z)
 {
-	x = (float)(cell.x) * m_mapInfo.m_cellWidth + m_mapInfo.m_mapOffX;
-	z = ((float)(cell.z) * -1.f) * m_mapInfo.m_cellHeight + m_mapInfo.m_mapOffZ;
+	const float cellX = cell.x;
+	const float cellZ = cell.z;
+
+	x = cellX * m_mapInfo.m_cellWidth + m_mapInfo.m_mapOffX;
+	z = (cellZ * -1.f) * m_mapInfo.m_cellHeight + m_mapInfo.m_mapOffZ;
 }
 
 bool Pathfinder::isCellTaken(const PathfinderCell& cell)
@@ -239,14 +242,14 @@ bool Pathfinder::solve(const PathfinderCell& start, const PathfinderCell& end, s
 	micropather::MPVector<void*> micropatherPath;
 
 	int result = m_microPather->Solve(getNode(start.x, start.z), getNode(end.x, end.z), &micropatherPath, &totalCost);
-	if (result == micropather::MicroPather::SOLVED) 
+	if (result == micropather::MicroPather::SOLVED)
 	{
 		for (size_t i = 0; i < micropatherPath.size(); ++i)
 		{
 			int x, z;
 			getCoords(micropatherPath[i], &x, &z);
 
-			path.emplace_back(PathfinderCell { x, z });
+			path.emplace_back(PathfinderCell{ x, z });
 		}
 
 		return true;
