@@ -32,6 +32,6 @@ public:
 
 		const auto roomSession = roomSessionPlayer->getRoomSession();
 
-		roomSession->getNpcManager()->spawnInitializedNpcs();
+		//roomSession->getNpcManager()->spawnInitializedNpcs();
 	}
 };
