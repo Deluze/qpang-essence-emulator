@@ -15,7 +15,6 @@ void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomS
 void RoomSessionNpcManager::onStart()
 {
 	initializeNpcs();
-	spawnInitializedNpcs();
 }
 
 void RoomSessionNpcManager::tick() const
@@ -66,11 +65,14 @@ void RoomSessionNpcManager::initializeNpcs()
 	}
 }
 
-void RoomSessionNpcManager::spawnInitializedNpcs()
+void RoomSessionNpcManager::spawnNpcsForArea(const uint32_t areaId)
 {
 	for (const auto& npc : m_npcs)
 	{
-		spawnNpc(std::make_shared<PveNpc>(npc));
+		if (npc.getAreaUid() == areaId)
+		{
+			spawnNpc(std::make_shared<PveNpc>(npc));
+		}
 	}
 }
 
