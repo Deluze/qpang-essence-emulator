@@ -19,6 +19,20 @@ public:
 		unk_11 = (U32)(a4 & 0xFFFFFFFFLL);
 	};
 
+	GCMasterLog(uint32_t playerId, bool win, uint32_t goldCoinsEarned, uint32_t silverCoinsEarned, uint32_t bronzeCoinsEarned, uint32_t bestTimeLeftInMs,
+		uint32_t currentTimeLeftInMs) : GameNetEvent{ GC_MASTERLOG, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny }
+	{
+		unk_01 = playerId; // player id
+		unk_02 = goldCoinsEarned; // gold coins earned
+		unk_03 = silverCoinsEarned; // silver coins earned
+		unk_07 = bronzeCoinsEarned; // bronze coins earned
+		unk_06 = win; // 0 = lose, 1 = win
+		unk_08 = bestTimeLeftInMs; // best time left in ms
+		unk_09 = currentTimeLeftInMs; // current time left in ms
+		unk_12 = 1337; // Needs to be 1337, it's an identifier for the tool
+	};
+
+
 	//U32 npcUid; // 88
 	//U32 playerId; // 92
 
