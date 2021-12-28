@@ -113,6 +113,7 @@ void PveManager::initializeNpcs()
 		",pve_npc_target_types.type AS TargetType "
 		",pve_npc_grade_types.type AS GradeType "
 		",pve_map_areas.area_uid AS AreaUid "
+		",pve_map_areas.floor_number AS FloorNumber "
 		",maps.map_id AS MapId "
 		"FROM pve_npc_spawns "
 		"INNER JOIN pve_npcs ON pve_npcs.id = pve_npc_spawns.npc_id "
@@ -139,6 +140,7 @@ void PveManager::initializeNpcs()
 		// Step 4: Construct the npc.
 		auto npcData = PveNpcData{
 			result->getInt("AreaUid"),
+			result->getInt("FloorNumber"),
 			result->getTiny("Type"),
 			result->getShort("BaseHealth"),
 			result->getFloat("Speed"),

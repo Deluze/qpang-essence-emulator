@@ -11,14 +11,15 @@
 std::mutex pathfindingMutex = {};
 
 std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&)> npcDoNextMove = [&](
-	RoomSession::Ptr roomSession, PveNpc* npc, const PathfinderCell& prevCell, const PathfinderCell& currCell)
+	const RoomSession::Ptr roomSession, PveNpc* npc, const PathfinderCell& prevCell, const PathfinderCell& currCell)
 {
 	std::lock_guard lg(pathfindingMutex);
 
 	if (npc == nullptr)
 		return;
 
-	auto pathFinder = npc->getPathFinder(roomSession);
+	const auto pathFinder = npc->getPathFinder(roomSession);
+
 	if (pathFinder == nullptr)
 	{
 		npc->clearPath();
@@ -42,15 +43,15 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 			return;
 		}
 
-		auto nextCell = npc->getMoveCell();
+		const auto nextCell = npc->getMoveCell();
 
 		const float speed = npc->getSpeed();
 		const float moveTime = roomSession->getAboveGroundPathfinder()->calculateMoveTime(speed, currCell, nextCell);
 
-		int timeMilliseconds = std::round(moveTime * 1000.f);
+		const int timeMilliseconds = std::round(moveTime * 1000.f);
+
 		TimeHelper::setTimeOut<RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&>
 			(timeMilliseconds, npcDoNextMove, roomSession, npc, currCell, nextCell);
-
 	}
 	else
 	{
@@ -62,6 +63,7 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_type(data.type),
 	m_areaUid(data.areaUid),
+	m_floorNumber(data.floorNumber),
 	m_baseHealth(data.baseHealth),
 	m_health(data.baseHealth),
 	m_speed(data.speed),
@@ -308,13 +310,14 @@ std::shared_ptr<RoomSessionPlayer> PveNpc::getTargetPlayer()
 	return m_targetPlayer;
 }
 
-bool PveNpc::isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player)
+bool PveNpc::isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player) const
 {
 	if (!player)
+	{
 		return false;
+	}
 
-	// TODO: Is player on same floor as npc?
-	return !player->isDead() && !player->isInvincible();
+	return !player->isDead() && !player->isInvincible() && player->getFloorNumber() == m_floorNumber;
 }
 
 RoomSessionPlayer::Ptr PveNpc::findValidAttackerPlayer(const std::shared_ptr<RoomSession>& roomSession)
@@ -331,7 +334,7 @@ RoomSessionPlayer::Ptr PveNpc::findValidAttackerPlayer(const std::shared_ptr<Roo
 	return nullptr;
 }
 
-RoomSessionPlayer::Ptr PveNpc::findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession)
+RoomSessionPlayer::Ptr PveNpc::findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession) const
 {
 	RoomSessionPlayer::Ptr target = nullptr;
 	float closestDistance = 40.f;
@@ -353,7 +356,7 @@ RoomSessionPlayer::Ptr PveNpc::findClosestValidPlayer(const std::shared_ptr<Room
 	return target;
 }
 
-Pathfinder* PveNpc::getPathFinder(const std::shared_ptr<RoomSession>& roomSession)
+Pathfinder* PveNpc::getPathFinder(const std::shared_ptr<RoomSession>& roomSession) const
 {
 	return m_position.y < 0 ? roomSession->getUnderGroundPathfinder() :
 		roomSession->getAboveGroundPathfinder();
@@ -378,9 +381,12 @@ void PveNpc::resetPosition()
 
 void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 {
-	auto pathFinder = getPathFinder(roomSession);
+	const auto pathFinder = getPathFinder(roomSession);
+
 	if (pathFinder)
+	{
 		pathFinder->setCellTaken(m_takenCell, false);
+	}
 
 	m_lastAttackTime = 0;
 
@@ -388,6 +394,7 @@ void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 
 	clearPath();
 	resetHealth();
+
 	spawn(roomSession);
 }
 

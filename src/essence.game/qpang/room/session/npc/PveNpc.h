@@ -36,7 +36,7 @@ public:
 
 	std::shared_ptr<RoomSessionPlayer> getTargetPlayer();
 
-	Pathfinder* getPathFinder(const std::shared_ptr<RoomSession>& roomSession);
+	Pathfinder* getPathFinder(const std::shared_ptr<RoomSession>& roomSession) const;
 
 	/**
 	 * \brief Spawns in the npc by relaying the init event.
@@ -209,11 +209,11 @@ private:
 
 	void handleMovement(const std::shared_ptr<RoomSession>& roomSession);
 
-	bool isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player);
+	bool isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player) const;
 
 	RoomSessionPlayer::Ptr findValidAttackerPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
-	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession);
+	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession) const;
 
 	/**
 	 * \brief Picks a random item from the loot table and drops it.
@@ -227,6 +227,7 @@ private:
 	uint32_t m_uid{};
 
 	uint32_t m_areaUid;
+	uint32_t m_floorNumber;
 
 	uint16_t m_baseHealth;
 	uint16_t m_health;

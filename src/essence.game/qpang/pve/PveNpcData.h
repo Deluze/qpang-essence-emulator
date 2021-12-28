@@ -46,6 +46,7 @@ struct NpcBodyPart
 struct PveNpcData
 {
 	uint32_t areaUid;
+	uint32_t floorNumber;
 	uint32_t type;
 	uint16_t baseHealth;
 	float speed;
