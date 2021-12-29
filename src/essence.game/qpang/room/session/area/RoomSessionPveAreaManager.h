@@ -35,10 +35,6 @@ public:
 	void removeAll();
 
 #pragma region NetEvent handlers
-	void onAreaTrigger(uint32_t areaId, uint32_t playerId);
-
-	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const;
-
 	void onStart();
 #pragma endregion
 

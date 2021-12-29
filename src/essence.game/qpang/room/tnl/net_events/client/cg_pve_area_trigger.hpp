@@ -41,7 +41,7 @@ public:
 			return;
 		}
 
-		roomSession->getPveAreaManager()->onAreaTrigger(areaId, player->getId());
+		//roomSession->getPveAreaManager()->onAreaTrigger(areaId, player->getId());
 	}
 
 	void process(EventConnection* ps) override

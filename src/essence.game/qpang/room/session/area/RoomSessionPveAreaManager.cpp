@@ -1,7 +1,5 @@
 #include "RoomSessionPveAreaManager.h"
 
-#include <iostream>
-
 #include "AABBHelper.h"
 
 #include "gc_pve_area_trigger_init.hpp"
@@ -48,8 +46,6 @@ void RoomSessionPveAreaManager::createArea(const std::shared_ptr<PveArea>& area)
 		return;
 	}
 
-	roomSession->relayPlaying<GCPvEAreaTriggerInit>(area);
-
 	m_areas[area->getUid()] = area;
 }
 
@@ -68,18 +64,6 @@ std::vector<std::shared_ptr<PveArea>> RoomSessionPveAreaManager::getAreas()
 void RoomSessionPveAreaManager::removeAll()
 {
 	m_areas.clear();
-}
-
-void RoomSessionPveAreaManager::onAreaTrigger(const uint32_t areaId, const uint32_t playerId)
-{
-}
-
-void RoomSessionPveAreaManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const
-{
-	for (const auto& [id, area] : m_areas)
-	{
-		roomSessionPlayer->send<GCPvEAreaTriggerInit>(area);
-	}
 }
 
 void RoomSessionPveAreaManager::onStart()

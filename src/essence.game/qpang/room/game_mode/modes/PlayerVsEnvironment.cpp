@@ -29,7 +29,6 @@ void PlayerVsEnvironment::onStart(const std::shared_ptr<RoomSession> roomSession
 
 void PlayerVsEnvironment::onPlayerSync(const std::shared_ptr<RoomSessionPlayer> session)
 {
-	session->getRoomSession()->getPveAreaManager()->onPlayerSync(session);
 	session->getRoomSession()->getObjectManager()->onPlayerSync(session);
 	session->getRoomSession()->getNpcManager()->onPlayerSync(session);
 	session->getRoomSession()->getPveItemManager()->onPlayerSync(session);
