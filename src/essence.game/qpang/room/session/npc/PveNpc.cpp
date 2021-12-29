@@ -140,42 +140,54 @@ void PveNpc::improveTargetCell(Pathfinder* pathFinder)
 	if (m_currentCell.z == m_targetCell.z)
 		zDelta = 0;
 
-	// Only trying cell with new x
+	const auto tryNewCells = [&](bool closer) -> bool
 	{
-		auto newTargetCell = m_targetCell;
-		newTargetCell.x += xDelta;
-
-		if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+		// Only trying cell with new x
 		{
-			m_targetCell = newTargetCell;
-			return;
+			auto newTargetCell = m_targetCell;
+			newTargetCell.x += closer ? xDelta : -xDelta;
+
+			if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+			{
+				m_targetCell = newTargetCell;
+				return true;
+			}
 		}
-	}
 
-	// Only trying cell with new Z
-	{
-		auto newTargetCell = m_targetCell;
-		newTargetCell.z += zDelta;
-
-		if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+		// Only trying cell with new Z
 		{
-			m_targetCell = newTargetCell;
-			return;
+			auto newTargetCell = m_targetCell;
+			newTargetCell.z += closer ? zDelta : -zDelta;
+
+			if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+			{
+				m_targetCell = newTargetCell;
+				return true;
+			}
 		}
-	}
 
-	// Trying cell with new x and z
-	{
-		auto newTargetCell = m_targetCell;
-		newTargetCell.x += xDelta;
-		newTargetCell.z += zDelta;
-
-		if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+		// Trying cell with new x and z
 		{
-			m_targetCell = newTargetCell;
-			return;
+			auto newTargetCell = m_targetCell;
+			newTargetCell.x += closer ? xDelta : -xDelta;
+			newTargetCell.z += closer ? zDelta : -zDelta;
+
+			if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+			{
+				m_targetCell = newTargetCell;
+				return true;
+			}
 		}
-	}
+
+		return false;
+	};
+
+	// Let's first try the closer cells
+	if (tryNewCells(true))
+		return;
+
+	// Now try the cells 1 step further away
+	tryNewCells(false);
 }
 
 void PveNpc::startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder)
@@ -354,7 +366,8 @@ bool PveNpc::isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell)
 		pathFinder->getCellZ(m_targetPlayer->getPosition().z)
 	};
 
-	if (/*m_targetCell != currentPlayerCell ||*/ pathFinder->isCellTaken(cell))
+	// If the cell is taken and it's not our taken cell
+	if (/*m_targetCell != currentPlayerCell ||*/ (pathFinder->isCellTaken(cell) && m_takenCell != cell))
 	{
 		return false;
 	}
