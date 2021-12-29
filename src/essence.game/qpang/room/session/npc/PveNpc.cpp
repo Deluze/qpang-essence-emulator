@@ -408,8 +408,7 @@ RoomSessionPlayer::Ptr PveNpc::findValidAttackerPlayer(const std::shared_ptr<Roo
 RoomSessionPlayer::Ptr PveNpc::findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession) const
 {
 	RoomSessionPlayer::Ptr target = nullptr;
-
-	float closestDistance = 60.0f;
+	float closestDistance = 40.f;
 
 	for (const auto& player : roomSession->getPlayingPlayers())
 	{

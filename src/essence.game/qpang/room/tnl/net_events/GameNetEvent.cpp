@@ -14,12 +14,10 @@ GameNetEvent::GameNetEvent(const GameNetId gameNetId, const GuaranteeType guaran
 	TNL::NetEvent(guaranteeType, eventDirection),
 	id(gameNetId)
 {
-	//if (gameNetId != CG_MOVE && gameNetId != CG_MOVE_REPORT && gameNetId != GC_PVE_OBJECT_INIT && gameNetId != GC_PVE_OBJECT_MOVE)
-	//{
-	//	std::cout << "[" << gameNetIdMapping[gameNetId] << "] GuaranteeType: "
-	//		<< guaranteeTypeMapping[guaranteeType] << ", Direction: "
-	//		<< eventDirectionMapping[eventDirection] << std::endl;
-	//}
+	if (gameNetId != CG_MOVE && gameNetId != CG_MOVE_REPORT)
+	{
+		//std::cout << "[" << gameNetIdMapping[gameNetId] << "] GuaranteeType: " << guaranteeTypeMapping[guaranteeType] << ", Direction: " << eventDirectionMapping[eventDirection] << "\n";
+	}
 }
 
 std::u16string GameNetEvent::byteBufferToString(ByteBuffer* buffer, uint32_t length)
