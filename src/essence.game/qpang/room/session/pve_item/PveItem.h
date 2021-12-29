@@ -59,5 +59,5 @@ protected:
 	uint32_t m_itemId;
 	Position m_position{};
 
-	bool m_isPickedUp;
+	bool m_isPickedUp = false;
 };
