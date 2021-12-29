@@ -293,6 +293,10 @@ void PveNpc::handleDeath(const std::shared_ptr<RoomSession>& roomSession)
 	{
 		const auto currentTime = time(nullptr);
 
+		const auto pathFinder = getPathFinder(roomSession);
+		if (pathFinder)
+			pathFinder->setCellTaken(m_takenCell, false);
+
 		if (m_timeOfDeath == NULL)
 		{
 			return;
@@ -493,14 +497,6 @@ void PveNpc::resetPosition()
 
 void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 {
-	// ReSharper disable once CppTooWideScope
-	const auto pathFinder = getPathFinder(roomSession);
-
-	if (pathFinder)
-	{
-		pathFinder->setCellTaken(m_takenCell, false);
-	}
-
 	m_lastAttackTime = 0;
 
 	resetPosition();
