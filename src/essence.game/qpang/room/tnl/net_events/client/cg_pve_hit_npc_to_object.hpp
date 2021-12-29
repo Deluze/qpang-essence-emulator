@@ -2,12 +2,15 @@
 #define CG_PVE_HIT_NPC_TO_OBJECT_H
 
 #include "GameNetEvent.h"
+#include "gc_pve_hit_npc_to_object.hpp"
+
 class CGPvEHitNpcToObject final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	U64 unk_01; // 88 92 # WeaponId?
-	U32 unk_02; // 96	 # ObjectUid or NpcUid?
+	// unk_01 is 0 all of the time so far.
+	U64 unk_01; // 88 92
+	U32 objectUid; // 96
 
 	CGPvEHitNpcToObject() : GameNetEvent{ CG_PVE_HIT_NPC_TO_OBJECT, GuaranteedOrdered, DirClientToServer } {}
 
@@ -16,13 +19,13 @@ public:
 	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->read(&unk_01);
-		bstream->read(&unk_02);
+		bstream->read(&objectUid);
 	}
 
-	void handle(GameConnection* conn, Player::Ptr player) override
+	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		// TODO: Handle CGPvEHitNpcToObject.
-		std::cout << "Reveived an unhandled CGPvEHitNpcToObject event." << std::endl;
+		// TODO: Handle CGPvEHitNpcToObject by sending GCPvEHitNpcToObject.
+		//player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession()->relayPlaying<GCPvEHitNpcToObject>(objectUid, 0, 100);
 	}
 
 	void process(EventConnection* ps) override
