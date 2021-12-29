@@ -202,6 +202,8 @@ public:
 private:
 	void handleNoMovement(const std::shared_ptr<RoomSession>& roomSession);
 
+	void improveTargetCell(Pathfinder* pathFinder);
+
 	void startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);

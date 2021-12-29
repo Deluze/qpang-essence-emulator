@@ -39,12 +39,9 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 	std::lock_guard lg(pathfindingMutex);
 
 	if (npc == nullptr)
-	{
 		return;
-	}
 
 	const auto pathFinder = npc->getPathFinder(roomSession);
-
 	if (pathFinder == nullptr)
 	{
 		npc->clearPath();
@@ -66,7 +63,6 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 		if (npc->didPathFinish())
 		{
 			npc->clearPath();
-
 			return;
 		}
 
@@ -132,11 +128,65 @@ void PveNpc::handleNoMovement(const std::shared_ptr<RoomSession>& roomSession)
 	}
 }
 
+void PveNpc::improveTargetCell(Pathfinder* pathFinder)
+{
+	// Try to see if any of the cells 1 step closer to the npc are valid
+	int xDelta = m_currentCell.x < m_targetCell.x ? -1 : 1;
+	int zDelta = m_currentCell.z < m_targetCell.z ? -1 : 1;
+
+	if (m_currentCell.x == m_targetCell.x)
+		xDelta = 0;
+
+	if (m_currentCell.z == m_targetCell.z)
+		zDelta = 0;
+
+	// Only trying cell with new x
+	{
+		auto newTargetCell = m_targetCell;
+		newTargetCell.x += xDelta;
+
+		if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+		{
+			m_targetCell = newTargetCell;
+			return;
+		}
+	}
+
+	// Only trying cell with new Z
+	{
+		auto newTargetCell = m_targetCell;
+		newTargetCell.z += zDelta;
+
+		if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+		{
+			m_targetCell = newTargetCell;
+			return;
+		}
+	}
+
+	// Trying cell with new x and z
+	{
+		auto newTargetCell = m_targetCell;
+		newTargetCell.x += xDelta;
+		newTargetCell.z += zDelta;
+
+		if (pathFinder->canPassThrough(newTargetCell.x, newTargetCell.z))
+		{
+			m_targetCell = newTargetCell;
+			return;
+		}
+	}
+}
+
 void PveNpc::startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder)
 {
 	if (m_targetPlayer != nullptr)
 	{
 		m_targetCell = { pathFinder->getCellX(m_targetPlayer->getPosition().x), pathFinder->getCellZ(m_targetPlayer->getPosition().z) };
+
+		// Try to find a closer cell if the target cell is in a wall
+		if (!pathFinder->canPassThrough(m_targetCell.x, m_targetCell.z))
+			improveTargetCell(pathFinder);
 
 		if (pathFinder->solve(m_currentCell, m_targetCell, m_path) && m_path.size() > 1)
 		{
@@ -152,19 +202,14 @@ void PveNpc::startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession
 bool PveNpc::canAttackTargetPlayer(Pathfinder* pathFinder) const
 {
 	if (!isPlayerValid(m_targetPlayer))
-	{
 		return false;
-	}
 
 	const auto playerPosition = m_targetPlayer->getPosition();
 	const auto playerCell = PathfinderCell{ pathFinder->getCellX(playerPosition.x), pathFinder->getCellZ(playerPosition.z) };
 
 	const float distance = sqrtf(std::pow(playerCell.x - m_currentCell.x, 2) + std::pow(playerCell.z - m_currentCell.z, 2));
-
 	if (distance > m_attackRange)
-	{
 		return false;
-	}
 
 	return pathFinder->lineOfSightBetween(m_currentCell, playerCell);
 }
@@ -172,11 +217,8 @@ bool PveNpc::canAttackTargetPlayer(Pathfinder* pathFinder) const
 void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
 {
 	const auto currentTime = time(nullptr);
-
 	if ((m_lastAttackTime + std::ceil(static_cast<float>(m_aiTime) / 1000.f)) > currentTime)
-	{
 		return;
-	}
 
 	// We can attack!
 	const auto playerPos = m_targetPlayer->getPosition();
@@ -199,7 +241,6 @@ void PveNpc::handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, P
 	{
 		m_targetPlayer = findClosestValidPlayer(roomSession);
 		startMovingToPlayer(roomSession, pathFinder);
-
 		return;
 	}
 
@@ -211,14 +252,10 @@ void PveNpc::handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSes
 	if (!canAttackTargetPlayer(pathFinder))
 	{
 		m_targetPlayer = findValidAttackerPlayer(roomSession);
-
 		if (!m_targetPlayer)
-		{
 			m_targetPlayer = findClosestValidPlayer(roomSession);
-		}
 
 		startMovingToPlayer(roomSession, pathFinder);
-
 		return;
 	}
 
@@ -288,8 +325,8 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 	case eNpcMovementType::M_PATH_FINDING:
 		handleMovement(roomSession);
 		break;
-	case eNpcMovementType::M_PATH_NODES: break;
-	case eNpcMovementType::M_MAX: break;
+	case eNpcMovementType::M_PATH_NODES:
+	case eNpcMovementType::M_MAX:
 	default: 
 		break;
 	}
