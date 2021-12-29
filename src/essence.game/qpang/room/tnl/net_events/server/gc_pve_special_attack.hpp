@@ -8,14 +8,16 @@ class GCPvESpecialAttack final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	U32 npcUid = 0;
-	U32 unk_02 = 50;
-	U8 unk_03 = 0;
+	U32 npcUid = 0; // 88
+	U32 unk_02 = 0; // 92
+	U8 unk_03 = 0; // 96
 
 	GCPvESpecialAttack() : GameNetEvent{ GC_PVE_SPECIAL_ATTACK, GuaranteedOrdered, DirServerToClient } {}
 	GCPvESpecialAttack(const uint32_t npcUid, const uint32_t unk02, const uint8_t unk03)
 		: GameNetEvent{ GC_PVE_SPECIAL_ATTACK, GuaranteedOrdered, DirServerToClient },
-		npcUid(npcUid), unk_02(unk02), unk_03(unk03)
+		npcUid(npcUid),
+		unk_02(unk02),
+		unk_03(unk03)
 	{
 	}
 
