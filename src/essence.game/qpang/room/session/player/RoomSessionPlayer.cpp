@@ -313,9 +313,39 @@ void RoomSessionPlayer::setFloorNumber(const uint8_t floorNumber)
 	m_floorNumber = floorNumber;
 }
 
-uint8_t RoomSessionPlayer::getFloorNumber()
+uint8_t RoomSessionPlayer::getFloorNumber() const
 {
 	return m_floorNumber;
+}
+
+void RoomSessionPlayer::increaseGoldenCoinCount()
+{
+	m_goldenCoinCount++;
+}
+
+void RoomSessionPlayer::increaseSilverCoinCount()
+{
+	m_silverCoinCount++;
+}
+
+void RoomSessionPlayer::increaseBronzeCoinCount()
+{
+	m_bronzeCoinCount++;
+}
+
+uint32_t RoomSessionPlayer::getGoldenCoinCount() const
+{
+	return m_goldenCoinCount;
+}
+
+uint32_t RoomSessionPlayer::getSilverCoinCount() const
+{
+	return m_silverCoinCount;
+}
+
+uint32_t RoomSessionPlayer::getBronzeCoinCount() const
+{
+	return m_bronzeCoinCount;
 }
 
 void RoomSessionPlayer::addHealth(uint16_t health, bool updateClient)

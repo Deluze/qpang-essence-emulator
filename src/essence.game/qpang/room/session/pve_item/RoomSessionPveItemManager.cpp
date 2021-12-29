@@ -157,24 +157,29 @@ void RoomSessionPveItemManager::handleMedkitPickup(const RoomSessionPlayer::Ptr&
 
 void RoomSessionPveItemManager::handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, const eItemType itemType)
 {
-	auto coins = 0;
+	auto coinCount = 0;
 
 	switch (itemType)
 	{
 	case eItemType::BRONZE_COIN:
-		coins = 1;
+		coinCount = 1;
+		roomSessionPlayer->increaseBronzeCoinCount();
 		break;
 	case eItemType::SILVER_COIN:
-		coins = 10;
+		coinCount = 10;
+		roomSessionPlayer->increaseSilverCoinCount();
 		break;
 	case eItemType::GOLDEN_COIN:
-		coins = 100;
+		coinCount = 100;
+
+		roomSessionPlayer->increaseGoldenCoinCount();
 		break;
 	case eItemType::NONE:
 	case eItemType::AMMO_CLIP:
 	case eItemType::RED_MEDKIT:
+	default:
 		return;
 	}
 
-	roomSessionPlayer->getPlayer()->addCoins(coins);
+	roomSessionPlayer->getPlayer()->addCoins(coinCount);
 }

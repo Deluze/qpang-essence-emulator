@@ -5,7 +5,6 @@
 #include <cstdint>
 
 #include "qpang/Position.h"
-#include "qpang/room/session/bullet/Bullet.h"
 
 #include "qpang/room/session/player/effect/PlayerEffectManager.h"
 #include "qpang/room/session/player/weapon/PlayerWeaponManager.h"
@@ -52,8 +51,16 @@ public:
 	void setPosition(const Position& position);
 	Position getPosition();
 
-	void setFloorNumber(const uint8_t floorNumber);
-	uint8_t getFloorNumber();
+	void setFloorNumber(uint8_t floorNumber);
+	uint8_t getFloorNumber() const;
+
+	void increaseGoldenCoinCount();
+	void increaseSilverCoinCount();
+	void increaseBronzeCoinCount();
+
+	uint32_t getGoldenCoinCount() const;
+	uint32_t getSilverCoinCount() const;
+	uint32_t getBronzeCoinCount() const;
 
 	void addHealth(uint16_t health, bool updateOnClient = false);
 	void takeHealth(uint16_t health, bool updateOnClient = false);
@@ -156,6 +163,10 @@ private:
 	Position m_position;
 
 	bool m_floorNumber;
+
+	uint32_t m_goldenCoinCount;
+	uint32_t m_silverCoinCount;
+	uint32_t m_bronzeCoinCount;
 
 	time_t m_joinTime;
 	time_t m_startTime;
