@@ -2,6 +2,14 @@
 
 #include "RoomSession.h"
 
+enum eCellType : uint8_t
+{
+	MOVEABLE,
+	WALL = 1,
+	TAKEN_BY_NPC = 2,
+	NO_DIAGONAL_MOVES = 3
+};
+
 Pathfinder::Pathfinder()
 {
 	// Use 60 * 60, as all the grids we're going to be using are 60x60.
@@ -28,6 +36,8 @@ void Pathfinder::free()
 void Pathfinder::updateMapInfo(const MapInfo& mapInfo)
 {
 	m_mapInfo = mapInfo;
+	m_backupMapInfo = m_mapInfo;
+
 	m_numCellsX = m_mapInfo.m_mapGrid[0].size() - 1;
 	m_numCellsZ = m_mapInfo.m_mapGrid.size() - 1;
 
@@ -70,7 +80,7 @@ bool Pathfinder::isCellTaken(const PathfinderCell& cell)
 	if (cell.x >= 0 && cell.x < m_numCellsX
 		&& cell.z >= 0 && cell.z < m_numCellsZ)
 	{
-		return m_mapInfo.m_mapGrid[cell.x][cell.z] == 2;
+		return m_mapInfo.m_mapGrid[cell.x][cell.z] == eCellType::TAKEN_BY_NPC;
 	}
 
 	return true;
@@ -81,7 +91,11 @@ void Pathfinder::setCellTaken(const PathfinderCell& cell, bool taken)
 	if (cell.x >= 0 && cell.x < m_numCellsX
 		&& cell.z >= 0 && cell.z < m_numCellsZ)
 	{
-		m_mapInfo.m_mapGrid[cell.x][cell.z] = taken ? 2 : 0;
+		// Set the cell to taken, or to what it was if it's not take anymore by using the
+		// backup map info.
+		m_mapInfo.m_mapGrid[cell.x][cell.z] = taken ? eCellType::TAKEN_BY_NPC : 
+			m_backupMapInfo.m_mapGrid[cell.x][cell.z];
+
 		m_microPather->Reset();
 	}
 }
@@ -148,8 +162,13 @@ bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const Pathfinder
 			xe = pos1.x;
 		}
 
-		if (!canPassThrough(x, z, true))
-			return false;
+		// The last cell may be in a "wall"
+		// and still be considered visible
+		if (x != pos2.x && z != pos2.z)
+		{
+			if (!canPassThrough(x, z, true))
+				return false;
+		}
 
 		for (int i = 0; x < xe; i++)
 		{
@@ -166,8 +185,13 @@ bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const Pathfinder
 				px = px + 2 * (dy1 - dx1);
 			}
 
-			if (!canPassThrough(x, z, true))
-				return false;
+			// The last cell may be in a "wall"
+			// and still be considered visible
+			if (x != pos2.x && z != pos2.z)
+			{
+				if (!canPassThrough(x, z, true))
+					return false;
+			}
 		}
 	}
 	else
@@ -186,8 +210,13 @@ bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const Pathfinder
 			ze = pos1.z;
 		}
 
-		if (!canPassThrough(x, z, true))
-			return false;
+		// The last cell may be in a "wall"
+		// and still be considered visible
+		if (x != pos2.x && z != pos2.z)
+		{
+			if (!canPassThrough(x, z, true))
+				return false;
+		}
 
 		for (int i = 0; z < ze; i++)
 		{
@@ -205,8 +234,13 @@ bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const Pathfinder
 				py = py + 2 * (dx1 - dy1);
 			}
 
-			if (!canPassThrough(x, z, true))
-				return false;
+			// The last cell may be in a "wall"
+			// and still be considered visible
+			if (x != pos2.x && z != pos2.z)
+			{
+				if (!canPassThrough(x, z, true))
+					return false;
+			}
 		}
 	}
 
@@ -218,7 +252,7 @@ bool Pathfinder::canPassThrough(int x, int z, bool ignoreTaken)
 	if (x >= 0 && x < m_numCellsX
 		&& z >= 0 && z < m_numCellsZ)
 	{
-		if (m_mapInfo.m_mapGrid[x][z] == 0 || (ignoreTaken && m_mapInfo.m_mapGrid[x][z] == 2))
+		if (m_mapInfo.m_mapGrid[x][z] == eCellType::MOVEABLE || (ignoreTaken && m_mapInfo.m_mapGrid[x][z] == eCellType::TAKEN_BY_NPC))
 			return true;
 	}
 
@@ -279,8 +313,17 @@ void Pathfinder::AdjacentCost(void* node, MP_VECTOR<micropather::StateCost>* nei
 	int x, z;
 	getCoords(node, &x, &z);
 
+	auto cellType = m_mapInfo.m_mapGrid[x][z];
 	for (int i = 0; i < 8; ++i)
 	{
+		// If the cell we're on doesn't allow diagonal moves, and i is uneven
+		// continue out of here.
+		// If you take a look at dx, dz and cost, you can see that every uneven index
+		// is a diagonal move.
+		bool isDiagonalMove = (i % 2 != 0);
+		if (cellType == eCellType::NO_DIAGONAL_MOVES && isDiagonalMove)
+			continue;
+
 		const int nx = x + dx[i];
 		const int nz = z + dz[i];
 

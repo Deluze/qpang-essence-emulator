@@ -82,6 +82,7 @@ private:
 	micropather::MicroPather* m_microPather = nullptr;
 
 	MapInfo m_mapInfo = {};
+	MapInfo m_backupMapInfo = {};
 
 	int m_numCellsX = 0;
 	int m_numCellsZ = 0;
