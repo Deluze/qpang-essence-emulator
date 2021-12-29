@@ -2,7 +2,6 @@
 #define CG_PVE_HIT_NPC_TO_OBJECT_H
 
 #include "GameNetEvent.h"
-#include "gc_pve_hit_npc_to_object.hpp"
 
 class CGPvEHitNpcToObject final : public GameNetEvent
 {
