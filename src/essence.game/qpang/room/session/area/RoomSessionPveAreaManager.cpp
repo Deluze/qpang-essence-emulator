@@ -28,7 +28,8 @@ void RoomSessionPveAreaManager::initializeAreas()
 
 	m_areas.clear();
 
-	const auto areaData = Game::instance()->getPveManager()->getAreaDataByMapId(roomSession->getRoom()->getMap());
+	const auto mapId = roomSession->getPveRoundManager()->getMap();
+	const auto areaData = Game::instance()->getPveManager()->getAreaDataByMapId(mapId);
 
 	for (const auto& data : areaData)
 	{

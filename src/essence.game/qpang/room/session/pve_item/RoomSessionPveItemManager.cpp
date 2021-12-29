@@ -27,7 +27,8 @@ void RoomSessionPveItemManager::initializeItems()
 	m_items.clear();
 	m_spawnedItems.clear();
 
-	const auto itemData = Game::instance()->getPveManager()->getItemDataByMapId(roomSession->getRoom()->getMap());
+	const auto mapId = roomSession->getPveRoundManager()->getMap();
+	const auto itemData = Game::instance()->getPveManager()->getItemDataByMapId(mapId);
 
 	for (const auto& [itemId, position] : itemData)
 	{

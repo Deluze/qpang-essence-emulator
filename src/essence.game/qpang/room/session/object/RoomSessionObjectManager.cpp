@@ -42,7 +42,8 @@ void RoomSessionObjectManager::initializeObjects()
 
 	m_objects.clear();
 
-	const auto objectData = Game::instance()->getPveManager()->getObjectDataByMapId(roomSession->getRoom()->getMap());
+	const auto mapId = roomSession->getPveRoundManager()->getMap();
+	const auto objectData = Game::instance()->getPveManager()->getObjectDataByMapId(mapId);
 
 	for (const auto& [uid, type, spawnPosition, endPosition, isMoveable, moveDuration, moveWait, linkedObjectId] : objectData)
 	{

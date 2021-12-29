@@ -31,11 +31,17 @@ public:
 	void tick();
 
 	void checkRoundZeroFinished();
+
+#pragma region Getters
+	uint8_t getMap() const;
+#pragma endregion
 private:
 	void updatePathfinders() const;
 
 	std::weak_ptr<RoomSession> m_roomSession;
 
-	bool m_roundEnded = false;
+	bool m_hasRoundEnded = false;
+
 	uint8_t m_currentRound = 0;
+	uint8_t m_currentMap = 120;
 };

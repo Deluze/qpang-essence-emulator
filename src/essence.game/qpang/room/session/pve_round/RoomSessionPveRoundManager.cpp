@@ -11,6 +11,7 @@
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
+	m_currentMap = roomSession->getRoom()->getMap();
 }
 
 void RoomSessionPveRoundManager::onStart() const
@@ -38,6 +39,8 @@ void RoomSessionPveRoundManager::updatePathfinders() const
 		//roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage3MapInfo);
 		roomSession->getUnderGroundPathfinder()->free();
 		break;
+	default: 
+		break;
 	}
 }
 
@@ -48,16 +51,16 @@ void RoomSessionPveRoundManager::onStartNewRound()
 		return;
 
 	m_currentRound++;
+	m_currentMap++;
 
 	updatePathfinders();
 
 	roomSession->resetTime();
 
-	roomSession->getRoom()->setMap(roomSession->getRoom()->getMap() + 1);
-
 	roomSession->getPveAreaManager()->initializeAreas();
 	roomSession->getObjectManager()->initializeObjects();
 	roomSession->getNpcManager()->initializeNpcs();
+	roomSession->getPveItemManager()->initializeItems();
 
 	// Update health back to full for all playing players.
 	for (const auto& player : roomSession->getPlayingPlayers())
@@ -82,7 +85,7 @@ void RoomSessionPveRoundManager::endRound()
 		return;
 	}
 
-	m_roundEnded = true;
+	m_hasRoundEnded = true;
 
 	roomSession->getPveAreaManager()->removeAll();
 	roomSession->getObjectManager()->removeAll();
@@ -95,7 +98,7 @@ void RoomSessionPveRoundManager::endRound()
 
 void RoomSessionPveRoundManager::tick()
 {
-	if (m_roundEnded)
+	if (m_hasRoundEnded)
 	{
 		return;
 	}
@@ -153,4 +156,9 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 	{
 		endRound();
 	}
+}
+
+uint8_t RoomSessionPveRoundManager::getMap() const
+{
+	return m_currentMap;
 }
