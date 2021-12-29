@@ -252,7 +252,8 @@ bool Pathfinder::canPassThrough(int x, int z, bool ignoreTaken)
 	if (x >= 0 && x < m_numCellsX
 		&& z >= 0 && z < m_numCellsZ)
 	{
-		if (m_mapInfo.m_mapGrid[x][z] == eCellType::MOVEABLE || (ignoreTaken && m_mapInfo.m_mapGrid[x][z] == eCellType::TAKEN_BY_NPC))
+		if (m_mapInfo.m_mapGrid[x][z] == eCellType::MOVEABLE || m_mapInfo.m_mapGrid[x][z] == eCellType::NO_DIAGONAL_MOVES
+			|| (ignoreTaken && m_mapInfo.m_mapGrid[x][z] == eCellType::TAKEN_BY_NPC))
 			return true;
 	}
 
