@@ -659,12 +659,18 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 		}
 	}
 
-	// TODO: Properly create a random seed.
-	// See: https://stackoverflow.com/questions/50662280/c-need-a-good-technique-for-seeding-rand-that-does-not-use-time
-	srand(time(nullptr));
+	std::random_device rd;
+	std::map<int, int> hist;
+
+	// FIXME: Since we're probably going to use this random functionality in other places it would be
+	// smart to put it in some helper method somewhere.
+
+	// Note: See https://stackoverflow.com/questions/50662280/c-need-a-good-technique-for-seeding-rand-that-does-not-use-time
+	// ReSharper disable once CppRedundantCastExpression
+	const std::uniform_int_distribution dist(0, (int) itemDrops.size());
 
 	// ReSharper disable once CppTooWideScopeInitStatement
-	const auto randomItemType = itemDrops[rand() % itemDrops.size()];
+	const auto randomItemType = itemDrops[dist(rd)];
 
 	if (randomItemType != static_cast<uint32_t>(eItemType::NONE))
 	{
