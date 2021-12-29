@@ -86,6 +86,11 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 		return;
 	}
 
+	if (item->isPickedUp())
+	{
+		return;
+	}
+
 	switch (const auto itemType = static_cast<eItemType>(item->getItemId()))
 	{
 	case eItemType::AMMO_CLIP:
@@ -105,7 +110,7 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 
 	roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, playerId, item->getItemId(), uid, 0);
 
-	m_spawnedItems.erase(uid);
+	item->setIsPickedUp(true);
 }
 
 void RoomSessionPveItemManager::removeAll()

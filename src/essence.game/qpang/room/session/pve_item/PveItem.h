@@ -29,6 +29,8 @@ public:
 	 */
 	void setUid(uint32_t uid);
 
+	void setIsPickedUp(bool value);
+
 	/**
 	 * \brief Gets the uid of the item.
 	 * \return The uid of the item.
@@ -49,8 +51,13 @@ public:
 	 */
 	[[nodiscard]]
 	Position getPosition() const;
+
+	[[nodiscard]]
+	bool isPickedUp() const;
 protected:
 	uint32_t m_uid{};
 	uint32_t m_itemId;
 	Position m_position{};
+
+	bool m_isPickedUp;
 };

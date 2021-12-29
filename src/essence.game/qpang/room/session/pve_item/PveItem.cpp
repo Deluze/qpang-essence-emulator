@@ -29,6 +29,11 @@ void PveItem::setUid(const uint32_t uid)
 	m_uid = uid;
 }
 
+void PveItem::setIsPickedUp(const bool value)
+{
+	m_isPickedUp = value;
+}
+
 uint32_t PveItem::getUid() const
 {
 	return m_uid;
@@ -42,4 +47,9 @@ uint32_t PveItem::getItemId() const
 Position PveItem::getPosition() const
 {
 	return m_position;
+}
+
+bool PveItem::isPickedUp() const
+{
+	return m_isPickedUp;
 }
