@@ -44,7 +44,8 @@ void RoomSessionNpcManager::initializeNpcs()
 	m_npcs.clear();
 	m_spawnedNpcs.clear();
 
-	const auto npcData = Game::instance()->getPveManager()->getNpcDataByMapId(roomSession->getRoom()->getMap());
+	const auto mapId = roomSession->getPveRoundManager()->getMap();
+	const auto npcData = Game::instance()->getPveManager()->getNpcDataByMapId(mapId);
 
 	for (auto& data : npcData)
 	{
