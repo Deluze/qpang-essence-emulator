@@ -293,7 +293,7 @@ void PveNpc::handleMovement(const std::shared_ptr<RoomSession>& roomSession)
 		case eNpcTargetType::T_STATIC_REVENGE: break;
 		case eNpcTargetType::T_ESSENCE_PRIORITY: break;
 		case eNpcTargetType::T_DAMAGE: break;
-		default: 
+		default:
 			break;
 		}
 	}
@@ -343,7 +343,7 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 		break;
 	case eNpcMovementType::M_PATH_NODES:
 	case eNpcMovementType::M_MAX:
-	default: 
+	default:
 		break;
 	}
 }
@@ -663,15 +663,19 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 	// See: https://stackoverflow.com/questions/50662280/c-need-a-good-technique-for-seeding-rand-that-does-not-use-time
 	srand(time(nullptr));
 
+	// ReSharper disable once CppTooWideScopeInitStatement
 	const auto randomItemType = itemDrops[rand() % itemDrops.size()];
 
-	const auto randomPveItem = PveItem
+	if (randomItemType != static_cast<uint32_t>(eItemType::NONE))
 	{
-		randomItemType,
-		m_position
-	};
+		const auto randomPveItem = PveItem
+		{
+			randomItemType,
+			m_position
+		};
 
-	roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(randomPveItem));
+		roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(randomPveItem));
+	}
 
 	m_canDropLoot = false;
 }

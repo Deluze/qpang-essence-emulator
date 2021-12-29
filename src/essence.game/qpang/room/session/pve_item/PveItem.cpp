@@ -8,6 +8,7 @@ PveItem::PveItem(const uint32_t itemId, const Position& position) :
 {
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void PveItem::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
 

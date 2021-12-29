@@ -103,7 +103,7 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 		return;
 	}
 
-	roomSession->relayPlaying<GCGameItem>(1, playerId, item->getItemId(), uid, 0);
+	roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, playerId, item->getItemId(), uid, 0);
 
 	m_spawnedItems.erase(uid);
 }
