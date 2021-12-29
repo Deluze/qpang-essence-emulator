@@ -93,7 +93,7 @@ void Pathfinder::setCellTaken(const PathfinderCell& cell, bool taken)
 	{
 		// Set the cell to taken, or to what it was if it's not take anymore by using the
 		// backup map info.
-		m_mapInfo.m_mapGrid[cell.x][cell.z] = taken ? eCellType::TAKEN_BY_NPC : 
+		m_mapInfo.m_mapGrid[cell.x][cell.z] = taken ? eCellType::TAKEN_BY_NPC :
 			m_backupMapInfo.m_mapGrid[cell.x][cell.z];
 
 		m_microPather->Reset();
@@ -252,8 +252,8 @@ bool Pathfinder::canPassThrough(int x, int z, bool ignoreTaken)
 	if (x >= 0 && x < m_numCellsX
 		&& z >= 0 && z < m_numCellsZ)
 	{
-		if (m_mapInfo.m_mapGrid[x][z] == eCellType::MOVEABLE || m_mapInfo.m_mapGrid[x][z] == eCellType::NO_DIAGONAL_MOVES
-			|| (ignoreTaken && m_mapInfo.m_mapGrid[x][z] == eCellType::TAKEN_BY_NPC))
+		auto cellType = m_mapInfo.m_mapGrid[x][z];
+		if (cellType == eCellType::MOVEABLE || cellType == eCellType::NO_DIAGONAL_MOVES || (ignoreTaken && (cellType == eCellType::TAKEN_BY_NPC)))
 			return true;
 	}
 
@@ -309,21 +309,22 @@ void Pathfinder::AdjacentCost(void* node, MP_VECTOR<micropather::StateCost>* nei
 {
 	const int dx[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
 	const int dz[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
-	const float cost[8] = { 1.0f, 1.41f, 1.0f, 1.41f, 1.0f, 1.41f, 1.0f, 1.41f };
+	float cost[8] = { 1.0f, 1.41f, 1.0f, 1.41f, 1.0f, 1.41f, 1.0f, 1.41f };
 
 	int x, z;
 	getCoords(node, &x, &z);
 
-	auto cellType = m_mapInfo.m_mapGrid[x][z];
+	// Using backupMapInfo to get the actual celltype, and not get polluted by "taken"
+	auto cellType = m_backupMapInfo.m_mapGrid[x][z];
+
 	for (int i = 0; i < 8; ++i)
 	{
-		// If the cell we're on doesn't allow diagonal moves, and i is uneven
-		// continue out of here.
+		// If the cell we're on doesn't allow diagonal moves, and i is uneven, make the cost very high
 		// If you take a look at dx, dz and cost, you can see that every uneven index
 		// is a diagonal move.
 		bool isDiagonalMove = (i % 2 != 0);
 		if (cellType == eCellType::NO_DIAGONAL_MOVES && isDiagonalMove)
-			continue;
+			cost[i] = FLT_MAX;
 
 		const int nx = x + dx[i];
 		const int nz = z + dz[i];
