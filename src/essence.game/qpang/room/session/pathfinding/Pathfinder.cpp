@@ -164,7 +164,7 @@ bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const Pathfinder
 
 		// The last cell may be in a "wall"
 		// and still be considered visible
-		if (x != pos2.x && z != pos2.z)
+		if (x != pos2.x || z != pos2.z)
 		{
 			if (!canPassThrough(x, z, true))
 				return false;
@@ -187,7 +187,7 @@ bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const Pathfinder
 
 			// The last cell may be in a "wall"
 			// and still be considered visible
-			if (x != pos2.x && z != pos2.z)
+			if (x != pos2.x || z != pos2.z)
 			{
 				if (!canPassThrough(x, z, true))
 					return false;
@@ -212,7 +212,7 @@ bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const Pathfinder
 
 		// The last cell may be in a "wall"
 		// and still be considered visible
-		if (x != pos2.x && z != pos2.z)
+		if (x != pos2.x || z != pos2.z)
 		{
 			if (!canPassThrough(x, z, true))
 				return false;
@@ -236,7 +236,7 @@ bool Pathfinder::lineOfSightBetween(const PathfinderCell& pos1, const Pathfinder
 
 			// The last cell may be in a "wall"
 			// and still be considered visible
-			if (x != pos2.x && z != pos2.z)
+			if (x != pos2.x || z != pos2.z)
 			{
 				if (!canPassThrough(x, z, true))
 					return false;
