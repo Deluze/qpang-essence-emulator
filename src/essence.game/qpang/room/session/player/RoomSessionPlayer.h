@@ -162,11 +162,11 @@ private:
 
 	Position m_position;
 
-	bool m_floorNumber;
+	bool m_floorNumber = 0;
 
-	uint32_t m_goldenCoinCount;
-	uint32_t m_silverCoinCount;
-	uint32_t m_bronzeCoinCount;
+	uint32_t m_goldenCoinCount = 0;
+	uint32_t m_silverCoinCount = 0;
+	uint32_t m_bronzeCoinCount = 0;
 
 	time_t m_joinTime;
 	time_t m_startTime;
