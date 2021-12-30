@@ -119,7 +119,7 @@ void PveNpc::handleNoMovement(const std::shared_ptr<RoomSession>& roomSession)
 	if (m_targetType == eNpcTargetType::T_STATIC)
 	{
 		const auto currentTime = time(nullptr);
-		if ((m_lastAttackTime + std::ceil(static_cast<float>(m_aiTime) / 1000.f)) > currentTime)
+		if ((m_lastAttackTime + (int)std::ceil(static_cast<float>(m_aiTime) / 1000.f)) > currentTime)
 			return;
 
 		attack(roomSession, m_staticShootingPosition);
@@ -229,7 +229,7 @@ bool PveNpc::canAttackTargetPlayer(Pathfinder* pathFinder) const
 void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
 {
 	const auto currentTime = time(nullptr);
-	if ((m_lastAttackTime + std::ceil(static_cast<float>(m_aiTime) / 1000.f)) > currentTime)
+	if ((m_lastAttackTime + (int)std::ceil(static_cast<float>(m_aiTime) / 1000.f)) > currentTime)
 		return;
 
 	// We can attack!
