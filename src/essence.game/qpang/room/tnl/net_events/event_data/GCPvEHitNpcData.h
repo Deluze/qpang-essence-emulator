@@ -23,6 +23,6 @@ struct GCPvEHitNpcData
 	uint8_t unk_17;
 	uint32_t unk_18;
 	uint16_t damageDealt;
-	bool hasTargetDied;
+	uint8_t killStreak;
 	uint32_t unk_21;
 };
