@@ -592,14 +592,16 @@ void RoomSession::finishPveGame()
 		// Send PvE end result.
 		constexpr bool win = true;
 
-		const uint32_t goldCoinsEarned = roomSessionPlayer->getGoldenCoinCount();
+		const uint32_t goldenCoinsEarned = roomSessionPlayer->getGoldenCoinCount();
 		const uint32_t silverCoinsEarned = roomSessionPlayer->getSilverCoinCount();
 		const uint32_t bronzeCoinsEarned = roomSessionPlayer->getBronzeCoinCount();
 
 		constexpr uint32_t bestTimeLeftInMs = 1000;
-		constexpr uint32_t currentTimeLeftInMs = 2000;
 
-		roomSessionPlayer->post(new GCMasterLog(player->getId(), win, goldCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftInMs));
+		const auto currentTime = time(nullptr);
+		const auto currentTimeLeftMs = static_cast<uint32_t>((m_endTime - currentTime) * 1000);
+
+		roomSessionPlayer->post(new GCMasterLog(player->getId(), win, goldenCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftMs));
 	}
 
 	m_room->finish();

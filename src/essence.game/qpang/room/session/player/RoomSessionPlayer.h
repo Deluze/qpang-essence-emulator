@@ -162,7 +162,7 @@ private:
 
 	Position m_position;
 
-	bool m_floorNumber = 0;
+	uint8_t m_floorNumber = 0;
 
 	uint32_t m_goldenCoinCount = 0;
 	uint32_t m_silverCoinCount = 0;
