@@ -193,8 +193,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	if (hasTargetDied)
 	{
 		killNpc(targetNpcUid);
-
-		// TODO: Relay the kill combo.
+		data.roomSessionPlayer->addStreak();
 	}
 
 	const auto gcPvEHitNpcData = GCPvEHitNpcData
@@ -214,7 +213,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.unk_18,
 		data.unk_19,
 		damageDealt,
-		hasTargetDied,
+		hasTargetDied ? (uint8_t)data.roomSessionPlayer->getStreak() : (uint8_t)0,
 		0
 	};
 
