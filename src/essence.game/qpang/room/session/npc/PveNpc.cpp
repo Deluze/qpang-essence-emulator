@@ -118,13 +118,10 @@ void PveNpc::handleNoMovement(const std::shared_ptr<RoomSession>& roomSession)
 {
 	if (m_targetType == eNpcTargetType::T_STATIC)
 	{
-		const auto currentTime = time(nullptr);
-		if ((m_lastAttackTime + (int)std::ceil(static_cast<float>(m_aiTime) / 1000.f)) > currentTime)
+		if (!canShoot())
 			return;
 
 		attack(roomSession, m_staticShootingPosition);
-
-		m_lastAttackTime = currentTime;
 	}
 }
 
@@ -226,10 +223,19 @@ bool PveNpc::canAttackTargetPlayer(Pathfinder* pathFinder) const
 	return pathFinder->lineOfSightBetween(m_currentCell, playerCell);
 }
 
-void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
+bool PveNpc::canShoot()
 {
 	const auto currentTime = time(nullptr);
 	if ((m_lastAttackTime + (int)std::ceil(static_cast<float>(m_aiTime) / 1000.f)) > currentTime)
+		return false;
+
+	m_lastAttackTime = currentTime;
+	return true;
+}
+
+void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
+{
+	if (!canShoot())
 		return;
 
 	// We can attack!
@@ -243,8 +249,6 @@ void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
 	};
 
 	attack(roomSession, targetPosition);
-
-	m_lastAttackTime = currentTime;
 }
 
 void PveNpc::handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder)

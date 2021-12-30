@@ -200,6 +200,8 @@ public:
 #pragma endregion
 
 private:
+	bool canShoot();
+
 	void handleNoMovement(const std::shared_ptr<RoomSession>& roomSession);
 
 	void improveTargetCell(Pathfinder* pathFinder);
