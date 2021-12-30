@@ -70,13 +70,17 @@ public:
 
 		roomSessionPlayer->setPosition({ xPos, yPos, zPos });
 
-		// Note: If this checking causes too much lag or whatever, move it back to PveAreaManager::tick method.
-		for (const auto& area : roomSession->getPveAreaManager()->getAreas())
+		const auto room = roomPlayer->getRoom();
+		if (room && room->getMode() == GameMode::PVE)
 		{
-			AABBHelper::isPositionInArea(roomSessionPlayer->getPosition(), area->getMinBound(), area->getMaxBound())
-				&& area->getFloorNumber() == roomSessionPlayer->getFloorNumber()
-				? area->onAreaEnter(roomSessionPlayer)
-				: area->onAreaExit(roomSessionPlayer);
+			// Note: If this checking causes too much lag or whatever, move it back to PveAreaManager::tick method.
+			for (const auto& area : roomSession->getPveAreaManager()->getAreas())
+			{
+				AABBHelper::isPositionInArea(roomSessionPlayer->getPosition(), area->getMinBound(), area->getMaxBound())
+					&& area->getFloorNumber() == roomSessionPlayer->getFloorNumber()
+					? area->onAreaEnter(roomSessionPlayer)
+					: area->onAreaExit(roomSessionPlayer);
+			}
 		}
 
 		// Convert pos to cell pos
