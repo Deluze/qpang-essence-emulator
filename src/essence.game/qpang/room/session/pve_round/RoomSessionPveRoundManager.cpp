@@ -62,11 +62,9 @@ void RoomSessionPveRoundManager::onStartNewRound()
 	roomSession->getNpcManager()->initializeNpcs();
 	roomSession->getPveItemManager()->initializeItems();
 
-	// Update health back to full for all playing players.
+	// Respawn all players
 	for (const auto& player : roomSession->getPlayingPlayers())
-	{
-		player->setHealth(player->getDefaultHealth(), true);
-	}
+		player->respawn();
 
 	// Relay the new round to all players.
 	roomSession->relayPlaying<GCPvENewRound>();
