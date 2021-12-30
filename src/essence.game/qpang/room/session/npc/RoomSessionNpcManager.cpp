@@ -187,7 +187,10 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	const auto playerId = data.roomSessionPlayer->getPlayer()->getId();
 	const auto targetNpcUid = data.targetNpc->getUid();
 
-	const auto damageDealt = data.targetNpc->takeDamage(data.weaponUsed.damage);
+	// FIXME: Temporarily added a 10% damage reduction until we mix in body parts with damage dealt.
+	const auto damage = static_cast<uint16_t>(data.weaponUsed.damage * 0.90);
+
+	const auto damageDealt = data.targetNpc->takeDamage(damage);
 	const auto hasTargetDied = data.targetNpc->isDead();
 
 	if (hasTargetDied)
@@ -195,6 +198,10 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		killNpc(targetNpcUid);
 		data.roomSessionPlayer->addStreak();
 	}
+
+	const auto killStreak = hasTargetDied
+		? std::clamp<uint8_t>(data.roomSessionPlayer->getStreak(), 0, 255)
+		: static_cast<uint8_t>(0);
 
 	const auto gcPvEHitNpcData = GCPvEHitNpcData
 	{
@@ -213,7 +220,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.unk_18,
 		data.unk_19,
 		damageDealt,
-		hasTargetDied ? std::clamp<uint8_t>(data.roomSessionPlayer->getStreak(), 0, 255) : (uint8_t)0,
+		killStreak,
 		0
 	};
 
