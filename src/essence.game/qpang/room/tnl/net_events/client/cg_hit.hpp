@@ -97,6 +97,13 @@ public:
 				return;
 			}
 
+			if (const auto room = roomPlayer->getRoom(); room != nullptr)
+			{
+				// Don't damage eachother in PVE
+				if (room->getMode() == GameMode::PVE)
+					return;
+			}
+				
 			if (const auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
 			{
 				if (!session->getWeaponManager()->hasWeapon(weaponId) && !isTrap(weaponId))

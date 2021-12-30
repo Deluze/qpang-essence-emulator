@@ -67,6 +67,19 @@ public:
 
 			if (roomSession != nullptr)
 			{
+				const auto room = roomPlayer->getRoom();
+				if (room && room->getMode() == GameMode::PVE)
+				{
+					// Note: If this checking causes too much lag or whatever, move it back to PveAreaManager::tick method.
+					for (const auto& area : roomSession->getPveAreaManager()->getAreas())
+					{
+						AABBHelper::isPositionInArea(session->getPosition(), area->getMinBound(), area->getMaxBound())
+							&& area->getFloorNumber() == session->getFloorNumber()
+							? area->onAreaEnter(session)
+							: area->onAreaExit(session);
+					}
+				}
+
 				roomSession->relayPlayingExcept<GCMove>(player->getId(), playerId, cmd, xPosition, yPosition, zPosition, unk_04, unk_05, unk_06, unk_07, unk_08, unk_09, unk_10);
 			}
 		}
