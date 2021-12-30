@@ -213,7 +213,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.unk_18,
 		data.unk_19,
 		damageDealt,
-		hasTargetDied ? (uint8_t)data.roomSessionPlayer->getStreak() : (uint8_t)0,
+		hasTargetDied ? std::clamp<uint8_t>(data.roomSessionPlayer->getStreak(), 0, 255) : (uint8_t)0,
 		0
 	};
 
