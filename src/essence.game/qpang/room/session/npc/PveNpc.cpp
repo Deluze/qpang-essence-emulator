@@ -63,6 +63,7 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 		if (npc->didPathFinish())
 		{
 			npc->clearPath();
+			npc->setPosition(pathFinder, currCell);
 			return;
 		}
 
