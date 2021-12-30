@@ -152,7 +152,8 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 
 	if (finishedStage)
 	{
-		endRound();
+		//endRound();
+		roomSession->finish();
 	}
 }
 
