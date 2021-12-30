@@ -27,7 +27,7 @@ public:
 	U8 unk_17; // 151
 	U32 unk_18; // 152 
 	U16 damageDealt; // 156
-	U8 hasTargetDied; // 158
+	U8 killStreak; // 158
 	U32 unk_21; // 160 // ?
 
 	GCPvEHitNpc() : GameNetEvent{ GC_PVE_HIT_NPC, GuaranteedOrdered, DirServerToClient } {}
@@ -52,7 +52,7 @@ public:
 		unk_17(data.unk_17),
 		unk_18(data.unk_18),
 		damageDealt(data.damageDealt),
-		hasTargetDied(static_cast<uint8_t>(data.hasTargetDied)),
+		killStreak(data.killStreak),
 		unk_21(data.unk_21)
 	{
 
@@ -79,7 +79,7 @@ public:
 		bstream->write(unk_17);
 		bstream->write(unk_18);
 		bstream->write(damageDealt);
-		bstream->write(hasTargetDied);
+		bstream->write(killStreak);
 		bstream->write(unk_21);
 	}
 
