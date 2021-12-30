@@ -6,6 +6,8 @@
 
 #include "Maps.h"
 
+#include "gc_pve_move_npc.hpp"
+
 class CGMoveReport final : public GameNetEvent
 {
 	typedef NetEvent Parent;
@@ -86,7 +88,7 @@ public:
 		// Convert pos to cell pos
 		const int cellX = ((xPos - -43.220) / 1.441);
 		const int cellZ = (((zPos - 40.823) / 1.399) * -1.f);
-		//roomSessionPlayer->send<GCPvEMoveNpc>(50, (uint16_t)cellX, (uint16_t)cellZ);
+		roomSessionPlayer->send<GCPvEMoveNpc>(1337, (uint16_t)cellX, (uint16_t)cellZ);
 
 		if (Maps::recordMoves)
 		{
