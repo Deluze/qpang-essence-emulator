@@ -97,13 +97,6 @@ public:
 				return;
 			}
 
-			if (const auto room = roomPlayer->getRoom(); room != nullptr)
-			{
-				// Don't damage eachother in PVE
-				if (room->getMode() == GameMode::PVE)
-					return;
-			}
-				
 			if (const auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
 			{
 				if (!session->getWeaponManager()->hasWeapon(weaponId) && !isTrap(weaponId))
@@ -181,6 +174,12 @@ public:
 		}
 		else
 		{
+			// Don't damage eachother in PVE
+			if (roomSession->getRoom()->getMode() == GameMode::PVE)
+			{
+				return;
+			}
+
 			constexpr auto octoMineItemId = 1095434246;
 
 			if (weaponId != octoMineItemId) // Jump mine

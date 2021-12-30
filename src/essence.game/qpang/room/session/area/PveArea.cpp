@@ -64,7 +64,7 @@ void PveArea::onAreaEnter(const std::shared_ptr<RoomSessionPlayer>& roomSessionP
 		initialize(roomSessionPlayer->getRoomSession());
 	}
 
-	printf("[+] Player %u has entered area %u\n", playerId, m_uid);
+	//printf("[+] Player %u has entered area %u\n", playerId, m_uid);
 }
 
 void PveArea::onAreaExit(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer)
@@ -81,5 +81,5 @@ void PveArea::onAreaExit(const std::shared_ptr<RoomSessionPlayer>& roomSessionPl
 
 	m_players.erase(it);
 
-	printf("[-] Player %u has exited area %u\n", playerId, m_uid);
+	//printf("[-] Player %u has exited area %u\n", playerId, m_uid);
 }
