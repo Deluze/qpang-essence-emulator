@@ -44,7 +44,6 @@ public:
 	~Pathfinder();
 
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
-	void free();
 
 	void updateMapInfo(const MapInfo& mapInfo);
 
@@ -79,7 +78,7 @@ public:
 	void AdjacentCost(void* node, MP_VECTOR<micropather::StateCost>* neighbors) override;
 	void PrintStateInfo(void* node) override;
 private:
-	micropather::MicroPather* m_microPather = nullptr;
+	std::unique_ptr<micropather::MicroPather> m_microPather = nullptr;
 
 	MapInfo m_mapInfo = {};
 	MapInfo m_backupMapInfo = {};

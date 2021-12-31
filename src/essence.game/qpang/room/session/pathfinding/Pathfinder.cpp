@@ -12,25 +12,20 @@ enum eCellType : uint8_t
 
 Pathfinder::Pathfinder()
 {
-	// Use 60 * 60, as all the grids we're going to be using are 60x60.
+	// Use 85 * 85, as all the grids we're going to be using are max 85x85.
 	// Increase if they're bigger, however, according to official documentation
 	// if the grid consists of more than a few thousand nodes, set it to 1/4 of the amount of nodes.
-	m_microPather = new micropather::MicroPather(this, 60 * 60, 8, true);
+	m_microPather = std::make_unique<micropather::MicroPather>(this, 85 * 85, 8, true);
 }
 
 Pathfinder::~Pathfinder()
 {
-	free();
+
 }
 
 void Pathfinder::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
-}
-
-void Pathfinder::free()
-{
-	delete m_microPather;
 }
 
 void Pathfinder::updateMapInfo(const MapInfo& mapInfo)
