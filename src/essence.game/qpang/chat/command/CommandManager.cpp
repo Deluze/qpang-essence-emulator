@@ -32,6 +32,7 @@
 #include "qpang/chat/command/commands/SpectateCommand.h"
 #include "qpang/chat/command/commands/FakeDeathCommand.h"
 #include "qpang/chat/command/commands/FakeDeathAllCommand.h"
+#include "qpang/chat/command/commands/PveMakePublicCommand.h"
 
 void CommandManager::initialize()
 {
@@ -65,6 +66,7 @@ void CommandManager::initialize()
 		{u"spawnnpc", new SpawnNpcCommand()},
 		{u"killnpc", new KillNpcCommand()},
 		{u"endround", new PveEndRoundCommand()},
+		{u"makepublic", new PveMakePublic()},
 	};
 }
 
