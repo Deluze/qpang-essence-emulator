@@ -10,14 +10,14 @@ class GCPvESpecialAttack final : public GameNetEvent
 public:
 	U32 npcUid = 0; // 88
 	U32 unk_02 = 0; // 92
-	U8 unk_03 = 0; // 96
+	U8 resetAttack = 0; // 96 1: npc goes to previous pos, 0: npc goes to y 20
 
 	GCPvESpecialAttack() : GameNetEvent{ GC_PVE_SPECIAL_ATTACK, GuaranteedOrdered, DirServerToClient } {}
-	GCPvESpecialAttack(const uint32_t npcUid, const uint32_t unk02, const uint8_t unk03)
+	GCPvESpecialAttack(const uint32_t npcUid, const uint32_t unk02, const uint8_t resetAttack)
 		: GameNetEvent{ GC_PVE_SPECIAL_ATTACK, GuaranteedOrdered, DirServerToClient },
 		npcUid(npcUid),
 		unk_02(unk02),
-		unk_03(unk03)
+		resetAttack(resetAttack)
 	{
 	}
 
