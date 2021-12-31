@@ -1007,8 +1007,17 @@ void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 	const auto isTeamMode = getGameMode()->isTeamMode();
 	const uint8_t team = (isTeamMode ? player->getTeam() : 0);
 
-	const auto spawn = Game::instance()->getSpawnManager()->
-		getLeastPopulatedSpawn(m_room->getMap(), team, getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team), shared_from_this());
+	Spawn spawn = {};
+	if (m_room->getMode() == GameMode::Mode::PVE)
+	{
+		const auto spawn = Game::instance()->getSpawnManager()->
+			getLeastPopulatedSpawn(getPveRoundManager()->getMap(), team, getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team), shared_from_this());
+	}
+	else
+	{
+		const auto spawn = Game::instance()->getSpawnManager()->
+			getLeastPopulatedSpawn(m_room->getMap(), team, getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team), shared_from_this());
+	}
 
 	setLastRespawnLocation(spawn);
 
