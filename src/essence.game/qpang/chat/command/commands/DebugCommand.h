@@ -84,19 +84,19 @@ public:
 		{
 			std::cout << "inline std::vector<std::vector<uint8_t>> debugWorldLayout = {" << std::endl;
 
-			for (int x = 0; x < 60; ++x)
+			for (int x = 0; x < Maps::debugWorldLayout.size(); ++x)
 			{
 				std::cout << "	{ ";
 
-				for (int z = 0; z < 60; ++z)
+				for (int z = 0; z < Maps::debugWorldLayout[0].size(); ++z)
 				{
-					if (z == 59)
+					if (z == Maps::debugWorldLayout[0].size() - 1)
 						std::cout << (int)Maps::debugWorldLayout[x][z];
 					else
 						std::cout << (int)Maps::debugWorldLayout[x][z] << ", ";
 				}
 
-				if (x == 59)
+				if (x == Maps::debugWorldLayout.size() - 1)
 					std::cout << " }" << std::endl;
 				else
 					std::cout << " }," << std::endl;
