@@ -45,17 +45,17 @@ void RoomSessionObjectManager::initializeObjects()
 	const auto mapId = roomSession->getPveRoundManager()->getMap();
 	const auto objectData = Game::instance()->getPveManager()->getObjectDataByMapId(mapId);
 
-	for (const auto& [uid, type, spawnPosition, endPosition, isMoveable, moveDuration, moveWait, linkedObjectId] : objectData)
+	for (const auto& [uid, type, spawnPosition, endPosition, initialHealth, isMoveable, moveDuration, moveWait, linkedObjectId] : objectData)
 	{
 		m_objects[uid] = (isMoveable)
-			? std::make_shared<MoveableObject>(uid, type, spawnPosition, endPosition, moveDuration, moveWait, linkedObjectId)
-			: std::make_shared<PveObject>(uid, type, spawnPosition, linkedObjectId);
+			? std::make_shared<MoveableObject>(uid, type, spawnPosition, endPosition, moveDuration, moveWait, linkedObjectId, initialHealth)
+			: std::make_shared<PveObject>(uid, type, spawnPosition, linkedObjectId, initialHealth);
 
-		roomSession->relayPlaying<GCPvEObjectInit>(static_cast<U32>(type), uid, spawnPosition.x, spawnPosition.y, spawnPosition.z, 0);
+		roomSession->relayPlaying<GCPvEObjectInit>(static_cast<U32>(type), uid, spawnPosition.x, spawnPosition.y, spawnPosition.z, initialHealth);
 	}
 }
 
-uint32_t RoomSessionObjectManager::spawnObject(std::shared_ptr<PveObject> object)
+uint32_t RoomSessionObjectManager::spawnObject(const std::shared_ptr<PveObject>& object)
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -65,7 +65,10 @@ uint32_t RoomSessionObjectManager::spawnObject(std::shared_ptr<PveObject> object
 	}
 
 	const auto objectUid = (m_objects.size() + 1);
-	roomSession->relayPlaying<GCPvEObjectInit>(static_cast<U32>(object->getType()), objectUid, object->getPosition().x, object->getPosition().y, object->getPosition().z, 0);
+
+	roomSession->relayPlaying<GCPvEObjectInit>(static_cast<U32>(object->getType()), objectUid,
+		object->getPosition().x, object->getPosition().y, object->getPosition().z,
+		object->getInitialHealth());
 
 	m_objects[objectUid] = object;
 
@@ -88,7 +91,7 @@ void RoomSessionObjectManager::despawnObject(const uint32_t uid)
 		return;
 	}
 
-	roomSession->relayPlaying<GCPvEObjectInit>(0, uid, object->getPosition().x, object->getPosition().y, object->getPosition().z, 0);
+	roomSession->relayPlaying<GCPvEObjectInit>(0, uid, object->getPosition().x, object->getPosition().y, object->getPosition().z, object->getHealth());
 
 	m_objects.erase(uid);
 }
@@ -159,9 +162,9 @@ std::shared_ptr<PveObject> RoomSessionObjectManager::findObjectByUid(const uint3
 
 void RoomSessionObjectManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session)
 {
-	for (const auto& object : m_objects)
+	for (const auto& [uid, object] : m_objects)
 	{
-		session->send<GCPvEObjectInit>(static_cast<U32>(object.second->getType()), object.first, object.second->getPosition().x, object.second->getPosition().y, object.second->getPosition().z, 0);
+		session->send<GCPvEObjectInit>(static_cast<U32>(object->getType()), uid, object->getPosition().x, object->getPosition().y, object->getPosition().z, object->getHealth());
 	}
 }
 

@@ -31,7 +31,7 @@ public:
 	 * \param object The object you want to spawn in.
 	 * \returns The uid of the spawned in object.
 	 */
-	uint32_t spawnObject(std::shared_ptr<PveObject> object);
+	uint32_t spawnObject(const std::shared_ptr<PveObject>& object);
 
 	/**
 	 * \brief De-spawns an object from the game and removes it from the objects map.
