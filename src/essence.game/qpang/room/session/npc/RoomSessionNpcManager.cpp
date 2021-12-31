@@ -196,6 +196,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	if (hasTargetDied)
 	{
 		killNpc(targetNpcUid);
+
 		data.roomSessionPlayer->addStreak();
 	}
 
@@ -221,7 +222,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.unk_19,
 		damageDealt,
 		killStreak,
-		0
+		data.targetNpc->getHealth()
 	};
 
 	roomSession->relayPlaying<GCPvEHitNpc>(gcPvEHitNpcData);

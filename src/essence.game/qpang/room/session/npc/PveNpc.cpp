@@ -5,6 +5,7 @@
 #include "gc_pve_die_npc.hpp"
 #include "gc_pve_move_npc.hpp"
 #include "gc_pve_npc_init.hpp"
+#include "RandomHelper.h"
 #include "RoomSession.h"
 #include "TimeHelper.h"
 
@@ -664,29 +665,23 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 		}
 	}
 
-	std::random_device rd;
-	std::map<int, int> hist;
+	const auto randomIndex = RandomHelper::getRandomNumber(0, itemDrops.size() - 1);
+	const auto randomItemId = itemDrops[randomIndex];
 
-	// FIXME: Since we're probably going to use this random functionality in other places it would be
-	// smart to put it in some helper method somewhere.
-
-	// Note: See https://stackoverflow.com/questions/50662280/c-need-a-good-technique-for-seeding-rand-that-does-not-use-time
-	// ReSharper disable once CppRedundantCastExpression
-	const std::uniform_int_distribution dist(0, (int) itemDrops.size());
-
-	// ReSharper disable once CppTooWideScopeInitStatement
-	const auto randomItemType = itemDrops[dist(rd)];
-
-	if (randomItemType != static_cast<uint32_t>(eItemType::NONE))
+	if (randomItemId == static_cast<uint32_t>(eItemId::NONE))
 	{
-		const auto randomPveItem = PveItem
-		{
-			randomItemType,
-			m_position
-		};
+		m_canDropLoot = false;
 
-		roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(randomPveItem));
+		return;
 	}
+
+	const auto randomPveItem = PveItem
+	{
+		randomItemId,
+		m_position
+	};
+
+	roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(randomPveItem));
 
 	m_canDropLoot = false;
 }
