@@ -15,6 +15,11 @@ public:
 	PveObject(uint32_t uid, eObjectType type, const Position& position, uint32_t linkedObjectId, uint16_t initialHealth);
 
 	virtual void tick(const std::shared_ptr<RoomSession>& roomSession);
+
+	void takeDamage(uint16_t damage);
+
+	void onHitByNpc(const std::shared_ptr<RoomSession>& roomSession);
+
 	virtual void onEvent(const std::shared_ptr<RoomSession>& roomSession);
 
 	[[nodiscard]]

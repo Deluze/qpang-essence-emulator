@@ -7,7 +7,6 @@ class CGPvEHitNpcToObject final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	// unk_01 is 0 all of the time so far.
 	U64 unk_01; // 88 92
 	U32 objectUid; // 96
 
@@ -23,8 +22,35 @@ public:
 
 	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		// TODO: Handle CGPvEHitNpcToObject by sending GCPvEHitNpcToObject.
-		//player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession()->relayPlaying<GCPvEHitNpcToObject>(objectUid, 0, 100);
+		const auto roomPlayer = player->getRoomPlayer();
+
+		if (roomPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
+
+		if (roomSessionPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSession = roomSessionPlayer->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		const auto object = roomSession->getObjectManager()->findObjectByUid(objectUid);
+
+		if (object == nullptr)
+		{
+			return;
+		}
+
+		object->onHitByNpc(roomSession);
 	}
 
 	void process(EventConnection* ps) override

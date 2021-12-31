@@ -2,7 +2,6 @@
 #define CG_PVE_HIT_OBJECT_H
 
 #include "GameNetEvent.h"
-#include "gc_pve_hit_object.hpp"
 
 class CGPvEHitObject final : public GameNetEvent
 {
@@ -27,12 +26,10 @@ public:
 
 	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-		std::cout << "Received a CGPvEHitObject event:" << std::endl;
-		std::cout << "PlayerId: " << playerId << ", ObjectUid: " << objectUid << ", WeaponItemId: " << weaponItemId
-			<< ", Cmd: " << static_cast<int>(cmd) << std::endl;
-
 		// TODO: This works but, we need to look at the object type and stuff to properly handle this event.
 		//player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession()->relayPlaying<GCPvEHitObject>(playerId, objectUid, weaponItemId, cmd, 10);
+
+		std::cout << "Received an unhandled CGPvEHitObject event." << std::endl;
 	}
 
 	void process(EventConnection* ps) override
