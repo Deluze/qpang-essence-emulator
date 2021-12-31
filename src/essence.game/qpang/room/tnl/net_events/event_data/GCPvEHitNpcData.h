@@ -24,5 +24,5 @@ struct GCPvEHitNpcData
 	uint32_t unk_18;
 	uint16_t damageDealt;
 	uint8_t killStreak;
-	uint32_t unk_21;
+	uint32_t remainingHealth;
 };
