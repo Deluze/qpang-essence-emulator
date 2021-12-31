@@ -28,7 +28,7 @@ public:
 	U32 unk_18; // 152 
 	U16 damageDealt; // 156
 	U8 killStreak; // 158
-	U32 unk_21; // 160 // ?
+	U32 remainingHealth; // 160
 
 	GCPvEHitNpc() : GameNetEvent{ GC_PVE_HIT_NPC, GuaranteedOrdered, DirServerToClient } {}
 
@@ -53,7 +53,7 @@ public:
 		unk_18(data.unk_18),
 		damageDealt(data.damageDealt),
 		killStreak(data.killStreak),
-		unk_21(data.unk_21)
+		remainingHealth(data.remainingHealth)
 	{
 
 	}
@@ -80,7 +80,7 @@ public:
 		bstream->write(unk_18);
 		bstream->write(damageDealt);
 		bstream->write(killStreak);
-		bstream->write(unk_21);
+		bstream->write(remainingHealth);
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override {}

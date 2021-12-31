@@ -8,15 +8,15 @@ class GCPvEHitNpcToObject final : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 	U32 objectUid; // 88
-	U16 unk_02; // 92
+	U16 remainingHealth; // 92
 	U16 damageDealt; // 94
 
 	GCPvEHitNpcToObject() : GameNetEvent{ GC_PVE_HIT_NPC_TO_OBJECT, GuaranteedOrdered,DirServerToClient } {}
 
-	GCPvEHitNpcToObject(const uint32_t objectUid, const uint16_t unk02, const uint16_t damageDealt)
+	GCPvEHitNpcToObject(const uint32_t objectUid, const uint16_t remainingHealth, const uint16_t damageDealt)
 		: GameNetEvent{ GC_PVE_HIT_NPC_TO_OBJECT, GuaranteedOrdered,DirServerToClient },
 		objectUid(objectUid),
-		unk_02(unk02),
+		remainingHealth(remainingHealth),
 		damageDealt(damageDealt)
 	{
 	}
@@ -24,7 +24,7 @@ public:
 	void pack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->write(objectUid);
-		bstream->write(unk_02);
+		bstream->write(remainingHealth);
 		bstream->write(damageDealt);
 	}
 
