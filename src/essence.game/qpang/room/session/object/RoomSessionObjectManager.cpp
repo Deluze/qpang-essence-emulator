@@ -51,7 +51,7 @@ void RoomSessionObjectManager::initializeObjects()
 			? std::make_shared<MoveableObject>(uid, type, spawnPosition, endPosition, moveDuration, moveWait, linkedObjectId)
 			: std::make_shared<PveObject>(uid, type, spawnPosition, linkedObjectId);
 
-		spawnObject(m_objects[uid]);
+		roomSession->relayPlaying<GCPvEObjectInit>(static_cast<U32>(type), uid, spawnPosition.x, spawnPosition.y, spawnPosition.z, 0);
 	}
 }
 
