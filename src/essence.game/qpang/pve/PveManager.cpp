@@ -249,6 +249,7 @@ void PveManager::initializeObjects()
 		",pve_object_spawns.end_position_x AS EndPositionX "
 		",pve_object_spawns.end_position_y AS EndPositionY "
 		",pve_object_spawns.end_position_z AS EndPositionZ "
+		",pve_object_spawns.initial_health AS InitialHealth "
 		",pve_object_spawns.is_moveable AS IsMoveable "
 		",pve_object_spawns.move_duration AS MoveDuration "
 		",pve_object_spawns.move_wait AS MoveWait "
@@ -267,19 +268,20 @@ void PveManager::initializeObjects()
 			result->getInt("ObjectUid"),
 			static_cast<eObjectType>(result->getInt("ObjectType")),
 			Position{
-					result->getFloat("SpawnPositionX"),
-					result->getFloat("SpawnPositionY"),
-					result->getFloat("SpawnPositionZ"),
-				},
+				result->getFloat("SpawnPositionX"),
+				result->getFloat("SpawnPositionY"),
+				result->getFloat("SpawnPositionZ"),
+			},
 			Position{
-					result->getFloat("EndPositionX"),
-					result->getFloat("EndPositionY"),
-					result->getFloat("EndPositionZ"),
-				},
-				result->getFlag("IsMoveable"),
+				result->getFloat("EndPositionX"),
+				result->getFloat("EndPositionY"),
+				result->getFloat("EndPositionZ"),
+			},
+			result->getShort("InitialHealth"),
+			result->getFlag("IsMoveable"),
 			result->getInt("MoveDuration"),
 			result->getInt("MoveWait"),
-				result->getInt("LinkedObject")
+			result->getInt("LinkedObject")
 		};
 
 		const auto mapId = result->getInt("MapId");

@@ -12,16 +12,12 @@ enum class eObjectType : uint32_t {
 struct PveObjectData
 {
 	uint32_t uid;
-
 	eObjectType type;
-
 	Position spawnPosition;
 	Position endPosition;
-
+	uint16_t initialHealth;
 	bool isMoveable;
-
 	uint32_t moveDuration;
 	uint32_t moveWait;
-
 	uint32_t linkedObjectId;
 };
