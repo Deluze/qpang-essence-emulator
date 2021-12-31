@@ -28,7 +28,7 @@ public:
 	U32 unk_18; // 152 
 	U16 damageDealt; // 156
 	U8 killStreak; // 158
-	U32 unk_21; // 160 // ?
+	U32 remainingHealth; // 160
 
 	GCPvEHitNpc() : GameNetEvent{ GC_PVE_HIT_NPC, GuaranteedOrdered, DirServerToClient } {}
 
