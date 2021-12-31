@@ -20,12 +20,17 @@ Pathfinder::Pathfinder()
 
 Pathfinder::~Pathfinder()
 {
-
+	free();
 }
 
 void Pathfinder::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
+}
+
+void Pathfinder::free()
+{
+	m_microPather.reset();
 }
 
 void Pathfinder::updateMapInfo(const MapInfo& mapInfo)

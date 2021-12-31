@@ -44,6 +44,7 @@ public:
 	~Pathfinder();
 
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
+	void free();
 
 	void updateMapInfo(const MapInfo& mapInfo);
 
