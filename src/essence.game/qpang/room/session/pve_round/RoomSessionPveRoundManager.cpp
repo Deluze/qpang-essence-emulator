@@ -7,6 +7,7 @@
 #include <qpang/helpers/AABBHelper.h>
 
 #include "Maps.h"
+#include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -32,7 +33,7 @@ void RoomSessionPveRoundManager::updatePathfinders() const
 		roomSession->getUnderGroundPathfinder()->updateMapInfo(Maps::pveStage1UnderGroundMapInfo);
 		break;
 	case 1:
-		//roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage2MapInfo);
+		roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage2MapInfo);
 		roomSession->getUnderGroundPathfinder()->free();
 		break;
 	case 2:
@@ -57,17 +58,19 @@ void RoomSessionPveRoundManager::onStartNewRound()
 
 	roomSession->resetTime();
 
-	roomSession->getPveAreaManager()->initializeAreas();
-	roomSession->getObjectManager()->initializeObjects();
-	roomSession->getNpcManager()->initializeNpcs();
-	roomSession->getPveItemManager()->initializeItems();
+	// Relay the new round to all players.
+	roomSession->relayPlaying<GCPvENewRound>();
 
 	// Respawn all players
 	for (const auto& player : roomSession->getPlayingPlayers())
 		player->respawn();
 
-	// Relay the new round to all players.
-	roomSession->relayPlaying<GCPvENewRound>();
+	roomSession->getPveAreaManager()->initializeAreas();
+	roomSession->getObjectManager()->initializeObjects();
+	roomSession->getNpcManager()->initializeNpcs();
+	roomSession->getPveItemManager()->initializeItems();
+
+	//roomSession->relayPlaying<GCPvENpcInit>(1, 1337, Position{ 0,0,0 }, 0);
 }
 
 void RoomSessionPveRoundManager::endRound()
