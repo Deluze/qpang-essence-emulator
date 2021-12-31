@@ -127,10 +127,13 @@ public:
 
 			if (room->getMode() == GameMode::Mode::PVE)
 			{
-				if (player->getName().compare(u"hinnie") != 0 && player->getName().compare(u"Jarrett") != 0)
+				if (!room->isPublicPveRoom())
 				{
-					player->broadcast(u"Sorry, but you can't join a pve room.");
-					return;
+					if (player->getName().compare(u"hinnie") != 0 && player->getName().compare(u"Jarrett") != 0)
+					{
+						player->broadcast(u"Sorry, but you can't join this pve room.");
+						return;
+					}
 				}
 
 				// FIXME: We should also disconnect the connection, otherwise the second time the player sends this packet
