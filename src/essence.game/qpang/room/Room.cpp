@@ -34,7 +34,8 @@ Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, cons
 	m_scoreTime(10),
 	m_isPointsGame(false),
 	m_isPlaying(false),
-	m_isEventRoom(false)
+	m_isEventRoom(false),
+	m_isPublicPveRoom(false)
 {
 	m_modeManager = Game::instance()->getRoomManager()->getGameModeManager()->get(mode);
 	m_isReloadGlitchEnabled = false;
@@ -624,4 +625,14 @@ bool Room::isReloadGlitchEnabled() const
 void Room::setIsReloadGlitchEnabled(const bool isReloadGlitchEnabled)
 {
 	m_isReloadGlitchEnabled = isReloadGlitchEnabled;
+}
+
+bool Room::isPublicPveRoom() const
+{
+	return m_isPublicPveRoom;
+}
+
+void Room::setIsPublicPveRoom(bool isPublicPveRoom)
+{
+	m_isPublicPveRoom = isPublicPveRoom;
 }
