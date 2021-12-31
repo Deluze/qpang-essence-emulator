@@ -86,9 +86,9 @@ public:
 		}
 
 		// Convert pos to cell pos
-		const int cellX = ((xPos - -43.220) / 1.441);
-		const int cellZ = (((zPos - 40.823) / 1.399) * -1.f);
-		roomSessionPlayer->send<GCPvEMoveNpc>(1337, (uint16_t)cellX, (uint16_t)cellZ);
+		const int cellX = ((xPos - -60.159) / 1.504);
+		const int cellZ = (((zPos - 60.159) / 1.450) * -1.f);
+		//roomSessionPlayer->send<GCPvEMoveNpc>(1337, (uint16_t)cellX, (uint16_t)cellZ);
 
 		if (Maps::recordMoves)
 		{
