@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "Position.h"
 
-enum class eItemType : uint32_t
+enum class eItemId : uint32_t
 {
 	NONE = 0,
 	AMMO_CLIP = 1191182337,
@@ -13,8 +13,20 @@ enum class eItemType : uint32_t
 	BRONZE_COIN = 1191182354
 };
 
+enum class eItemSpawnType : uint8_t
+{
+	COIN = 0,
+	AMMO_OR_MEDKIT = 1,
+};
+
+struct WeightedItem
+{
+	eItemId itemId;
+	uint32_t weight;
+};
+
 struct PveItemData
 {
-	uint32_t itemId;
+	eItemSpawnType itemSpawnType;
 	Position position;
 };

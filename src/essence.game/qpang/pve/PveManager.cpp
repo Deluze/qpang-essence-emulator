@@ -298,12 +298,13 @@ void PveManager::initializeItems()
 
 	const auto result = DATABASE->prepare(
 		"SELECT "
-		"item_id as ItemId "
-		",position_x as PositionX "
-		",position_y as PositionY "
-		",position_z as PositionZ "
+		"position_x AS PositionX "
+		",position_y AS PositionY "
+		",position_z AS PositionZ "
+		",pve_item_spawn_types.type AS SpawnType "
 		",maps.map_id AS MapId "
 		"FROM pve_item_spawns "
+		"INNER JOIN pve_item_spawn_types ON pve_item_spawn_types.id = pve_item_spawns.item_spawn_type_id "
 		"INNER JOIN maps ON maps.id = pve_item_spawns.map_id;"
 	)->fetch();
 
@@ -313,7 +314,7 @@ void PveManager::initializeItems()
 	{
 		auto itemData = PveItemData
 		{
-			result->getInt("ItemId"),
+			static_cast<eItemSpawnType>(result->getTiny("SpawnType")),
 			Position{
 				result->getFloat("PositionX"),
 				result->getFloat("PositionY"),

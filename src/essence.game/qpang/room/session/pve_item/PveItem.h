@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "PveItemData.h"
 #include "RoomSessionPlayer.h"
 
 class RoomSession;
@@ -10,6 +11,8 @@ class PveItem final
 {
 public:
 	PveItem() = default;
+
+	PveItem(eItemSpawnType spawnType, const Position& position);
 	PveItem(uint32_t itemId, const Position& position);
 
 	~PveItem() = default;
@@ -28,6 +31,11 @@ public:
 	 * \param uid The uid of the item.
 	 */
 	void setUid(uint32_t uid);
+
+	/**
+	 * \brief Sets the item id for the item.
+	 */
+	void setWeightedRandomItemId();
 
 	void setIsPickedUp(bool value);
 
@@ -53,11 +61,30 @@ public:
 	Position getPosition() const;
 
 	[[nodiscard]]
+	eItemSpawnType getSpawnType() const;
+
+	[[nodiscard]]
 	bool isPickedUp() const;
 protected:
 	uint32_t m_uid{};
+
 	uint32_t m_itemId;
+	eItemSpawnType m_spawnType;
+
 	Position m_position{};
 
 	bool m_isPickedUp = false;
+
+	std::vector<WeightedItem> m_weightedCoins
+	{
+		WeightedItem { eItemId::GOLDEN_COIN, 3 },
+		WeightedItem { eItemId::SILVER_COIN, 7 },
+		WeightedItem { eItemId::BRONZE_COIN, 10 }
+	};
+
+	std::vector<WeightedItem> m_weightedAmmoAndMedkits
+	{
+		WeightedItem { eItemId::AMMO_CLIP, 1 },
+		WeightedItem { eItemId::RED_MEDKIT, 1 }
+	};
 };

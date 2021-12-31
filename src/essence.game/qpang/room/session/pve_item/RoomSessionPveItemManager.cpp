@@ -30,9 +30,9 @@ void RoomSessionPveItemManager::initializeItems()
 	const auto mapId = roomSession->getPveRoundManager()->getMap();
 	const auto itemData = Game::instance()->getPveManager()->getItemDataByMapId(mapId);
 
-	for (const auto& [itemId, position] : itemData)
+	for (const auto& [itemSpawnType, position] : itemData)
 	{
-		const auto item = PveItem(itemId, position);
+		const auto item = PveItem(itemSpawnType, position);
 
 		m_items.push_back(item);
 	}
@@ -42,8 +42,26 @@ void RoomSessionPveItemManager::spawnInitializedItems()
 {
 	for (const auto& item : m_items)
 	{
-		spawnItem(std::make_shared<PveItem>(item));
+		spawnWeightedRandomItem(std::make_shared<PveItem>(item));
 	}
+}
+
+uint32_t RoomSessionPveItemManager::spawnWeightedRandomItem(const std::shared_ptr<PveItem>& item)
+{
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return 0;
+	}
+
+	item->setUid(m_spawnedItems.size() + 1);
+	item->setWeightedRandomItemId();
+	item->spawn(roomSession);
+
+	m_spawnedItems[item->getUid()] = item;
+
+	return item->getUid();
 }
 
 uint32_t RoomSessionPveItemManager::spawnItem(const std::shared_ptr<PveItem>& item)
@@ -91,20 +109,20 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 		return;
 	}
 
-	switch (const auto itemType = static_cast<eItemType>(item->getItemId()))
+	switch (const auto itemType = static_cast<eItemId>(item->getItemId()))
 	{
-	case eItemType::AMMO_CLIP:
+	case eItemId::AMMO_CLIP:
 		handleAmmoPickup(roomSessionPlayer);
 		break;
-	case eItemType::RED_MEDKIT:
+	case eItemId::RED_MEDKIT:
 		handleMedkitPickup(roomSessionPlayer);
 		break;
-	case eItemType::BRONZE_COIN:
-	case eItemType::SILVER_COIN:
-	case eItemType::GOLDEN_COIN:
+	case eItemId::BRONZE_COIN:
+	case eItemId::SILVER_COIN:
+	case eItemId::GOLDEN_COIN:
 		handleCoinPickup(roomSessionPlayer, itemType);
 		break;
-	case eItemType::NONE:
+	case eItemId::NONE:
 		return;
 	}
 
@@ -155,29 +173,28 @@ void RoomSessionPveItemManager::handleMedkitPickup(const RoomSessionPlayer::Ptr&
 	roomSessionPlayer->addHealth(50, true);
 }
 
-void RoomSessionPveItemManager::handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, const eItemType itemType)
+void RoomSessionPveItemManager::handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, const eItemId itemType)
 {
 	auto coinCount = 0;
 
 	switch (itemType)
 	{
-	case eItemType::BRONZE_COIN:
+	case eItemId::BRONZE_COIN:
 		coinCount = 1;
 		roomSessionPlayer->increaseBronzeCoinCount();
 		break;
-	case eItemType::SILVER_COIN:
+	case eItemId::SILVER_COIN:
 		coinCount = 10;
 		roomSessionPlayer->increaseSilverCoinCount();
 		break;
-	case eItemType::GOLDEN_COIN:
+	case eItemId::GOLDEN_COIN:
 		coinCount = 100;
 
 		roomSessionPlayer->increaseGoldenCoinCount();
 		break;
-	case eItemType::NONE:
-	case eItemType::AMMO_CLIP:
-	case eItemType::RED_MEDKIT:
-	default:
+	case eItemId::NONE:
+	case eItemId::AMMO_CLIP:
+	case eItemId::RED_MEDKIT:
 		return;
 	}
 

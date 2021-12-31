@@ -24,6 +24,8 @@ public:
 	void initializeItems();
 	void spawnInitializedItems();
 
+	uint32_t spawnWeightedRandomItem(const std::shared_ptr<PveItem>& item);
+
 	/**
 	 * \brief Spawns in an item.
 	 * \param item The item you want to spawn in.
@@ -67,7 +69,7 @@ private:
 	/**
 	 * \brief Handles the item pick up event for coins.
 	 */
-	static void handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, eItemType itemType);
+	static void handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, eItemId itemType);
 
 	std::weak_ptr<RoomSession> m_roomSession;
 
