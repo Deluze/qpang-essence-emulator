@@ -163,6 +163,9 @@ public:
 	[[nodiscard]]
 	uint32_t getWeaponItemId() const;
 
+	[[nodiscard]]
+	eWeaponType getWeaponType() const;
+
 	/**
 	 * \brief Gets the spawn area id for the npc.
 	 * \return The spawn area id.
@@ -243,6 +246,7 @@ private:
 	// These two are used for shooting/attacking.
 	uint32_t m_weaponItemId;
 	uint8_t m_weaponBodyPartId;
+	eWeaponType m_weaponType;
 
 	// How often the npcs attacks.
 	uint32_t m_aiTime;

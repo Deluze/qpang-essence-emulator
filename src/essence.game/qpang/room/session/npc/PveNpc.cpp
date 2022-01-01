@@ -94,6 +94,7 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_speed(data.speed),
 	m_weaponItemId(data.weaponItemId),
 	m_weaponBodyPartId(data.weaponBodyPartId),
+	m_weaponType(data.weaponType),
 	m_aiTime(data.aiTime),
 	m_attackRange(data.attackRange),
 	m_attackWidth(data.attackWidth),
@@ -125,6 +126,7 @@ PveNpc::PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell) :
 	m_speed(data.speed),
 	m_weaponItemId(data.weaponItemId),
 	m_weaponBodyPartId(data.weaponBodyPartId),
+	m_weaponType(data.weaponType),
 	m_aiTime(data.aiTime),
 	m_attackRange(data.attackRange),
 	m_attackWidth(data.attackWidth),
@@ -647,6 +649,11 @@ uint16_t PveNpc::getInitialRotation() const
 uint32_t PveNpc::getWeaponItemId() const
 {
 	return m_weaponItemId;
+}
+
+eWeaponType PveNpc::getWeaponType() const
+{
+	return m_weaponType;
 }
 
 uint32_t PveNpc::getAreaUid() const
