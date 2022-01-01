@@ -68,3 +68,23 @@ struct PveNpcData
 	std::vector<NpcLootDrop> lootDrops;
 	std::vector<NpcBodyPart> bodyParts;
 };
+
+struct PveNpcWaveData
+{
+	uint32_t type;
+	uint16_t baseHealth;
+	float speed;
+	uint32_t weaponItemId;
+	uint8_t weaponBodyPartId;
+	uint32_t aiTime;
+	float attackRange;
+	float attackWidth;
+	float attackHeight;
+	bool canDropLoot;
+	Position initialPosition;
+	eNpcGradeType gradeType;
+	eNpcMovementType movementType;
+	eNpcTargetType targetType;
+	std::vector<NpcLootDrop> lootDrops;
+	std::vector<NpcBodyPart> bodyParts;
+};

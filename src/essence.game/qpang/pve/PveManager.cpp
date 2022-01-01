@@ -12,6 +12,7 @@ void PveManager::initialize()
 	initializeObjects();
 	initializeItems();
 	initializeAreas();
+	initializeNpcWaves();
 }
 
 std::vector<PveNpcData> PveManager::getNpcDataByMapId(const uint8_t mapId)
@@ -29,6 +30,18 @@ std::vector<PveNpcData> PveManager::getNpcDataByMapId(const uint8_t mapId)
 	}
 
 	return it->second;
+}
+
+std::unordered_map<uint8_t, std::vector<PveNpcWaveData>> PveManager::getNpcWaveData(const uint8_t mapId)
+{
+	const auto& mapIt = m_npcWaveData.find(mapId);
+
+	if (mapIt == m_npcWaveData.end())
+	{
+		return {};
+	}
+
+	return mapIt->second;
 }
 
 std::vector<PveObjectData> PveManager::getObjectDataByMapId(const uint8_t mapId)
@@ -370,6 +383,86 @@ void PveManager::initializeAreas()
 		const auto mapId = result->getInt("MapId");
 
 		m_areaData[mapId].push_back(areaData);
+
+		result->next();
+	}
+}
+
+void PveManager::initializeNpcWaves()
+{
+	std::cout << "Initializing pve npc wave data." << std::endl;
+
+	// Step 1: Get all npcs from pve_npc_waves.
+	const auto result = DATABASE->prepare(
+		"SELECT "
+		"pve_npcs.id AS Id "
+		",pve_npcs.type AS Type "
+		",pve_npcs.base_health AS BaseHealth "
+		",pve_npcs.speed AS Speed "
+		",pve_npcs.weapon_item_id AS WeaponItemId "
+		",pve_npcs.weapon_body_part_id AS WeaponBodyPartId "
+		",pve_npcs.ai_time AS AITime "
+		",pve_npcs.attack_range AS AttackRange "
+		",pve_npcs.attack_width AS AttackWidth "
+		",pve_npcs.attack_height AS AttackHeight "
+		",pve_npcs.can_drop_loot AS CanDropLoot "
+		",pve_npc_waves.wave_number AS WaveNumber "
+		",pve_npc_waves.spawn_position_x AS SpawnPositionX "
+		",pve_npc_waves.spawn_position_y AS SpawnPositionY "
+		",pve_npc_waves.spawn_position_z AS SpawnPositionZ "
+		",pve_npc_movement_types.type AS MovementType "
+		",pve_npc_target_types.type AS TargetType "
+		",pve_npc_grade_types.type AS GradeType "
+		",maps.map_id AS MapId "
+		"FROM pve_npc_waves "
+		"INNER JOIN pve_npcs ON pve_npcs.id = pve_npc_waves.npc_id "
+		"INNER JOIN pve_npc_movement_types ON pve_npc_movement_types.id = pve_npcs.movement_type_id "
+		"INNER JOIN pve_npc_target_types ON pve_npc_target_types.id = pve_npcs.target_type_id "
+		"INNER JOIN pve_npc_grade_types ON pve_npc_grade_types.id = pve_npcs.grade_type_id "
+		"INNER JOIN maps on maps.id = pve_npc_waves.map_id;"
+	)->fetch();
+
+	m_npcWaveData.clear();
+
+	while (result->hasNext())
+	{
+		const auto npcPrimaryKey = result->getInt("Id");
+
+		// Step 2: Get the loot for every npc.
+		const auto lootDrops = getLootDropsByNpcPrimaryKey(npcPrimaryKey);
+
+		// Step 3: Get the body parts for every npc. 
+		const auto bodyParts = getBodyPartsByNpcPrimaryKey(npcPrimaryKey);
+
+		// Step 4: Construct the npc.
+		auto npcWaveData = PveNpcWaveData{
+			result->getTiny("Type"),
+			result->getShort("BaseHealth"),
+			result->getFloat("Speed"),
+			result->getInt("WeaponItemId"),
+			result->getTiny("WeaponBodyPartId"),
+			result->getInt("AITime"),
+			result->getFloat("AttackRange"),
+			result->getFloat("AttackWidth"),
+			result->getFloat("AttackHeight"),
+			result->getFlag("CanDropLoot"),
+			Position{
+				result->getFloat("SpawnPositionX"),
+				result->getFloat("SpawnPositionY"),
+				result->getFloat("SpawnPositionZ"),
+			},
+			static_cast<eNpcGradeType>(result->getInt("GradeType")),
+			static_cast<eNpcMovementType>(result->getInt("MovementType")),
+			static_cast<eNpcTargetType>(result->getInt("TargetType")),
+			lootDrops,
+			bodyParts
+		};
+
+		const auto mapId = result->getInt("MapId");
+		const auto waveNumber = result->getTiny("WaveNumber");
+
+		// Step 5: Save the npcs to the map.
+		m_npcWaveData[mapId][waveNumber].push_back(npcWaveData);
 
 		result->next();
 	}

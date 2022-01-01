@@ -11,16 +11,23 @@ class PveManager
 {
 public:
 	/**
-	 * \brief Initializes the pve manager (npcs and objects).
+	 * \brief Initializes the pve manager (npc's and objects).
 	 */
 	void initialize();
 
 	/**
-	 * \brief Retrieves the npcs for the given map.
+	 * \brief Retrieves the npc's for the given map.
 	 * \param mapId The map id.
-	 * \return A vector filled with npcs.
+	 * \return A vector filled with npc's.
 	 */
 	std::vector<PveNpcData> getNpcDataByMapId(uint8_t mapId);
+
+	/**
+	 * \brief Retrieves the npc's waves for the given map.
+	 * \param mapId The map id.
+	 * \return A data set containing wave number and pve npc data.
+	 */
+	std::unordered_map<uint8_t, std::vector<PveNpcWaveData>> getNpcWaveData(uint8_t mapId);
 
 	/**
 	 * \brief Retrieves the objects for the given map.
@@ -77,8 +84,15 @@ private:
 	 */
 	void initializeAreas();
 
+	/**
+	 * \brief Retrieves all npc waves from the database and stores them.
+	 */
+	void initializeNpcWaves();
+
 	std::unordered_map<uint32_t, std::vector<PveNpcData>> m_npcData{};
 	std::unordered_map<uint32_t, std::vector<PveObjectData>> m_objectData{};
 	std::unordered_map<uint32_t, std::vector<PveItemData>> m_itemData{};
 	std::unordered_map<uint32_t, std::vector<PveAreaData>> m_areaData{};
+
+	std::unordered_map<uint32_t, std::unordered_map<uint8_t, std::vector<PveNpcWaveData>>> m_npcWaveData{};
 };
