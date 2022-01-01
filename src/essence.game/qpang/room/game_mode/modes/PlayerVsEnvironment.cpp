@@ -47,9 +47,9 @@ void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 	roomSession->getPveRoundManager()->tick();
 	roomSession->getPveAreaManager()->tick();
 
-	const auto currentRound = roomSession->getPveRoundManager()->getCurrentRound();
+	const auto currentRound = static_cast<eRound>(roomSession->getPveRoundManager()->getCurrentRound());
 
-	if (currentRound == 1)
+	if (currentRound == eRound::CHESS_CASTLE_STAGE_2)
 	{
 		roomSession->getPveWaveManager()->tick();
 	}

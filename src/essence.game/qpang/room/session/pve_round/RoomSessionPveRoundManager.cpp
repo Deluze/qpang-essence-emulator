@@ -25,22 +25,22 @@ void RoomSessionPveRoundManager::updatePathfinders() const
 	if (roomSession == nullptr)
 		return;
 
-	switch (m_currentRound)
+	switch (static_cast<eRound>(m_currentRound))
 	{
-	case 0:
+	case eRound::CHESS_CASTLE_STAGE_1:
 		roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage1AboveGroundMapInfo);
 		roomSession->getUnderGroundPathfinder()->updateMapInfo(Maps::pveStage1UnderGroundMapInfo);
 		break;
-	case 1:
+	case eRound::CHESS_CASTLE_STAGE_2:
 		roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage2MapInfo);
 		roomSession->getUnderGroundPathfinder()->free();
 		break;
-	case 2:
+	case eRound::CHESS_CASTLE_STAGE_3:
 		//roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage3MapInfo);
 		roomSession->getAboveGroundPathfinder()->free();
 		roomSession->getUnderGroundPathfinder()->free();
 		break;
-	default: 
+	default:
 		break;
 	}
 }
@@ -70,12 +70,10 @@ void RoomSessionPveRoundManager::onStartNewRound()
 	roomSession->getNpcManager()->initializeNpcs();
 	roomSession->getPveItemManager()->initializeItems();
 
-	if (m_currentRound == 1)
+	if (static_cast<eRound>(m_currentRound) == eRound::CHESS_CASTLE_STAGE_2)
 	{
 		roomSession->getPveWaveManager()->initializeWaves();
 	}
-
-	//roomSession->relayPlaying<GCPvENpcInit>(1, 1337, Position{ 0,0,0 }, 0);
 }
 
 void RoomSessionPveRoundManager::endRound()
@@ -85,7 +83,7 @@ void RoomSessionPveRoundManager::endRound()
 		return;
 
 	// Can not end this round since it's the last round.
-	if (m_currentRound == 2)
+	if (static_cast<eRound>(m_currentRound) == eRound::CHESS_CASTLE_STAGE_3)
 	{
 		// TODO: Finish the game and send result screen?
 		return;
@@ -110,12 +108,13 @@ void RoomSessionPveRoundManager::tick() const
 		return;
 	}
 
-	switch (m_currentRound)
+	switch (static_cast<eRound>(m_currentRound))
 	{
-	case 0:
+	case eRound::CHESS_CASTLE_STAGE_1:
 		checkRoundZeroFinished();
 		break;
-	default:
+	case eRound::CHESS_CASTLE_STAGE_2:
+	case eRound::CHESS_CASTLE_STAGE_3:
 		break;
 	}
 }
