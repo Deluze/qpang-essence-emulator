@@ -85,7 +85,7 @@ public:
 
 	bool canAttackTargetPlayer(Pathfinder* pathFinder);
 
-	void attackTargetPos(const std::shared_ptr<RoomSession>& roomSession, const Position& targetPosition);
+	void attackTargetPos(const std::shared_ptr<RoomSession>& roomSession);
 
 	void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
