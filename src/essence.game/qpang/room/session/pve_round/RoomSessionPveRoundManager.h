@@ -2,6 +2,14 @@
 
 #include <memory>
 
+enum class eRound : uint8_t
+{
+	CHESS_CASTLE_STAGE_1 = 0,
+	CHESS_CASTLE_STAGE_2 = 1,
+	CHESS_CASTLE_STAGE_3 = 2,
+};
+
+
 class RoomSession;
 
 class RoomSessionPveRoundManager
