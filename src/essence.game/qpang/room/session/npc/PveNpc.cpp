@@ -366,7 +366,7 @@ void PveNpc::handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roo
 			return;
 		}
 
-		attackTargetPos(roomSession, m_targetShootPosition);
+		attackTargetPos(roomSession);
 	}
 }
 
