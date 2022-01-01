@@ -116,6 +116,35 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 {
 }
 
+PveNpc::PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell) :
+	m_type(data.type),
+	m_areaUid(0),
+	m_floorNumber(0),
+	m_baseHealth(data.baseHealth),
+	m_health(data.baseHealth),
+	m_speed(data.speed),
+	m_weaponItemId(data.weaponItemId),
+	m_weaponBodyPartId(data.weaponBodyPartId),
+	m_aiTime(data.aiTime),
+	m_attackRange(data.attackRange),
+	m_attackWidth(data.attackWidth),
+	m_attackHeight(data.attackHeight),
+	m_canDropLoot(data.canDropLoot),
+	m_initialRotation(0),
+	m_initialPosition(data.initialPosition),
+	m_position(data.initialPosition),
+	m_staticShootingPosition({}),
+	m_gradeType(data.gradeType),
+	m_movementType(data.movementType),
+	m_targetType(data.targetType),
+	m_initialCell(spawnCell),
+	m_takenCell(spawnCell),
+	m_currentCell(spawnCell),
+	m_lootDrops(std::move(data.lootDrops)),
+	m_bodyParts(std::move(data.bodyParts))
+{
+}
+
 void PveNpc::handleNoMovement(const std::shared_ptr<RoomSession>& roomSession)
 {
 	if (m_targetType == eNpcTargetType::T_STATIC)

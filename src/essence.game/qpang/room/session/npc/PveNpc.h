@@ -13,6 +13,7 @@ public:
 	~PveNpc() = default;
 
 	PveNpc(PveNpcData data, const PathfinderCell& spawnCell);
+	PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell);
 
 	void tick(const std::shared_ptr<RoomSession>& roomSession);
 
