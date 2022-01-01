@@ -82,6 +82,10 @@ void PlayerVsEnvironment::onPlayerDeathByNpc(const std::shared_ptr<RoomSessionPl
 	roomSessionPlayer->resetStreak();
 	roomSessionPlayer->startRespawnCooldown(true);
 
+	// If the last attacker of the npc is the player he killed, reset it to 0, as he's now gotten his revenge.
+	if (npc->getLastAttackerId() == roomSessionPlayer->getPlayer()->getId())
+		npc->setLastAttackerId(0);
+
 	// TODO: Add pve statistics.
 
 	GameMode::onPlayerDeathByNpc(roomSessionPlayer, npc);
