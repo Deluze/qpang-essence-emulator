@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "Position.h"
+#include "PveNpc.h"
 #include "PveObjectData.h"
 
 class RoomSession;
@@ -18,7 +19,7 @@ public:
 
 	void takeDamage(uint16_t damage);
 
-	void onHitByNpc(const std::shared_ptr<RoomSession>& roomSession);
+	void onHitByNpc(const std::shared_ptr<RoomSession>& roomSession, const std::shared_ptr<PveNpc>& npc);
 
 	virtual void onEvent(const std::shared_ptr<RoomSession>& roomSession);
 

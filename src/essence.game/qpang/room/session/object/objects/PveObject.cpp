@@ -31,16 +31,36 @@ void PveObject::takeDamage(const uint16_t damage)
 	m_health = m_health - damage;
 }
 
-void PveObject::onHitByNpc(const std::shared_ptr<RoomSession>& roomSession)
+void PveObject::onHitByNpc(const std::shared_ptr<RoomSession>& roomSession, const std::shared_ptr<PveNpc>& npc)
 {
-	// TODO: Deal 10/15/25 damage based on weapon type.. if we can even get that.
-	constexpr auto damage = 10;
+	const auto weaponType = npc->getWeaponType();
+
+	uint16_t damage = 0;
+
+	switch(weaponType)
+	{
+	case eWeaponType::MELEE:
+		damage = 10;
+		break;
+	case eWeaponType::GUN_1:
+	case eWeaponType::GUN_2:
+	case eWeaponType::GUN_3:
+		damage = 15;
+		break;
+	case eWeaponType::THROWABLE_1:
+	case eWeaponType::THROWABLE_2:
+		damage = 15;
+		break;
+	case eWeaponType::LAUNCHER:
+		damage = 25;
+		break;
+	}
 
 	takeDamage(damage);
 
-	// TODO: Finish the game if health is 0.
+	// TODO: Finish the game if the health is at 0 since that means they have lost.
 
-	//roomSession->relayPlaying<GCPvEHitNpcToObject>(m_uid, m_health, damage);
+	roomSession->relayPlaying<GCPvEHitNpcToObject>(m_uid, m_health, damage);
 }
 
 void PveObject::onEvent(const std::shared_ptr<RoomSession>& roomSession)

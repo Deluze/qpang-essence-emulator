@@ -43,14 +43,22 @@ public:
 			return;
 		}
 
-		const auto object = roomSession->getObjectManager()->findObjectByUid(objectUid);
+		const auto& npc = roomSession->getNpcManager()->findNpcByUid(npcUid);
 
-		if (object == nullptr)
+		if (npc == nullptr)
 		{
 			return;
 		}
 
-		object->onHitByNpc(roomSession);
+		// Note: We have hardcoded the uid for the essence object to be 1 so we only check for that one.
+		const auto essenceObject = roomSession->getObjectManager()->findObjectByUid(1);
+
+		if (essenceObject == nullptr || essenceObject->getType() != eObjectType::ESSENCE)
+		{
+			return;
+		}
+
+		essenceObject->onHitByNpc(roomSession, npc);
 	}
 
 	void process(EventConnection* ps) override
