@@ -28,12 +28,16 @@ public:
 	 */
 	void endRound();
 
-	void tick();
+	void tick() const;
 
-	void checkRoundZeroFinished();
+	void checkRoundZeroFinished() const;
 
 #pragma region Getters
+	[[nodiscard]]
 	uint8_t getMap() const;
+
+	[[nodiscard]]
+	uint8_t getCurrentRound() const;
 #pragma endregion
 private:
 	void updatePathfinders() const;

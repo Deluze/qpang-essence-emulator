@@ -7,7 +7,6 @@
 #include <qpang/helpers/AABBHelper.h>
 
 #include "Maps.h"
-#include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -38,6 +37,7 @@ void RoomSessionPveRoundManager::updatePathfinders() const
 		break;
 	case 2:
 		//roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage3MapInfo);
+		roomSession->getAboveGroundPathfinder()->free();
 		roomSession->getUnderGroundPathfinder()->free();
 		break;
 	default: 
@@ -70,6 +70,11 @@ void RoomSessionPveRoundManager::onStartNewRound()
 	roomSession->getNpcManager()->initializeNpcs();
 	roomSession->getPveItemManager()->initializeItems();
 
+	if (m_currentRound == 1)
+	{
+		roomSession->getPveWaveManager()->initializeWaves();
+	}
+
 	//roomSession->relayPlaying<GCPvENpcInit>(1, 1337, Position{ 0,0,0 }, 0);
 }
 
@@ -92,12 +97,13 @@ void RoomSessionPveRoundManager::endRound()
 	roomSession->getObjectManager()->removeAll();
 	roomSession->getNpcManager()->removeAll();
 	roomSession->getPveItemManager()->removeAll();
+	roomSession->getPveWaveManager()->removeAll();
 
 	// Relay the round ending to all players.
 	roomSession->relayPlaying<GCPvERoundEnd>();
 }
 
-void RoomSessionPveRoundManager::tick()
+void RoomSessionPveRoundManager::tick() const
 {
 	if (m_hasRoundEnded)
 	{
@@ -114,7 +120,7 @@ void RoomSessionPveRoundManager::tick()
 	}
 }
 
-void RoomSessionPveRoundManager::checkRoundZeroFinished()
+void RoomSessionPveRoundManager::checkRoundZeroFinished() const
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -163,4 +169,9 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 uint8_t RoomSessionPveRoundManager::getMap() const
 {
 	return m_currentMap;
+}
+
+uint8_t RoomSessionPveRoundManager::getCurrentRound() const
+{
+	return m_currentRound;
 }
