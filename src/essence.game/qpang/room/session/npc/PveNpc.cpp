@@ -528,12 +528,12 @@ Pathfinder* PveNpc::getPathFinder(const std::shared_ptr<RoomSession>& roomSessio
 
 void PveNpc::spawn(const std::shared_ptr<RoomSession>& roomSession) const
 {
-	roomSession->relayPlaying<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation);
+	roomSession->relayPlaying<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation, m_health);
 }
 
 void PveNpc::spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const
 {
-	roomSessionPlayer->send<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation);
+	roomSessionPlayer->send<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation, m_health);
 }
 
 void PveNpc::resetPosition()
