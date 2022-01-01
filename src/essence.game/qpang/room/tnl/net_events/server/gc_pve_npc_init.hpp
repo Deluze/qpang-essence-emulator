@@ -14,18 +14,19 @@ public:
 	F32 zPos; // 104
 	U16 rotation; // 108
 	U8 shouldExplode = 0; // 110 bool
-	U32 unk_08 = 0; // 112
+	U32 health; // 112
 
 	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient } {}
 
-	GCPvENpcInit(const uint32_t type, const uint32_t npcUid, const Position position, const uint16_t rotation)
+	GCPvENpcInit(const uint32_t type, const uint32_t npcUid, const Position position, const uint16_t rotation, const uint32_t health)
 		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient },
 		npcType(type),
 		npcUid(npcUid),
 		xPos(position.x),
 		yPos(position.y),
 		zPos(position.z),
-		rotation(rotation)
+		rotation(rotation),
+		health(health)
 	{
 
 	}
@@ -39,7 +40,7 @@ public:
 		bstream->write(zPos);
 		bstream->write(rotation);
 		bstream->write(shouldExplode);
-		bstream->write(unk_08);
+		bstream->write(health);
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override {}
