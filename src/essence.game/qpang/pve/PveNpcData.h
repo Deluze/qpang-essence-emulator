@@ -1,5 +1,6 @@
 #pragma once
 
+#include "eWeaponType.h"
 #include "Position.h"
 
 enum class eNpcGradeType : uint8_t
@@ -52,6 +53,7 @@ struct PveNpcData
 	float speed;
 	uint32_t weaponItemId;
 	uint8_t weaponBodyPartId;
+	eWeaponType weaponType;
 	uint32_t aiTime;
 	float attackRange;
 	float attackWidth;
@@ -76,6 +78,7 @@ struct PveNpcWaveData
 	float speed;
 	uint32_t weaponItemId;
 	uint8_t weaponBodyPartId;
+	eWeaponType weaponType;
 	uint32_t aiTime;
 	float attackRange;
 	float attackWidth;

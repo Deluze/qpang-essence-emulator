@@ -108,6 +108,7 @@ void PveManager::initializeNpcs()
 		",pve_npcs.speed AS Speed "
 		",pve_npcs.weapon_item_id AS WeaponItemId "
 		",pve_npcs.weapon_body_part_id AS WeaponBodyPartId "
+		",pve_npcs.weapon_type AS WeaponType "
 		",pve_npcs.ai_time AS AITime "
 		",pve_npcs.attack_range AS AttackRange "
 		",pve_npcs.attack_width AS AttackWidth "
@@ -159,6 +160,7 @@ void PveManager::initializeNpcs()
 			result->getFloat("Speed"),
 			result->getInt("WeaponItemId"),
 			result->getTiny("WeaponBodyPartId"),
+			static_cast<eWeaponType>(result->getInt("WeaponType")),
 			result->getInt("AITime"),
 			result->getFloat("AttackRange"),
 			result->getFloat("AttackWidth"),
@@ -401,6 +403,7 @@ void PveManager::initializeNpcWaves()
 		",pve_npcs.speed AS Speed "
 		",pve_npcs.weapon_item_id AS WeaponItemId "
 		",pve_npcs.weapon_body_part_id AS WeaponBodyPartId "
+		",pve_npcs.weapon_type AS WeaponType "
 		",pve_npcs.ai_time AS AITime "
 		",pve_npcs.attack_range AS AttackRange "
 		",pve_npcs.attack_width AS AttackWidth "
@@ -441,6 +444,7 @@ void PveManager::initializeNpcWaves()
 			result->getFloat("Speed"),
 			result->getInt("WeaponItemId"),
 			result->getTiny("WeaponBodyPartId"),
+			static_cast<eWeaponType>(result->getInt("WeaponType")),
 			result->getInt("AITime"),
 			result->getFloat("AttackRange"),
 			result->getFloat("AttackWidth"),
