@@ -67,8 +67,8 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 
 		if (npc->didPathFinish())
 		{
-			npc->clearPath();
 			npc->setPosition(pathFinder, currCell);
+			npc->clearPath();
 			return;
 		}
 
@@ -84,12 +84,12 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 	}
 	else
 	{
-		npc->clearPath();
-
 		if (npc->getIsMovingToPlayer())
 			npc->attackTargetPlayer(roomSession);
 		else
 			npc->attackTargetPos(roomSession);
+
+		npc->clearPath();
 	}
 };
 
