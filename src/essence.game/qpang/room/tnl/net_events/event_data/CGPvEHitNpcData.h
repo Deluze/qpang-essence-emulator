@@ -10,8 +10,6 @@ struct CGPvEHitNpcData
 {
 	std::shared_ptr<RoomSessionPlayer> roomSessionPlayer;
 	std::shared_ptr<PveNpc> targetNpc;
-	//uint32_t playerId;
-	//uint32_t targetNpcUid;
 	uint32_t unk_03;
 	Position impactPos;
 	Position impactPosOffset;
