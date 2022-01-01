@@ -40,7 +40,7 @@ void PveObject::onHitByNpc(const std::shared_ptr<RoomSession>& roomSession)
 
 	// TODO: Finish the game if health is 0.
 
-	roomSession->relayPlaying<GCPvEHitNpcToObject>(m_uid, m_health, damage);
+	//roomSession->relayPlaying<GCPvEHitNpcToObject>(m_uid, m_health, damage);
 }
 
 void PveObject::onEvent(const std::shared_ptr<RoomSession>& roomSession)
