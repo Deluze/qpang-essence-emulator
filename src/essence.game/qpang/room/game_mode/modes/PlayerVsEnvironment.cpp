@@ -47,6 +47,13 @@ void PlayerVsEnvironment::tick(const std::shared_ptr<RoomSession> roomSession)
 	roomSession->getPveRoundManager()->tick();
 	roomSession->getPveAreaManager()->tick();
 
+	const auto currentRound = roomSession->getPveRoundManager()->getCurrentRound();
+
+	if (currentRound == 1)
+	{
+		roomSession->getPveWaveManager()->tick();
+	}
+
 	GameMode::tick(roomSession);
 }
 
