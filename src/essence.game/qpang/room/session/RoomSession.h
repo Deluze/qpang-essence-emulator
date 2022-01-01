@@ -11,6 +11,7 @@
 #include "RoomSessionPveAreaManager.h"
 #include "RoomSessionPveItemManager.h"
 #include "RoomSessionPveRoundManager.h"
+#include "RoomSessionPveWaveManager.h"
 
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 #include "qpang/room/session/game_item/GameItemManager.h"
@@ -76,6 +77,7 @@ public:
 	RoomSessionPveItemManager* getPveItemManager();
 	RoomSessionPveRoundManager* getPveRoundManager();
 	RoomSessionPveAreaManager* getPveAreaManager();
+	RoomSessionPveWaveManager* getPveWaveManager();
 
 	Pathfinder* getAboveGroundPathfinder();
 	Pathfinder* getUnderGroundPathfinder();
@@ -234,6 +236,7 @@ private:
 	RoomSessionPveItemManager m_pveItemManager;
 	RoomSessionPveRoundManager m_pveRoundManager;
 	RoomSessionPveAreaManager m_pveAreaManager;
+	RoomSessionPveWaveManager m_pveWaveManager;
 
 	Pathfinder m_aboveGroundPathfinder;
 	Pathfinder m_underGroundPathfinder;
