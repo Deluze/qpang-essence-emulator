@@ -438,6 +438,11 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 	}
 }
 
+uint32_t PveNpc::getLastAttackerId()
+{
+	return m_lastAttackerId;
+}
+
 void PveNpc::setLastAttackerId(const uint32_t id)
 {
 	m_lastAttackerId = id;
