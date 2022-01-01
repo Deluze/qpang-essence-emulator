@@ -8,7 +8,7 @@ class CGPvEHitNpcToObject final : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 	U64 unk_01; // 88 92
-	U32 objectUid; // 96
+	U32 npcUid; // 96 this normally is objectUid, however, with our patch, this is npcUid. We can just assume object uid is 1
 
 	CGPvEHitNpcToObject() : GameNetEvent{ CG_PVE_HIT_NPC_TO_OBJECT, GuaranteedOrdered, DirClientToServer } {}
 
@@ -17,7 +17,7 @@ public:
 	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
 		bstream->read(&unk_01);
-		bstream->read(&objectUid);
+		bstream->read(&npcUid);
 	}
 
 	void handle(GameConnection* conn, const Player::Ptr player) override
