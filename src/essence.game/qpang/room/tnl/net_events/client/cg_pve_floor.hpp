@@ -33,21 +33,7 @@ public:
 			return;
 		}
 
-		const auto [x, y, z] = roomSessionPlayer->getPosition();
-
-		// This means the player has gone underground (stage 1 sewers)
-		if ((floorNumber == 0) && (y < 0.0f))
-		{
-			roomSessionPlayer->setFloorNumber(floorNumber);
-
-			return;
-		}
-
-		// We compare with -1.0 here instead of 0.0 since a little correction is neccessary.
-		if ((floorNumber == 1) && (y > -1.0f))
-		{
-			roomSessionPlayer->setFloorNumber(floorNumber);
-		}
+		roomSessionPlayer->setFloorNumber(floorNumber);
 	}
 
 	void process(EventConnection* ps) override

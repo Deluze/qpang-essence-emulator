@@ -72,10 +72,18 @@ public:
 	 */
 	uint16_t takeDamage(uint16_t damage);
 
+	bool getIsMovingToPlayer();
+
+	eNpcTargetType getTargetType();
+
 	// NOTE: Temporary attack function for an npc.
 	void attack(const std::shared_ptr<RoomSession>& roomSession, Position targetPosition) const;
 
-	bool canAttackTargetPlayer(Pathfinder* pathFinder) const;
+	bool canAttackTargetPos(Pathfinder* pathFinder);
+
+	bool canAttackTargetPlayer(Pathfinder* pathFinder);
+
+	void attackTargetPos(const std::shared_ptr<RoomSession>& roomSession, const Position& targetPosition);
 
 	void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -210,11 +218,15 @@ private:
 
 	void improveTargetCell(Pathfinder* pathFinder);
 
+	void startMovingToPos(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder, const Position& targetPos);
+
 	void startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+
+	void handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleMovement(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -276,6 +288,8 @@ private:
 
 	Position m_staticShootingPosition;
 
+	Position m_targetShootPosition;
+
 	eNpcGradeType m_gradeType;
 	eNpcMovementType m_movementType;
 	eNpcTargetType m_targetType;
@@ -289,6 +303,8 @@ private:
 	int m_pathIdx = 0;
 
 	std::shared_ptr<RoomSessionPlayer> m_targetPlayer = nullptr;
+
+	bool m_isMovingToPlayer = false;
 
 	std::vector<NpcLootDrop> m_lootDrops{};
 	std::vector<NpcBodyPart> m_bodyParts{};
