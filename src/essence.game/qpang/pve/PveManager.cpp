@@ -238,7 +238,8 @@ std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t 
 		"INNER JOIN pve_body_part_attribute_types ON pve_body_part_attribute_types.id = pve_body_parts.attribute_type_id "
 		"INNER JOIN pve_body_part_damage_types ON pve_body_part_damage_types.id = pve_body_parts.damage_type_id "
 		"INNER JOIN pve_body_part_part_types ON pve_body_part_part_types.id = pve_body_parts.part_type_id "
-		"WHERE pve_npc_body_parts.npc_id = ?;"
+		"WHERE pve_npc_body_parts.npc_id = ? "
+		"ORDER BY pve_npc_body_parts.body_part_id;"
 	);
 
 	statement->bindInteger(npcPrimaryKey);
