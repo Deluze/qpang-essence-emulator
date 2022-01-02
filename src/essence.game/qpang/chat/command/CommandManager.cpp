@@ -67,6 +67,7 @@ void CommandManager::initialize()
 		{u"killnpc", new KillNpcCommand()},
 		{u"endround", new PveEndRoundCommand()},
 		{u"makepublic", new PveMakePublic()},
+		{u"mp", new PveMakePublic()},
 	};
 }
 
