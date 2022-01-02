@@ -35,6 +35,12 @@ public:
 				else
 				{
 					session->setPermanentlyDead(true);
+
+					if (auto roomSession = session->getRoomSession(); roomSession != nullptr)
+					{
+						if (roomSession->areAllPlayersPermanentlyDead())
+							roomSession->finishPveGame(false);
+					}
 				}
 			}
 		}
