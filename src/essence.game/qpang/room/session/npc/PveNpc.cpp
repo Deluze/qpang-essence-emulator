@@ -67,8 +67,8 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 
 		if (npc->didPathFinish())
 		{
-			npc->clearPath();
 			npc->setPosition(pathFinder, currCell);
+			npc->clearPath();
 			return;
 		}
 
@@ -84,8 +84,12 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 	}
 	else
 	{
+		if (npc->getIsMovingToPlayer())
+			npc->attackTargetPlayer(roomSession);
+		else
+			npc->attackTargetPos(roomSession);
+
 		npc->clearPath();
-		npc->attackTargetPlayer(roomSession);
 	}
 };
 
@@ -281,17 +285,20 @@ bool PveNpc::canShoot()
 	return true;
 }
 
-void PveNpc::attackTargetPos(const std::shared_ptr<RoomSession>& roomSession, const Position& targetPosition)
+void PveNpc::attackTargetPos(const std::shared_ptr<RoomSession>& roomSession)
 {
 	if (!canShoot())
 		return;
 
 	// We can attack!
-	attack(roomSession, targetPosition);
+	attack(roomSession, m_targetShootPosition);
 }
 
 void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
 {
+	if (!m_targetPlayer)
+		return;
+
 	const auto playerPos = m_targetPlayer->getPosition();
 
 	const auto targetPosition = Position
@@ -301,7 +308,8 @@ void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
 		playerPos.z
 	};
 
-	attackTargetPos(roomSession, targetPosition);
+	m_targetShootPosition = targetPosition;
+	attackTargetPos(roomSession);
 }
 
 void PveNpc::handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder)
@@ -358,7 +366,7 @@ void PveNpc::handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roo
 			return;
 		}
 
-		attackTargetPos(roomSession, m_targetShootPosition);
+		attackTargetPos(roomSession);
 	}
 }
 
@@ -436,6 +444,11 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 	default:
 		break;
 	}
+}
+
+uint32_t PveNpc::getLastAttackerId()
+{
+	return m_lastAttackerId;
 }
 
 void PveNpc::setLastAttackerId(const uint32_t id)
