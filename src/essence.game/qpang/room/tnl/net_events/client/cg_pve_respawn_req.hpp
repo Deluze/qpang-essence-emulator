@@ -15,6 +15,17 @@ public:
 
 	void pack(EventConnection* conn, BitStream* bstream) override {}
 
+	void handleCantRespawn(RoomSessionPlayer::Ptr session)
+	{
+		session->setPermanentlyDead(true);
+
+		if (auto roomSession = session->getRoomSession(); roomSession != nullptr)
+		{
+			if (roomSession->areAllPlayersPermanentlyDead())
+				roomSession->finishPveGame(false);
+		}
+	}
+
 	void handle(GameConnection* conn, Player::Ptr player) override
 	{
 		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
@@ -31,17 +42,11 @@ public:
 						session->setCanRespawn(true);
 						player->removeCoins(100);
 					}
+					else
+						handleCantRespawn(session);
 				}
 				else
-				{
-					session->setPermanentlyDead(true);
-
-					if (auto roomSession = session->getRoomSession(); roomSession != nullptr)
-					{
-						if (roomSession->areAllPlayersPermanentlyDead())
-							roomSession->finishPveGame(false);
-					}
-				}
+					handleCantRespawn(session);
 			}
 		}
 	}
