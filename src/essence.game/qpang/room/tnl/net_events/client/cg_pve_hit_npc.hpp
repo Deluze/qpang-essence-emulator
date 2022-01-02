@@ -146,18 +146,21 @@ public:
 
 		// TODO: Check if weaponType matches with the used weapon.
 
-		if (!targetNpc->hasBodyPart(bodyPartId))
+		const auto bodyPart = targetNpc->getBodyPartById(bodyPartId);
+
+		if (bodyPart.id == 0)
 		{
 			return;
 		}
 
-		// TODO: At this point we know the player & npc exists and both are not dead,
-		// TODO: more checks probably need to happen but for now we can relay the damage.
 
 		const auto impactPos = Position{ impactPosX, impactPosY, impactPosZ };
 		const auto impactOffsetPos = Position{ impactOffsetPosX, impactOffsetPosY, impactOffsetPosZ };
 
 		const auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponItemId);
+
+		// FIXME: Right now we grab the weaponType the client sends us. But we want to use the weapon type that we
+		// have stored in the database, currently it is not stored as 71-76 range but rather 1-4 so that's something that needs to change first.
 
 		const auto cgPvEHitNpcData = CGPvEHitNpcData
 		{
@@ -168,7 +171,7 @@ public:
 			impactOffsetPos,
 			entityId,
 			unk_11,
-			bodyPartId,
+			bodyPart,
 			weaponUsed,
 			weaponCardId,
 			static_cast<eWeaponType>(weaponType),
