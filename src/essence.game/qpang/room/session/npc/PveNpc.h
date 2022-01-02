@@ -207,8 +207,15 @@ public:
 	 * \return true if the npc has the body part otherwise false.
 	 */
 	[[nodiscard]]
-	bool hasBodyPart(uint32_t bodyPartId);
+	bool hasBodyPart(uint32_t bodyPartId) const;
 
+	/**
+	 * \brief Retrieves the body part based on its id.
+	 * \param bodyPartId The body part id.
+	 * \return The found body part or an empty body part struct.
+	 */
+	[[nodiscard]]
+	NpcBodyPart getBodyPartById(uint32_t bodyPartId) const;
 #pragma endregion
 
 private:

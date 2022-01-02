@@ -740,17 +740,31 @@ bool PveNpc::isDead() const
 	return m_health <= 0;
 }
 
-bool PveNpc::hasBodyPart(const uint32_t bodyPartId)
+bool PveNpc::hasBodyPart(const uint32_t bodyPartId) const
 {
-	for (const auto& [id, health, weaponItemId, itemBoxId, isDualGun] : m_bodyParts)
+	// ReSharper disable once CppUseStructuredBinding
+	for (const auto& bodyPart : m_bodyParts)
 	{
-		if (id == bodyPartId)
+		if (bodyPart.id == bodyPartId)
 		{
 			return true;
 		}
 	}
 
 	return false;
+}
+
+NpcBodyPart PveNpc::getBodyPartById(const uint32_t bodyPartId) const
+{
+	for (const auto& bodyPart : m_bodyParts)
+	{
+		if (bodyPart.id == bodyPartId)
+		{
+			return bodyPart;
+		}
+	}
+
+	return {};
 }
 
 void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)

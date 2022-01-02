@@ -9,7 +9,6 @@ enum class eRound : uint8_t
 	CHESS_CASTLE_STAGE_3 = 2,
 };
 
-
 class RoomSession;
 
 class RoomSessionPveRoundManager
