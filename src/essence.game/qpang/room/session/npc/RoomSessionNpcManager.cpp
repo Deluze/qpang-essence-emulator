@@ -1,3 +1,4 @@
+// ReSharper disable CppClangTidyBugproneBranchClone
 #include "RoomSessionNpcManager.h"
 
 #include "GCPvEHitNpcData.h"
@@ -187,10 +188,48 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	const auto playerId = data.roomSessionPlayer->getPlayer()->getId();
 	const auto targetNpcUid = data.targetNpc->getUid();
 
-	// FIXME: Temporarily added a 10% damage reduction until we mix in body parts with damage dealt.
-	const auto damage = static_cast<uint16_t>(data.weaponUsed.damage * 0.90);
+	auto damage = static_cast<double>(data.weaponUsed.damage);
 
-	const auto damageDealt = data.targetNpc->takeDamage(damage);
+	// Note: Currently there are no bodyparts with attribute type A_DEFAULT or A_DESTROY.
+	switch (data.bodyPart.attributeType)
+	{
+	case eNpcBodyPartAttributeType::A_DEFAULT:
+		damage = 0;
+		break;
+	case eNpcBodyPartAttributeType::A_INCAPACITY:
+		// FIXME: If we interpret the description correctly, this body part needs to be destroyed on hit (gc_pve_destroy_part).
+	case eNpcBodyPartAttributeType::A_DESTROY:
+		break;
+	}
+
+	// Note: Currently the damage type D_ONLY_NEARWEAPON is not being used by any npc.
+	switch (data.bodyPart.damageType)
+	{
+	case eNpcBodyPartDamageType::D_DEFAULT:
+		// Takes damage regardless of weapon.
+		break;
+	case eNpcBodyPartDamageType::D_EXCEPT_SPLASH:
+		// FIXME: Check if weapon deals splash damage. For now, we disable all damage from throwables.
+		if (data.weaponType == eWeaponType::THROWABLE_1)
+			damage = 0;
+
+		break;
+	case eNpcBodyPartDamageType::D_ONLY_NEARWEAPON:
+		if (data.weaponType != eWeaponType::MELEE)
+			damage = 0;
+
+		break;
+	}
+
+	const auto npcBodyParts = data.targetNpc->getBodyParts();
+	// ReSharper disable once CppTooWideScopeInitStatement
+	const auto isHeadshot = (!npcBodyParts.empty() && (npcBodyParts[0].id == data.bodyPart.id));
+
+	// This means it is headshot damage.
+	if (!isHeadshot)
+		damage *= 0.5;
+
+	const auto damageDealt = data.targetNpc->takeDamage(static_cast<uint16_t>(damage));
 	const auto hasTargetDied = data.targetNpc->isDead();
 
 	if (hasTargetDied)
@@ -213,7 +252,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.impactPosOffset,
 		data.entityId,
 		data.unk_11,
-		data.bodyPartId,
+		static_cast<uint8_t>(data.bodyPart.id),
 		data.weaponUsed.itemId,
 		data.weaponCardId,
 		data.weaponType,
