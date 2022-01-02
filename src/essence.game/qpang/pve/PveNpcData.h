@@ -35,6 +35,27 @@ struct NpcLootDrop
 	uint32_t probability;
 };
 
+enum class eNpcBodyPartAttributeType : uint8_t
+{
+	A_DEFAULT = 0,
+	A_INCAPACITY = 1,
+	A_DESTROY = 2
+};
+
+enum class eNpcBodyPartDamageType : uint8_t
+{
+	D_DEFAULT = 0,
+	D_EXCEPT_SPLASH = 1,
+	D_ONLY_NEARWEAPON = 2
+};
+
+enum class eNpcBodyPartPartType : uint8_t
+{
+	T_DEFAULT = 0,
+	T_ATTACK = 1,
+	T_DEFENSE = 2
+};
+
 struct NpcBodyPart
 {
 	uint32_t id;
@@ -42,6 +63,9 @@ struct NpcBodyPart
 	uint32_t weaponItemId;
 	uint32_t itemBoxId;
 	bool isDualGun;
+	eNpcBodyPartAttributeType attributeType;
+	eNpcBodyPartDamageType damageType;
+	eNpcBodyPartPartType partType;
 };
 
 struct PveNpcData

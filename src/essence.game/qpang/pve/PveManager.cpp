@@ -223,7 +223,23 @@ std::vector<NpcLootDrop> PveManager::getLootDropsByNpcPrimaryKey(const uint32_t 
 
 std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t npcPrimaryKey)
 {
-	const auto statement = DATABASE->prepare("SELECT * FROM pve_npc_body_parts WHERE npc_id = ?");
+	const auto statement = DATABASE->prepare(
+		"SELECT "
+		"pve_npc_body_parts.body_part_id AS BodyPartId "
+		",pve_npc_body_parts.health AS Health "
+		",pve_npc_body_parts.weapon_item_id AS WeaponItemId "
+		",pve_npc_body_parts.item_box_id AS ItemBoxId "
+		",pve_npc_body_parts.is_dual_gun AS IsDualGun "
+		",pve_body_part_attribute_types.type AS AttributeType "
+		",pve_body_part_damage_types.type AS DamageType "
+		",pve_body_part_part_types.type AS PartType "
+		"FROM pve_npc_body_parts "
+		"INNER JOIN pve_body_parts ON pve_body_parts.id = pve_npc_body_parts.body_part_id "
+		"INNER JOIN pve_body_part_attribute_types ON pve_body_part_attribute_types.id = pve_body_parts.attribute_type_id "
+		"INNER JOIN pve_body_part_damage_types ON pve_body_part_damage_types.id = pve_body_parts.damage_type_id "
+		"INNER JOIN pve_body_part_part_types ON pve_body_part_part_types.id = pve_body_parts.part_type_id "
+		"WHERE pve_npc_body_parts.npc_id = ?;"
+	);
 
 	statement->bindInteger(npcPrimaryKey);
 
@@ -235,11 +251,14 @@ std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t 
 	{
 		auto bodyPart = NpcBodyPart
 		{
-			result->getInt("body_part_id"),
-			result->getShort("health"),
-			result->getInt("weapon_item_id"),
-			result->getInt("item_box_id"),
-			result->getFlag("is_dual_gun")
+			result->getInt("BodyPartId"),
+			result->getShort("Health"),
+			result->getInt("WeaponItemId"),
+			result->getInt("ItemBoxId"),
+			result->getFlag("IsDualGun"),
+			static_cast<eNpcBodyPartAttributeType>(result->getTiny("AttributeType")),
+			static_cast<eNpcBodyPartDamageType>(result->getTiny("DamageType")),
+			static_cast<eNpcBodyPartPartType>(result->getTiny("PartType")),
 		};
 
 		bodyParts.push_back(bodyPart);
