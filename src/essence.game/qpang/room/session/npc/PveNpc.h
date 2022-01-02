@@ -19,6 +19,8 @@ public:
 
 	void handleDeath(const std::shared_ptr<RoomSession>& roomSession);
 
+	uint32_t getLastAttackerId();
+
 	void setLastAttackerId(uint32_t id);
 
 	bool isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell) const;
@@ -83,7 +85,7 @@ public:
 
 	bool canAttackTargetPlayer(Pathfinder* pathFinder);
 
-	void attackTargetPos(const std::shared_ptr<RoomSession>& roomSession, const Position& targetPosition);
+	void attackTargetPos(const std::shared_ptr<RoomSession>& roomSession);
 
 	void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
