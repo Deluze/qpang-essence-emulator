@@ -379,8 +379,8 @@ void RoomSession::tick()
 			session->tick();
 	}
 
-	if (canFinish())
-		finish();
+	/*if (canFinish())
+		finish();*/
 }
 
 void RoomSession::clear()
@@ -550,7 +550,7 @@ bool RoomSession::isAlmostFinished()
 
 }
 
-void RoomSession::finishPveGame()
+void RoomSession::finishPveGame(bool didWin)
 {
 	if (!canFinishPveGame())
 	{
@@ -591,18 +591,16 @@ void RoomSession::finishPveGame()
 		roomSessionPlayer->post(new GCGameState(roomSessionPlayer, 23));
 
 		// Send PvE end result.
-		constexpr bool win = true;
-
 		const uint32_t goldenCoinsEarned = roomSessionPlayer->getGoldenCoinCount();
 		const uint32_t silverCoinsEarned = roomSessionPlayer->getSilverCoinCount();
 		const uint32_t bronzeCoinsEarned = roomSessionPlayer->getBronzeCoinCount();
 
-		constexpr uint32_t bestTimeLeftInMs = 1000;
+		constexpr uint32_t bestTimeLeftInMs = 0;
 
 		const auto currentTime = time(nullptr);
-		const auto currentTimeLeftMs = static_cast<uint32_t>((m_endTime - currentTime) * 1000);
+		const auto currentTimeLeftMs = didWin ? static_cast<uint32_t>((m_endTime - currentTime) * 1000) : 0;
 
-		roomSessionPlayer->post(new GCMasterLog(player->getId(), win, goldenCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftMs));
+		roomSessionPlayer->post(new GCMasterLog(player->getId(), didWin, goldenCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftMs));
 	}
 
 	m_room->finish();
@@ -684,6 +682,23 @@ void RoomSession::resetTime()
 {
 	m_startTime = time(NULL) + 5;
 	m_endTime = m_startTime + m_goal * 60;
+}
+
+bool RoomSession::areAllPlayersPermanentlyDead()
+{
+	auto players = getPlayingPlayers();
+
+	int permanentlyDeadPlayers = 0;
+	for (const auto& player : players)
+	{
+		if (player->isPermanentlyDead())
+			permanentlyDeadPlayers++;
+	}
+
+	if (permanentlyDeadPlayers == players.size())
+		return true;
+
+	return false;
 }
 
 void RoomSession::resetEssence()

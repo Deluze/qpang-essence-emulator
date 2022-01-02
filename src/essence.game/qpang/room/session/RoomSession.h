@@ -47,7 +47,7 @@ public:
 	bool isAlmostFinished();
 
 	// Note: Pve finish.
-	void finishPveGame();
+	void finishPveGame(bool didWin = true);
 	static bool canFinishPveGame();
 
 	void setLastRespawnLocation(Spawn spawn);
@@ -93,6 +93,8 @@ public:
 	uint32_t getTopScore();
 
 	void resetTime();
+
+	bool areAllPlayersPermanentlyDead();
 
 #pragma region Essence
 
