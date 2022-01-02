@@ -161,7 +161,7 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished() const
 	if (finishedStage)
 	{
 		//endRound();
-		roomSession->finish();
+		roomSession->finishPveGame(true);
 	}
 }
 
