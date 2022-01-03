@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <mutex>
 
 #include "CGPvEHitNpcData.h"
 #include "PveNpc.h"
@@ -24,7 +25,7 @@ public:
 	/**
 	 * \brief Updates npc related stuff every tick.
 	 */
-	void tick() const;
+	void tick();
 
 	/**
 	 * \brief Retrieves all npcs for the current map.
@@ -86,6 +87,8 @@ public:
 	 */
 	void onCGPvEHitNpc(const CGPvEHitNpcData& data);
 private:
+	std::recursive_mutex m_npcMutex;
+
 	std::weak_ptr<RoomSession> m_roomSession;
 
 	std::vector<PveNpc> m_npcs{};
