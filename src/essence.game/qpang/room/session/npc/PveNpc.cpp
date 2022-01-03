@@ -299,16 +299,13 @@ void PveNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
 	if (!m_targetPlayer)
 		return;
 
-	const auto playerPos = m_targetPlayer->getPosition();
+	const auto [x, y, z] = m_targetPlayer->getPosition();
 
-	const auto targetPosition = Position
-	{
-		playerPos.x,
-		playerPos.y + 0.5f,
-		playerPos.z
-	};
+	const auto yCorrection = RandomHelper::getRandomFloat(0, 1);
+	const auto targetPosition = Position{ x, (y + yCorrection), z };
 
 	m_targetShootPosition = targetPosition;
+
 	attackTargetPos(roomSession);
 }
 
