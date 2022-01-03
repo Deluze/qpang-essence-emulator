@@ -124,6 +124,13 @@ void RoomSessionPveRoundManager::endRound()
 	updatePathfinders();
 
 	roomSession->stopTime();
+
+	for (const auto& player : roomSession->getPlayingPlayers())
+	{
+		// Synchronize time for every player.
+		player->send<GCGameState>(player->getPlayer()->getId(), CGGameState::State::SYNC_TIME, roomSession->getElapsedTime());
+	}
+
 	// Relay the round ending to all players.
 	roomSession->relayPlaying<GCPvERoundEnd>();
 }
