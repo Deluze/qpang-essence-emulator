@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "RoomSessionPlayer.h"
+
 enum class eRound : uint8_t
 {
 	CHESS_CASTLE_STAGE_1 = 0,
@@ -28,14 +30,14 @@ public:
 	/**
 	 * \brief Handles the CGPvERoundStart event by relaying the CGPvENewRound event.
 	 */
-	void onStartNewRound();
+	void onStartNewRound(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer);
 
 	/**
 	 * \brief Ends the current round which causes the client to send a start new round packet/event.
 	 */
 	void endRound();
 
-	void tick() const;
+	void tick();
 
 	void checkRoundZeroFinished() const;
 
@@ -50,6 +52,10 @@ private:
 	void updatePathfinders() const;
 
 	std::weak_ptr<RoomSession> m_roomSession;
+
+	std::vector<std::shared_ptr<RoomSessionPlayer>> m_initializedPlayers;
+
+	uint32_t m_initializedPlayerCount = 0;
 
 	bool m_hasRoundEnded = false;
 

@@ -40,45 +40,48 @@ void RoomSessionPveRoundManager::updatePathfinders() const
 		roomSession->getAboveGroundPathfinder()->free();
 		roomSession->getUnderGroundPathfinder()->free();
 		break;
-	default:
-		break;
 	}
 }
 
-void RoomSessionPveRoundManager::onStartNewRound()
+void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer)
 {
 	const auto roomSession = m_roomSession.lock();
+
 	if (roomSession == nullptr)
-		return;
-
-	m_currentRound++;
-	m_currentMap++;
-
-	updatePathfinders();
-
-	roomSession->resetTime();
-
-	// Relay the new round to all players.
-	roomSession->relayPlaying<GCPvENewRound>();
-
-	// Respawn all players
-	for (const auto& player : roomSession->getPlayingPlayers())
-		player->respawn();
-
-	roomSession->getPveAreaManager()->initializeAreas();
-	roomSession->getObjectManager()->initializeObjects();
-	roomSession->getNpcManager()->initializeNpcs();
-	roomSession->getPveItemManager()->initializeItems();
-
-	if (static_cast<eRound>(m_currentRound) == eRound::CHESS_CASTLE_STAGE_2)
 	{
-		roomSession->getPveWaveManager()->initializeWaves();
+		return;
+	}
+
+	m_initializedPlayerCount++;
+
+	// Check if the initialized player count equals the playing players size.
+	if (m_initializedPlayerCount >= roomSession->getPlayingPlayers().size())
+	{
+		// All players are initialized so we can initialize everything for them.
+		roomSession->resetTime();
+
+		roomSession->getPveAreaManager()->initializeAreas();
+		roomSession->getObjectManager()->initializeObjects();
+		roomSession->getNpcManager()->initializeNpcs();
+		roomSession->getPveItemManager()->initializeItems();
+
+		if (static_cast<eRound>(m_currentRound) == eRound::CHESS_CASTLE_STAGE_2)
+		{
+			roomSession->getPveWaveManager()->initializeWaves();
+		}
+
+		for (const auto& player : roomSession->getPlayingPlayers())
+		{
+			player->send<GCPvENewRound>();
+			player->respawn();
+		}
 	}
 }
 
 void RoomSessionPveRoundManager::endRound()
 {
 	const auto roomSession = m_roomSession.lock();
+
 	if (roomSession == nullptr)
 		return;
 
@@ -97,11 +100,20 @@ void RoomSessionPveRoundManager::endRound()
 	roomSession->getPveItemManager()->removeAll();
 	roomSession->getPveWaveManager()->removeAll();
 
+	// Initiate stuff for new round.
+	m_currentRound++;
+	m_currentMap++;
+
+	m_initializedPlayerCount = 0;
+	m_hasRoundEnded = false;
+
+	updatePathfinders();
+
 	// Relay the round ending to all players.
 	roomSession->relayPlaying<GCPvERoundEnd>();
 }
 
-void RoomSessionPveRoundManager::tick() const
+void RoomSessionPveRoundManager::tick()
 {
 	if (m_hasRoundEnded)
 	{

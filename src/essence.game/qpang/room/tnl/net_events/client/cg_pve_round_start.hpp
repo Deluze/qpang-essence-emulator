@@ -7,7 +7,7 @@ class CGPvERoundStart : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	CGPvERoundStart() : GameNetEvent{ CG_PVE_ROUND_START, GuaranteedOrdered, DirClientToServer} {}
+	CGPvERoundStart() : GameNetEvent{ CG_PVE_ROUND_START, GuaranteedOrdered, DirClientToServer } {}
 
 	void pack(EventConnection* conn, BitStream* bstream) override {}
 	void unpack(EventConnection* conn, BitStream* bstream) override {}
@@ -40,7 +40,7 @@ public:
 			return;
 		}
 
-		roomSession->getPveRoundManager()->onStartNewRound();
+		roomSession->getPveRoundManager()->onStartNewRound(roomSessionPlayer);
 	}
 
 	void process(EventConnection* ps) override
