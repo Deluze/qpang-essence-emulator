@@ -47,6 +47,11 @@ bool PveArea::isInitialized() const
 
 void PveArea::onAreaEnter(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer)
 {
+	if (roomSessionPlayer->getRoomSession()->getElapsedTime() < 1000)
+	{
+		return;
+	}
+
 	const auto playerId = roomSessionPlayer->getPlayer()->getId();
 
 	const auto& it = std::find(m_players.begin(), m_players.end(), playerId);
@@ -58,6 +63,8 @@ void PveArea::onAreaEnter(const std::shared_ptr<RoomSessionPlayer>& roomSessionP
 	}
 
 	m_players.push_back(playerId);
+
+
 
 	if (!m_isInitialized)
 	{
