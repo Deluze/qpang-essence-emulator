@@ -27,8 +27,6 @@ void RoomSessionNpcManager::tick()
 		return;
 	}
 
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
-
 	for (const auto& [uid, npc] : m_spawnedNpcs)
 	{
 		npc->tick(roomSession);
@@ -44,10 +42,11 @@ void RoomSessionNpcManager::initializeNpcs()
 		return;
 	}
 
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+	m_npcMutex.lock();
+	m_spawnedNpcs.clear();
+	m_npcMutex.unlock();
 
 	m_npcs.clear();
-	m_spawnedNpcs.clear();
 
 	const auto mapId = roomSession->getPveRoundManager()->getMap();
 	const auto npcData = Game::instance()->getPveManager()->getNpcDataByMapId(mapId);
@@ -73,8 +72,6 @@ void RoomSessionNpcManager::initializeNpcs()
 
 void RoomSessionNpcManager::spawnNpcsForArea(const uint32_t areaId)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
-
 	for (const auto& npc : m_npcs)
 	{
 		if (npc.getAreaUid() == areaId)
@@ -86,8 +83,6 @@ void RoomSessionNpcManager::spawnNpcsForArea(const uint32_t areaId)
 
 uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -95,10 +90,14 @@ uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 		return 0;
 	}
 
+	m_npcMutex.lock();
+
 	npc->setUid(m_spawnedNpcs.size() + 1);
 	npc->spawn(roomSession);
 
 	m_spawnedNpcs[npc->getUid()] = npc;
+
+	m_npcMutex.unlock();
 
 	return npc->getUid();
 }
@@ -143,10 +142,11 @@ void RoomSessionNpcManager::killNpc(const uint32_t uid)
 
 void RoomSessionNpcManager::removeAll()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
-
 	m_npcs.clear();
+
+	m_npcMutex.lock();
 	m_spawnedNpcs.clear();
+	m_npcMutex.unlock();
 }
 
 std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
@@ -165,8 +165,6 @@ std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
 
 std::vector<std::shared_ptr<PveNpc>> RoomSessionNpcManager::getAliveNpcs()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
-
 	std::vector<std::shared_ptr<PveNpc>> aliveNpcs{};
 
 	for (const auto& [id, npc] : m_spawnedNpcs)
