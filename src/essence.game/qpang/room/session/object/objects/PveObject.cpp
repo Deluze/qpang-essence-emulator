@@ -58,9 +58,12 @@ void PveObject::onHitByNpc(const std::shared_ptr<RoomSession>& roomSession, cons
 
 	takeDamage(damage);
 
-	// TODO: Finish the game if the health is at 0 since that means they have lost.
-
 	roomSession->relayPlaying<GCPvEHitNpcToObject>(m_uid, m_health, damage);
+
+	if (m_health == 0)
+	{
+		roomSession->finishPveGame(false);
+	}
 }
 
 void PveObject::onEvent(const std::shared_ptr<RoomSession>& roomSession)
