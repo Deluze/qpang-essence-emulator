@@ -20,6 +20,7 @@ public:
 	U8 unk_09;  // 120
 	U8 bodyPartHitLocation;  // 121
 	U64 unk_11; // 128?
+
 	CGPvEHitN2P() : GameNetEvent{ CG_PVE_HIT_N2P, GuaranteedOrdered, DirClientToServer } {}
 
 	enum BodyPartHitLocation : U8 {
@@ -153,7 +154,7 @@ public:
 			roomSession->getGameMode()->onPlayerDeathByNpc(roomSessionPlayer, npc);
 		}
 
-		roomSession->relayPlaying<GCPvEHitN2P>(npcUid, npcBodyPartId, impactPos, impactOffsetPos, unk_09, bodyPartHitLocation, 0, 0);
+		roomSession->relayPlaying<GCPvEHitN2P>(npcUid, npcBodyPartId, impactPos, impactOffsetPos, 2, bodyPartHitLocation, player->getId(), roomSessionPlayer->getHealth());
 	}
 
 	void process(EventConnection* ps) override

@@ -20,12 +20,12 @@ public:
 	U8 bodyPartHitLocation = 0; // 121
 
 	// One of these unknowns must be damageDealt or healthLeft (I think).
-	U32 unk_11 = 0; // 124
-	U32 unk_12 = 0; // 128
+	U32 playerId = 0; // 124
+	U32 remainingHealth = 0; // 128
 
 	GCPvEHitN2P() : GameNetEvent{ GC_PVE_HIT_N2P, GuaranteedOrdered, DirServerToClient } {}
 	GCPvEHitN2P(const uint32_t npcUid, const uint32_t npcBodyPartId, const Position impactPosition, const Position impactOffsetPosition, 
-		const uint8_t unk09,const uint8_t bodyPartHitLocation, const uint32_t unk11, const uint32_t unk12)
+		const uint8_t unk09,const uint8_t bodyPartHitLocation, const uint32_t playerId, const uint32_t remainingHealth)
 		: GameNetEvent{ GC_PVE_HIT_N2P, GuaranteedOrdered, DirServerToClient },
 		npcUid(npcUid),
 		npcBodyPartId(npcBodyPartId),
@@ -37,8 +37,8 @@ public:
 		impactOffsetPosZ(impactOffsetPosition.z),
 		unk_09(unk09),
 		bodyPartHitLocation(bodyPartHitLocation),
-		unk_11(unk11),
-		unk_12(unk12)
+		playerId(playerId),
+		remainingHealth(remainingHealth)
 	{
 	}
 
@@ -54,8 +54,8 @@ public:
 		bstream->write(impactOffsetPosZ);
 		bstream->write(unk_09);
 		bstream->write(bodyPartHitLocation);
-		bstream->write(unk_11);
-		bstream->write(unk_12);
+		bstream->write(playerId);
+		bstream->write(remainingHealth);
 	}
 
 	void unpack(EventConnection* conn, BitStream* bstream) override {}
