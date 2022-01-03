@@ -32,6 +32,10 @@ public:
 
 		const auto roomSession = roomSessionPlayer->getRoomSession();
 
+		const auto type = convertToInteger(args.at(0));
+		const auto uid = convertToInteger(args.at(0));
+
+		roomSession->relayPlaying<GCPvENpcInit>(type, uid, roomSessionPlayer->getPosition(), 0, 100);
 		//roomSession->getNpcManager()->spawnInitializedNpcs();
 	}
 };
