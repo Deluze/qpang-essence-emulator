@@ -34,12 +34,17 @@ std::mutex pathfindingMutex = {};
 // If it is, for that npc, return false in canAttackTargetPlayer, so that it will continue pathfinding.
 // Once it's taken path isn't in the vector anymore, it can stop moving, and continue attacking.
 
-std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&)> npcDoNextMove = [&](
-	const RoomSession::Ptr& roomSession, PveNpc* npc, const PathfinderCell& prevCell, const PathfinderCell& currCell)
+std::function<void(RoomSession::Ptr, uint32_t, const PathfinderCell&, const PathfinderCell&)> npcDoNextMove = [&](
+	const RoomSession::Ptr& roomSession, uint32_t npcUid, const PathfinderCell& prevCell, const PathfinderCell& currCell)
 {
 	std::lock_guard lg(pathfindingMutex);
 
-	if (npc == nullptr)
+	auto npcManager = roomSession->getNpcManager();
+	if (!npcManager)
+		return;
+
+	auto npc = npcManager->findNpcByUid(npcUid);
+	if (!npc)
 		return;
 
 	const auto pathFinder = npc->getPathFinder(roomSession);
@@ -79,8 +84,8 @@ std::function<void(RoomSession::Ptr, PveNpc*, const PathfinderCell&, const Pathf
 
 		const int timeMilliseconds = std::round(moveTime * 1000.f);
 
-		TimeHelper::setTimeOut<RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&>
-			(timeMilliseconds, npcDoNextMove, roomSession, npc, currCell, nextCell);
+		TimeHelper::setTimeOut<RoomSession::Ptr, uint32_t, const PathfinderCell&, const PathfinderCell&>
+			(timeMilliseconds, npcDoNextMove, roomSession, npcUid, currCell, nextCell);
 	}
 	else
 	{
@@ -244,8 +249,8 @@ void PveNpc::startMovingToPos(const std::shared_ptr<RoomSession>& roomSession, P
 		m_pathIdx = 1;
 
 		// Starting at path[1], as the first pos is the current pos.
-		TimeHelper::setTimeOut<RoomSession::Ptr, PveNpc*, const PathfinderCell&, const PathfinderCell&>
-			(0, npcDoNextMove, roomSession, this, m_currentCell, m_path[1]);
+		TimeHelper::setTimeOut<RoomSession::Ptr, uint32_t, const PathfinderCell&, const PathfinderCell&>
+			(0, npcDoNextMove, roomSession, m_uid, m_currentCell, m_path[1]);
 	}
 }
 
@@ -354,32 +359,35 @@ void PveNpc::handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSes
 
 void PveNpc::handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder)
 {
-	m_targetPlayerId = findClosestValidPlayerId(roomSession);
-	if (m_targetPlayerId != 0)
+	if (m_lastAttackerId != 0)
 	{
-		if (!canAttackTargetPlayer(roomSession, pathFinder))
+		m_targetPlayerId = m_lastAttackerId;
+		auto targetPlayer = roomSession->find(m_targetPlayerId);
+		if (isPlayerValid(targetPlayer))
 		{
-			// Perhaps we want to check to see if we can attack the target player
-			// if it get's too easy this way.
+			if (!canAttackTargetPlayer(roomSession, pathFinder))
+			{
+				// Perhaps we want to check to see if we can attack the target player
+				// if it get's too easy this way.
 
-			startMovingToPlayer(roomSession, pathFinder);
+				startMovingToPlayer(roomSession, pathFinder);
+				return;
+			}
+
+			attackTargetPlayer(roomSession);
 			return;
 		}
-
-		attackTargetPlayer(roomSession);
 	}
-	else
+
+	m_targetShootPosition = { 0, 1.1f, 0.f };
+	if (!canAttackTargetPos(pathFinder))
 	{
-		m_targetShootPosition = { 0, 1.1f, 0.f };
-		if (!canAttackTargetPos(pathFinder))
-		{
-			m_isMovingToPlayer = false;
-			startMovingToPos(roomSession, pathFinder, m_targetShootPosition);
-			return;
-		}
-
-		attackTargetPos(roomSession);
+		m_isMovingToPlayer = false;
+		startMovingToPos(roomSession, pathFinder, m_targetShootPosition);
+		return;
 	}
+
+	attackTargetPos(roomSession);
 }
 
 void PveNpc::handleMovement(const std::shared_ptr<RoomSession>& roomSession)
