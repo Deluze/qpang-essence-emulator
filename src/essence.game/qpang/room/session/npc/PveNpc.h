@@ -23,7 +23,7 @@ public:
 
 	void setLastAttackerId(uint32_t id);
 
-	bool isNextMoveValid(Pathfinder* pathFinder, const PathfinderCell& cell) const;
+	bool isNextMoveValid(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder, const PathfinderCell& cell) const;
 
 	PathfinderCell getMoveCell();
 
@@ -37,8 +37,6 @@ public:
 	void setPosition(Pathfinder* pathFinder, const PathfinderCell& cell);
 
 	PathfinderCell getTargetCell();
-
-	std::shared_ptr<RoomSessionPlayer> getTargetPlayer();
 
 	Pathfinder* getPathFinder(const std::shared_ptr<RoomSession>& roomSession) const;
 
@@ -83,7 +81,7 @@ public:
 
 	bool canAttackTargetPos(Pathfinder* pathFinder);
 
-	bool canAttackTargetPlayer(Pathfinder* pathFinder);
+	bool canAttackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void attackTargetPos(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -241,9 +239,7 @@ private:
 
 	bool isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player) const;
 
-	RoomSessionPlayer::Ptr findValidAttackerPlayer(const std::shared_ptr<RoomSession>& roomSession) const;
-
-	RoomSessionPlayer::Ptr findClosestValidPlayer(const std::shared_ptr<RoomSession>& roomSession) const;
+	uint32_t findClosestValidPlayerId(const std::shared_ptr<RoomSession>& roomSession) const;
 
 	/**
 	 * \brief Picks a random item from the loot table and drops it.
@@ -311,7 +307,7 @@ private:
 	std::vector<PathfinderCell> m_path = {};
 	int m_pathIdx = 0;
 
-	std::shared_ptr<RoomSessionPlayer> m_targetPlayer = nullptr;
+	uint32_t m_targetPlayerId = 0;
 
 	bool m_isMovingToPlayer = false;
 
