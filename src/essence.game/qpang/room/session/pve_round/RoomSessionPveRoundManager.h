@@ -37,7 +37,7 @@ public:
 	 */
 	void endRound();
 
-	void tick();
+	void tick() const;
 
 	void checkRoundZeroFinished() const;
 
@@ -52,8 +52,6 @@ private:
 	void updatePathfinders() const;
 
 	std::weak_ptr<RoomSession> m_roomSession;
-
-	std::vector<std::shared_ptr<RoomSessionPlayer>> m_initializedPlayers;
 
 	uint32_t m_initializedPlayerCount = 0;
 
