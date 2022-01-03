@@ -46,7 +46,7 @@ public:
 	uint8_t getMap() const;
 
 	[[nodiscard]]
-	uint8_t getCurrentRound() const;
+	eRound getCurrentRound() const;
 #pragma endregion
 private:
 	void updatePathfinders() const;
@@ -57,6 +57,6 @@ private:
 
 	bool m_hasRoundEnded = false;
 
-	uint8_t m_currentRound = 0;
 	uint8_t m_currentMap = 120;
+	eRound m_currentRound = eRound::CHESS_CASTLE_STAGE_1;
 };

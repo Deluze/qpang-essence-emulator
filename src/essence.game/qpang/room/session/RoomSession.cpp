@@ -14,9 +14,6 @@
 #include "qpang/room/tnl/net_events/server/gc_hit_essence.hpp"
 #include <utils/StringConverter.h>
 
-#include "cg_game_state.hpp"
-#include "gc_pve_round_end.hpp"
-#include "gc_pve_score_result.hpp"
 #include "SendUpdateSkillSet.h"
 
 #include "gc_master_log.hpp"
@@ -25,14 +22,14 @@ constexpr auto TAG_BASE_HEALTH = 500;
 
 RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_room(room),
-	m_gameMode(mode),
 	m_isFinished(false),
-	m_essenceHolder(nullptr),
 	m_bluePoints(0),
 	m_yellowPoints(0),
 	m_lastTickTime(NULL),
 	m_essenceDropTime(NULL),
 	m_isEssenceReset(true),
+	m_gameMode(mode),
+	m_essenceHolder(nullptr),
 	m_blueVip(nullptr),
 	m_nextBlueVip(nullptr),
 	m_blueVipSetTime(NULL),
@@ -40,16 +37,18 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_nextYellowVip(nullptr),
 	m_yellowVipSetTime(NULL),
 	m_currentlySelectedTag(0),
-	m_tagCountdown(0),
 	m_isSearchingForNextTag(false),
+	m_tagCountdown(0),
 	m_initialWaitTime((CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000)
 {
 	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
-	
+
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
-	m_startTime = time(NULL) + waitingForPlayersTime + 5;
-	m_endTime = room->isPointsGame() ? NULL : m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
+	m_startTime = time(nullptr) + waitingForPlayersTime + 5;
+	m_endTime = room->isPointsGame()
+		? NULL
+		: m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
 }
 
 void RoomSession::initialize()
@@ -80,7 +79,7 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 {
 	auto player = std::make_shared<RoomSessionPlayer>(conn, shared_from_this(), team);
 
-	if (auto roomPlayer = conn->getPlayer()->getRoomPlayer(); roomPlayer != nullptr)
+	if (const auto roomPlayer = conn->getPlayer()->getRoomPlayer(); roomPlayer != nullptr)
 		roomPlayer->setRoomSessionPlayer(player);
 
 	player->initialize();
@@ -103,7 +102,8 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 	m_players[player->getPlayer()->getId()] = player;
 	m_playerMx.unlock();
 
-	auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), team);
+	// ReSharper disable once CppUseStructuredBinding
+	const auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), team);
 
 	player->post(new GCGameState(player->getPlayer()->getId(), 11, 0)); // Necessary to initiate spectator mode in "waiting for players" state
 	player->post(new GCRespawn(player->getPlayer()->getId(), player->getCharacter(), 1, spawn.x, spawn.y, spawn.z));
@@ -680,7 +680,14 @@ uint32_t RoomSession::getTopScore()
 
 void RoomSession::resetTime()
 {
-	m_startTime = time(NULL) + 5;
+	m_startTime = time(nullptr) + 5;
+	m_endTime = m_startTime + m_goal * 60;
+}
+
+void RoomSession::stopTime()
+{
+	// This method stops the time counting down for about 60 seconds.
+	m_startTime = time(nullptr) + 60;
 	m_endTime = m_startTime + m_goal * 60;
 }
 
@@ -1075,27 +1082,33 @@ void RoomSession::syncPlayer(RoomSessionPlayer::Ptr player)
 	m_gameMode->onPlayerSync(player);
 }
 
-uint32_t RoomSession::getElapsedTime()
+uint32_t RoomSession::getElapsedTime() const
 {
-	time_t currTime = time(NULL);
+	const time_t currTime = time(nullptr);
 
 	if (currTime <= m_startTime)
+	{
 		return 0;
+	}
 
 	return (currTime - m_startTime) * 1000;
 }
 
-uint32_t RoomSession::getTimeLeftInSeconds()
+uint32_t RoomSession::getTimeLeftInSeconds() const
 {
 	if (m_isPoints)
+	{
 		return 1;
+	}
 
-	const auto currTime = time(NULL);
+	const auto currTime = time(nullptr);
 
 	if (currTime > m_endTime)
+	{
 		return 0;
+	}
 
-	return m_endTime - currTime;
+	return (m_endTime - currTime);
 }
 
 void RoomSession::killPlayer(RoomSessionPlayer::Ptr killer, RoomSessionPlayer::Ptr target, uint32_t weaponId, bool isHeadshot)

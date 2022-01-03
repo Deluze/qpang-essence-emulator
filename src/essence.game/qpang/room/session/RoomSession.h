@@ -63,8 +63,8 @@ public:
 	void spawnPlayer(RoomSessionPlayer::Ptr player);
 	void syncPlayer(RoomSessionPlayer::Ptr player);
 
-	uint32_t getElapsedTime(); // in milliseconds
-	uint32_t getTimeLeftInSeconds();
+	uint32_t getElapsedTime() const; // in milliseconds
+	uint32_t getTimeLeftInSeconds() const;
 
 	void killPlayer(RoomSessionPlayer::Ptr killer, RoomSessionPlayer::Ptr target, uint32_t weaponId, bool isHeadshot);
 
@@ -93,6 +93,7 @@ public:
 	uint32_t getTopScore();
 
 	void resetTime();
+	void stopTime();
 
 	bool areAllPlayersPermanentlyDead();
 

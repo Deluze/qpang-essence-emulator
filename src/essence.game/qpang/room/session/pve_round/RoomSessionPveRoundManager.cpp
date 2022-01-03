@@ -6,6 +6,8 @@
 
 #include <qpang/helpers/AABBHelper.h>
 
+#include "cg_game_state.hpp"
+#include "gc_game_state.hpp"
 #include "Maps.h"
 
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
@@ -25,7 +27,7 @@ void RoomSessionPveRoundManager::updatePathfinders() const
 	if (roomSession == nullptr)
 		return;
 
-	switch (static_cast<eRound>(m_currentRound))
+	switch (m_currentRound)
 	{
 	case eRound::CHESS_CASTLE_STAGE_1:
 		roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage1AboveGroundMapInfo);
@@ -57,23 +59,28 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 	// Check if the initialized player count equals the playing players size.
 	if (m_initializedPlayerCount >= roomSession->getPlayingPlayers().size())
 	{
-		// All players are initialized so we can initialize everything for them.
+		// Relay the new round to all players.
+		roomSession->relayPlaying<GCPvENewRound>();
+
+		// Reset the time.
 		roomSession->resetTime();
 
+		// Initialize all areas,objects, npcs and items.
 		roomSession->getPveAreaManager()->initializeAreas();
 		roomSession->getObjectManager()->initializeObjects();
 		roomSession->getNpcManager()->initializeNpcs();
 		roomSession->getPveItemManager()->initializeItems();
 
-		if (static_cast<eRound>(m_currentRound) == eRound::CHESS_CASTLE_STAGE_2)
+		if (m_currentRound == eRound::CHESS_CASTLE_STAGE_2)
 		{
 			roomSession->getPveWaveManager()->initializeWaves();
 		}
 
 		for (const auto& player : roomSession->getPlayingPlayers())
 		{
-			player->send<GCPvENewRound>();
 			player->respawn();
+			// Synchronize time for every player.
+			player->send<GCGameState>(player->getPlayer()->getId(), CGGameState::State::SYNC_TIME, roomSession->getElapsedTime());
 		}
 	}
 }
@@ -83,12 +90,7 @@ void RoomSessionPveRoundManager::endRound()
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
-		return;
-
-	// Can not end this round since it's the last round.
-	if (static_cast<eRound>(m_currentRound) == eRound::CHESS_CASTLE_STAGE_3)
 	{
-		// TODO: Finish the game and send result screen?
 		return;
 	}
 
@@ -101,7 +103,19 @@ void RoomSessionPveRoundManager::endRound()
 	roomSession->getPveWaveManager()->removeAll();
 
 	// Initiate stuff for new round.
-	m_currentRound++;
+	switch (m_currentRound)
+	{
+	case eRound::CHESS_CASTLE_STAGE_1:
+		m_currentRound = eRound::CHESS_CASTLE_STAGE_2;
+		break;
+	case eRound::CHESS_CASTLE_STAGE_2:
+		m_currentRound = eRound::CHESS_CASTLE_STAGE_3;
+		break;
+	case eRound::CHESS_CASTLE_STAGE_3:
+		// TODO: Finish the game, since this is the last stage.
+		return;
+	}
+
 	m_currentMap++;
 
 	m_initializedPlayerCount = 0;
@@ -109,6 +123,7 @@ void RoomSessionPveRoundManager::endRound()
 
 	updatePathfinders();
 
+	roomSession->stopTime();
 	// Relay the round ending to all players.
 	roomSession->relayPlaying<GCPvERoundEnd>();
 }
@@ -120,7 +135,7 @@ void RoomSessionPveRoundManager::tick() const
 		return;
 	}
 
-	switch (static_cast<eRound>(m_currentRound))
+	switch (m_currentRound)
 	{
 	case eRound::CHESS_CASTLE_STAGE_1:
 		checkRoundZeroFinished();
@@ -182,7 +197,7 @@ uint8_t RoomSessionPveRoundManager::getMap() const
 	return m_currentMap;
 }
 
-uint8_t RoomSessionPveRoundManager::getCurrentRound() const
+eRound RoomSessionPveRoundManager::getCurrentRound() const
 {
 	return m_currentRound;
 }
