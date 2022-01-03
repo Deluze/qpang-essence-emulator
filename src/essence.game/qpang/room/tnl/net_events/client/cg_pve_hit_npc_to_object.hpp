@@ -58,7 +58,10 @@ public:
 			return;
 		}
 
-		essenceObject->onHitByNpc(roomSession, npc);
+		if (roomSession->getRoom()->getMasterId() == player->getId())
+		{
+			essenceObject->onHitByNpc(roomSession, npc);
+		}
 	}
 
 	void process(EventConnection* ps) override
