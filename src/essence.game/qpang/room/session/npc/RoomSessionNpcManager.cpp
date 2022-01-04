@@ -222,8 +222,8 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		break;
 	case eNpcBodyPartDamageType::D_EXCEPT_SPLASH:
 		// FIXME: Check if weapon deals splash damage. For now, we disable all damage from throwables.
-		if (data.weaponType == eWeaponType::THROWABLE_1)
-			damage = 0;
+		/*if (data.weaponType == eWeaponType::THROWABLE_1)
+			damage = 0;*/
 
 		break;
 	case eNpcBodyPartDamageType::D_ONLY_NEARWEAPON:
