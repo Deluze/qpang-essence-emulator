@@ -2,6 +2,7 @@
 
 #include "AABBHelper.h"
 #include "gc_master_log.hpp"
+#include "gc_pve_destroy_parts.hpp"
 #include "gc_pve_die_npc.hpp"
 #include "gc_pve_move_npc.hpp"
 #include "gc_pve_npc_init.hpp"
@@ -626,6 +627,16 @@ void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 void PveNpc::die(const std::shared_ptr<RoomSession>& roomSession)
 {
 	roomSession->relayPlaying<GCPvEDieNpc>(m_uid);
+
+	// Explode spycam on death, just to see if people like it.
+	if (m_type == 10)
+	{
+		// ReSharper disable once CppUseStructuredBinding
+		for (const auto& bodyPart : m_bodyParts)
+		{
+			roomSession->relayPlaying<GCPvEDestroyParts>(m_uid, bodyPart.id);
+		}
+	}
 
 	onDeath(roomSession);
 }
