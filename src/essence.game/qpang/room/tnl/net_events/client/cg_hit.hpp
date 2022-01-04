@@ -174,12 +174,6 @@ public:
 		}
 		else
 		{
-			// Don't damage eachother in PVE
-			if (roomSession->getRoom()->getMode() == GameMode::PVE)
-			{
-				return;
-			}
-
 			constexpr auto octoMineItemId = 1095434246;
 
 			if (weaponId != octoMineItemId) // Jump mine
@@ -340,6 +334,12 @@ public:
 						damage = 0;
 					}
 				}
+			}
+
+			// Don't damage eachother in PVE
+			if (roomSession->getRoom()->getMode() == GameMode::PVE)
+			{
+				damage = 0;
 			}
 
 			dstPlayer->takeHealth(damage);
