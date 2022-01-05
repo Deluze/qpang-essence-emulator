@@ -153,7 +153,7 @@ void RoomSessionPveRoundManager::tick() const
 	}
 }
 
-void RoomSessionPveRoundManager::checkRoundZeroFinished() const
+void RoomSessionPveRoundManager::checkRoundZeroFinished()
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -196,6 +196,7 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished() const
 	{
 		//endRound();
 		roomSession->finishPveGame(true);
+		m_currentRound = eRound::CHESS_CASTLE_STAGE_2; // just for now, when we later call endRound again this is not needed
 	}
 }
 

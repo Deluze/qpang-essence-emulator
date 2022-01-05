@@ -39,7 +39,7 @@ public:
 
 	void tick() const;
 
-	void checkRoundZeroFinished() const;
+	void checkRoundZeroFinished();
 
 #pragma region Getters
 	[[nodiscard]]
