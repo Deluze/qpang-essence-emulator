@@ -372,15 +372,19 @@ void RoomSession::tick()
 	{
 		std::unique_lock<std::recursive_mutex> lg(m_playerMx);
 
+		for (auto& [id, session] : m_players)
+		{
+			session->tick();
+		}
+
 		m_itemManager.tick();
 		m_gameMode->tick(shared_from_this());
-
-		for (auto& [id, session] : m_players)
-			session->tick();
 	}
 
-	/*if (canFinish())
-		finish();*/
+	if (canFinish())
+	{
+		finish();
+	}
 }
 
 void RoomSession::clear()
@@ -505,24 +509,33 @@ void RoomSession::finish()
 bool RoomSession::canFinish()
 {
 	if (m_isFinished)
+	{
 		return false;
+	}
 
 	if (m_isPoints)
 	{
 		if (m_gameMode->isTeamMode())
 		{
-			auto bluePoints = getBluePoints();
-			auto yellowPoints = getYellowPoints();
+			const auto bluePoints = getBluePoints();
+			const auto yellowPoints = getYellowPoints();
 
-			return bluePoints >= m_goal || yellowPoints >= m_goal;
+			return ((bluePoints >= m_goal) || (yellowPoints >= m_goal));
 		}
 
 		return getTopScore() >= m_goal;
 	}
 
-	const auto currTime = time(NULL);
+	const auto currentTime = time(nullptr);
+	const auto noTimeLeft = (currentTime >= m_endTime);
 
-	return currTime >= m_endTime;
+	if (m_room->getMode() == GameMode::PVE)
+	{
+		// Note: All finish related checks for pve will happen in the round manager.
+		return false;
+	}
+
+	return noTimeLeft;
 }
 
 bool RoomSession::isAlmostFinished()
@@ -550,13 +563,8 @@ bool RoomSession::isAlmostFinished()
 
 }
 
-void RoomSession::finishPveGame(bool didWin)
+void RoomSession::finishPveGame(const bool didWin)
 {
-	if (!canFinishPveGame())
-	{
-		return;
-	}
-
 	m_isFinished = true;
 
 	m_leaverMx.lock();
