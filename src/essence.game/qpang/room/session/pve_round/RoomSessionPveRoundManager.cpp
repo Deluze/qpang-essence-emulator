@@ -148,6 +148,8 @@ void RoomSessionPveRoundManager::tick()
 		checkRoundZeroFinished();
 		break;
 	case eRound::CHESS_CASTLE_STAGE_2:
+		checkRoundOneFinished();
+		break;
 	case eRound::CHESS_CASTLE_STAGE_3:
 		break;
 	}
@@ -197,6 +199,64 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 		//endRound();
 		roomSession->finishPveGame(true);
 		m_currentRound = eRound::CHESS_CASTLE_STAGE_2; // just for now, when we later call endRound again this is not needed
+
+		return;
+	}
+
+	if (roomSession->getTimeLeftInSeconds() == 0)
+	{
+		roomSession->finishPveGame(false);
+	}
+}
+
+void RoomSessionPveRoundManager::checkRoundOneFinished() const
+{
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	uint32_t deadPlayerCount = 0;
+
+	const auto players = roomSession->getPlayingPlayers();
+
+	for (const auto& player : players)
+	{
+		if (player->isPermanentlyDead())
+		{
+			deadPlayerCount++;
+		}
+	}
+
+	if (players.size() == deadPlayerCount)
+	{
+		// All players are dead without being able to respawn so we can finish the game.
+		roomSession->finishPveGame(false);
+
+		return;
+	}
+
+	// Note: Essence object should always be uid 1.
+	const auto essenceObject = roomSession->getObjectManager()->findObjectByUid(1);
+
+	if (essenceObject == nullptr)
+	{
+		return;
+	}
+
+	if (essenceObject->getHealth() == 0)
+	{
+		// The essence object has no health left, this means the players have lost.
+		roomSession->finishPveGame(false);
+
+		return;
+	}
+
+	if (roomSession->getTimeLeftInSeconds() == 0)
+	{
+		roomSession->finishPveGame(true);
 	}
 }
 

@@ -41,6 +41,8 @@ public:
 
 	void checkRoundZeroFinished();
 
+	void checkRoundOneFinished() const;
+
 #pragma region Getters
 	[[nodiscard]]
 	uint8_t getMap() const;
