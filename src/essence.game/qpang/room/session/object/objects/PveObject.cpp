@@ -1,7 +1,8 @@
 #include "PveObject.h"
 
-#include "RoomSession.h"
+#include "gc_pve_destroy_object.hpp"
 #include "gc_pve_hit_npc_to_object.hpp"
+#include "RoomSession.h"
 
 PveObject::PveObject(const uint32_t uid, const eObjectType type, const Position& position,
                      const uint32_t linkedObjectId, const uint16_t initialHealth) :
@@ -33,11 +34,13 @@ void PveObject::takeDamage(const uint16_t damage)
 
 void PveObject::onHitByNpc(const std::shared_ptr<RoomSession>& roomSession, const std::shared_ptr<PveNpc>& npc)
 {
+	// Note: This method only gets triggered if it is of type Essence.
+
 	const auto weaponType = npc->getWeaponType();
 
 	uint16_t damage = 0;
 
-	switch(weaponType)
+	switch (weaponType)
 	{
 	case eWeaponType::MELEE:
 		damage = 10;
@@ -62,7 +65,8 @@ void PveObject::onHitByNpc(const std::shared_ptr<RoomSession>& roomSession, cons
 
 	if (m_health == 0)
 	{
-		roomSession->finishPveGame(false);
+		// Destroy the essence object since its health is at 0.
+		roomSession->relayPlaying<GCPvEDestroyObject>(m_uid);
 	}
 }
 
