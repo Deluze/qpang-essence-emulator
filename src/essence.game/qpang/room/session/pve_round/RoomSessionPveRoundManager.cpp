@@ -260,7 +260,8 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 
 	if (currentTime >= roomSession->getEndTime())
 	{
-		roomSession->finishPveGame(false);
+		// TODO: Move to the next stage instead of finishing.
+		roomSession->finishPveGame(true);
 	}
 }
 
