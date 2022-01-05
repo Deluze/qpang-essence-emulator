@@ -135,7 +135,7 @@ void RoomSessionPveRoundManager::endRound()
 	roomSession->relayPlaying<GCPvERoundEnd>();
 }
 
-void RoomSessionPveRoundManager::tick() const
+void RoomSessionPveRoundManager::tick()
 {
 	if (m_hasRoundEnded)
 	{

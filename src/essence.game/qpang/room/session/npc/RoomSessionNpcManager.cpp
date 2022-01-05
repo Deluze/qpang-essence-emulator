@@ -27,6 +27,8 @@ void RoomSessionNpcManager::tick()
 		return;
 	}
 
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	for (const auto& [uid, npc] : m_spawnedNpcs)
 	{
 		npc->tick(roomSession);
@@ -166,6 +168,8 @@ std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
 std::vector<std::shared_ptr<PveNpc>> RoomSessionNpcManager::getAliveNpcs()
 {
 	std::vector<std::shared_ptr<PveNpc>> aliveNpcs{};
+
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
 	for (const auto& [id, npc] : m_spawnedNpcs)
 	{

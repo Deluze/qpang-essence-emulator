@@ -37,7 +37,7 @@ public:
 	 */
 	void endRound();
 
-	void tick() const;
+	void tick();
 
 	void checkRoundZeroFinished();
 
