@@ -64,6 +64,7 @@ public:
 	void syncPlayer(RoomSessionPlayer::Ptr player);
 
 	uint32_t getElapsedTime() const; // in milliseconds
+	time_t getEndTime() const;
 	uint32_t getTimeLeftInSeconds() const;
 
 	void killPlayer(RoomSessionPlayer::Ptr killer, RoomSessionPlayer::Ptr target, uint32_t weaponId, bool isHeadshot);

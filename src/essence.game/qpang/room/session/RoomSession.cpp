@@ -1102,6 +1102,11 @@ uint32_t RoomSession::getElapsedTime() const
 	return (currTime - m_startTime) * 1000;
 }
 
+time_t RoomSession::getEndTime() const
+{
+	return m_endTime;
+}
+
 uint32_t RoomSession::getTimeLeftInSeconds() const
 {
 	if (m_isPoints)
