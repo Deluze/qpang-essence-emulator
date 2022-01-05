@@ -336,8 +336,10 @@ public:
 				}
 			}
 
+			const auto isPve = (roomSession->getRoom()->getMode() == GameMode::PVE);
+
 			// Don't damage eachother in PVE
-			if (roomSession->getRoom()->getMode() == GameMode::PVE)
+			if (isPve)
 			{
 				damage = 0;
 			}
@@ -345,7 +347,7 @@ public:
 			dstPlayer->takeHealth(damage);
 
 			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance;
-				applyEffect && !dstPlayerShouldIgnoreDamageFromAllSources && !isSameTeam)
+				applyEffect && !dstPlayerShouldIgnoreDamageFromAllSources && !isSameTeam && !isPve)
 			{
 				if (dstPlayerIsTagged && weaponUsed.effectDuration > 2)
 				{
@@ -353,6 +355,7 @@ public:
 				}
 
 				effectId = weaponUsed.effectId;
+
 				dstPlayer->getEffectManager()->addEffect(srcPlayer, weaponUsed, entityId);
 			}
 		}
