@@ -80,6 +80,8 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 
 		m_currentMap++;
 
+		updatePathfinders();
+
 		// Initialize all areas,objects, npcs and items.
 		roomSession->getPveAreaManager()->initializeAreas();
 		roomSession->getObjectManager()->initializeObjects();
@@ -120,8 +122,6 @@ void RoomSessionPveRoundManager::endRound()
 	roomSession->getPveWaveManager()->removeAll();
 
 	m_initializedPlayerCount = 0;
-
-	updatePathfinders();
 
 	roomSession->stopTime();
 
