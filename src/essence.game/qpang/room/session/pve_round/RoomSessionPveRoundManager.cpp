@@ -256,13 +256,15 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 		return;
 	}
 
+	/*
+	 * TODO: A bug currently exists with the game ending right away for stage 2 so commenting this out for now.
 	const auto currentTime = time(nullptr);
 
 	if (currentTime >= roomSession->getEndTime())
 	{
 		// TODO: Move to the next stage instead of finishing.
 		roomSession->finishPveGame(true);
-	}
+	}*/
 }
 
 uint8_t RoomSessionPveRoundManager::getMap() const
