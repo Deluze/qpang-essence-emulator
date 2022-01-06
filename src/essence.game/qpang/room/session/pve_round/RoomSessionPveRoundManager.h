@@ -41,7 +41,7 @@ public:
 
 	void checkRoundZeroFinished();
 
-	void checkRoundOneFinished() const;
+	void checkRoundOneFinished();
 
 #pragma region Getters
 	[[nodiscard]]

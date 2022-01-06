@@ -65,6 +65,21 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 		// Reset the time.
 		roomSession->resetTime();
 
+		switch (m_currentRound)
+		{
+		case eRound::CHESS_CASTLE_STAGE_1:
+			m_currentRound = eRound::CHESS_CASTLE_STAGE_2;
+			break;
+		case eRound::CHESS_CASTLE_STAGE_2:
+			m_currentRound = eRound::CHESS_CASTLE_STAGE_3;
+			break;
+		case eRound::CHESS_CASTLE_STAGE_3:
+			// TODO: Finish the game, since this is the last stage.
+			return;
+		}
+
+		m_currentMap++;
+
 		// Initialize all areas,objects, npcs and items.
 		roomSession->getPveAreaManager()->initializeAreas();
 		roomSession->getObjectManager()->initializeObjects();
@@ -82,6 +97,8 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 			// Synchronize time for every player.
 			player->send<GCGameState>(player->getPlayer()->getId(), CGGameState::State::SYNC_TIME, roomSession->getElapsedTime());
 		}
+
+		m_hasRoundEnded = false;
 	}
 }
 
@@ -102,28 +119,17 @@ void RoomSessionPveRoundManager::endRound()
 	roomSession->getPveItemManager()->removeAll();
 	roomSession->getPveWaveManager()->removeAll();
 
-	// Initiate stuff for new round.
-	switch (m_currentRound)
-	{
-	case eRound::CHESS_CASTLE_STAGE_1:
-		m_currentRound = eRound::CHESS_CASTLE_STAGE_2;
-		break;
-	case eRound::CHESS_CASTLE_STAGE_2:
-		m_currentRound = eRound::CHESS_CASTLE_STAGE_3;
-		break;
-	case eRound::CHESS_CASTLE_STAGE_3:
-		// TODO: Finish the game, since this is the last stage.
-		return;
-	}
-
-	m_currentMap++;
-
 	m_initializedPlayerCount = 0;
-	m_hasRoundEnded = false;
 
 	updatePathfinders();
 
 	roomSession->stopTime();
+
+	if (m_currentRound == eRound::CHESS_CASTLE_STAGE_3)
+	{
+		// finish game or something
+		return;
+	}
 
 	for (const auto& player : roomSession->getPlayingPlayers())
 	{
@@ -148,7 +154,7 @@ void RoomSessionPveRoundManager::tick()
 		checkRoundZeroFinished();
 		break;
 	case eRound::CHESS_CASTLE_STAGE_2:
-		checkRoundOneFinished();
+		//checkRoundOneFinished();
 		break;
 	case eRound::CHESS_CASTLE_STAGE_3:
 		break;
@@ -198,8 +204,6 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 	{
 		//endRound();
 		roomSession->finishPveGame(true);
-		m_currentRound = eRound::CHESS_CASTLE_STAGE_2; // just for now, when we later call endRound again this is not needed
-
 		return;
 	}
 
@@ -211,7 +215,7 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 	}
 }
 
-void RoomSessionPveRoundManager::checkRoundOneFinished() const
+void RoomSessionPveRoundManager::checkRoundOneFinished()
 {
 	const auto roomSession = m_roomSession.lock();
 
@@ -236,7 +240,6 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 	{
 		// All players are dead without being able to respawn so we can finish the game.
 		roomSession->finishPveGame(false);
-
 		return;
 	}
 
@@ -252,19 +255,16 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 	{
 		// The essence object has no health left, this means the players have lost.
 		roomSession->finishPveGame(false);
-
 		return;
 	}
 
-	/*
-	 * TODO: A bug currently exists with the game ending right away for stage 2 so commenting this out for now.
 	const auto currentTime = time(nullptr);
 
 	if (currentTime >= roomSession->getEndTime())
 	{
 		// TODO: Move to the next stage instead of finishing.
 		roomSession->finishPveGame(true);
-	}*/
+	}
 }
 
 uint8_t RoomSessionPveRoundManager::getMap() const
