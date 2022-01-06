@@ -820,5 +820,9 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 
 	roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(randomPveItem));
 
-	m_canDropLoot = false;
+	// In stage 2 npcs that respawn should always drop loot (plants and such).
+	if (roomSession->getPveRoundManager()->getCurrentRound() != eRound::CHESS_CASTLE_STAGE_2)
+	{
+		m_canDropLoot = false;
+	}
 }
