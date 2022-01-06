@@ -10,6 +10,14 @@ public:
 	{
 	}
 
+	std::vector<CommandArgument*> getArguments() override
+	{
+		return {
+			argTypes[STRING],
+			argTypes[STRING],
+		};
+	}
+
 	void handle(const std::shared_ptr<Player> player, const std::vector<std::u16string>& args) override
 	{
 		const auto roomPlayer = player->getRoomPlayer();
@@ -33,9 +41,12 @@ public:
 		const auto roomSession = roomSessionPlayer->getRoomSession();
 
 		const auto type = convertToInteger(args.at(0));
-		const auto uid = convertToInteger(args.at(0));
+		const auto rotation = convertToInteger(args.at(1));
 
-		roomSession->relayPlaying<GCPvENpcInit>(type, uid, roomSessionPlayer->getPosition(), 0, 100);
-		//roomSession->getNpcManager()->spawnInitializedNpcs();
+		const auto position = roomSessionPlayer->getPosition();
+
+		printf("{ x: %f, y: %f, z: %f, type: %u }\n", position.x, position.y, position.z, type);
+
+		roomSession->relayPlaying<GCPvENpcInit>(type, type, position, rotation, 100);
 	}
 };
