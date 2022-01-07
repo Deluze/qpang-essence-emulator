@@ -632,16 +632,6 @@ void PveNpc::die(const std::shared_ptr<RoomSession>& roomSession)
 {
 	roomSession->relayPlaying<GCPvEDieNpc>(m_uid);
 
-	// Explode spycam on death, just to see if people like it.
-	if (m_type == 10)
-	{
-		// ReSharper disable once CppUseStructuredBinding
-		for (const auto& bodyPart : m_bodyParts)
-		{
-			roomSession->relayPlaying<GCPvEDestroyParts>(m_uid, bodyPart.id);
-		}
-	}
-
 	onDeath(roomSession);
 }
 
