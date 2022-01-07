@@ -9,6 +9,7 @@
 #include "cg_game_state.hpp"
 #include "gc_game_state.hpp"
 #include "Maps.h"
+#include <qpang/room/tnl/net_events/server/gc_join.hpp>
 
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -59,8 +60,8 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 	// Check if the initialized player count equals the playing players size.
 	if (m_initializedPlayerCount >= roomSession->getPlayingPlayers().size())
 	{
-		// Relay the new round to all players.
-		roomSession->relayPlaying<GCPvENewRound>();
+		// DONT! Relay the new round to all players.
+		//roomSession->relayPlaying<GCPvENewRound>();
 
 		// Reset the time.
 		roomSession->resetTime();
