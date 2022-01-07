@@ -102,8 +102,16 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 	m_players[player->getPlayer()->getId()] = player;
 	m_playerMx.unlock();
 
+	const auto map = (m_room->getMode() == GameMode::PVE)
+		? m_pveRoundManager.getMap()
+		: m_room->getMap();
+
+	const auto alivePlayingPlayers = getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team);
+
 	// ReSharper disable once CppUseStructuredBinding
-	const auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), team);
+	const auto spawn = (m_room->getMode() == GameMode::PVE)
+		? Game::instance()->getSpawnManager()->getLeastPopulatedSpawn(map, team, alivePlayingPlayers, shared_from_this())
+		: Game::instance()->getSpawnManager()->getRandomSpawn(map, team);
 
 	player->post(new GCGameState(player->getPlayer()->getId(), 11, 0)); // Necessary to initiate spectator mode in "waiting for players" state
 	player->post(new GCRespawn(player->getPlayer()->getId(), player->getCharacter(), 1, spawn.x, spawn.y, spawn.z));
@@ -1038,17 +1046,12 @@ void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 	const auto isTeamMode = getGameMode()->isTeamMode();
 	const uint8_t team = (isTeamMode ? player->getTeam() : 0);
 
-	Spawn spawn = {};
-	if (m_room->getMode() == GameMode::Mode::PVE)
-	{
-		spawn = Game::instance()->getSpawnManager()->
-			getLeastPopulatedSpawn(getPveRoundManager()->getMap(), team, getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team), shared_from_this());
-	}
-	else
-	{
-		spawn = Game::instance()->getSpawnManager()->
-			getLeastPopulatedSpawn(m_room->getMap(), team, getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team), shared_from_this());
-	}
+	const auto map = (m_room->getMode() == GameMode::PVE)
+		? m_pveRoundManager.getMap()
+		: m_room->getMap();
+
+	const auto alivePlayingPlayers = getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team);
+	const auto spawn = Game::instance()->getSpawnManager()->getLeastPopulatedSpawn(map, team, alivePlayingPlayers, shared_from_this());
 
 	setLastRespawnLocation(spawn);
 
