@@ -170,6 +170,13 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 		return;
 	}
 
+	const auto currentTime = time(nullptr);
+
+	if (currentTime >= roomSession->getEndTime())
+	{
+		roomSession->finishPveGame(false);
+	}
+
 	const auto players = roomSession->getPlayingPlayers();
 
 	const int finishesNeeded = static_cast<int>(players.size());
@@ -202,16 +209,7 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 
 	if (finishedStage)
 	{
-		//endRound();
-		roomSession->finishPveGame(true);
-		return;
-	}
-
-	const auto currentTime = time(nullptr);
-
-	if (currentTime >= roomSession->getEndTime())
-	{
-		roomSession->finishPveGame(false);
+		endRound();
 	}
 }
 
