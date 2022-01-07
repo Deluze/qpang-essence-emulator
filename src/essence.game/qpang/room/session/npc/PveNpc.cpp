@@ -424,10 +424,6 @@ void PveNpc::handleDeath(const std::shared_ptr<RoomSession>& roomSession)
 	{
 		const auto currentTime = time(nullptr);
 
-		const auto pathFinder = getPathFinder(roomSession);
-		if (pathFinder)
-			pathFinder->setCellTaken(m_takenCell, false);
-
 		if (m_timeOfDeath == NULL)
 		{
 			return;
@@ -637,6 +633,10 @@ void PveNpc::die(const std::shared_ptr<RoomSession>& roomSession)
 			roomSession->relayPlaying<GCPvEDestroyParts>(m_uid, bodyPart.id);
 		}
 	}
+
+	const auto pathFinder = getPathFinder(roomSession);
+
+	pathFinder->setCellTaken(m_currentCell, false);
 
 	onDeath(roomSession);
 }
