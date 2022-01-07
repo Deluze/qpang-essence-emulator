@@ -360,6 +360,9 @@ void PveNpc::handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSes
 
 void PveNpc::handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder)
 {
+	// NOTE: Npcs will as first move walk in range to the essence, after that reconsider to attack essence, or walk & attack player.
+	// This makes the stage a lot harder, perhaps don't let them do this.
+
 	if (m_lastAttackerId != 0)
 	{
 		m_targetPlayerId = m_lastAttackerId;
