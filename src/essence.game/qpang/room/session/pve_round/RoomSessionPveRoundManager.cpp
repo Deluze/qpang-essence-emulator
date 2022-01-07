@@ -154,7 +154,7 @@ void RoomSessionPveRoundManager::tick()
 		checkRoundZeroFinished();
 		break;
 	case eRound::CHESS_CASTLE_STAGE_2:
-		//checkRoundOneFinished();
+		checkRoundOneFinished();
 		break;
 	case eRound::CHESS_CASTLE_STAGE_3:
 		break;
@@ -215,12 +215,35 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 	}
 }
 
-void RoomSessionPveRoundManager::checkRoundOneFinished()
+void RoomSessionPveRoundManager::checkRoundOneFinished() const
 {
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
 	{
+		return;
+	}
+
+	// ReSharper disable once CppTooWideScopeInitStatement
+	const auto currentTime = time(nullptr);
+
+	if (currentTime >= roomSession->getEndTime())
+	{
+		// TODO: Move to the next stage instead of finishing.
+		roomSession->finishPveGame(true);
+
+		return;
+	}
+
+	// Note: Essence object should always be uid 1.
+	// ReSharper disable once CppTooWideScopeInitStatement
+	const auto essenceObject = roomSession->getObjectManager()->findObjectByUid(1);
+
+	if ((essenceObject != nullptr) && (essenceObject->getHealth() == 0))
+	{
+		// The essence object has no health left, this means the players have lost.
+		roomSession->finishPveGame(false);
+
 		return;
 	}
 
@@ -236,34 +259,15 @@ void RoomSessionPveRoundManager::checkRoundOneFinished()
 		}
 	}
 
-	if (players.size() == deadPlayerCount)
+	if (deadPlayerCount == 0)
+	{
+		return;
+	}
+
+	if ((deadPlayerCount != 0) && (players.size() == deadPlayerCount))
 	{
 		// All players are dead without being able to respawn so we can finish the game.
 		roomSession->finishPveGame(false);
-		return;
-	}
-
-	// Note: Essence object should always be uid 1.
-	const auto essenceObject = roomSession->getObjectManager()->findObjectByUid(1);
-
-	if (essenceObject == nullptr)
-	{
-		return;
-	}
-
-	if (essenceObject->getHealth() == 0)
-	{
-		// The essence object has no health left, this means the players have lost.
-		roomSession->finishPveGame(false);
-		return;
-	}
-
-	const auto currentTime = time(nullptr);
-
-	if (currentTime >= roomSession->getEndTime())
-	{
-		// TODO: Move to the next stage instead of finishing.
-		roomSession->finishPveGame(true);
 	}
 }
 
