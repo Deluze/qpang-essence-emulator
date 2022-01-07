@@ -161,18 +161,15 @@ PveNpc::PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell) :
 {
 }
 
-void PveNpc::handleNoMovement(const std::shared_ptr<RoomSession>& roomSession)
+void PveNpc::handleTargetStatic(const std::shared_ptr<RoomSession>& roomSession)
 {
-	if (m_targetType == eNpcTargetType::T_STATIC)
-	{
-		if (!canShoot())
-			return;
+	if (!canShoot())
+		return;
 
-		const auto yCorrection = RandomHelper::getRandomFloat(-0.2f, 0.8f);
-		const auto shootPos = Position{ m_staticShootingPosition.x, m_staticShootingPosition.y + yCorrection, m_staticShootingPosition.z };
+	const auto yCorrection = RandomHelper::getRandomFloat(-0.2f, 0.8f);
+	const auto shootPos = Position{ m_staticShootingPosition.x, m_staticShootingPosition.y + yCorrection, m_staticShootingPosition.z };
 
-		attack(roomSession, shootPos);
-	}
+	attack(roomSession, shootPos);
 }
 
 void PveNpc::improveTargetCell(Pathfinder* pathFinder)
@@ -335,7 +332,10 @@ void PveNpc::handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, P
 	if (!canAttackTargetPlayer(roomSession, pathFinder))
 	{
 		m_targetPlayerId = findClosestValidPlayerId(roomSession);
-		startMovingToPlayer(roomSession, pathFinder);
+
+		if (m_movementType != eNpcMovementType::M_NONE)
+			startMovingToPlayer(roomSession, pathFinder);
+
 		return;
 	}
 
@@ -351,7 +351,9 @@ void PveNpc::handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSes
 		if (!isPlayerValid(player))
 			m_targetPlayerId = findClosestValidPlayerId(roomSession);
 
-		startMovingToPlayer(roomSession, pathFinder);
+		if (m_movementType != eNpcMovementType::M_NONE)
+			startMovingToPlayer(roomSession, pathFinder);
+
 		return;
 	}
 
@@ -394,7 +396,7 @@ void PveNpc::handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roo
 	attackTargetPos(roomSession);
 }
 
-void PveNpc::handleMovement(const std::shared_ptr<RoomSession>& roomSession)
+void PveNpc::handleLogic(const std::shared_ptr<RoomSession>& roomSession)
 {
 	const auto pathFinder = getPathFinder(roomSession);
 
@@ -402,6 +404,9 @@ void PveNpc::handleMovement(const std::shared_ptr<RoomSession>& roomSession)
 	{
 		switch (m_targetType)
 		{
+		case eNpcTargetType::T_STATIC:
+			handleTargetStatic(roomSession);
+			break;
 		case eNpcTargetType::T_NEAR:
 			handleTargetNear(roomSession, pathFinder);
 			break;
@@ -412,7 +417,6 @@ void PveNpc::handleMovement(const std::shared_ptr<RoomSession>& roomSession)
 			handleTargetEssencePriority(roomSession, pathFinder);
 			break;
 		case eNpcTargetType::T_NONE: break;
-		case eNpcTargetType::T_STATIC: break;
 		case eNpcTargetType::T_STATIC_REVENGE: break;
 		case eNpcTargetType::T_DAMAGE: break;
 		default:
@@ -459,19 +463,7 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 		return;
 	}
 
-	switch (m_movementType)
-	{
-	case eNpcMovementType::M_NONE:
-		handleNoMovement(roomSession);
-		break;
-	case eNpcMovementType::M_PATH_FINDING:
-		handleMovement(roomSession);
-		break;
-	case eNpcMovementType::M_PATH_NODES:
-	case eNpcMovementType::M_MAX:
-	default:
-		break;
-	}
+	handleLogic(roomSession);
 }
 
 uint32_t PveNpc::getLastAttackerId()

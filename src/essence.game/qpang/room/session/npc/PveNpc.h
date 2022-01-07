@@ -221,7 +221,7 @@ public:
 private:
 	bool canShoot();
 
-	void handleNoMovement(const std::shared_ptr<RoomSession>& roomSession);
+	void handleTargetStatic(const std::shared_ptr<RoomSession>& roomSession);
 
 	void improveTargetCell(Pathfinder* pathFinder);
 
@@ -235,7 +235,7 @@ private:
 
 	void handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
-	void handleMovement(const std::shared_ptr<RoomSession>& roomSession);
+	void handleLogic(const std::shared_ptr<RoomSession>& roomSession);
 
 	bool isPlayerValid(const std::shared_ptr<RoomSessionPlayer>& player) const;
 
