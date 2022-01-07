@@ -456,12 +456,14 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 
 	if (isDead())
 	{
-		if (m_takenCell.x != -1 && m_takenCell.z != -1)
+		if ((m_takenCell.x != -1 && m_takenCell.z != -1) || (m_currentCell.x != -1 && m_currentCell.z != -1))
 		{
 			const auto pathFinder = getPathFinder(roomSession);
 			pathFinder->setCellTaken(m_takenCell, false);
+			pathFinder->setCellTaken(m_currentCell, false);
 
 			m_takenCell = { -1, -1 };
+			m_currentCell = { -1, -1 };
 		}
 
 		return;
