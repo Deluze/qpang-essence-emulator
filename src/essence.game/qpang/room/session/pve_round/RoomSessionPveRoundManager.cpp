@@ -55,11 +55,15 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 		return;
 	}
 
+	printf("Increasing player count.\n");
+
 	m_initializedPlayerCount++;
 
 	// Check if the initialized player count equals the playing players size.
-	if (m_initializedPlayerCount >= roomSession->getPlayingPlayers().size())
+	if (m_initializedPlayerCount >= roomSession->getPlayers().size())
 	{
+		printf("Players initialized! Initializing everything.\n");
+
 		// DONT! Relay the new round to all players.
 		//roomSession->relayPlaying<GCPvENewRound>();
 
@@ -256,11 +260,6 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 		{
 			deadPlayerCount++;
 		}
-	}
-
-	if (deadPlayerCount == 0)
-	{
-		return;
 	}
 
 	if ((deadPlayerCount != 0) && (players.size() == deadPlayerCount))
