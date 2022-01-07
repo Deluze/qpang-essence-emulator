@@ -445,6 +445,14 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 
 	if (isDead())
 	{
+		if (m_takenCell.x != -1 && m_takenCell.z != -1)
+		{
+			const auto pathFinder = getPathFinder(roomSession);
+			pathFinder->setCellTaken(m_takenCell, false);
+
+			m_takenCell = { -1, -1 };
+		}
+
 		return;
 	}
 
@@ -633,10 +641,6 @@ void PveNpc::die(const std::shared_ptr<RoomSession>& roomSession)
 			roomSession->relayPlaying<GCPvEDestroyParts>(m_uid, bodyPart.id);
 		}
 	}
-
-	const auto pathFinder = getPathFinder(roomSession);
-
-	pathFinder->setCellTaken(m_currentCell, false);
 
 	onDeath(roomSession);
 }
