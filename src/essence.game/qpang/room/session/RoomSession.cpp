@@ -227,19 +227,31 @@ bool RoomSession::removePlayer(uint32_t playerId)
 				{
 					m_yellowPoints = 1;
 					m_bluePoints = 0;
+
 					finish();
 				}
 				else if (yellowPlayers.empty())
 				{
 					m_yellowPoints = 0;
 					m_bluePoints = 1;
+
 					finish();
 				}
 			}
 		}
 		else
-			if (m_players.size() <= 1)
+		{
+			// ReSharper disable once CppTooWideScope
+			const auto canFinish = (m_room->getMode() == GameMode::PVE)
+				? m_players.empty()
+				: m_players.size() <= 1;
+
+			if (canFinish)
+			{
 				finish();
+			}
+		}
+
 	}
 
 	return true;
@@ -413,7 +425,7 @@ void RoomSession::finish()
 {
 	if (m_room->getMode() == GameMode::PVE)
 	{
-		finishPveGame();
+		finishPveGame(false);
 
 		return;
 	}
