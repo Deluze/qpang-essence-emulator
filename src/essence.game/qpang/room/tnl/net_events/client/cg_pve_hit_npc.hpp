@@ -187,7 +187,8 @@ public:
 			roomSessionPlayer->removeInvincibility();
 		}
 
-		targetNpc->setLastAttackerId(player->getId());
+		if (weaponUsed.weaponType != WeaponType::BOMB)
+			targetNpc->setLastAttackerId(player->getId());
 	}
 
 	void process(EventConnection* ps) override
