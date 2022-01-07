@@ -375,8 +375,9 @@ void PveNpc::handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roo
 			{
 				// Perhaps we want to check to see if we can attack the target player
 				// if it get's too easy this way.
+				if (m_movementType != eNpcMovementType::M_NONE)
+					startMovingToPlayer(roomSession, pathFinder);
 
-				startMovingToPlayer(roomSession, pathFinder);
 				return;
 			}
 
@@ -389,7 +390,10 @@ void PveNpc::handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roo
 	if (!canAttackTargetPos(pathFinder))
 	{
 		m_isMovingToPlayer = false;
-		startMovingToPos(roomSession, pathFinder, m_targetShootPosition);
+
+		if (m_movementType != eNpcMovementType::M_NONE)
+			startMovingToPos(roomSession, pathFinder, m_targetShootPosition);
+
 		return;
 	}
 
