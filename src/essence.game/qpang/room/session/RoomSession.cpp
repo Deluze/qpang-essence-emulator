@@ -251,7 +251,6 @@ bool RoomSession::removePlayer(uint32_t playerId)
 				finish();
 			}
 		}
-
 	}
 
 	return true;
