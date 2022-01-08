@@ -91,6 +91,8 @@ private:
 
 	std::weak_ptr<RoomSession> m_roomSession;
 
+	uint32_t m_lastSpawnedUid = 0;
+
 	std::vector<PveNpc> m_npcs{};
 	std::unordered_map<uint32_t, std::shared_ptr<PveNpc>> m_spawnedNpcs{};
 };
