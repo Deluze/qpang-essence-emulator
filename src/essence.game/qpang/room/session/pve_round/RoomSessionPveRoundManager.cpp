@@ -64,24 +64,13 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 	{
 		printf("Players initialized! Initializing everything.\n");
 
-		// DONT! Relay the new round to all players.
-		//roomSession->relayPlaying<GCPvENewRound>();
+		for (const auto& player : roomSession->getPlayers())
+		{
+			roomSession->addPlayer(player->getGameConnection(), player->getTeam());
+		}
 
 		// Reset the time.
 		roomSession->resetTime();
-
-		switch (m_currentRound)
-		{
-		case eRound::CHESS_CASTLE_STAGE_1:
-			m_currentRound = eRound::CHESS_CASTLE_STAGE_2;
-			break;
-		case eRound::CHESS_CASTLE_STAGE_2:
-			m_currentRound = eRound::CHESS_CASTLE_STAGE_3;
-			break;
-		case eRound::CHESS_CASTLE_STAGE_3:
-			// TODO: Finish the game, since this is the last stage.
-			return;
-		}
 
 		m_currentMap++;
 
@@ -98,7 +87,7 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 			roomSession->getPveWaveManager()->initializeWaves();
 		}
 
-		for (const auto& player : roomSession->getPlayingPlayers())
+		for (const auto& player : roomSession->getPlayers())
 		{
 			// Synchronize time for every player.
 			player->send<GCGameState>(player->getPlayer()->getId(), CGGameState::State::SYNC_TIME, roomSession->getElapsedTime());
@@ -132,6 +121,19 @@ void RoomSessionPveRoundManager::endRound()
 	if (m_currentRound == eRound::CHESS_CASTLE_STAGE_3)
 	{
 		// finish game or something
+		return;
+	}
+
+	switch (m_currentRound)
+	{
+	case eRound::CHESS_CASTLE_STAGE_1:
+		m_currentRound = eRound::CHESS_CASTLE_STAGE_2;
+		break;
+	case eRound::CHESS_CASTLE_STAGE_2:
+		m_currentRound = eRound::CHESS_CASTLE_STAGE_3;
+		break;
+	case eRound::CHESS_CASTLE_STAGE_3:
+		// TODO: Finish the game, since this is the last stage.
 		return;
 	}
 
@@ -229,6 +231,11 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 	{
 		endRound();
 	}
+}
+
+int RoomSessionPveRoundManager::getInitializedPlayerCount()
+{
+	return m_initializedPlayerCount;
 }
 
 void RoomSessionPveRoundManager::checkRoundOneFinished() const
