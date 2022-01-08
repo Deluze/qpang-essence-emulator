@@ -49,7 +49,7 @@ std::function<void(RoomSession::Ptr, uint32_t, const PathfinderCell&, const Path
 		return;
 
 	const auto pathFinder = npc->getPathFinder(roomSession);
-	if (pathFinder == nullptr)
+	if (!pathFinder)
 	{
 		npc->clearPath();
 		return;
@@ -459,11 +459,14 @@ void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 		if ((m_takenCell.x != -1 && m_takenCell.z != -1) || (m_currentCell.x != -1 && m_currentCell.z != -1))
 		{
 			const auto pathFinder = getPathFinder(roomSession);
-			pathFinder->setCellTaken(m_takenCell, false);
-			pathFinder->setCellTaken(m_currentCell, false);
+			if (pathFinder)
+			{
+				pathFinder->setCellTaken(m_takenCell, false);
+				pathFinder->setCellTaken(m_currentCell, false);
 
-			m_takenCell = { -1, -1 };
-			m_currentCell = { -1, -1 };
+				m_takenCell = { -1, -1 };
+				m_currentCell = { -1, -1 };
+			}
 		}
 
 		return;
