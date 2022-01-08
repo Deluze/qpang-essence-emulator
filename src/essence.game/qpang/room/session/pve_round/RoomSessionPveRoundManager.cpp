@@ -100,7 +100,6 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 
 		for (const auto& player : roomSession->getPlayingPlayers())
 		{
-			player->respawn();
 			// Synchronize time for every player.
 			player->send<GCGameState>(player->getPlayer()->getId(), CGGameState::State::SYNC_TIME, roomSession->getElapsedTime());
 		}
