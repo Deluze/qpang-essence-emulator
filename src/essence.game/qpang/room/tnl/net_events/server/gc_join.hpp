@@ -31,7 +31,7 @@ public:
 		this->playerRank = spectatorMode ? 3 : player->getRank();
 		this->refers = player->getPrestige();
 		this->level = player->getLevel();
-		this->life = player->getEquipmentManager()->getBaseHealth() + player->getEquipmentManager()->getBonusHealth();
+		this->life = player->getEquipmentManager()->getBaseHealth() + player->getEquipmentManager()->getBonusHealth(nullptr);
 		this->experience = player->getExperience();
 
 		if (roomPlayer->getRoom()->getMode() == GameMode::PVE)

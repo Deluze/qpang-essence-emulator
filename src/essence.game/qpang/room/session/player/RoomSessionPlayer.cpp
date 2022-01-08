@@ -61,7 +61,8 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	auto* equipManager = player->getEquipmentManager();
 
 	m_baseHealth = equipManager->getBaseHealth();
-	m_bonusHealth = equipManager->getBonusHealth();
+	m_bonusHealth = equipManager->getBonusHealth(roomSession);
+
 	m_health = getDefaultHealth();
 
 	m_armor = equipManager->getArmorItemIdsByCharacter(m_character);
