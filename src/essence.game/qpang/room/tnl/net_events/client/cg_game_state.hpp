@@ -6,6 +6,8 @@
 #include "qpang/room/tnl/net_events/server/gc_game_state.hpp"
 #include "qpang/room/session/RoomSession.h"
 
+#include "gc_respawn.hpp"
+
 class CGGameState : public GameNetEvent
 {
 	typedef NetEvent Parent;
@@ -88,7 +90,15 @@ public:
 				roomPlayer->getRoom()->syncPlayers(roomPlayer);
 				break;
 			case State::GAME_WAITING_PLAYERS:
-				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) {
+				if (auto roomSession = roomPlayer->getRoom()->getRoomSession(); roomSession != nullptr) 
+				{
+					if (roomSession->getRoom()->getMode() == GameMode::PVE &&
+						roomSession->getPveRoundManager()->getCurrentRound() > eRound::CHESS_CASTLE_STAGE_1)
+					{
+						// We do the addPlayer calls in the round manager instead.
+						return;
+					}
+
 					roomSession->addPlayer(conn, roomPlayer->getTeam());
 				}
 

@@ -43,6 +43,8 @@ public:
 
 	void checkRoundOneFinished() const;
 
+	int getInitializedPlayerCount();
+
 #pragma region Getters
 	[[nodiscard]]
 	uint8_t getMap() const;
