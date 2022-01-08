@@ -184,6 +184,8 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 	const auto players = roomSession->getPlayingPlayers();
 
 	const int finishesNeeded = static_cast<int>(players.size());
+	if (finishesNeeded == 0)
+		return;
 
 	int deadFinishes = 0;
 	int actualFinishes = 0;
@@ -252,6 +254,8 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 	uint32_t deadPlayerCount = 0;
 
 	const auto players = roomSession->getPlayingPlayers();
+	if (players.size() == 0)
+		return;
 
 	for (const auto& player : players)
 	{
