@@ -279,8 +279,8 @@ void PveManager::initializeObjects()
 
 	const auto result = DATABASE->prepare(
 		"SELECT "
-		"pve_object_spawns.id AS ObjectUid "
-		",pve_object_spawns.type AS ObjectType "
+		"pve_object_spawns.type AS ObjectType "
+		",pve_object_spawns.uid AS ObjectUid "
 		",pve_object_spawns.spawn_position_x AS SpawnPositionX "
 		",pve_object_spawns.spawn_position_y AS SpawnPositionY "
 		",pve_object_spawns.spawn_position_z AS SpawnPositionZ "
