@@ -405,7 +405,11 @@ public:
 			srcPlayer->getEntityManager()->addKill(entityId);
 
 			// Killfeed?
-			roomSession->relayPlaying<GCGameState>(dstId, bodyPartHitLocation == 0 ? 28 : 17, weaponId, srcId);
+			if (srcId == dstId)
+				roomSession->relayPlaying<GCGameState>(dstId, 19, weaponId, srcId); // suicide
+			else
+				roomSession->relayPlaying<GCGameState>(dstId, bodyPartHitLocation == 0 ? 28 : 17, weaponId, srcId);
+
 			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, bodyPartHitLocation);
 		}
 	}
