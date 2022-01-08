@@ -44,10 +44,9 @@ void RoomSessionNpcManager::initializeNpcs()
 		return;
 	}
 
-	m_npcMutex.lock();
-	m_spawnedNpcs.clear();
-	m_npcMutex.unlock();
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
+	m_spawnedNpcs.clear();
 	m_npcs.clear();
 
 	const auto mapId = roomSession->getPveRoundManager()->getMap();
@@ -74,6 +73,8 @@ void RoomSessionNpcManager::initializeNpcs()
 
 void RoomSessionNpcManager::spawnNpcsForArea(const uint32_t areaId)
 {
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	for (const auto& npc : m_npcs)
 	{
 		if (npc.getAreaUid() == areaId)
@@ -92,14 +93,12 @@ uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 		return 0;
 	}
 
-	m_npcMutex.lock();
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
 	npc->setUid(m_spawnedNpcs.size() + 1);
 	npc->spawn(roomSession);
 
 	m_spawnedNpcs[npc->getUid()] = npc;
-
-	m_npcMutex.unlock();
 
 	return npc->getUid();
 }
@@ -144,11 +143,10 @@ void RoomSessionNpcManager::killNpc(const uint32_t uid)
 
 void RoomSessionNpcManager::removeAll()
 {
-	m_npcs.clear();
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
-	m_npcMutex.lock();
+	m_npcs.clear();
 	m_spawnedNpcs.clear();
-	m_npcMutex.unlock();
 }
 
 std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
@@ -167,9 +165,9 @@ std::shared_ptr<PveNpc> RoomSessionNpcManager::findNpcByUid(const uint32_t uid)
 
 std::vector<std::shared_ptr<PveNpc>> RoomSessionNpcManager::getAliveNpcs()
 {
-	std::vector<std::shared_ptr<PveNpc>> aliveNpcs{};
-
 	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
+	std::vector<std::shared_ptr<PveNpc>> aliveNpcs{};
 
 	for (const auto& [id, npc] : m_spawnedNpcs)
 	{
@@ -200,6 +198,8 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	{
 		return;
 	}
+
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
 	const auto playerId = data.roomSessionPlayer->getPlayer()->getId();
 	const auto targetNpcUid = data.targetNpc->getUid();
