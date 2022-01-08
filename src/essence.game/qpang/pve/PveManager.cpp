@@ -377,6 +377,7 @@ void PveManager::initializeAreas()
 		",pve_map_areas.max_bound_x as MaxBoundX "
 		",pve_map_areas.max_bound_z as MaxBoundZ "
 		",pve_map_areas.floor_number as FloorNumber "
+		",pve_map_areas.pass_through_is_required as PassThroughIsRequired "
 		",maps.map_id AS MapId "
 		"FROM pve_map_areas "
 		"INNER JOIN maps ON maps.id = pve_map_areas.map_id;"
@@ -399,7 +400,8 @@ void PveManager::initializeAreas()
 				0.00f,
 				result->getFloat("MaxBoundZ"),
 			},
-			result->getInt("FloorNumber")
+			result->getInt("FloorNumber"),
+			result->getFlag("PassThroughIsRequired")
 		};
 
 		const auto mapId = result->getInt("MapId");

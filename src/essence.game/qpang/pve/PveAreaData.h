@@ -8,4 +8,5 @@ struct PveAreaData
 	Position minBound;
 	Position maxBound;
 	uint32_t floorNumber;
+	bool passThroughIsRequired;
 };
