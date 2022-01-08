@@ -482,8 +482,20 @@ void PveNpc::setLastAttackerId(const uint32_t id)
 	m_lastAttackerId = id;
 }
 
-bool PveNpc::isNextMoveValid(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder, const PathfinderCell& cell) const
+bool PveNpc::isNextMoveValid(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder, const PathfinderCell& cell)
 {
+	if (m_targetType == eNpcTargetType::T_ESSENCE_PRIORITY)
+	{
+		// We were moving to the essence, but we've now got a valid attacker player, so stop moving to the essence
+		// and take care of the player >:)
+		if (!m_isMovingToPlayer && m_lastAttackerId != 0)
+		{
+			auto targetPlayer = roomSession->find(m_lastAttackerId);
+			if (isPlayerValid(targetPlayer))
+				return false;
+		}
+	}
+
 	auto targetPlayer = roomSession->find(m_targetPlayerId);
 	if (m_isMovingToPlayer && !isPlayerValid(targetPlayer))
 		return false;

@@ -23,7 +23,7 @@ public:
 
 	void setLastAttackerId(uint32_t id);
 
-	bool isNextMoveValid(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder, const PathfinderCell& cell) const;
+	bool isNextMoveValid(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder, const PathfinderCell& cell);
 
 	PathfinderCell getMoveCell();
 
