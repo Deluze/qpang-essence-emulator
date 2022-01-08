@@ -34,6 +34,9 @@ public:
 	uint32_t getFloorNumber() const;
 
 	[[nodiscard]]
+	bool isPassThroughRequired() const;
+
+	[[nodiscard]]
 	bool isInitialized() const;
 #pragma endregion
 
@@ -58,6 +61,7 @@ private:
 
 	uint32_t m_floorNumber;
 
+	bool m_passThroughIsRequired;
 	bool m_isInitialized;
 
 	std::vector<uint32_t> m_players{};

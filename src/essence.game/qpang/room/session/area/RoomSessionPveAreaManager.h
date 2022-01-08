@@ -26,6 +26,12 @@ public:
 	void initializeAreas();
 
 	/**
+	 * \brief Retrieves all areas that are required to have been passed through.
+	 * \return All areas that must've been passed through.	
+	 */
+	std::vector<std::shared_ptr<PveArea>> getAllRequiredPassThroughAreas();
+
+	/**
 	 * \brief Creates an area.
 	 * \param area The area to create.
 	 */

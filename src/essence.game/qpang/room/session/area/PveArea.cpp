@@ -2,13 +2,13 @@
 
 #include "Player.h"
 #include "RoomSession.h"
-#include "StringConverter.h"
 
 PveArea::PveArea(const PveAreaData& pveAreaData) :
 	m_uid(pveAreaData.uid),
 	m_minBound(pveAreaData.minBound),
 	m_maxBound(pveAreaData.maxBound),
 	m_floorNumber(pveAreaData.floorNumber),
+	m_passThroughIsRequired(pveAreaData.passThroughIsRequired),
 	m_isInitialized(false)
 {
 }
@@ -40,6 +40,11 @@ uint32_t PveArea::getFloorNumber() const
 	return m_floorNumber;
 }
 
+bool PveArea::isPassThroughRequired() const
+{
+	return m_passThroughIsRequired;
+}
+
 bool PveArea::isInitialized() const
 {
 	return m_isInitialized;
@@ -64,14 +69,10 @@ void PveArea::onAreaEnter(const std::shared_ptr<RoomSessionPlayer>& roomSessionP
 
 	m_players.push_back(playerId);
 
-
-
 	if (!m_isInitialized)
 	{
 		initialize(roomSessionPlayer->getRoomSession());
 	}
-
-	//printf("[+] Player %u has entered area %u\n", playerId, m_uid);
 }
 
 void PveArea::onAreaExit(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer)

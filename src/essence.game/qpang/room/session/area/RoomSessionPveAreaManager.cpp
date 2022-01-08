@@ -39,6 +39,21 @@ void RoomSessionPveAreaManager::initializeAreas()
 	}
 }
 
+std::vector<std::shared_ptr<PveArea>> RoomSessionPveAreaManager::getAllRequiredPassThroughAreas()
+{
+	std::vector<std::shared_ptr<PveArea>> areas{};
+
+	for (const auto& [uid, area] : m_areas)
+	{
+		if (area->isPassThroughRequired())
+		{
+			areas.push_back(area);
+		}
+	}
+
+	return areas;
+}
+
 void RoomSessionPveAreaManager::createArea(const std::shared_ptr<PveArea>& area)
 {
 	const auto roomSession = m_roomSession.lock();

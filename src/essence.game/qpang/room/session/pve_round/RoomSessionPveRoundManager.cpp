@@ -213,7 +213,19 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 	// ReSharper disable once CppTooWideScope
 	const bool finishedStage = actualFinishes + deadFinishes == finishesNeeded;
 
-	if (finishedStage)
+	bool allRequiredAreasAreInitialized = true;
+
+	// Now we check if all areas have been initialized/passed through.
+	for (const auto& area : roomSession->getPveAreaManager()->getAllRequiredPassThroughAreas())
+	{
+		if (!area->isInitialized())
+		{
+			allRequiredAreasAreInitialized = false;
+			break;
+		}
+	}
+
+	if (finishedStage && allRequiredAreasAreInitialized)
 	{
 		endRound();
 	}
