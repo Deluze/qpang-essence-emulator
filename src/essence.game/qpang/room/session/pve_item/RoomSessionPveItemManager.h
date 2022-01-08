@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <map>
+#include <mutex>
 
 #include "PveItem.h"
 #include "PveItemData.h"
@@ -52,7 +53,7 @@ public:
 	 */
 	std::shared_ptr<PveItem> findItemByUid(uint32_t itemUid);
 
-	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session) const;
+	void onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session);
 
 	void onStart();
 private:
@@ -70,6 +71,8 @@ private:
 	 * \brief Handles the item pick up event for coins.
 	 */
 	static void handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, eItemId itemType);
+
+	std::recursive_mutex m_mx;
 
 	std::weak_ptr<RoomSession> m_roomSession;
 

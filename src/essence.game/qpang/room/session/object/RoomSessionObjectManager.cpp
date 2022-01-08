@@ -16,8 +16,10 @@ void RoomSessionObjectManager::initialize(const std::shared_ptr<RoomSession>& ro
 }
 
 
-void RoomSessionObjectManager::tick() const
+void RoomSessionObjectManager::tick()
 {
+	std::lock_guard<std::recursive_mutex> lg(mutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -33,6 +35,8 @@ void RoomSessionObjectManager::tick() const
 
 void RoomSessionObjectManager::initializeObjects()
 {
+	std::lock_guard<std::recursive_mutex> lg(mutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -57,6 +61,8 @@ void RoomSessionObjectManager::initializeObjects()
 
 uint32_t RoomSessionObjectManager::spawnObject(const std::shared_ptr<PveObject>& object)
 {
+	std::lock_guard<std::recursive_mutex> lg(mutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -93,6 +99,8 @@ void RoomSessionObjectManager::despawnObject(const uint32_t uid)
 
 	roomSession->relayPlaying<GCPvEObjectInit>(0, uid, object->getPosition().x, object->getPosition().y, object->getPosition().z, object->getHealth());
 
+	std::lock_guard<std::recursive_mutex> lg(mutex);
+
 	m_objects.erase(uid);
 }
 
@@ -112,11 +120,15 @@ void RoomSessionObjectManager::destroyObject(const uint32_t uid)
 
 	roomSession->relayPlaying<GCPvEDestroyObject>(uid);
 
+	std::lock_guard<std::recursive_mutex> lg(mutex);
+
 	m_objects.erase(uid);
 }
 
 void RoomSessionObjectManager::removeAll()
 {
+	std::lock_guard<std::recursive_mutex> lg(mutex);
+
 	m_objects.clear();
 }
 
@@ -150,6 +162,8 @@ void RoomSessionObjectManager::closeGate(const uint32_t uid) const
 
 std::shared_ptr<PveObject> RoomSessionObjectManager::findObjectByUid(const uint32_t uid)
 {
+	std::lock_guard<std::recursive_mutex> lg(mutex);
+
 	const auto it = m_objects.find(uid);
 
 	if (it == m_objects.end())
@@ -162,6 +176,8 @@ std::shared_ptr<PveObject> RoomSessionObjectManager::findObjectByUid(const uint3
 
 void RoomSessionObjectManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session)
 {
+	std::lock_guard<std::recursive_mutex> lg(mutex);
+
 	for (const auto& [uid, object] : m_objects)
 	{
 		session->send<GCPvEObjectInit>(static_cast<U32>(object->getType()), uid, object->getPosition().x, object->getPosition().y, object->getPosition().z, object->getHealth());

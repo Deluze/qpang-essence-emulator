@@ -19,7 +19,7 @@ public:
 	 */
 	void initialize(const std::shared_ptr<RoomSession>& roomSession);
 
-	void tick() const;
+	void tick();
 
 	/**
 	 * \brief Retrieves all objects for the current map.
@@ -73,7 +73,7 @@ public:
 
 	void onStart();
 private:
-	std::mutex mutex;
+	std::recursive_mutex mutex;
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::unordered_map<uint32_t, std::shared_ptr<PveObject>> m_objects{};
 };

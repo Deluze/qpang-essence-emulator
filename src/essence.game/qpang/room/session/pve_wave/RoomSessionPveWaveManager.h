@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <mutex>
 
 #include "PveNpc.h"
 
@@ -19,7 +20,7 @@ public:
 	/**
 	 * \brief Ticks every tick.
 	 */
-	void tick() const;
+	void tick();
 
 	/**
 	 * \brief Retrieves the waves + npc's from the PveManager.
@@ -28,6 +29,8 @@ public:
 
 	void removeAll();
 private:
+	std::mutex m_mx;
+
 	std::weak_ptr<RoomSession> m_roomSession;
 
 	std::unordered_map<uint32_t, std::vector<PveNpc>> m_npcWaves;

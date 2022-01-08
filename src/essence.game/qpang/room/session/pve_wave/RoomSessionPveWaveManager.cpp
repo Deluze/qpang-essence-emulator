@@ -8,8 +8,10 @@ void RoomSessionPveWaveManager::initialize(const std::shared_ptr<RoomSession>& r
 	m_roomSession = roomSession;
 }
 
-void RoomSessionPveWaveManager::tick() const
+void RoomSessionPveWaveManager::tick()
 {
+	std::lock_guard<std::mutex> lg(m_mx);
+
 	if (!m_isInitialized)
 	{
 		return;
@@ -48,6 +50,8 @@ void RoomSessionPveWaveManager::tick() const
 
 void RoomSessionPveWaveManager::initializeWaves()
 {
+	std::lock_guard<std::mutex> lg(m_mx);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -84,5 +88,7 @@ void RoomSessionPveWaveManager::initializeWaves()
 
 void RoomSessionPveWaveManager::removeAll()
 {
+	std::lock_guard<std::mutex> lg(m_mx);
+
 	m_npcWaves.clear();
 }
