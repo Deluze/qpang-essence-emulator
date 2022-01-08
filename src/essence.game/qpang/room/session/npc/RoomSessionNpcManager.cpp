@@ -95,10 +95,30 @@ uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 
 	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
-	npc->setUid(m_spawnedNpcs.size() + 1);
+	if (npc->getUid() == 0)
+	{
+		// ReSharper disable once CppTooWideScopeInitStatement
+		const auto nextUid = (m_lastSpawnedUid + 1);
+
+		if (m_spawnedNpcs.count(nextUid) == 0)
+		{
+			npc->setUid(nextUid);
+		}
+		else
+		{
+			m_lastSpawnedUid = nextUid;
+
+			spawnNpc(npc);
+
+			return 0;
+		}
+	}
+
 	npc->spawn(roomSession);
 
 	m_spawnedNpcs[npc->getUid()] = npc;
+
+	m_lastSpawnedUid = npc->getUid();
 
 	return npc->getUid();
 }

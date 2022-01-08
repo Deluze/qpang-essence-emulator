@@ -101,6 +101,7 @@ std::function<void(RoomSession::Ptr, uint32_t, const PathfinderCell&, const Path
 
 PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_type(data.type),
+	m_uid(data.uid),
 	m_areaUid(data.areaUid),
 	m_floorNumber(data.floorNumber),
 	m_baseHealth(data.baseHealth),

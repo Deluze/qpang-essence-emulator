@@ -114,6 +114,7 @@ void PveManager::initializeNpcs()
 		",pve_npcs.attack_width AS AttackWidth "
 		",pve_npcs.attack_height AS AttackHeight "
 		",pve_npcs.can_drop_loot AS CanDropLoot "
+		",pve_npc_spawns.uid AS Uid "
 		",pve_npc_spawns.should_respawn AS ShouldRespawn "
 		",pve_npc_spawns.respawn_time AS RespawnTime "
 		",pve_npc_spawns.initial_rotation AS InitialRotation "
@@ -136,7 +137,8 @@ void PveManager::initializeNpcs()
 		"INNER JOIN pve_npc_movement_types ON pve_npc_movement_types.id = pve_npcs.movement_type_id "
 		"INNER JOIN pve_npc_target_types ON pve_npc_target_types.id = pve_npcs.target_type_id "
 		"INNER JOIN pve_npc_grade_types ON pve_npc_grade_types.id = pve_npcs.grade_type_id "
-		"INNER JOIN maps on maps.id = pve_npc_spawns.map_id;"
+		"INNER JOIN maps on maps.id = pve_npc_spawns.map_id "
+		"ORDER BY pve_npc_spawns.uid"
 	)->fetch();
 
 	m_npcData.clear();
@@ -153,6 +155,7 @@ void PveManager::initializeNpcs()
 
 		// Step 4: Construct the npc.
 		auto npcData = PveNpcData{
+			result->getInt("Uid"),
 			result->getInt("AreaUid"),
 			result->getInt("FloorNumber"),
 			result->getTiny("Type"),
@@ -276,8 +279,8 @@ void PveManager::initializeObjects()
 
 	const auto result = DATABASE->prepare(
 		"SELECT "
-		"pve_object_spawns.id AS ObjectUid "
-		",pve_object_spawns.type AS ObjectType "
+		"pve_object_spawns.type AS ObjectType "
+		",pve_object_spawns.uid AS ObjectUid "
 		",pve_object_spawns.spawn_position_x AS SpawnPositionX "
 		",pve_object_spawns.spawn_position_y AS SpawnPositionY "
 		",pve_object_spawns.spawn_position_z AS SpawnPositionZ "
