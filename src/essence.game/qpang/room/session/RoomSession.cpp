@@ -707,7 +707,9 @@ uint32_t RoomSession::getTopScore()
 
 void RoomSession::resetTime()
 {
-	m_startTime = time(nullptr) + 5;
+	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
+
+	m_startTime = time(nullptr) + waitingForPlayersTime + 5;
 	m_endTime = m_startTime + m_goal * 60;
 }
 
