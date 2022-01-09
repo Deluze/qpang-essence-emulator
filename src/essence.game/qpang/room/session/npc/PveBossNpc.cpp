@@ -1,17 +1,17 @@
 #include "PveBossNpc.h"
 
-#include "RoomSession.h"
-
 #include <utility>
 #include <qpang/room/tnl/net_events/event_data/CGPvEHitNpcData.h>
 #include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 #include "gc_master_log.hpp"
 
+#include "RoomSession.h"
+
 PveBossNpc::PveBossNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	PveNpc(std::move(data), spawnCell),
 	m_isInSpecialAttack(false),
-	m_specialAttackDamageTreshold(5000),
+	m_specialAttackDamageTreshold(1000),
 	m_previousSpecialAttackHealth(data.baseHealth)
 {
 }
@@ -42,6 +42,11 @@ void PveBossNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 
 float PveBossNpc::calculateHitDamage(const CGPvEHitNpcData& data)
 {
+	if (m_isInSpecialAttack)
+	{
+		return 0;
+	}
+
 	return PveNpc::calculateHitDamage(data);
 }
 
