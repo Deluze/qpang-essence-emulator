@@ -29,8 +29,6 @@ public:
 
 	void removeAll();
 private:
-	std::mutex m_mx;
-
 	std::weak_ptr<RoomSession> m_roomSession;
 
 	std::unordered_map<uint32_t, std::vector<PveNpc>> m_npcWaves;

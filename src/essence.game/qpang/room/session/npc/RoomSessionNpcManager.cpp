@@ -20,14 +20,14 @@ void RoomSessionNpcManager::onStart()
 
 void RoomSessionNpcManager::tick()
 {
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
 	{
 		return;
 	}
-
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
 	for (const auto& [uid, npc] : m_spawnedNpcs)
 	{
@@ -37,14 +37,14 @@ void RoomSessionNpcManager::tick()
 
 void RoomSessionNpcManager::initializeNpcs()
 {
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
 	{
 		return;
 	}
-
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
 	m_spawnedNpcs.clear();
 	m_npcs.clear();
@@ -86,14 +86,14 @@ void RoomSessionNpcManager::spawnNpcsForArea(const uint32_t areaId)
 
 uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 {
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
 	{
 		return 0;
 	}
-
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
 	if (npc->getUid() == 0)
 	{
@@ -125,6 +125,8 @@ uint32_t RoomSessionNpcManager::spawnNpc(const std::shared_ptr<PveNpc>& npc)
 
 void RoomSessionNpcManager::respawnNpcByUid(const uint32_t uid)
 {
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -144,6 +146,8 @@ void RoomSessionNpcManager::respawnNpcByUid(const uint32_t uid)
 
 void RoomSessionNpcManager::killNpc(const uint32_t uid)
 {
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -204,6 +208,8 @@ std::vector<std::shared_ptr<PveNpc>> RoomSessionNpcManager::getAliveNpcs()
 
 void RoomSessionNpcManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session)
 {
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	for (const auto& npc : getAliveNpcs())
 	{
 		npc->spawn(session);
@@ -212,14 +218,14 @@ void RoomSessionNpcManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer
 
 void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 {
+	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
+
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
 	{
 		return;
 	}
-
-	std::lock_guard<std::recursive_mutex> lg(m_npcMutex);
 
 	const auto playerId = data.roomSessionPlayer->getPlayer()->getId();
 	const auto targetNpcUid = data.targetNpc->getUid();

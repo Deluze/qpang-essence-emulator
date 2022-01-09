@@ -73,7 +73,6 @@ public:
 
 	void onStart();
 private:
-	std::recursive_mutex mutex;
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::unordered_map<uint32_t, std::shared_ptr<PveObject>> m_objects{};
 };

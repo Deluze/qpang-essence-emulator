@@ -35,15 +35,29 @@ std::mutex pathfindingMutex = {};
 // If it is, for that npc, return false in canAttackTargetPlayer, so that it will continue pathfinding.
 // Once it's taken path isn't in the vector anymore, it can stop moving, and continue attacking.
 
-std::function<void(RoomSession::Ptr, uint32_t, const PathfinderCell&, const PathfinderCell&)> npcDoNextMove = [&](
-	const RoomSession::Ptr& roomSession, uint32_t npcUid, const PathfinderCell& prevCell, const PathfinderCell& currCell)
+std::function<void(uint32_t, uint32_t, const PathfinderCell&, const PathfinderCell&)> npcDoNextMove = [&](
+	uint32_t roomId, uint32_t npcUid, const PathfinderCell& prevCell, const PathfinderCell& currCell)
 {
-	std::lock_guard lg(pathfindingMutex);
+	auto roomManager = Game::instance()->getRoomManager();
+	if (!roomManager) // can this realistically even happen? I don't think so, unless the room manager gets destroyed, but it will only get destroyed if stuff is going havoc already.
+		return;
+
+	// Using the room manager mutex to be sure that the room is valid for as long as this code runs.
+	// This also ensures that npcs/players will all still be there.
+	std::lock_guard<std::recursive_mutex> lg(roomManager->m_roomMx);
+
+	auto room = roomManager->get(roomId);
+	if (!room)
+		return;
+
+	auto roomSession = room->getRoomSession();
+	if (!roomSession)
+		return;
 
 	auto npcManager = roomSession->getNpcManager();
 	if (!npcManager)
 		return;
-
+	
 	auto npc = npcManager->findNpcByUid(npcUid);
 	if (!npc)
 		return;
@@ -85,8 +99,8 @@ std::function<void(RoomSession::Ptr, uint32_t, const PathfinderCell&, const Path
 
 		const int timeMilliseconds = std::round(moveTime * 1000.f);
 
-		TimeHelper::setTimeOut<RoomSession::Ptr, uint32_t, const PathfinderCell&, const PathfinderCell&>
-			(timeMilliseconds, npcDoNextMove, roomSession, npcUid, currCell, nextCell);
+		TimeHelper::setTimeOut<uint32_t, uint32_t, const PathfinderCell&, const PathfinderCell&>
+			(timeMilliseconds, npcDoNextMove, roomId, npcUid, currCell, nextCell);
 	}
 	else
 	{
@@ -248,8 +262,8 @@ void PveNpc::startMovingToPos(const std::shared_ptr<RoomSession>& roomSession, P
 		m_pathIdx = 1;
 
 		// Starting at path[1], as the first pos is the current pos.
-		TimeHelper::setTimeOut<RoomSession::Ptr, uint32_t, const PathfinderCell&, const PathfinderCell&>
-			(0, npcDoNextMove, roomSession, m_uid, m_currentCell, m_path[1]);
+		TimeHelper::setTimeOut<uint32_t, uint32_t, const PathfinderCell&, const PathfinderCell&>
+			(0, npcDoNextMove, roomSession->getRoom()->getId(), m_uid, m_currentCell, m_path[1]);
 	}
 }
 
@@ -514,10 +528,20 @@ bool PveNpc::isNextMoveValid(const std::shared_ptr<RoomSession>& roomSession, Pa
 	};
 
 	// If the cell is taken and it's not our taken cell
-	if (/*m_targetCell != currentPlayerCell ||*/ (pathFinder->isCellTaken(cell) && m_takenCell != cell))
+	if ((pathFinder->isCellTaken(cell) && m_takenCell != cell))
 	{
 		return false;
 	}
+
+	//if (m_targetCell != currentPlayerCell)
+	//{
+	//	// Player has moved at least 1 cell, reconsider logic
+	//	m_path.clear();
+	//	handleLogic(roomSession);
+	// This would work, but would also impact server performance a bit probably
+	// and this would also need a small timeout so that the npcs don't move too quickly.
+	// This would however make them a lot smarter
+	//}
 
 	return true;
 }

@@ -17,8 +17,6 @@ void RoomSessionPveItemManager::tick() const
 
 void RoomSessionPveItemManager::initializeItems()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -42,8 +40,6 @@ void RoomSessionPveItemManager::initializeItems()
 
 void RoomSessionPveItemManager::spawnInitializedItems()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	for (const auto& item : m_items)
 	{
 		spawnWeightedRandomItem(std::make_shared<PveItem>(item));
@@ -52,8 +48,6 @@ void RoomSessionPveItemManager::spawnInitializedItems()
 
 uint32_t RoomSessionPveItemManager::spawnWeightedRandomItem(const std::shared_ptr<PveItem>& item)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -72,8 +66,6 @@ uint32_t RoomSessionPveItemManager::spawnWeightedRandomItem(const std::shared_pt
 
 uint32_t RoomSessionPveItemManager::spawnItem(const std::shared_ptr<PveItem>& item)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -141,16 +133,12 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 
 void RoomSessionPveItemManager::removeAll()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	m_items.clear();
 	m_spawnedItems.clear();
 }
 
 std::shared_ptr<PveItem> RoomSessionPveItemManager::findItemByUid(const uint32_t itemUid)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	const auto it = m_spawnedItems.find(itemUid);
 
 	if (it == m_spawnedItems.end())
@@ -163,8 +151,6 @@ std::shared_ptr<PveItem> RoomSessionPveItemManager::findItemByUid(const uint32_t
 
 void RoomSessionPveItemManager::onPlayerSync(const std::shared_ptr<RoomSessionPlayer>& session)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	for (const auto& [uid, item] : m_spawnedItems)
 	{
 		item->spawn(session);

@@ -17,8 +17,6 @@ void RoomSessionPveAreaManager::tick() const
 
 void RoomSessionPveAreaManager::initializeAreas()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	const auto roomSession = m_roomSession.lock();
 
 	if (roomSession == nullptr)
@@ -63,15 +61,11 @@ void RoomSessionPveAreaManager::createArea(const std::shared_ptr<PveArea>& area)
 		return;
 	}
 
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	m_areas[area->getUid()] = area;
 }
 
 std::vector<std::shared_ptr<PveArea>> RoomSessionPveAreaManager::getAreas()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	std::vector<std::shared_ptr<PveArea>> areas{};
 
 	for (const auto& [id, area] : m_areas)
@@ -84,8 +78,6 @@ std::vector<std::shared_ptr<PveArea>> RoomSessionPveAreaManager::getAreas()
 
 void RoomSessionPveAreaManager::removeAll()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_mx);
-
 	m_areas.clear();
 }
 

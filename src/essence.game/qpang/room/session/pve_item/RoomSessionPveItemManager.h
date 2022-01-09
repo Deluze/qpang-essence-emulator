@@ -72,8 +72,6 @@ private:
 	 */
 	static void handleCoinPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer, eItemId itemType);
 
-	std::recursive_mutex m_mx;
-
 	std::weak_ptr<RoomSession> m_roomSession;
 
 	std::vector<PveItem> m_items;

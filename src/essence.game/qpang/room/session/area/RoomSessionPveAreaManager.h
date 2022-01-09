@@ -46,7 +46,6 @@ public:
 #pragma endregion
 
 private:
-	std::recursive_mutex m_mx;
 	std::weak_ptr<RoomSession> m_roomSession;
 	std::map<uint32_t, std::shared_ptr<PveArea>> m_areas;
 };
