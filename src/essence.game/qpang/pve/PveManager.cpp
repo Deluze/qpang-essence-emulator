@@ -224,7 +224,7 @@ std::vector<NpcLootDrop> PveManager::getLootDropsByNpcPrimaryKey(const uint32_t 
 	return lootDrops;
 }
 
-std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t npcPrimaryKey)
+std::vector<std::shared_ptr<NpcBodyPart>> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t npcPrimaryKey)
 {
 	const auto statement = DATABASE->prepare(
 		"SELECT "
@@ -249,13 +249,14 @@ std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t 
 
 	const auto result = statement->fetch();
 
-	std::vector<NpcBodyPart> bodyParts{};
+	std::vector<std::shared_ptr<NpcBodyPart>> bodyParts{};
 
 	while (result->hasNext())
 	{
 		auto bodyPart = NpcBodyPart
 		{
 			result->getInt("BodyPartId"),
+			result->getShort("Health"),
 			result->getShort("Health"),
 			result->getInt("WeaponItemId"),
 			result->getInt("ItemBoxId"),
@@ -265,7 +266,7 @@ std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t 
 			static_cast<eNpcBodyPartPartType>(result->getTiny("PartType")),
 		};
 
-		bodyParts.push_back(bodyPart);
+		bodyParts.push_back(std::make_shared<NpcBodyPart>(bodyPart));
 
 		result->next();
 	}

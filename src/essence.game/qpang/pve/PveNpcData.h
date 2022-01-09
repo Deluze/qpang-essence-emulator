@@ -59,6 +59,7 @@ enum class eNpcBodyPartPartType : uint8_t
 struct NpcBodyPart
 {
 	uint32_t id;
+	uint16_t initialHealth;
 	uint16_t health;
 	uint32_t weaponItemId;
 	uint32_t itemBoxId;
@@ -93,7 +94,7 @@ struct PveNpcData
 	eNpcMovementType movementType;
 	eNpcTargetType targetType;
 	std::vector<NpcLootDrop> lootDrops;
-	std::vector<NpcBodyPart> bodyParts;
+	std::vector<std::shared_ptr<NpcBodyPart>> bodyParts;
 };
 
 struct PveNpcWaveData
@@ -114,5 +115,5 @@ struct PveNpcWaveData
 	eNpcMovementType movementType;
 	eNpcTargetType targetType;
 	std::vector<NpcLootDrop> lootDrops;
-	std::vector<NpcBodyPart> bodyParts;
+	std::vector<std::shared_ptr<NpcBodyPart>> bodyParts;
 };

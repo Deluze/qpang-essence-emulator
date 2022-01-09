@@ -67,7 +67,7 @@ private:
 	 * \param npcPrimaryKey The primary key (id) of the npc in the pve_npcs database table.
 	 * \return A vector filled with npc body parts.
 	 */
-	static std::vector<NpcBodyPart> getBodyPartsByNpcPrimaryKey(uint32_t npcPrimaryKey);
+	static std::vector<std::shared_ptr<NpcBodyPart>> getBodyPartsByNpcPrimaryKey(uint32_t npcPrimaryKey);
 
 	/**
 	 * \brief Retrieves all pve objects from the database and stores them.
