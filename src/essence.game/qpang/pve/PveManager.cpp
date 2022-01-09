@@ -228,7 +228,7 @@ std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t 
 {
 	const auto statement = DATABASE->prepare(
 		"SELECT "
-		"pve_npc_body_parts.body_part_id AS BodyPartId "
+		"pve_body_parts.part_id AS BodyPartId "
 		",pve_npc_body_parts.health AS Health "
 		",pve_npc_body_parts.weapon_item_id AS WeaponItemId "
 		",pve_npc_body_parts.item_box_id AS ItemBoxId "
