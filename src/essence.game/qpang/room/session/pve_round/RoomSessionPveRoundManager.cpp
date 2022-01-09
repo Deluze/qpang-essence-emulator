@@ -177,18 +177,18 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 		return;
 	}
 
+	const auto players = roomSession->getPlayingPlayers();
+
+	const int finishesNeeded = static_cast<int>(players.size());
+	if (finishesNeeded == 0)
+		return;
+
 	const auto currentTime = time(nullptr);
 
 	if (currentTime >= roomSession->getEndTime())
 	{
 		roomSession->finishPveGame(false);
 	}
-
-	const auto players = roomSession->getPlayingPlayers();
-
-	const int finishesNeeded = static_cast<int>(players.size());
-	if (finishesNeeded == 0)
-		return;
 
 	int deadFinishes = 0;
 	int actualFinishes = 0;
@@ -248,6 +248,10 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 		return;
 	}
 
+	const auto players = roomSession->getPlayingPlayers();
+	if (players.size() == 0)
+		return;
+
 	// ReSharper disable once CppTooWideScopeInitStatement
 	const auto currentTime = time(nullptr);
 
@@ -272,10 +276,6 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 	}
 
 	uint32_t deadPlayerCount = 0;
-
-	const auto players = roomSession->getPlayingPlayers();
-	if (players.size() == 0)
-		return;
 
 	for (const auto& player : players)
 	{
