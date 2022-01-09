@@ -232,8 +232,17 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 
 	auto damage = static_cast<double>(data.weaponUsed.damage);
 
+	const auto targetNpc = findNpcByUid(targetNpcUid);
+
+	if (targetNpc == nullptr)
+	{
+		return;
+	}
+
+	const auto& hitBodyPart = targetNpc->getBodyPartById(data.bodyPartId);
+
 	// Note: Currently there are no bodyparts with attribute type A_DEFAULT or A_DESTROY.
-	switch (data.bodyPart.attributeType)
+	switch (hitBodyPart->attributeType)
 	{
 	case eNpcBodyPartAttributeType::A_DEFAULT:
 		damage = 0;
@@ -245,16 +254,13 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	}
 
 	// Note: Currently the damage type D_ONLY_NEARWEAPON is not being used by any npc.
-	switch (data.bodyPart.damageType)
+	switch (hitBodyPart->damageType)
 	{
 	case eNpcBodyPartDamageType::D_DEFAULT:
 		// Takes damage regardless of weapon.
 		break;
 	case eNpcBodyPartDamageType::D_EXCEPT_SPLASH:
-		// FIXME: Check if weapon deals splash damage. For now, we disable all damage from throwables.
-		/*if (data.weaponType == eWeaponType::THROWABLE_1)
-			damage = 0;*/
-
+		// FIXME: Should ignore splash damage weapons.
 		break;
 	case eNpcBodyPartDamageType::D_ONLY_NEARWEAPON:
 		if (data.weaponType != eWeaponType::MELEE)
@@ -263,16 +269,16 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		break;
 	}
 
-	const auto npcBodyParts = data.targetNpc->getBodyParts();
-	// ReSharper disable once CppTooWideScopeInitStatement
-	const auto isHeadshot = (!npcBodyParts.empty() && (npcBodyParts[0].id == data.bodyPart.id));
-
-	// This means it is headshot damage.
-	if (!isHeadshot)
+	// This body part is broken.
+	if (hitBodyPart->health == 0)
+	{
 		damage *= 0.5;
+	}
 
-	const auto damageDealt = data.targetNpc->takeDamage(static_cast<uint16_t>(damage));
-	const auto hasTargetDied = data.targetNpc->isDead();
+	targetNpc->takeBodyPartDamage(hitBodyPart->id, static_cast<uint16_t>(damage));
+
+	const auto damageDealtToNpc = targetNpc->takeDamage(static_cast<uint16_t>(damage));
+	const auto hasTargetDied = targetNpc->isDead();
 
 	if (hasTargetDied)
 	{
@@ -294,14 +300,14 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.impactPosOffset,
 		data.entityId,
 		data.unk_11,
-		static_cast<uint8_t>(data.bodyPart.id),
+		static_cast<uint8_t>(hitBodyPart->id),
 		data.weaponUsed.itemId,
 		data.weaponCardId,
 		data.weaponType,
 		data.hitLocation,
 		data.unk_18,
 		data.unk_19,
-		damageDealt,
+		damageDealtToNpc,
 		killStreak,
 		data.targetNpc->getHealth()
 	};
