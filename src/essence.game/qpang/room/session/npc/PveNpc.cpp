@@ -10,6 +10,8 @@
 #include "RoomSession.h"
 #include "TimeHelper.h"
 
+#include <qpang/room/tnl/net_events/event_data/CGPvEHitNpcData.h>
+
 std::mutex pathfindingMutex = {};
 
 // TODO (Perhaps?):
@@ -465,6 +467,49 @@ void PveNpc::handleDeath(const std::shared_ptr<RoomSession>& roomSession)
 			roomSession->getNpcManager()->respawnNpcByUid(m_uid);
 		}
 	}
+}
+
+float PveNpc::calculateHitDamage(const CGPvEHitNpcData& data)
+{
+	auto damage = static_cast<double>(data.weaponUsed.damage);
+
+	const auto& hitBodyPart = getBodyPartById(data.bodyPartId);
+
+	// Note: Currently there are no bodyparts with attribute type A_DEFAULT or A_DESTROY.
+	switch (hitBodyPart->attributeType)
+	{
+	case eNpcBodyPartAttributeType::A_DEFAULT:
+		damage = 0;
+		break;
+	case eNpcBodyPartAttributeType::A_INCAPACITY:
+		// FIXME: If we interpret the description correctly, this body part needs to be destroyed on hit (gc_pve_destroy_part).
+	case eNpcBodyPartAttributeType::A_DESTROY:
+		break;
+	}
+
+	// Note: Currently the damage type D_ONLY_NEARWEAPON is not being used by any npc.
+	switch (hitBodyPart->damageType)
+	{
+	case eNpcBodyPartDamageType::D_DEFAULT:
+		// Takes damage regardless of weapon.
+		break;
+	case eNpcBodyPartDamageType::D_EXCEPT_SPLASH:
+		// FIXME: Should ignore splash damage weapons.
+		break;
+	case eNpcBodyPartDamageType::D_ONLY_NEARWEAPON:
+		if (data.weaponType != eWeaponType::MELEE)
+			damage = 0;
+
+		break;
+	}
+
+	// This body part is broken.
+	if (hitBodyPart->health == 0)
+	{
+		damage *= 0.5;
+	}
+
+	return damage;
 }
 
 void PveNpc::tick(const std::shared_ptr<RoomSession>& roomSession)

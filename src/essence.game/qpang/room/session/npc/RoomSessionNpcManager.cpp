@@ -4,7 +4,7 @@
 #include "GCPvEHitNpcData.h"
 #include "gc_pve_die_npc.hpp"
 #include "gc_pve_hit_npc.hpp"
-#include "PveNpc.h"
+#include "PveBossNpc.h"
 #include "RoomSession.h"
 #include "RoomSessionPlayer.h"
 
@@ -65,7 +65,9 @@ void RoomSessionNpcManager::initializeNpcs()
 			pathFinder->getCellZ(z)
 		};
 
-		const auto npc = PveNpc(data, spawnCell);
+		const bool isBossNpc = data.type == 13 || data.type == 38 || data.type == 39 || data.type == 59;
+		const auto npc = isBossNpc ? std::make_shared<PveBossNpc>(data, spawnCell) :
+			std::make_shared<PveNpc>(data, spawnCell);
 
 		m_npcs.push_back(npc);
 	}
@@ -77,9 +79,9 @@ void RoomSessionNpcManager::spawnNpcsForArea(const uint32_t areaId)
 
 	for (const auto& npc : m_npcs)
 	{
-		if (npc.getAreaUid() == areaId)
+		if (npc->getAreaUid() == areaId)
 		{
-			spawnNpc(std::make_shared<PveNpc>(npc));
+			spawnNpc(npc);
 		}
 	}
 }
@@ -230,54 +232,18 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	const auto playerId = data.roomSessionPlayer->getPlayer()->getId();
 	const auto targetNpcUid = data.targetNpc->getUid();
 
-	auto damage = static_cast<double>(data.weaponUsed.damage);
-
-	const auto targetNpc = findNpcByUid(targetNpcUid);
+	const auto& targetNpc = findNpcByUid(targetNpcUid);
 
 	if (targetNpc == nullptr)
 	{
 		return;
 	}
 
-	const auto& hitBodyPart = targetNpc->getBodyPartById(data.bodyPartId);
+	const auto damage = targetNpc->calculateHitDamage(data);
 
-	// Note: Currently there are no bodyparts with attribute type A_DEFAULT or A_DESTROY.
-	switch (hitBodyPart->attributeType)
-	{
-	case eNpcBodyPartAttributeType::A_DEFAULT:
-		damage = 0;
-		break;
-	case eNpcBodyPartAttributeType::A_INCAPACITY:
-		// FIXME: If we interpret the description correctly, this body part needs to be destroyed on hit (gc_pve_destroy_part).
-	case eNpcBodyPartAttributeType::A_DESTROY:
-		break;
-	}
-
-	// Note: Currently the damage type D_ONLY_NEARWEAPON is not being used by any npc.
-	switch (hitBodyPart->damageType)
-	{
-	case eNpcBodyPartDamageType::D_DEFAULT:
-		// Takes damage regardless of weapon.
-		break;
-	case eNpcBodyPartDamageType::D_EXCEPT_SPLASH:
-		// FIXME: Should ignore splash damage weapons.
-		break;
-	case eNpcBodyPartDamageType::D_ONLY_NEARWEAPON:
-		if (data.weaponType != eWeaponType::MELEE)
-			damage = 0;
-
-		break;
-	}
-
-	// This body part is broken.
-	if (hitBodyPart->health == 0)
-	{
-		damage *= 0.5;
-	}
-
-	targetNpc->takeBodyPartDamage(hitBodyPart->id, static_cast<uint16_t>(damage));
-
+	const auto damageDealtToBodyPart = targetNpc->takeBodyPartDamage(data.bodyPartId, damage);
 	const auto damageDealtToNpc = targetNpc->takeDamage(static_cast<uint16_t>(damage));
+
 	const auto hasTargetDied = targetNpc->isDead();
 
 	if (hasTargetDied)
@@ -300,7 +266,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.impactPosOffset,
 		data.entityId,
 		data.unk_11,
-		static_cast<uint8_t>(hitBodyPart->id),
+		static_cast<uint8_t>(data.bodyPartId),
 		data.weaponUsed.itemId,
 		data.weaponCardId,
 		data.weaponType,
@@ -309,7 +275,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 		data.unk_19,
 		damageDealtToNpc,
 		killStreak,
-		data.targetNpc->getHealth()
+		targetNpc->getHealth()
 	};
 
 	roomSession->relayPlaying<GCPvEHitNpc>(gcPvEHitNpcData);
