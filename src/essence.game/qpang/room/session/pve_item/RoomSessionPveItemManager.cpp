@@ -12,7 +12,17 @@ void RoomSessionPveItemManager::initialize(const std::shared_ptr<RoomSession>& r
 
 void RoomSessionPveItemManager::tick() const
 {
+	const auto roomSession = m_roomSession.lock();
 
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	for (const auto& [uid, item] : m_spawnedItems)
+	{
+		item->tick(roomSession);
+	}
 }
 
 void RoomSessionPveItemManager::initializeItems()
@@ -30,12 +40,14 @@ void RoomSessionPveItemManager::initializeItems()
 	const auto mapId = roomSession->getPveRoundManager()->getMap();
 	const auto itemData = Game::instance()->getPveManager()->getItemDataByMapId(mapId);
 
-	for (const auto& [itemSpawnType, position] : itemData)
+	for (const auto& data : itemData)
 	{
-		const auto item = PveItem(itemSpawnType, position);
+		const auto item = PveItem(data);
 
 		m_items.push_back(item);
 	}
+
+	spawnInitializedItems();
 }
 
 void RoomSessionPveItemManager::spawnInitializedItems()
@@ -79,6 +91,20 @@ uint32_t RoomSessionPveItemManager::spawnItem(const std::shared_ptr<PveItem>& it
 	m_spawnedItems[item->getUid()] = item;
 
 	return item->getUid();
+}
+
+void RoomSessionPveItemManager::respawnItem(const uint32_t uid)
+{
+	const auto& item = findItemByUid(uid);
+
+	if (item == nullptr)
+	{
+		return;
+	}
+
+	item->setIsPickedUp(false);
+
+	spawnWeightedRandomItem(item);
 }
 
 void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint32_t uid)
@@ -129,6 +155,7 @@ void RoomSessionPveItemManager::onItemPickup(const uint32_t playerId, const uint
 	roomSession->relayPlaying<GCGameItem>(GCGameItem::CMD::PICKUP_GAME_ITEM, playerId, item->getItemId(), uid, 0);
 
 	item->setIsPickedUp(true);
+	item->setLastPickupTime(time(nullptr));
 }
 
 void RoomSessionPveItemManager::removeAll()
@@ -160,7 +187,6 @@ void RoomSessionPveItemManager::onPlayerSync(const std::shared_ptr<RoomSessionPl
 void RoomSessionPveItemManager::onStart()
 {
 	initializeItems();
-	spawnInitializedItems();
 }
 
 void RoomSessionPveItemManager::handleAmmoPickup(const RoomSessionPlayer::Ptr& roomSessionPlayer)
