@@ -15,9 +15,11 @@ public:
 	PveNpc(PveNpcData data, const PathfinderCell& spawnCell);
 	PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell);
 
-	void tick(const std::shared_ptr<RoomSession>& roomSession);
+	virtual void tick(const std::shared_ptr<RoomSession>& roomSession);
 
 	void handleDeath(const std::shared_ptr<RoomSession>& roomSession);
+
+	virtual float calculateHitDamage(const class CGPvEHitNpcData& data);
 
 	uint32_t getLastAttackerId();
 
@@ -43,8 +45,8 @@ public:
 	/**
 	 * \brief Spawns in the npc by relaying the init event.
 	 */
-	void spawn(const std::shared_ptr<RoomSession>& roomSession) const;
-	void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const;
+	virtual void spawn(const std::shared_ptr<RoomSession>& roomSession) const;
+	virtual void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const;
 
 	void resetPosition();
 
@@ -218,7 +220,7 @@ public:
 	NpcBodyPart getBodyPartById(uint32_t bodyPartId) const;
 #pragma endregion
 
-private:
+protected:
 	bool canShoot();
 
 	void handleTargetStatic(const std::shared_ptr<RoomSession>& roomSession);
