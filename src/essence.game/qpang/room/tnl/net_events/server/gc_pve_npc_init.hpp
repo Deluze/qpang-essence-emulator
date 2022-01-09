@@ -18,7 +18,7 @@ public:
 
 	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient } {}
 
-	GCPvENpcInit(const uint32_t type, const uint32_t npcUid, const Position position, const uint16_t rotation, const uint32_t health)
+	GCPvENpcInit(const uint32_t type, const uint32_t npcUid, const Position position, const uint16_t rotation, const uint32_t health, const bool shouldExplode = false)
 		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient },
 		npcType(type),
 		npcUid(npcUid),
@@ -26,7 +26,8 @@ public:
 		yPos(position.y),
 		zPos(position.z),
 		rotation(rotation),
-		health(health)
+		health(health),
+		shouldExplode(shouldExplode)
 	{
 
 	}
