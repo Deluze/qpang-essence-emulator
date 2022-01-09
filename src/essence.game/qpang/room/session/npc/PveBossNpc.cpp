@@ -17,8 +17,7 @@ void PveBossNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 
 float PveBossNpc::calculateHitDamage(const CGPvEHitNpcData& data)
 {
-	return PveNpc::calculateHitDamage(data);
-	//return static_cast<float>(data.weaponUsed.damage);
+	return static_cast<float>(data.weaponUsed.damage);
 }
 
 void PveBossNpc::spawn(const std::shared_ptr<RoomSession>& roomSession) const
