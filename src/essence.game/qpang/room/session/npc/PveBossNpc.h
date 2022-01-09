@@ -26,15 +26,29 @@ public:
 	[[nodiscard]]
 	bool canStartSpecialAttack() const;
 
+private:
+	void handleSpecialAttackStart(const std::shared_ptr<RoomSession>& roomSession);
+	void handleSpecialAttackEnd(const std::shared_ptr<RoomSession>& roomSession);
+	void handlePerformSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession);
+
 	/**
 	 * \brief Starts the special attack.
 	 * \param roomSession The room in session.
 	 */
 	void startSpecialAttack(const std::shared_ptr<RoomSession>& roomSession);
 
+	/**
+	 * \brief Ends the special attack.
+	 * \param roomSession The room in session.
+	 */
 	void endSpecialAttack(const std::shared_ptr<RoomSession>& roomSession);
 
-private:
+	/**
+	 * \brief Performs the special attack shooting.
+	 * \param roomSession The room in session.
+	 */
+	void performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession) const;
+
 	bool m_isInSpecialAttack;
 	uint16_t m_specialAttackDamageTreshold;
 

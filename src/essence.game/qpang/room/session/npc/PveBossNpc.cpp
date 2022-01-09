@@ -5,6 +5,7 @@
 #include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 #include "gc_master_log.hpp"
+#include "RandomHelper.h"
 
 #include "RoomSession.h"
 
@@ -20,24 +21,9 @@ void PveBossNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
 	PveNpc::tick(roomSession);
 
-	if (canStartSpecialAttack())
-	{
-		startSpecialAttack(roomSession);
-
-		return;
-	}
-
-	const auto currentTime = time(nullptr);
-
-	if (m_lastSpecialAttackTime == NULL)
-	{
-		return;
-	}
-
-	if ((m_lastSpecialAttackTime + m_specialAttackDuration) < currentTime)
-	{
-		endSpecialAttack(roomSession);
-	}
+	handleSpecialAttackStart(roomSession);
+	handlePerformSpecialAttackShoot(roomSession);
+	handleSpecialAttackEnd(roomSession);
 }
 
 float PveBossNpc::calculateHitDamage(const CGPvEHitNpcData& data)
@@ -65,6 +51,32 @@ bool PveBossNpc::canStartSpecialAttack() const
 	return (!m_isInSpecialAttack && (m_health < (m_previousSpecialAttackHealth - m_specialAttackDamageTreshold)));
 }
 
+void PveBossNpc::handleSpecialAttackStart(const std::shared_ptr<RoomSession>& roomSession)
+{
+	if (canStartSpecialAttack())
+	{
+		startSpecialAttack(roomSession);
+	}
+}
+
+void PveBossNpc::handleSpecialAttackEnd(const std::shared_ptr<RoomSession>& roomSession)
+{
+	const auto currentTime = time(nullptr);
+
+	if (m_isInSpecialAttack && (m_lastSpecialAttackTime != NULL) && (m_lastSpecialAttackTime + m_specialAttackDuration) < currentTime)
+	{
+		endSpecialAttack(roomSession);
+	}
+}
+
+void PveBossNpc::handlePerformSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession)
+{
+	if (m_isInSpecialAttack && canShoot())
+	{
+		performSpecialAttackShoot(roomSession);
+	}
+}
+
 void PveBossNpc::startSpecialAttack(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_isInSpecialAttack = true;
@@ -81,4 +93,17 @@ void PveBossNpc::endSpecialAttack(const std::shared_ptr<RoomSession>& roomSessio
 	m_lastSpecialAttackTime = NULL;
 
 	roomSession->relayPlaying<GCMasterLog>(m_uid, 0, 1);
+}
+
+void PveBossNpc::performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession) const
+{
+	/*for (uint32_t i = 0; i < 5; i++)
+	{*/
+	const auto randomX = RandomHelper::getRandomFloat(-21, 21);
+	const auto randomZ = RandomHelper::getRandomFloat(-21, 21);
+
+	const auto targetPosition = Position{ randomX, 0, randomZ };
+
+	roomSession->relayPlaying<GCMasterLog>(m_uid, 88, targetPosition, 0);
+	/*}*/
 }
