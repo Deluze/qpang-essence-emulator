@@ -148,11 +148,10 @@ public:
 
 		const auto bodyPart = targetNpc->getBodyPartById(bodyPartId);
 
-		if (bodyPart.id == 0)
+		if (bodyPart == nullptr)
 		{
 			return;
 		}
-
 
 		const auto impactPos = Position{ impactPosX, impactPosY, impactPosZ };
 		const auto impactOffsetPos = Position{ impactOffsetPosX, impactOffsetPosY, impactOffsetPosZ };
@@ -171,7 +170,7 @@ public:
 			impactOffsetPos,
 			entityId,
 			unk_11,
-			bodyPart,
+			bodyPartId,
 			weaponUsed,
 			weaponCardId,
 			static_cast<eWeaponType>(weaponType),

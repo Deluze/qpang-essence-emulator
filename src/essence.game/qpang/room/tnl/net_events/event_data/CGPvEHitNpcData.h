@@ -15,7 +15,7 @@ struct CGPvEHitNpcData
 	Position impactPosOffset;
 	uint32_t entityId;
 	uint8_t unk_11;
-	NpcBodyPart bodyPart;
+	uint32_t bodyPartId;
 	Weapon weaponUsed;
 	uint64_t weaponCardId;
 	eWeaponType weaponType;
