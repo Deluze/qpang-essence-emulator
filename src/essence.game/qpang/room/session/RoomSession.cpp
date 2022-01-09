@@ -625,7 +625,7 @@ void RoomSession::finishPveGame(const bool didWin)
 		constexpr uint32_t bestTimeLeftInMs = 0;
 
 		const auto currentTime = time(nullptr);
-		const auto currentTimeLeftMs = didWin ? static_cast<uint32_t>((m_endTime - currentTime) * 1000) : 0;
+		const auto currentTimeLeftMs = /*didWin ? */static_cast<uint32_t>((m_endTime - currentTime) * 1000)/* : 0*/;
 
 		roomSessionPlayer->post(new GCMasterLog(player->getId(), didWin, goldenCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftMs));
 	}
