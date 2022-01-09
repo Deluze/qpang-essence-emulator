@@ -12,6 +12,7 @@ class PveItem final
 public:
 	PveItem() = default;
 
+	explicit PveItem(PveItemData data);
 	PveItem(eItemSpawnType spawnType, const Position& position);
 	PveItem(uint32_t itemId, const Position& position);
 
@@ -38,6 +39,8 @@ public:
 	void setWeightedRandomItemId();
 
 	void setIsPickedUp(bool value);
+
+	void setLastPickupTime(uint32_t time);
 
 	/**
 	 * \brief Gets the uid of the item.
@@ -68,11 +71,15 @@ public:
 protected:
 	uint32_t m_uid{};
 
-	uint32_t m_itemId;
+	uint32_t m_itemId{};
 	eItemSpawnType m_spawnType;
 
 	Position m_position{};
 
+	uint32_t m_respawnTime = NULL;
+	bool m_shouldRespawn = false;
+
+	uint32_t m_lastPickupTime = NULL;
 	bool m_isPickedUp = false;
 
 	std::vector<WeightedItem> m_weightedCoins
