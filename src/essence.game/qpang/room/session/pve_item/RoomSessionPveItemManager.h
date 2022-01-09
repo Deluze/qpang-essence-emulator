@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <map>
-#include <mutex>
 
 #include "PveItem.h"
 #include "PveItemData.h"
@@ -33,6 +32,8 @@ public:
 	 * \returns The uid of the spawned in item.
 	 */
 	uint32_t spawnItem(const std::shared_ptr<PveItem>& item);
+
+	void respawnItem(uint32_t uid);
 
 	/**
 	 * \brief Handles the CGPveGetItem event (item pickup).

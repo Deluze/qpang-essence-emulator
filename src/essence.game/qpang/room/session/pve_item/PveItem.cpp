@@ -3,8 +3,15 @@
 #include "gc_pve_item_init.hpp"
 #include "RandomHelper.h"
 
+PveItem::PveItem(const PveItemData data) :
+	m_spawnType(data.itemSpawnType),
+	m_position(data.position),
+	m_respawnTime(data.respawnTime),
+	m_shouldRespawn(data.shouldRespawn)
+{
+}
+
 PveItem::PveItem(const eItemSpawnType spawnType, const Position& position) :
-	m_itemId(0),
 	m_spawnType(spawnType),
 	m_position(position)
 {
@@ -20,7 +27,22 @@ PveItem::PveItem(const uint32_t itemId, const Position& position) :
 // ReSharper disable once CppMemberFunctionMayBeStatic
 void PveItem::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
+	if (m_shouldRespawn)
+	{
+		const auto currentTime = time(nullptr);
 
+		if (m_lastPickupTime == NULL)
+		{
+			return;
+		}
+
+		if ((m_lastPickupTime + m_respawnTime) < currentTime)
+		{
+			m_lastPickupTime = NULL;
+
+			roomSession->getPveItemManager()->respawnItem(m_uid);
+		}
+	}
 }
 
 void PveItem::spawn(const std::shared_ptr<RoomSession>& roomSession) const
@@ -71,6 +93,11 @@ void PveItem::setWeightedRandomItemId()
 void PveItem::setIsPickedUp(const bool value)
 {
 	m_isPickedUp = value;
+}
+
+void PveItem::setLastPickupTime(const uint32_t time)
+{
+	m_lastPickupTime = time;
 }
 
 uint32_t PveItem::getUid() const

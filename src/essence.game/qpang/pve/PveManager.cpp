@@ -228,7 +228,7 @@ std::vector<NpcBodyPart> PveManager::getBodyPartsByNpcPrimaryKey(const uint32_t 
 {
 	const auto statement = DATABASE->prepare(
 		"SELECT "
-		"pve_npc_body_parts.body_part_id AS BodyPartId "
+		"pve_body_parts.part_id AS BodyPartId "
 		",pve_npc_body_parts.health AS Health "
 		",pve_npc_body_parts.weapon_item_id AS WeaponItemId "
 		",pve_npc_body_parts.item_box_id AS ItemBoxId "
@@ -336,9 +336,11 @@ void PveManager::initializeItems()
 
 	const auto result = DATABASE->prepare(
 		"SELECT "
-		"position_x AS PositionX "
-		",position_y AS PositionY "
-		",position_z AS PositionZ "
+		"pve_item_spawns.position_x AS PositionX "
+		",pve_item_spawns.position_y AS PositionY "
+		",pve_item_spawns.position_z AS PositionZ "
+		",pve_item_spawns.respawn_time AS RespawnTime "
+		",pve_item_spawns.should_respawn AS ShouldRespawn "
 		",pve_item_spawn_types.type AS SpawnType "
 		",maps.map_id AS MapId "
 		"FROM pve_item_spawns "
@@ -357,7 +359,9 @@ void PveManager::initializeItems()
 				result->getFloat("PositionX"),
 				result->getFloat("PositionY"),
 				result->getFloat("PositionZ")
-			}
+			},
+			result->getInt("RespawnTime"),
+			result->getFlag("ShouldRespawn")
 		};
 
 		const auto mapId = result->getInt("MapId");
