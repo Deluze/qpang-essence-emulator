@@ -10,6 +10,7 @@
 #include "gc_game_state.hpp"
 #include "Maps.h"
 #include <qpang/room/tnl/net_events/server/gc_join.hpp>
+#include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -39,8 +40,7 @@ void RoomSessionPveRoundManager::updatePathfinders() const
 		roomSession->getUnderGroundPathfinder()->free();
 		break;
 	case eRound::CHESS_CASTLE_STAGE_3:
-		//roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage3MapInfo);
-		roomSession->getAboveGroundPathfinder()->free();
+		roomSession->getAboveGroundPathfinder()->updateMapInfo(Maps::pveStage3MapInfo);
 		roomSession->getUnderGroundPathfinder()->free();
 		break;
 	}
@@ -91,6 +91,7 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 		{
 			// Synchronize time for every player.
 			player->send<GCGameState>(player->getPlayer()->getId(), CGGameState::State::SYNC_TIME, roomSession->getElapsedTime());
+			//player->send<GCPvENpcInit>(1, 1337, Position{ 0,0,0 }, 0, 0);
 		}
 
 		m_hasRoundEnded = false;
