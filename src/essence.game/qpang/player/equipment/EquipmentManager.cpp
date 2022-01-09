@@ -460,6 +460,7 @@ uint16_t EquipmentManager::getBonusHealth(const std::shared_ptr<RoomSession>& ro
 	case 1429412099:
 	case 1429412100:
 	case 1429410049: // Squirtle shield
+	case 1429408257: // Frysian backpack
 		if (isPveGameMode)
 		{
 			switch (roomSession->getPveRoundManager()->getCurrentRound())
