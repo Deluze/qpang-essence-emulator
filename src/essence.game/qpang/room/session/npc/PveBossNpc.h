@@ -18,4 +18,7 @@ public:
 
 	virtual void spawn(const std::shared_ptr<RoomSession>& roomSession) const override;
 	virtual void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const override;
+private:
+	bool m_isInSpecialAttack;
+	float m_specialAttackDamageTreshold;
 };

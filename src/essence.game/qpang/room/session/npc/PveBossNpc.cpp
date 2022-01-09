@@ -7,7 +7,9 @@
 #include <qpang/room/tnl/net_events/event_data/CGPvEHitNpcData.h>
 
 PveBossNpc::PveBossNpc(PveNpcData data, const PathfinderCell& spawnCell) :
-	PveNpc(std::move(data), spawnCell)
+	PveNpc(std::move(data), spawnCell),
+	m_isInSpecialAttack(false),
+	m_specialAttackDamageTreshold(5000.f)
 {
 }
 
