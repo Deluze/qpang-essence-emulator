@@ -57,7 +57,7 @@ std::function<void(uint32_t, uint32_t, const PathfinderCell&, const PathfinderCe
 	auto npcManager = roomSession->getNpcManager();
 	if (!npcManager)
 		return;
-	
+
 	auto npc = npcManager->findNpcByUid(npcUid);
 	if (!npc)
 		return;
@@ -135,6 +135,7 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_initialPosition(data.initialPosition),
 	m_position(data.initialPosition),
 	m_staticShootingPosition(data.staticShootingPosition),
+	m_targetShootPosition(),
 	m_gradeType(data.gradeType),
 	m_movementType(data.movementType),
 	m_targetType(data.targetType),
@@ -142,7 +143,7 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_takenCell(spawnCell),
 	m_currentCell(spawnCell),
 	m_lootDrops(std::move(data.lootDrops)),
-	m_bodyParts(std::move(data.bodyParts))
+	m_bodyParts(data.bodyParts)
 {
 }
 
@@ -165,6 +166,7 @@ PveNpc::PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell) :
 	m_initialPosition(data.initialPosition),
 	m_position(data.initialPosition),
 	m_staticShootingPosition({}),
+	m_targetShootPosition(),
 	m_gradeType(data.gradeType),
 	m_movementType(data.movementType),
 	m_targetType(data.targetType),
@@ -172,7 +174,7 @@ PveNpc::PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell) :
 	m_takenCell(spawnCell),
 	m_currentCell(spawnCell),
 	m_lootDrops(std::move(data.lootDrops)),
-	m_bodyParts(std::move(data.bodyParts))
+	m_bodyParts(data.bodyParts)
 {
 }
 
@@ -664,7 +666,9 @@ void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 	resetPosition();
 
 	clearPath();
+
 	resetHealth();
+	resetBodyPartsHealth();
 
 	spawn(roomSession);
 }
@@ -681,6 +685,14 @@ void PveNpc::resetHealth()
 	m_health = m_baseHealth;
 }
 
+void PveNpc::resetBodyPartsHealth() const
+{
+	for (const auto& bodyPart : m_bodyParts)
+	{
+		bodyPart->health = bodyPart->initialHealth;
+	}
+}
+
 uint16_t PveNpc::takeDamage(const uint16_t damage)
 {
 	if (damage > m_health)
@@ -691,6 +703,28 @@ uint16_t PveNpc::takeDamage(const uint16_t damage)
 	}
 
 	m_health = m_health - damage;
+
+	return damage;
+}
+
+uint16_t PveNpc::takeBodyPartDamage(const uint32_t bodyPartId, uint16_t damage) const
+{
+	const auto& bodyPart = getBodyPartById(bodyPartId);
+
+	if (bodyPart == nullptr)
+	{
+		// Body part was not found so 0 damage was taken.
+		return 0;
+	}
+
+	if (damage > bodyPart->health)
+	{
+		bodyPart->health = 0;
+
+		return (damage - bodyPart->health);
+	}
+
+	bodyPart->health = (bodyPart->health - damage);
 
 	return damage;
 }
@@ -788,7 +822,7 @@ bool PveNpc::shouldRespawn() const
 	return m_shouldRespawn;
 }
 
-std::vector<NpcBodyPart> PveNpc::getBodyParts()
+std::vector<std::shared_ptr<NpcBodyPart>> PveNpc::getBodyParts()
 {
 	return m_bodyParts;
 }
@@ -803,7 +837,7 @@ bool PveNpc::hasBodyPart(const uint32_t bodyPartId) const
 	// ReSharper disable once CppUseStructuredBinding
 	for (const auto& bodyPart : m_bodyParts)
 	{
-		if (bodyPart.id == bodyPartId)
+		if (bodyPart->id == bodyPartId)
 		{
 			return true;
 		}
@@ -812,21 +846,26 @@ bool PveNpc::hasBodyPart(const uint32_t bodyPartId) const
 	return false;
 }
 
-NpcBodyPart PveNpc::getBodyPartById(const uint32_t bodyPartId) const
+std::shared_ptr<NpcBodyPart> PveNpc::getBodyPartById(const uint32_t bodyPartId) const
 {
 	for (const auto& bodyPart : m_bodyParts)
 	{
-		if (bodyPart.id == bodyPartId)
+		if (bodyPart->id == bodyPartId)
 		{
 			return bodyPart;
 		}
 	}
 
-	return {};
+	return nullptr;
 }
 
 void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 {
+	if (m_lootDrops.empty())
+	{
+		return;
+	}
+
 	std::vector<uint32_t> itemDrops{};
 
 	for (const auto [itemId, probability] : m_lootDrops)
@@ -835,6 +874,11 @@ void PveNpc::dropLoot(const std::shared_ptr<RoomSession>& roomSession)
 		{
 			itemDrops.push_back(itemId);
 		}
+	}
+
+	if (itemDrops.empty())
+	{
+		return;
 	}
 
 	const auto randomIndex = RandomHelper::getRandomNumber(0, itemDrops.size() - 1);

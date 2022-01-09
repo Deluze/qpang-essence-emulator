@@ -65,12 +65,16 @@ public:
 	 */
 	void resetHealth();
 
+	void resetBodyPartsHealth() const;
+
 	/**
 	 * \brief Subtracts the damage value from the health value.
 	 * \param damage The damage to subtract from the health.
 	 * \return The amount of damage taken.
 	 */
 	uint16_t takeDamage(uint16_t damage);
+
+	uint16_t takeBodyPartDamage(uint32_t bodyPartId, uint16_t damage) const;
 
 	bool getIsMovingToPlayer();
 
@@ -192,7 +196,7 @@ public:
 	 * \brief The body parts of the npc.
 	 * \return The body parts.
 	 */
-	std::vector<NpcBodyPart> getBodyParts();
+	std::vector<std::shared_ptr<NpcBodyPart>> getBodyParts();
 
 	/**
 	 * \brief Whether or not the npc is dead.
@@ -215,7 +219,7 @@ public:
 	 * \return The found body part or an empty body part struct.
 	 */
 	[[nodiscard]]
-	NpcBodyPart getBodyPartById(uint32_t bodyPartId) const;
+	std::shared_ptr<NpcBodyPart> getBodyPartById(uint32_t bodyPartId) const;
 #pragma endregion
 
 private:
@@ -312,5 +316,5 @@ private:
 	bool m_isMovingToPlayer = false;
 
 	std::vector<NpcLootDrop> m_lootDrops{};
-	std::vector<NpcBodyPart> m_bodyParts{};
+	std::vector<std::shared_ptr<NpcBodyPart>> m_bodyParts{};
 };
