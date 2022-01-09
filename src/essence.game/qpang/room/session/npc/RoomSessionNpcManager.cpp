@@ -4,7 +4,7 @@
 #include "GCPvEHitNpcData.h"
 #include "gc_pve_die_npc.hpp"
 #include "gc_pve_hit_npc.hpp"
-#include "PveNpc.h"
+#include "PveBossNpc.h"
 #include "RoomSession.h"
 #include "RoomSessionPlayer.h"
 
@@ -65,7 +65,9 @@ void RoomSessionNpcManager::initializeNpcs()
 			pathFinder->getCellZ(z)
 		};
 
-		const auto npc = PveNpc(data, spawnCell);
+		const bool isBossNpc = data.type == 13 || data.type == 38 || data.type == 39 || data.type == 59;
+		const auto npc = isBossNpc ? std::make_shared<PveBossNpc>(data, spawnCell) :
+			std::make_shared<PveNpc>(data, spawnCell);
 
 		m_npcs.push_back(npc);
 	}
@@ -77,9 +79,9 @@ void RoomSessionNpcManager::spawnNpcsForArea(const uint32_t areaId)
 
 	for (const auto& npc : m_npcs)
 	{
-		if (npc.getAreaUid() == areaId)
+		if (npc->getAreaUid() == areaId)
 		{
-			spawnNpc(std::make_shared<PveNpc>(npc));
+			spawnNpc(npc);
 		}
 	}
 }
@@ -230,46 +232,7 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 	const auto playerId = data.roomSessionPlayer->getPlayer()->getId();
 	const auto targetNpcUid = data.targetNpc->getUid();
 
-	auto damage = static_cast<double>(data.weaponUsed.damage);
-
-	// Note: Currently there are no bodyparts with attribute type A_DEFAULT or A_DESTROY.
-	switch (data.bodyPart.attributeType)
-	{
-	case eNpcBodyPartAttributeType::A_DEFAULT:
-		damage = 0;
-		break;
-	case eNpcBodyPartAttributeType::A_INCAPACITY:
-		// FIXME: If we interpret the description correctly, this body part needs to be destroyed on hit (gc_pve_destroy_part).
-	case eNpcBodyPartAttributeType::A_DESTROY:
-		break;
-	}
-
-	// Note: Currently the damage type D_ONLY_NEARWEAPON is not being used by any npc.
-	switch (data.bodyPart.damageType)
-	{
-	case eNpcBodyPartDamageType::D_DEFAULT:
-		// Takes damage regardless of weapon.
-		break;
-	case eNpcBodyPartDamageType::D_EXCEPT_SPLASH:
-		// FIXME: Check if weapon deals splash damage. For now, we disable all damage from throwables.
-		/*if (data.weaponType == eWeaponType::THROWABLE_1)
-			damage = 0;*/
-
-		break;
-	case eNpcBodyPartDamageType::D_ONLY_NEARWEAPON:
-		if (data.weaponType != eWeaponType::MELEE)
-			damage = 0;
-
-		break;
-	}
-
-	const auto npcBodyParts = data.targetNpc->getBodyParts();
-	// ReSharper disable once CppTooWideScopeInitStatement
-	const auto isHeadshot = (!npcBodyParts.empty() && (npcBodyParts[0].id == data.bodyPart.id));
-
-	// This means it is headshot damage.
-	if (!isHeadshot)
-		damage *= 0.5;
+	const auto damage = data.targetNpc->calculateHitDamage(data);
 
 	const auto damageDealt = data.targetNpc->takeDamage(static_cast<uint16_t>(damage));
 	const auto hasTargetDied = data.targetNpc->isDead();
