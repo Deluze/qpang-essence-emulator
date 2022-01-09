@@ -44,16 +44,6 @@ public:
 		unk_12 = 1338; // Needs to be 1338, it's an identifier for the tool
 	};
 
-	//U32 npcUid; // 88
-	//U32 playerId; // 92
-
-	//// What are the following floats for?
-	//F32 xPos; // 96 
-	//F32 yPos; // 100
-	//F32 zPos; // 104
-
-	//U64 unk_06 = 0;
-
 	U32 unk_01; // 88
 	U32 unk_02; // 92
 	U32 unk_03; // 96
