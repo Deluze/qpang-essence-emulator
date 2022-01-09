@@ -29,4 +29,6 @@ struct PveItemData
 {
 	eItemSpawnType itemSpawnType;
 	Position position;
+	uint32_t respawnTime;
+	bool shouldRespawn;
 };
