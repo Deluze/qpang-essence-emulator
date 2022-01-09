@@ -117,7 +117,7 @@ public:
 		const auto impactPos = Position{ impactPosX, impactPosY, impactPosZ };
 		const auto impactOffsetPos = Position{ impactOffsetPosX, impactOffsetPosY, impactOffsetPosZ };
 
-		const auto weaponItemId = npc->getBodyPartById(npcBodyPartId).weaponItemId;
+		const auto weaponItemId = npc->getBodyPartById(npcBodyPartId)->weaponItemId;
 		const auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponItemId);
 
 		auto damage = weaponUsed.damage;
