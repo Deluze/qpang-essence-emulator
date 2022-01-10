@@ -32,6 +32,7 @@ private:
 	void handleSpecialAttackStart(const std::shared_ptr<RoomSession>& roomSession);
 	void handleSpecialAttackEnd(const std::shared_ptr<RoomSession>& roomSession);
 	void handlePerformSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession);
+	void handleSpawnGoldCoins(const std::shared_ptr<RoomSession>& roomSession);
 
 	/**
 	 * \brief Starts the special attack.
@@ -51,6 +52,8 @@ private:
 	 */
 	void performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession) const;
 
+	void spawnGoldCoins(const std::shared_ptr<RoomSession>& roomSession) const;
+
 	bool m_isInSpecialAttack;
 	uint16_t m_specialAttackDamageTreshold;
 
@@ -58,4 +61,6 @@ private:
 
 	uint32_t m_specialAttackDuration = 30;
 	uint32_t m_lastSpecialAttackTime = NULL;
+
+	bool m_shouldSpawnGoldCoins = false;
 };
