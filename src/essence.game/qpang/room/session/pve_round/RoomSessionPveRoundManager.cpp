@@ -55,15 +55,11 @@ void RoomSessionPveRoundManager::onStartNewRound(const std::shared_ptr<RoomSessi
 		return;
 	}
 
-	printf("Increasing player count.\n");
-
 	m_initializedPlayerCount++;
 
 	// Check if the initialized player count equals the playing players size.
 	if (m_initializedPlayerCount >= roomSession->getPlayers().size())
 	{
-		printf("Players initialized! Initializing everything.\n");
-
 		for (const auto& player : roomSession->getPlayers())
 		{
 			roomSession->addPlayer(player->getGameConnection(), player->getTeam());
@@ -121,7 +117,8 @@ void RoomSessionPveRoundManager::endRound()
 
 	if (m_currentRound == eRound::CHESS_CASTLE_STAGE_3)
 	{
-		// finish game or something
+		roomSession->finishPveGame(true);
+
 		return;
 	}
 
@@ -134,7 +131,7 @@ void RoomSessionPveRoundManager::endRound()
 		m_currentRound = eRound::CHESS_CASTLE_STAGE_3;
 		break;
 	case eRound::CHESS_CASTLE_STAGE_3:
-		// TODO: Finish the game, since this is the last stage.
+	default:
 		return;
 	}
 
@@ -164,6 +161,7 @@ void RoomSessionPveRoundManager::tick()
 		checkRoundOneFinished();
 		break;
 	case eRound::CHESS_CASTLE_STAGE_3:
+		checkRoundTwoFinished();
 		break;
 	}
 }
@@ -234,7 +232,7 @@ void RoomSessionPveRoundManager::checkRoundZeroFinished()
 	}
 }
 
-int RoomSessionPveRoundManager::getInitializedPlayerCount()
+uint32_t RoomSessionPveRoundManager::getInitializedPlayerCount() const
 {
 	return m_initializedPlayerCount;
 }
@@ -249,7 +247,8 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 	}
 
 	const auto players = roomSession->getPlayingPlayers();
-	if (players.size() == 0)
+
+	if (players.empty())
 		return;
 
 	// ReSharper disable once CppTooWideScopeInitStatement
@@ -271,6 +270,65 @@ void RoomSessionPveRoundManager::checkRoundOneFinished() const
 	{
 		// The essence object has no health left, this means the players have lost.
 		roomSession->finishPveGame(false);
+
+		return;
+	}
+
+	uint32_t deadPlayerCount = 0;
+
+	for (const auto& player : players)
+	{
+		if (player->isPermanentlyDead())
+		{
+			deadPlayerCount++;
+		}
+	}
+
+	if ((deadPlayerCount != 0) && (players.size() == deadPlayerCount))
+	{
+		// All players are dead without being able to respawn so we can finish the game.
+		roomSession->finishPveGame(false);
+	}
+}
+
+void RoomSessionPveRoundManager::checkRoundTwoFinished()
+{
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	const auto players = roomSession->getPlayingPlayers();
+
+	if (players.empty())
+	{
+		return;
+	}
+
+	// Note: Boss npc should always be uid 1.
+	// ReSharper disable once CppTooWideScopeInitStatement
+	const auto bossNpc = roomSession->getNpcManager()->findNpcByUid(1);
+	// ReSharper disable once CppTooWideScope
+	const auto hasBossBeenDefeated = (bossNpc != nullptr) && (bossNpc->getHealth() == 0);
+
+	if (hasBossBeenDefeated && m_endTime == NULL)
+	{
+		// End the game in 10 seconds after killing the boss.
+		if (roomSession->getTimeLeftInSeconds() > 10)
+		{
+			m_endTime = (time(nullptr) + static_cast<time_t>(10));
+		}
+	}
+
+	// ReSharper disable once CppTooWideScopeInitStatement
+	const auto currentTime = time(nullptr);
+
+	if ((hasBossBeenDefeated && (m_endTime != NULL) && currentTime >= m_endTime)
+		|| currentTime >= roomSession->getEndTime())
+	{
+		roomSession->finishPveGame(hasBossBeenDefeated);
 
 		return;
 	}

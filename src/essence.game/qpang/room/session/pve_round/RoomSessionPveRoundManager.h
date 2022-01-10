@@ -43,7 +43,10 @@ public:
 
 	void checkRoundOneFinished() const;
 
-	int getInitializedPlayerCount();
+	void checkRoundTwoFinished();
+
+	[[nodiscard]]
+	uint32_t getInitializedPlayerCount() const;
 
 #pragma region Getters
 	[[nodiscard]]
@@ -63,4 +66,7 @@ private:
 
 	uint8_t m_currentMap = 120;
 	eRound m_currentRound = eRound::CHESS_CASTLE_STAGE_1;
+
+	time_t m_endTime = NULL;
+	bool m_endTimeHasBeenSet = false;
 };
