@@ -10,7 +10,7 @@ class PveNpc
 {
 public:
 	PveNpc() = default;
-	~PveNpc() = default;
+	virtual ~PveNpc() = default;
 
 	PveNpc(PveNpcData data, const PathfinderCell& spawnCell);
 	PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell);
@@ -98,7 +98,7 @@ public:
 	/**
 	 * \brief Handles the on death event for an npc.
 	 */
-	void onDeath(const std::shared_ptr<RoomSession>& roomSession);
+	virtual void onDeath(const std::shared_ptr<RoomSession>& roomSession);
 
 #pragma endregion
 
@@ -258,28 +258,28 @@ protected:
 	uint32_t m_type{};
 	uint32_t m_uid{};
 
-	uint32_t m_areaUid;
-	uint32_t m_floorNumber;
+	uint32_t m_areaUid{};
+	uint32_t m_floorNumber{};
 
-	uint16_t m_baseHealth;
-	uint16_t m_health;
+	uint16_t m_baseHealth{};
+	uint16_t m_health{};
 
-	float m_speed;
+	float m_speed{};
 
 	// These two are used for shooting/attacking.
-	uint32_t m_weaponItemId;
-	uint8_t m_weaponBodyPartId;
+	uint32_t m_weaponItemId{};
+	uint8_t m_weaponBodyPartId{};
 	eWeaponType m_weaponType;
 
 	// How often the npcs attacks.
-	uint32_t m_aiTime;
+	uint32_t m_aiTime{};
 	uint32_t m_lastAttackTime = 0;
 
-	float m_attackRange;
+	float m_attackRange{};
 
 	// The range in width and height for the npc.
-	float m_attackWidth;
-	float m_attackHeight;
+	float m_attackWidth{};
+	float m_attackHeight{};
 
 	// Whether or not the npc should respawn.
 	bool m_shouldRespawn{};
@@ -289,17 +289,17 @@ protected:
 	uint64_t m_timeOfDeath = NULL;
 
 	// Whether or not the npc can drop loot on death.
-	bool m_canDropLoot;
+	bool m_canDropLoot{};
 
 	// Initial rotation on spawn.
-	uint16_t m_initialRotation;
+	uint16_t m_initialRotation{};
 
-	Position m_initialPosition;
-	Position m_position;
+	Position m_initialPosition{};
+	Position m_position{};
 
-	Position m_staticShootingPosition;
+	Position m_staticShootingPosition{};
 
-	Position m_targetShootPosition;
+	Position m_targetShootPosition{};
 
 	eNpcGradeType m_gradeType;
 	eNpcMovementType m_movementType;

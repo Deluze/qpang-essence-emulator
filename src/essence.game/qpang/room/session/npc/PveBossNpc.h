@@ -4,11 +4,11 @@
 
 #include "PveNpc.h"
 
-class PveBossNpc : public PveNpc
+class PveBossNpc final : public PveNpc
 {
 public:
 	PveBossNpc() = default;
-	~PveBossNpc() = default;
+	~PveBossNpc() override = default;
 
 	PveBossNpc(PveNpcData data, const PathfinderCell& spawnCell);
 
@@ -18,6 +18,8 @@ public:
 
 	void spawn(const std::shared_ptr<RoomSession>& roomSession) const override;
 	void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const override;
+
+	void onDeath(const std::shared_ptr<RoomSession>& roomSession) override;
 
 	/**
 	 * \brief Indicates whether or not the boss can start its special attack.

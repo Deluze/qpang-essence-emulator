@@ -7,6 +7,7 @@
 #include "gc_master_log.hpp"
 #include "RandomHelper.h"
 
+#include <Maps.h>
 #include "RoomSession.h"
 
 PveBossNpc::PveBossNpc(PveNpcData data, const PathfinderCell& spawnCell) :
@@ -44,6 +45,33 @@ void PveBossNpc::spawn(const std::shared_ptr<RoomSession>& roomSession) const
 void PveBossNpc::spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const
 {
 	roomSessionPlayer->send<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation, m_health, true);
+}
+
+void PveBossNpc::onDeath(const std::shared_ptr<RoomSession>& roomSession)
+{
+	PveNpc::onDeath(roomSession);
+
+	const auto cellWidth = Maps::pveStage3MapInfo.m_cellWidth;
+
+	const float posX = 5.0f * cellWidth;
+	// ReSharper disable once CppTooWideScope
+	const float posZ = 5.0f * cellWidth;
+
+	for (float x = -posX; x <= posX; x += cellWidth * 2.0f)
+	{
+		for (float z = -posZ; z <= posZ; z += cellWidth * 2.0f)
+		{
+			const auto goldCoin = PveItem(static_cast<uint32_t>(eItemId::GOLDEN_COIN), Position{ x, 0, z });
+
+			roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(goldCoin));
+		}
+	}
+
+	for (const auto& npc : roomSession->getNpcManager()->getAliveNpcs())
+	{
+		npc->takeDamage(npc->getHealth());
+		npc->die(roomSession);
+	}
 }
 
 bool PveBossNpc::canStartSpecialAttack() const
