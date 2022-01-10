@@ -54,12 +54,12 @@ private:
 
 	void spawnGoldCoins(const std::shared_ptr<RoomSession>& roomSession) const;
 
-	bool m_isInSpecialAttack;
-	uint16_t m_specialAttackDamageTreshold;
+	bool m_isInSpecialAttack = false;
+	uint16_t m_specialAttackDamageTreshold{};
 
-	uint16_t m_previousSpecialAttackHealth;
+	uint16_t m_previousSpecialAttackHealth{};
 
-	uint32_t m_specialAttackDuration = 30;
+	uint32_t m_specialAttackDuration{};
 	uint32_t m_lastSpecialAttackTime = NULL;
 
 	bool m_shouldSpawnGoldCoins = false;

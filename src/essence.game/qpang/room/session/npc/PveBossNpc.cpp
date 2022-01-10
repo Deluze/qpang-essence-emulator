@@ -12,9 +12,9 @@
 
 PveBossNpc::PveBossNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	PveNpc(std::move(data), spawnCell),
-	m_isInSpecialAttack(false),
-	m_specialAttackDamageTreshold(1000),
-	m_previousSpecialAttackHealth(data.baseHealth)
+	m_specialAttackDamageTreshold(500),
+	m_previousSpecialAttackHealth(data.baseHealth),
+	m_specialAttackDuration(30)
 {
 }
 
