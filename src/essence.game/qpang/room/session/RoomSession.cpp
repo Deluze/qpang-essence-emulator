@@ -63,6 +63,7 @@ void RoomSession::initialize()
 		m_aboveGroundPathfinder.initialize(shared_from_this());
 		m_underGroundPathfinder.initialize(shared_from_this());
 		m_pveWaveManager.initialize(shared_from_this());
+		m_roomSessionBossFightManager.initialize(shared_from_this());
 	}
 	else
 	{
@@ -1198,6 +1199,11 @@ RoomSessionPveAreaManager* RoomSession::getPveAreaManager()
 RoomSessionPveWaveManager* RoomSession::getPveWaveManager()
 {
 	return &m_pveWaveManager;
+}
+
+RoomSessionBossFightManager* RoomSession::getBossFightManager()
+{
+	return &m_roomSessionBossFightManager;
 }
 
 Room::Ptr RoomSession::getRoom()

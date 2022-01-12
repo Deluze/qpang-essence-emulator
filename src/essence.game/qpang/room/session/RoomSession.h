@@ -6,6 +6,7 @@
 #include <mutex>
 
 #include "ConfigManager.h"
+#include "RoomSessionBossFightManager.h"
 #include "RoomSessionNpcManager.h"
 #include "RoomSessionObjectManager.h"
 #include "RoomSessionPveAreaManager.h"
@@ -79,6 +80,7 @@ public:
 	RoomSessionPveRoundManager* getPveRoundManager();
 	RoomSessionPveAreaManager* getPveAreaManager();
 	RoomSessionPveWaveManager* getPveWaveManager();
+	RoomSessionBossFightManager* getBossFightManager();
 
 	Pathfinder* getAboveGroundPathfinder();
 	Pathfinder* getUnderGroundPathfinder();
@@ -241,6 +243,7 @@ private:
 	RoomSessionPveRoundManager m_pveRoundManager;
 	RoomSessionPveAreaManager m_pveAreaManager;
 	RoomSessionPveWaveManager m_pveWaveManager;
+	RoomSessionBossFightManager m_roomSessionBossFightManager;
 
 	Pathfinder m_aboveGroundPathfinder;
 	Pathfinder m_underGroundPathfinder;
