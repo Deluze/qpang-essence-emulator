@@ -25,8 +25,6 @@ void PveBossNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 	handleSpecialAttackStart(roomSession);
 	handlePerformSpecialAttackShoot(roomSession);
 	handleSpecialAttackEnd(roomSession);
-
-	handleSpawnGoldCoins(roomSession);
 }
 
 float PveBossNpc::calculateHitDamage(const CGPvEHitNpcData& data)
@@ -52,8 +50,6 @@ void PveBossNpc::spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlay
 void PveBossNpc::onDeath(const std::shared_ptr<RoomSession>& roomSession)
 {
 	PveNpc::onDeath(roomSession);
-
-	m_shouldSpawnGoldCoins = true;
 
 	for (const auto& npc : roomSession->getNpcManager()->getAliveNpcs())
 	{
@@ -93,16 +89,6 @@ void PveBossNpc::handlePerformSpecialAttackShoot(const std::shared_ptr<RoomSessi
 	}
 }
 
-void PveBossNpc::handleSpawnGoldCoins(const std::shared_ptr<RoomSession>& roomSession)
-{
-	if (m_shouldSpawnGoldCoins)
-	{
-		m_shouldSpawnGoldCoins = false;
-
-		spawnGoldCoins(roomSession);
-	}
-}
-
 void PveBossNpc::startSpecialAttack(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_isInSpecialAttack = true;
@@ -132,23 +118,4 @@ void PveBossNpc::performSpecialAttackShoot(const std::shared_ptr<RoomSession>& r
 
 	roomSession->relayPlaying<GCMasterLog>(m_uid, 88, targetPosition, 0);
 	/*}*/
-}
-
-void PveBossNpc::spawnGoldCoins(const std::shared_ptr<RoomSession>& roomSession) const
-{
-	const auto cellWidth = Maps::pveStage3MapInfo.m_cellWidth;
-
-	const float posX = 5.0f * cellWidth;
-	// ReSharper disable once CppTooWideScope
-	const float posZ = 5.0f * cellWidth;
-
-	for (float x = -posX; x <= posX; x += cellWidth * 2.0f)
-	{
-		for (float z = -posZ; z <= posZ; z += cellWidth * 2.0f)
-		{
-			const auto goldCoin = PveItem(static_cast<uint32_t>(eItemId::GOLDEN_COIN), Position{ x, 0, z });
-
-			roomSession->getPveItemManager()->spawnItem(std::make_shared<PveItem>(goldCoin));
-		}
-	}
 }
