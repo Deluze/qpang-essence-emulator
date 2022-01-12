@@ -10,7 +10,6 @@
 #include "gc_game_state.hpp"
 #include "Maps.h"
 #include <qpang/room/tnl/net_events/server/gc_join.hpp>
-#include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
@@ -131,7 +130,6 @@ void RoomSessionPveRoundManager::endRound()
 		m_currentRound = eRound::CHESS_CASTLE_STAGE_3;
 		break;
 	case eRound::CHESS_CASTLE_STAGE_3:
-	default:
 		return;
 	}
 
@@ -311,7 +309,7 @@ void RoomSessionPveRoundManager::checkRoundTwoFinished()
 	// ReSharper disable once CppTooWideScopeInitStatement
 	const auto bossNpc = roomSession->getNpcManager()->findNpcByUid(1);
 	// ReSharper disable once CppTooWideScope
-	const auto hasBossBeenDefeated = (bossNpc != nullptr) && (bossNpc->getHealth() == 0);
+	const auto hasBossBeenDefeated = (bossNpc != nullptr) && (bossNpc->isDead());
 
 	if (hasBossBeenDefeated && m_endTime == NULL)
 	{
