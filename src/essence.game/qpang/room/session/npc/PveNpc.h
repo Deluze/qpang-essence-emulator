@@ -76,7 +76,9 @@ public:
 	 */
 	uint16_t takeDamage(uint16_t damage);
 
-	uint16_t takeBodyPartDamage(uint32_t bodyPartId, uint16_t damage) const;
+	void takeBodyPartDamage(uint32_t bodyPartId, uint16_t damage) const;
+
+	void registerDamageDealtByPlayer(uint32_t playerId, uint16_t damage);
 
 	bool getIsMovingToPlayer();
 
@@ -319,4 +321,6 @@ protected:
 
 	std::vector<NpcLootDrop> m_lootDrops{};
 	std::vector<std::shared_ptr<NpcBodyPart>> m_bodyParts{};
+
+	std::unordered_map<uint32_t, uint32_t> m_damageDealtByPlayers{};
 };

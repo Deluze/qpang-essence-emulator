@@ -241,8 +241,11 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 
 	const auto damage = targetNpc->calculateHitDamage(data);
 
-	const auto damageDealtToBodyPart = targetNpc->takeBodyPartDamage(data.bodyPartId, static_cast<uint16_t>(damage));
+	targetNpc->takeBodyPartDamage(data.bodyPartId, static_cast<uint16_t>(damage));
+
 	const auto damageDealtToNpc = targetNpc->takeDamage(static_cast<uint16_t>(damage));
+
+	targetNpc->registerDamageDealtByPlayer(playerId, damageDealtToNpc);
 
 	const auto hasTargetDied = targetNpc->isDead();
 

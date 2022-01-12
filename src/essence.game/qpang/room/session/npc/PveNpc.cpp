@@ -137,7 +137,6 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	m_initialPosition(data.initialPosition),
 	m_position(data.initialPosition),
 	m_staticShootingPosition(data.staticShootingPosition),
-	m_targetShootPosition(),
 	m_gradeType(data.gradeType),
 	m_movementType(data.movementType),
 	m_targetType(data.targetType),
@@ -151,8 +150,6 @@ PveNpc::PveNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 
 PveNpc::PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell) :
 	m_type(data.type),
-	m_areaUid(0),
-	m_floorNumber(0),
 	m_baseHealth(data.baseHealth),
 	m_health(data.baseHealth),
 	m_speed(data.speed),
@@ -164,11 +161,9 @@ PveNpc::PveNpc(PveNpcWaveData data, const PathfinderCell& spawnCell) :
 	m_attackWidth(data.attackWidth),
 	m_attackHeight(data.attackHeight),
 	m_canDropLoot(data.canDropLoot),
-	m_initialRotation(0),
 	m_initialPosition(data.initialPosition),
 	m_position(data.initialPosition),
 	m_staticShootingPosition({}),
-	m_targetShootPosition(),
 	m_gradeType(data.gradeType),
 	m_movementType(data.movementType),
 	m_targetType(data.targetType),
@@ -439,10 +434,10 @@ void PveNpc::handleLogic(const std::shared_ptr<RoomSession>& roomSession)
 		case eNpcTargetType::T_ESSENCE_PRIORITY:
 			handleTargetEssencePriority(roomSession, pathFinder);
 			break;
-		case eNpcTargetType::T_NONE: break;
-		case eNpcTargetType::T_STATIC_REVENGE: break;
-		case eNpcTargetType::T_DAMAGE: break;
-		default:
+		case eNpcTargetType::T_NONE:
+		case eNpcTargetType::T_STATIC_REVENGE:
+		case eNpcTargetType::T_DAMAGE:
+			// TODO: Implement
 			break;
 		}
 	}
@@ -707,6 +702,7 @@ void PveNpc::resetPosition()
 void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_lastAttackTime = 0;
+	m_damageDealtByPlayers.clear();
 
 	resetPosition();
 
@@ -740,38 +736,52 @@ void PveNpc::resetBodyPartsHealth() const
 
 uint16_t PveNpc::takeDamage(const uint16_t damage)
 {
+	uint16_t damageDealt;
+
 	if (damage > m_health)
 	{
+		damageDealt = m_health;
 		m_health = 0;
-
-		return (damage - m_health);
+	}
+	else
+	{
+		damageDealt = damage;
+		m_health -= damage;
 	}
 
-	m_health = m_health - damage;
-
-	return damage;
+	return damageDealt;
 }
 
-uint16_t PveNpc::takeBodyPartDamage(const uint32_t bodyPartId, uint16_t damage) const
+void PveNpc::takeBodyPartDamage(const uint32_t bodyPartId, const uint16_t damage) const
 {
 	const auto& bodyPart = getBodyPartById(bodyPartId);
 
 	if (bodyPart == nullptr)
 	{
 		// Body part was not found so 0 damage was taken.
-		return 0;
+		return;
 	}
 
 	if (damage > bodyPart->health)
 	{
 		bodyPart->health = 0;
-
-		return (damage - bodyPart->health);
 	}
+	else
+	{
+		bodyPart->health -= damage;
+	}
+}
 
-	bodyPart->health = (bodyPart->health - damage);
-
-	return damage;
+void PveNpc::registerDamageDealtByPlayer(const uint32_t playerId, const uint16_t damage)
+{
+	if (m_damageDealtByPlayers.count(playerId))
+	{
+		m_damageDealtByPlayers[playerId] += damage;
+	}
+	else
+	{
+		m_damageDealtByPlayers[playerId] = damage;
+	}
 }
 
 bool PveNpc::getIsMovingToPlayer()
