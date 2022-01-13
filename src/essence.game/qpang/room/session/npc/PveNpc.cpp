@@ -1,5 +1,8 @@
 #include "PveNpc.h"
 
+#include <algorithm>
+#include <qpang/room/tnl/net_events/event_data/CGPvEHitNpcData.h>
+
 #include "AABBHelper.h"
 #include "gc_master_log.hpp"
 #include "gc_pve_destroy_parts.hpp"
@@ -9,8 +12,6 @@
 #include "RandomHelper.h"
 #include "RoomSession.h"
 #include "TimeHelper.h"
-
-#include <qpang/room/tnl/net_events/event_data/CGPvEHitNpcData.h>
 
 std::mutex pathfindingMutex = {};
 
@@ -414,6 +415,57 @@ void PveNpc::handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roo
 	attackTargetPos(roomSession);
 }
 
+void PveNpc::handleTargetMostDamageDealt(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder)
+{
+	uint32_t mostDamageDealt = 0;
+
+	// Iterate over all playing players.
+	for (const auto& player : roomSession->getPlayingPlayers())
+	{
+		const auto targetPlayerId = player->getPlayer()->getId();
+
+		// If the player is not in the map, the player has not dealt damage to the npc so we can ignore it.
+		if (!m_playerDamageToNpc.count(targetPlayerId))
+		{
+			continue;
+		}
+
+		const auto targetPlayer = roomSession->find(targetPlayerId);
+
+		// We only want to continue on when the player is actually valid.
+		if (!isPlayerValid(targetPlayer))
+		{
+			continue;
+		}
+
+		// ReSharper disable once CppTooWideScopeInitStatement
+		const auto damageDealt = m_playerDamageToNpc.at(targetPlayerId);
+
+		if (damageDealt > mostDamageDealt)
+		{
+			mostDamageDealt = damageDealt;
+			m_targetPlayerId = targetPlayerId;
+		}
+	}
+
+	if (m_targetPlayerId == 0)
+	{
+		m_targetPlayerId = findClosestValidPlayerId(roomSession);
+	}
+
+	if (canAttackTargetPlayer(roomSession, pathFinder))
+	{
+		attackTargetPlayer(roomSession);
+	}
+	else
+	{
+		if (m_movementType != eNpcMovementType::M_NONE)
+		{
+			startMovingToPlayer(roomSession, pathFinder);
+		}
+	}
+}
+
 void PveNpc::handleLogic(const std::shared_ptr<RoomSession>& roomSession)
 {
 	const auto pathFinder = getPathFinder(roomSession);
@@ -436,8 +488,9 @@ void PveNpc::handleLogic(const std::shared_ptr<RoomSession>& roomSession)
 			break;
 		case eNpcTargetType::T_NONE:
 		case eNpcTargetType::T_STATIC_REVENGE:
+			break;
 		case eNpcTargetType::T_DAMAGE:
-			// TODO: Implement
+			handleTargetMostDamageDealt(roomSession, pathFinder);
 			break;
 		}
 	}
@@ -702,7 +755,7 @@ void PveNpc::resetPosition()
 void PveNpc::respawn(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_lastAttackTime = 0;
-	m_damageDealtByPlayers.clear();
+	m_playerDamageToNpc.clear();
 
 	resetPosition();
 
@@ -774,13 +827,13 @@ void PveNpc::takeBodyPartDamage(const uint32_t bodyPartId, const uint16_t damage
 
 void PveNpc::registerDamageDealtByPlayer(const uint32_t playerId, const uint16_t damage)
 {
-	if (m_damageDealtByPlayers.count(playerId))
+	if (m_playerDamageToNpc.count(playerId))
 	{
-		m_damageDealtByPlayers[playerId] += damage;
+		m_playerDamageToNpc[playerId] += damage;
 	}
 	else
 	{
-		m_damageDealtByPlayers[playerId] = damage;
+		m_playerDamageToNpc[playerId] = damage;
 	}
 }
 

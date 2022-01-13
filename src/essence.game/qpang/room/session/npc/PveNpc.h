@@ -93,7 +93,7 @@ public:
 
 	void attackTargetPos(const std::shared_ptr<RoomSession>& roomSession);
 
-	void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession);
+	virtual void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession);
 
 #pragma region Event handlers
 
@@ -235,13 +235,15 @@ protected:
 
 	void startMovingToPos(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder, const Position& targetPos);
 
-	void startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+	virtual void startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleTargetNear(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleTargetNearRevenge(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleTargetEssencePriority(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
+
+	void handleTargetMostDamageDealt(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 
 	void handleLogic(const std::shared_ptr<RoomSession>& roomSession);
 
@@ -322,5 +324,5 @@ protected:
 	std::vector<NpcLootDrop> m_lootDrops{};
 	std::vector<std::shared_ptr<NpcBodyPart>> m_bodyParts{};
 
-	std::unordered_map<uint32_t, uint32_t> m_damageDealtByPlayers{};
+	std::unordered_map<uint32_t, uint32_t> m_playerDamageToNpc{};
 };
