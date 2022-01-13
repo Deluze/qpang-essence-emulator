@@ -20,11 +20,11 @@ PveBossNpc::PveBossNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 
 void PveBossNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
-	PveNpc::tick(roomSession);
-
 	handleSpecialAttackStart(roomSession);
 	handlePerformSpecialAttackShoot(roomSession);
 	handleSpecialAttackEnd(roomSession);
+
+	PveNpc::tick(roomSession);
 }
 
 float PveBossNpc::calculateHitDamage(const CGPvEHitNpcData& data)
