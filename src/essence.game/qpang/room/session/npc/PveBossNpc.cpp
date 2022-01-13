@@ -47,6 +47,37 @@ void PveBossNpc::spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlay
 	roomSessionPlayer->send<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation, m_health, true);
 }
 
+void PveBossNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)
+{
+	if (m_targetPlayerId == 0 || m_isInSpecialAttack)
+	{
+		return;
+	}
+
+	const auto targetPlayer = roomSession->find(m_targetPlayerId);
+
+	if (!targetPlayer || !isPlayerValid(targetPlayer))
+	{
+		return;
+	}
+
+	const auto targetPosition = targetPlayer->getPosition();
+
+	m_targetShootPosition = targetPosition;
+
+	attackTargetPos(roomSession);
+}
+
+void PveBossNpc::startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder)
+{
+	if (m_isInSpecialAttack)
+	{
+		return;
+	}
+
+	PveNpc::startMovingToPlayer(roomSession, pathFinder);
+}
+
 void PveBossNpc::onDeath(const std::shared_ptr<RoomSession>& roomSession)
 {
 	PveNpc::onDeath(roomSession);
