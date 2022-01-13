@@ -22,6 +22,7 @@
 #include "gameroom/HandleGetGameSettingsRequest.h"
 #include "HandleHandshakeRequest.h"
 #include "HandleLoginRequest.h"
+#include "HandleOpenLootBoxRequest.h"
 #include "inventory/HandleDeleteInventoryCardRequest.h"
 #include "inventory/HandleDisableFunctionCardRequest.h"
 #include "inventory/HandleEnableFunctionCardRequest.h"
@@ -136,7 +137,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	// PacketId = 904, Direction: SEND, Description: Plays a sound?
 	// PacketId = 905, Direction: SEND, Description: "This item is not allowed to enchant"
 	// PacketId = 906, Direction: RECEIVE, Description: Panthalassa box opening
-
+	add(906, new HandleOpenLootBoxRequest());
 	/*
 		LOBBY_TRADE_ERROR = 877,
 		LOBBY_TRADE_RECEIVE_REQUEST = 878,
