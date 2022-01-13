@@ -44,6 +44,8 @@ public:
 			return;
 		}
 
+		// TODO: Remaining 8 bytes have yet to be figured out, if they're even of any importance.
+
 		printf("[INCOMING HandleOpenLootBoxRequest] BoxCardId: %llu, BoxItemId: %u, KeyCardId: %llu, KeyItemId: %u\n",
 			lootBoxCardId, lootBoxItemId, keyCardId, keyItemId);
 
