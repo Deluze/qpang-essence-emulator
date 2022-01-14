@@ -514,13 +514,9 @@ void RoomSession::finish()
 	{
 		const auto actPlayer = player->getPlayer();
 
-		std::vector<GCGameState::BonusInfo> tempBonuses{};
-
 		player->post(new GCGameState(actPlayer->getId(), 1));
-		player->post(new GCGameState(player, 23, tempBonuses));
+		player->post(new GCGameState(player, 23, std::vector<GCGameState::BonusInfo>{}));
 		player->post(new GCScoreResult(shared_from_this(), playingPlayers));
-
-		// TODO: Send gc game state for bonus.
 	}
 
 	m_room->finish();
@@ -626,9 +622,23 @@ void RoomSession::finishPveGame(const bool didWin)
 		constexpr uint32_t bestTimeLeftInMs = 0;
 
 		const auto currentTime = time(nullptr);
-		const auto currentTimeLeftMs = /*didWin ? */static_cast<uint32_t>((m_endTime - currentTime) * 1000)/* : 0*/;
+		const auto currentTimeLeftMs = static_cast<uint32_t>((m_endTime - currentTime) * 1000);
 
 		roomSessionPlayer->post(new GCMasterLog(player->getId(), didWin, goldenCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftMs));
+
+		if (didWin)
+		{
+			constexpr auto panthalassaBoxBonus = static_cast<uint16_t>(GCGameState::ePveBonusId::PANTHALASSA_BOX_01);
+			constexpr auto omphalosBoxBonus = static_cast<uint16_t>(GCGameState::ePveBonusId::OMPHALOS_BOX_01);
+
+			const std::vector<GCGameState::BonusInfo> bonuses
+			{
+				{panthalassaBoxBonus, 0, 0, panthalassaBoxBonus, 0},
+				{omphalosBoxBonus, 0, 0, panthalassaBoxBonus, 0 }
+			};
+
+			roomSessionPlayer->post(new GCGameState(roomSessionPlayer, 23, bonuses));
+		}
 	}
 
 	m_room->finish();
