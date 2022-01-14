@@ -6,7 +6,7 @@
 #include "DebugCommand.h"
 #include "DatabaseCommand.h"
 #include "ReloadCommand.h"
-#include "UnlimitedCommand.h"
+#include "MaxPlayersCommand.h"
 #include "AddSkillPointsCommand.h"
 #include "KillNpcCommand.h"
 #include "PveEndRoundCommand.h"
@@ -68,6 +68,7 @@ void CommandManager::initialize()
 		{u"endround", new PveEndRoundCommand()},
 		{u"makepublic", new PveMakePublic()},
 		{u"mp", new PveMakePublic()},
+		{u"maxplayers", new MaxPlayersCommand()}
 	};
 }
 
