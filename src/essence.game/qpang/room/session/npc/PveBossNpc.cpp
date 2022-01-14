@@ -148,13 +148,6 @@ void PveBossNpc::endSpecialAttack(const std::shared_ptr<RoomSession>& roomSessio
 	m_lastSpecialAttackTime = NULL;
 
 	roomSession->relayPlaying<GCMasterLog>(m_uid, 0, 1);
-
-	const std::vector<uint32_t> uids{ 1337, 1338, 1339, 1340 };
-
-	for (const auto uid : uids)
-	{
-		roomSession->relayPlaying<GCPvEDieNpc>(uid);
-	}
 }
 
 void PveBossNpc::performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession) const
