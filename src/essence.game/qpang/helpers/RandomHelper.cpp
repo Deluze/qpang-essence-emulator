@@ -19,9 +19,9 @@ uint32_t RandomHelper::getRandomNumber(const uint32_t min, const uint32_t max)
 
 float RandomHelper::getRandomFloat(const float min, const float max)
 {
-	std::default_random_engine e(static_cast <unsigned> (time(nullptr)));
+	std::random_device rd;
 
 	const std::uniform_real_distribution<> dis(min, max);
 
-	return dis(e);
+	return dis(rd);
 }
