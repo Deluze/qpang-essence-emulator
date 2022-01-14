@@ -124,22 +124,9 @@ void PveBossNpc::startSpecialAttack(const std::shared_ptr<RoomSession>& roomSess
 	m_previousSpecialAttackHealth = m_health;
 
 	m_lastSpecialAttackTime = time(nullptr);
+	m_lastSpecialBulletId = 5;
 
 	roomSession->relayPlaying<GCMasterLog>(m_uid, 0, 0);
-
-	const std::vector<uint32_t> uids{ 1337, 1338, 1339, 1340 };
-
-	for (const auto uid : uids)
-	{
-		const auto spawnPosition = Position
-		{
-			m_position.x,
-			m_position.y + 20,
-			m_position.z
-		};
-
-		roomSession->relayPlaying<GCPvENpcInit>(m_type, uid, spawnPosition, m_initialRotation, m_baseHealth);
-	}
 }
 
 void PveBossNpc::endSpecialAttack(const std::shared_ptr<RoomSession>& roomSession)
@@ -148,26 +135,17 @@ void PveBossNpc::endSpecialAttack(const std::shared_ptr<RoomSession>& roomSessio
 	m_lastSpecialAttackTime = NULL;
 
 	roomSession->relayPlaying<GCMasterLog>(m_uid, 0, 1);
-
-	const std::vector<uint32_t> uids{ 1337, 1338, 1339, 1340 };
-
-	for (const auto uid : uids)
-	{
-		roomSession->relayPlaying<GCPvEDieNpc>(uid);
-	}
 }
 
-void PveBossNpc::performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession) const
+void PveBossNpc::performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession)
 {
-	const std::vector<uint32_t> uids{ m_uid, 1337, 1338, 1339, 1340 };
-
-	for (const auto uid : uids)
+	for (int i = 0; i < 5; ++i)
 	{
 		const auto randomX = RandomHelper::getRandomFloat(-21, 21);
 		const auto randomZ = RandomHelper::getRandomFloat(-21, 21);
 
 		const auto targetPosition = Position{ randomX, 0, randomZ };
 
-		roomSession->relayPlaying<GCMasterLog>(uid, 88, targetPosition, time(nullptr));
+		roomSession->relayPlaying<GCMasterLog>(m_uid, 88, targetPosition, ++m_lastSpecialBulletId);
 	}
 }

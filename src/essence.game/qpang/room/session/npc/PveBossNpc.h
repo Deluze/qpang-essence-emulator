@@ -52,7 +52,7 @@ private:
 	 * \brief Performs the special attack shooting.
 	 * \param roomSession The room in session.
 	 */
-	void performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession) const;
+	void performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession);
 
 	bool m_isInSpecialAttack = false;
 	uint16_t m_specialAttackDamageTreshold{};
@@ -61,4 +61,6 @@ private:
 
 	uint32_t m_specialAttackDuration{};
 	uint32_t m_lastSpecialAttackTime = NULL;
+
+	uint64_t m_lastSpecialBulletId = 0;
 };
