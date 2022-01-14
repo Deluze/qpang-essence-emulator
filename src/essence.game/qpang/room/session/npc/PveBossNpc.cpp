@@ -1,28 +1,33 @@
 #include "PveBossNpc.h"
 
+#include <Maps.h>
 #include <utility>
 #include <qpang/room/tnl/net_events/event_data/CGPvEHitNpcData.h>
 #include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 #include "gc_master_log.hpp"
 #include "RandomHelper.h"
-
-#include <Maps.h>
 #include "RoomSession.h"
 
 PveBossNpc::PveBossNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	PveNpc(std::move(data), spawnCell),
-	m_specialAttackDamageTreshold(500),
+	m_specialAttackDamageTreshold(500),				// Should be total of 4 times, so m_baseHealt / 4?
 	m_previousSpecialAttackHealth(data.baseHealth),
-	m_specialAttackDuration(30)
+	m_specialAttackDuration(30)						// Should be 60 (full minute, like in the videos). 
 {
 }
 
 void PveBossNpc::tick(const std::shared_ptr<RoomSession>& roomSession)
 {
-	handleSpecialAttackStart(roomSession);
-	handlePerformSpecialAttackShoot(roomSession);
-	handleSpecialAttackEnd(roomSession);
+	if (canStartSpecialAttack())
+	{
+		startSpecialAttack(roomSession);
+	}
+	else
+	{
+		handlePerformSpecialAttackShoot(roomSession);
+		handleSpecialAttackEnd(roomSession);
+	}
 
 	PveNpc::tick(roomSession);
 }
@@ -94,14 +99,6 @@ bool PveBossNpc::canStartSpecialAttack() const
 	return (!m_isInSpecialAttack && (m_health < (m_previousSpecialAttackHealth - m_specialAttackDamageTreshold)));
 }
 
-void PveBossNpc::handleSpecialAttackStart(const std::shared_ptr<RoomSession>& roomSession)
-{
-	if (canStartSpecialAttack())
-	{
-		startSpecialAttack(roomSession);
-	}
-}
-
 void PveBossNpc::handleSpecialAttackEnd(const std::shared_ptr<RoomSession>& roomSession)
 {
 	const auto currentTime = time(nullptr);
@@ -140,13 +137,10 @@ void PveBossNpc::endSpecialAttack(const std::shared_ptr<RoomSession>& roomSessio
 
 void PveBossNpc::performSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession) const
 {
-	/*for (uint32_t i = 0; i < 5; i++)
-	{*/
 	const auto randomX = RandomHelper::getRandomFloat(-21, 21);
 	const auto randomZ = RandomHelper::getRandomFloat(-21, 21);
 
 	const auto targetPosition = Position{ randomX, 0, randomZ };
 
-	roomSession->relayPlaying<GCMasterLog>(m_uid, 88, targetPosition, 0);
-	/*}*/
+	roomSession->relayPlaying<GCMasterLog>(m_uid, 88, targetPosition, time(nullptr));
 }

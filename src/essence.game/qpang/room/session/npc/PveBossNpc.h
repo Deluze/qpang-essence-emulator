@@ -33,7 +33,6 @@ public:
 	bool canStartSpecialAttack() const;
 
 private:
-	void handleSpecialAttackStart(const std::shared_ptr<RoomSession>& roomSession);
 	void handleSpecialAttackEnd(const std::shared_ptr<RoomSession>& roomSession);
 	void handlePerformSpecialAttackShoot(const std::shared_ptr<RoomSession>& roomSession);
 
