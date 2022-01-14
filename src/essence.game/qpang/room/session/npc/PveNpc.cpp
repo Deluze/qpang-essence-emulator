@@ -424,10 +424,9 @@ void PveNpc::handleTargetMostDamageDealt(const std::shared_ptr<RoomSession>& roo
 	{
 		const auto targetPlayerId = player->getPlayer()->getId();
 
-		// If the player is not in the map, the player has not dealt damage to the npc so we can ignore it.
 		if (!m_playerDamageToNpc.count(targetPlayerId))
 		{
-			continue;
+			m_playerDamageToNpc[targetPlayerId] = 0;
 		}
 
 		const auto targetPlayer = roomSession->find(targetPlayerId);
