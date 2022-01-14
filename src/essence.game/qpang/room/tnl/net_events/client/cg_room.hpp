@@ -196,10 +196,18 @@ public:
 			{
 			case MAP_ROOM:
 			{
-				if (mode != GameMode::Mode::PVE)
+				const auto mapId = static_cast<uint8_t>(value);
+
+				// Note: So, switching difficulty in a PvE room triggers a change in the mapId
+				// and thus if we do allow switching difficulties we need to take that into account. 
+				if (room->getMode() == GameMode::Mode::PVE)
 				{
-					room->setMap(value);
+					return;
 				}
+
+				// FIXME: We probably need to add a gamemode check to ensure a player can set a certain mapId.
+
+				room->setMap(mapId);
 			}
 			break;
 			case MODE_ROOM:
