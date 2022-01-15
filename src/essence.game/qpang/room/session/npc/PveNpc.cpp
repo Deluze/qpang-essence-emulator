@@ -280,7 +280,7 @@ void PveNpc::startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession
 	startMovingToPos(roomSession, pathFinder, targetPlayer->getPosition());
 }
 
-bool PveNpc::canAttackTargetPos(Pathfinder* pathFinder)
+bool PveNpc::canAttackTargetPos(Pathfinder* pathFinder) const
 {
 	const auto targetCell = PathfinderCell{ pathFinder->getCellX(m_targetShootPosition.x), pathFinder->getCellZ(m_targetShootPosition.z) };
 

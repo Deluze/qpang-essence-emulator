@@ -87,7 +87,7 @@ public:
 	// NOTE: Temporary attack function for an npc.
 	void attack(const std::shared_ptr<RoomSession>& roomSession, Position targetPosition) const;
 
-	bool canAttackTargetPos(Pathfinder* pathFinder);
+	virtual bool canAttackTargetPos(Pathfinder* pathFinder) const;
 
 	bool canAttackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder);
 

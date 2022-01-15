@@ -6,7 +6,6 @@
 #include <qpang/room/tnl/net_events/server/gc_pve_npc_init.hpp>
 
 #include "gc_master_log.hpp"
-#include "gc_pve_die_npc.hpp"
 #include "RandomHelper.h"
 #include "RoomSession.h"
 
@@ -51,6 +50,14 @@ void PveBossNpc::spawn(const std::shared_ptr<RoomSession>& roomSession) const
 void PveBossNpc::spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const
 {
 	roomSessionPlayer->send<GCPvENpcInit>(m_type, m_uid, m_initialPosition, m_initialRotation, m_health, true);
+}
+
+bool PveBossNpc::canAttackTargetPos(Pathfinder* pathFinder) const
+{
+	const auto targetCell = PathfinderCell{ pathFinder->getCellX(m_targetShootPosition.x), pathFinder->getCellZ(m_targetShootPosition.z) };
+	const float distance = sqrtf(std::pow(targetCell.x - m_currentCell.x, 2) + std::pow(targetCell.z - m_currentCell.z, 2));
+
+	return (distance < m_attackRange);
 }
 
 void PveBossNpc::attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession)

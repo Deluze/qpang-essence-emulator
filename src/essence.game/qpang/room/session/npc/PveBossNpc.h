@@ -19,6 +19,8 @@ public:
 	void spawn(const std::shared_ptr<RoomSession>& roomSession) const override;
 	void spawn(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer) const override;
 
+	bool canAttackTargetPos(Pathfinder* pathFinder) const override;
+
 	void attackTargetPlayer(const std::shared_ptr<RoomSession>& roomSession) override;
 
 	void startMovingToPlayer(const std::shared_ptr<RoomSession>& roomSession, Pathfinder* pathFinder) override;
