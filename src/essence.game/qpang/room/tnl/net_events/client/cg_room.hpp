@@ -80,11 +80,11 @@ public:
 
 			if (mode == GameMode::Mode::PVE)
 			{
-				if (player->getName().compare(u"hinnie") != 0 && player->getName().compare(u"Jarrett") != 0)
+				/*if (player->getName().compare(u"hinnie") != 0 && player->getName().compare(u"Jarrett") != 0)
 				{
 					player->broadcast(u"Sorry, but you can't create a pve room.");
 					return;
-				}
+				}*/
 
 				// FIXME: We should also disconnect the connection, otherwise the second time the player sends this packet
 				// it will fail. It will work after that though.
@@ -127,14 +127,14 @@ public:
 
 			if (room->getMode() == GameMode::Mode::PVE)
 			{
-				if (!room->isPublicPveRoom())
+				/*if (!room->isPublicPveRoom())
 				{
 					if (player->getName().compare(u"hinnie") != 0 && player->getName().compare(u"Jarrett") != 0)
 					{
 						player->broadcast(u"Sorry, but you can't join this pve room.");
 						return;
 					}
-				}
+				}*/
 
 				// FIXME: We should also disconnect the connection, otherwise the second time the player sends this packet
 				// it will fail. It will work after that though.
