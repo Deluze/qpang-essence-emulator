@@ -14,12 +14,61 @@
 void RoomSessionPveRoundManager::initialize(const std::shared_ptr<RoomSession>& roomSession)
 {
 	m_roomSession = roomSession;
+
 	m_currentMap = roomSession->getRoom()->getMap();
+
+	// For pve this results int 20, 21, 22 and 23.
+	switch (m_currentMap % 100)
+	{
+	case 20:
+	case 21:
+		m_currentRound = eRound::CHESS_CASTLE_STAGE_1;
+		break;
+	case 22:
+		m_currentRound = eRound::CHESS_CASTLE_STAGE_2;
+		break;
+	case 23:
+		m_currentRound = eRound::CHESS_CASTLE_STAGE_3;
+		break;
+	default:
+		break;
+	}
 }
 
 void RoomSessionPveRoundManager::onStart() const
 {
+	const auto roomSession = m_roomSession.lock();
+
+	if (roomSession == nullptr)
+	{
+		return;
+	}
+
+	for (const auto& player : roomSession->getPlayers())
+	{
+		roomSession->addPlayer(player->getGameConnection(), player->getTeam());
+	}
+
+	// Reset the time.
+	roomSession->resetTime();
+
 	updatePathfinders();
+
+	// Initialize all areas,objects, npcs and items.
+	roomSession->getPveAreaManager()->initializeAreas();
+	roomSession->getObjectManager()->initializeObjects();
+	roomSession->getNpcManager()->initializeNpcs();
+	roomSession->getPveItemManager()->initializeItems();
+
+	if (m_currentRound == eRound::CHESS_CASTLE_STAGE_2)
+	{
+		roomSession->getPveWaveManager()->initializeWaves();
+	}
+
+	for (const auto& player : roomSession->getPlayers())
+	{
+		player->send<GCGameState>(player->getPlayer()->getId(), CGGameState::State::SYNC_TIME, roomSession->getElapsedTime());
+	}
 }
 
 void RoomSessionPveRoundManager::updatePathfinders() const
@@ -159,7 +208,7 @@ void RoomSessionPveRoundManager::tick()
 		checkRoundOneFinished();
 		break;
 	case eRound::CHESS_CASTLE_STAGE_3:
-		checkRoundTwoFinished();
+		//checkRoundTwoFinished();
 		break;
 	}
 }

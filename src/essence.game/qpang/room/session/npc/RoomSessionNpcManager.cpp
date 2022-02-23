@@ -65,9 +65,11 @@ void RoomSessionNpcManager::initializeNpcs()
 			pathFinder->getCellZ(z)
 		};
 
-		const bool isBossNpc = data.type == 13 || data.type == 38 || data.type == 39 || data.type == 59;
+		const bool isBossNpc = (data.type == 13 || data.type == 38 || data.type == 39 || data.type == 59);
 		const auto npc = isBossNpc ? std::make_shared<PveBossNpc>(data, spawnCell) :
 			std::make_shared<PveNpc>(data, spawnCell);
+
+		npc->resetBodyPartsHealth();
 
 		m_npcs.push_back(npc);
 	}
@@ -241,9 +243,13 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 
 	const auto damage = targetNpc->calculateHitDamage(data);
 
+	printf("Calculated the following damage: %f for npc %i\n", damage, targetNpcUid);
+
 	targetNpc->takeBodyPartDamage(data.bodyPartId, static_cast<uint16_t>(damage));
 
 	const auto damageDealtToNpc = targetNpc->takeDamage(static_cast<uint16_t>(damage));
+
+	printf("Damage dealt to npc %hu with id %i\n", damageDealtToNpc, targetNpcUid);
 
 	targetNpc->registerDamageDealtByPlayer(playerId, damageDealtToNpc);
 
