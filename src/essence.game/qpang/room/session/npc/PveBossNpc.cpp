@@ -11,9 +11,11 @@
 
 PveBossNpc::PveBossNpc(PveNpcData data, const PathfinderCell& spawnCell) :
 	PveNpc(std::move(data), spawnCell),
-	m_specialAttackDamageTreshold(500),				// Should be total of 4 times, so m_baseHealt / 4?
+	m_specialAttackDamageTreshold(data.baseHealth / 4),
+	// Initialize health with base health.
 	m_previousSpecialAttackHealth(data.baseHealth),
-	m_specialAttackDuration(30)						// Should be 60 (full minute, like in the videos). 
+	// Should be 60 (full minute, like in the videos).
+	m_specialAttackDuration(60)
 {
 }
 
