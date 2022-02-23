@@ -143,6 +143,7 @@ public:
 		}
 
 		roomSessionPlayer->takeHealth(damage, true);
+		roomSession->relayPlaying<GCPvEHitN2P>(npcUid, npcBodyPartId, impactPos, impactOffsetPos, unk_09, bodyPartHitLocation, player->getId(), roomSessionPlayer->getHealth());
 
 		if (roomSessionPlayer->isDead())
 		{
@@ -153,8 +154,6 @@ public:
 			roomSession->relayPlaying<GCGameState>(player->getId(), gameState, weaponUsed.itemId, npcUid);
 			roomSession->getGameMode()->onPlayerDeathByNpc(roomSessionPlayer, npc);
 		}
-
-		roomSession->relayPlaying<GCPvEHitN2P>(npcUid, npcBodyPartId, impactPos, impactOffsetPos, unk_09, bodyPartHitLocation, player->getId(), roomSessionPlayer->getHealth());
 	}
 
 	void process(EventConnection* ps) override
