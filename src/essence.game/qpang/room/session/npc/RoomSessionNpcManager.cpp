@@ -243,13 +243,9 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 
 	const auto damage = targetNpc->calculateHitDamage(data);
 
-	printf("Calculated the following damage: %f for npc %i\n", damage, targetNpcUid);
-
 	targetNpc->takeBodyPartDamage(data.bodyPartId, static_cast<uint16_t>(damage));
 
 	const auto damageDealtToNpc = targetNpc->takeDamage(static_cast<uint16_t>(damage));
-
-	printf("Damage dealt to npc %hu with id %i\n", damageDealtToNpc, targetNpcUid);
 
 	targetNpc->registerDamageDealtByPlayer(playerId, damageDealtToNpc);
 
