@@ -38,7 +38,8 @@ Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, cons
 	m_isPublicPveRoom(false)
 {
 	m_modeManager = Game::instance()->getRoomManager()->getGameModeManager()->get(mode);
-	m_isReloadGlitchEnabled = false;
+	// Reload glitch is only enabled by default in pve rooms.
+	m_isReloadGlitchEnabled = (m_mode == GameMode::PVE);
 
 	setSkillsEnabled(!m_modeManager->isPublicEnemyMode());
 }
