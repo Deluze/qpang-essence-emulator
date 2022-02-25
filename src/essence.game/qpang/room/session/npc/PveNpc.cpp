@@ -522,8 +522,6 @@ float PveNpc::calculateHitDamage(const CGPvEHitNpcData& data)
 {
 	auto damage = static_cast<double>(data.weaponUsed.damage);
 
-	printf("- Damage from weapon used %f\n", damage);
-
 	const auto& hitBodyPart = getBodyPartById(data.bodyPartId);
 
 	// Note: Currently there are no bodyparts with attribute type A_DEFAULT or A_DESTROY.
@@ -554,13 +552,9 @@ float PveNpc::calculateHitDamage(const CGPvEHitNpcData& data)
 		break;
 	}
 
-	printf("- Bodypart health %hu/%hu\n", hitBodyPart->health, hitBodyPart->initialHealth);
-
 	// This body part is broken.
 	if (hitBodyPart->health == 0)
 	{
-		printf("- Bodypart is broken\n");
-
 		damage *= 0.5;
 	}
 
