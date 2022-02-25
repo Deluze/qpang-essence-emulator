@@ -15,7 +15,8 @@ void RoomSessionNpcManager::initialize(const std::shared_ptr<RoomSession>& roomS
 
 void RoomSessionNpcManager::onStart()
 {
-	initializeNpcs();
+	// This method is being called from RoomSessionPveRoundManager::onStart.
+	//initializeNpcs();
 }
 
 void RoomSessionNpcManager::tick()
@@ -66,10 +67,10 @@ void RoomSessionNpcManager::initializeNpcs()
 		};
 
 		const bool isBossNpc = (data.type == 13 || data.type == 38 || data.type == 39 || data.type == 59);
-		const auto npc = isBossNpc ? std::make_shared<PveBossNpc>(data, spawnCell) :
-			std::make_shared<PveNpc>(data, spawnCell);
 
-		npc->resetBodyPartsHealth();
+		const auto& npc = isBossNpc
+			? std::make_shared<PveBossNpc>(data, spawnCell)
+			: std::make_shared<PveNpc>(data, spawnCell);
 
 		m_npcs.push_back(npc);
 	}
@@ -243,9 +244,13 @@ void RoomSessionNpcManager::onCGPvEHitNpc(const CGPvEHitNpcData& data)
 
 	const auto damage = targetNpc->calculateHitDamage(data);
 
+	printf("Calculated %f damage for %u\n", damage, targetNpcUid);
+
 	targetNpc->takeBodyPartDamage(data.bodyPartId, static_cast<uint16_t>(damage));
 
 	const auto damageDealtToNpc = targetNpc->takeDamage(static_cast<uint16_t>(damage));
+
+	printf("Damage dealt to npc %u is %hu\n", targetNpcUid, damageDealtToNpc);
 
 	targetNpc->registerDamageDealtByPlayer(playerId, damageDealtToNpc);
 

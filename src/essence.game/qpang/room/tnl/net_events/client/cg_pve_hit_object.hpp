@@ -28,8 +28,6 @@ public:
 	{
 		// TODO: This works but, we need to look at the object type and stuff to properly handle this event.
 		//player->getRoomPlayer()->getRoomSessionPlayer()->getRoomSession()->relayPlaying<GCPvEHitObject>(playerId, objectUid, weaponItemId, cmd, 10);
-
-		std::cout << "Received an unhandled CGPvEHitObject event." << std::endl;
 	}
 
 	void process(EventConnection* ps) override
