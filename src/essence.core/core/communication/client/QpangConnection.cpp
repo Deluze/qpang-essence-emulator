@@ -5,7 +5,6 @@
 
 #include "core/communication/PacketHandler.h"
 #include "core/communication/server/QpangServer.h"
-#include "core/communication/PacketHandler.h"
 
 QpangConnection::QpangConnection(tcp::socket&& socket, uint32_t connectionId) :
 	m_socket(std::move(socket)),
@@ -87,6 +86,8 @@ void QpangConnection::send(const ServerPacket& packet)
 
 void QpangConnection::close()
 {
+	printf("(QpangConnection::close) Closing connection %u.\n", m_connectionId);
+
 	if (!m_isConnected)
 		return;
 

@@ -2,9 +2,7 @@
 
 #include <boost/thread.hpp>
 #include <any>
-
 #include "packets/lobby/outgoing/account/SendAccountDuplicateLogin.h"
-#include "packets/lobby/outgoing/trading/SendTradeCancelOther.h"
 
 #include "packets/lobby/incoming/trading/HandleUpdateTradeStateRequest.h"
 
@@ -95,6 +93,8 @@ void Game::removeClient(Player::Ptr player)
 {
 	assert(player != nullptr);
 
+	printf("(Game::removeClient) Removing client %u.\n", player->getId());
+
 	m_playerMx.lock();
 	m_players.erase(player->getId());
 	m_playersByNickname.erase(player->getName());
@@ -117,6 +117,8 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 
 	if (playerFound)
 	{
+		printf("(Game::createPlayer) Closing connection for player %u due to a duplicate account login.\n", playerId);
+
 		it->second->send(SendAccountDuplicateLogin());
 		it->second->close();
 	}
@@ -127,6 +129,8 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 
 	m_players[playerId] = player;
 	m_playersByNickname[StringConverter::ToLowerCase(player->getName())] = player;
+
+	printf("(Game::createPlayer) Creating player %u.\n", playerId);
 }
 
 Player::Ptr Game::getPlayer(uint32_t playerId)
@@ -286,14 +290,20 @@ DatabaseDispatcher* Game::getDatabaseDispatcher()
 
 void Game::onLobbyConnectionClosed(QpangConnection::Ptr conn)
 {
+	printf("(Game::onLobbyConnectionClosed) Closing lobbyServer connection for player %u.\n", conn->getPlayer()->getId());
+
 	m_lobbyServer->removeConnection(conn);
 
 	if (auto player = conn->getPlayer(); player != nullptr)
 	{
+		printf("(Game::onLobbyConnectionClosed) Closing squareServer connection for player %u.\n", conn->getPlayer()->getId());
+
 		m_squareServer->removeConnection(conn);
 
 		if (player->isClosed())
 			return;
+
+		printf("(Game::onLobbyConnectionClosed) Closing connection for player %u.\n", conn->getPlayer()->getId());
 
 		player->close();
 
@@ -311,6 +321,8 @@ void Game::onSquareConnectionClosed(QpangConnection::Ptr conn)
 {
 	if (auto player = conn->getPlayer(); player != nullptr)
 	{
+		printf("(Game::onSquareConnectionClosed) onSquareConnectionClosed called for player %u.\n", player->getId());
+
 		auto playerId = player->getId();
 
 		auto tradeManager = Game::instance()->getTradeManager();
@@ -318,6 +330,8 @@ void Game::onSquareConnectionClosed(QpangConnection::Ptr conn)
 
 		if (player->isClosed())
 			return;
+
+		printf("(Game::onSquareConnectionClosed) Closing connection for player %u.\n", conn->getPlayer()->getId());
 
 		player->close();
 
