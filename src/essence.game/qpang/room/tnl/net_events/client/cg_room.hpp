@@ -95,6 +95,9 @@ public:
 					player->broadcast(u"Sorry, but you have to use the tweak tool in order to create a PVE room. You can enable it in the launcher.");
 					return;
 				}
+
+				// For now, lets default the map to 120 since starting from different maps/stages is not yet supported.
+				map = 120;
 			}
 
 			if (!isValidMode)
@@ -202,14 +205,15 @@ public:
 				// and thus if we do allow switching difficulties we need to take that into account. 
 				if (room->getMode() == GameMode::Mode::PVE)
 				{
-					return;
+					break;
 				}
 
 				// FIXME: We probably need to add a gamemode check to ensure a player can set a certain mapId.
 
 				room->setMap(mapId);
+
+				break;
 			}
-			break;
 			case MODE_ROOM:
 			{
 				const auto isValidMode =
@@ -237,12 +241,11 @@ public:
 
 					break;
 				}
-				else
-				{
-					room->setSkillsEnabled(true);
-				}
+
+				room->setSkillsEnabled(true);
+
+				break;
 			}
-			break;
 			case SET_POINTS:
 			{
 				if (value == 10 || value == 15 || value == 20 || value == 25 || value == 30 || value == 35 || value == 40)
@@ -250,8 +253,9 @@ public:
 					room->setScorePoints(value);
 					room->setIsPointsGame(true);
 				}
+
+				break;
 			}
-			break;
 			case SET_TIME:
 			{
 				if (value == 5 || value == 10 || value == 15 || value == 20)
@@ -259,32 +263,34 @@ public:
 					room->setScoreTime(value);
 					room->setIsPointsGame(false);
 				}
+
+				break;
 			}
-			break;
 			case PLAYERS_ROOM:
 			{
 				if (value == 4 || value == 8 || value == 12 || value == 16)
 				{
 					room->setMaxPlayers(value);
 				}
+
+				break;
 			}
-			break;
 			case PASS_ROOM:
 			{
 				room->setPassword(password);
+				break;
 			}
-			break;
 			case LEVEL_ROOM:
 			{
 				room->setLevelLimited(value);
+				break;
 			}
-			break;
 			case TOGGLE_MELEE:
 			{
 				room->setMeleeOnly(value);
 				room->setSkillsEnabled(false);
+				break;
 			}
-			break;
 			case TOGGLE_SKILL:
 			{
 				if (room->getMode() == GameMode::PREY)
@@ -298,12 +304,11 @@ public:
 
 				break;
 			}
-			break;
 			case TEAM_ROOM:
 			{
 				room->setTeamSorting(value);
+				break;
 			}
-			break;
 			default:
 				std::cout << "CGRoom::handle >> Unknown cmd: " << cmd << std::endl;
 				break;
