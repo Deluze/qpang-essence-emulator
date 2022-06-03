@@ -475,12 +475,12 @@ bool InventoryManager::isExpired(const uint64_t cardId)
 
 bool InventoryManager::hasSpace(const uint32_t space) const
 {
-	return m_cards.size() + m_gifts.size() + space < 200;
+	return m_cards.size() + m_gifts.size() + space < 300;
 }
 
 bool InventoryManager::hasSpace() const
 {
-	return m_cards.size() + m_gifts.size() < 200;
+	return m_cards.size() + m_gifts.size() < 300;
 }
 
 void InventoryManager::tradeCard(InventoryCard& card, const std::shared_ptr<Player>& player)
