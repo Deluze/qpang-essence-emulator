@@ -36,7 +36,7 @@ public:
 		writeEmpty(12);
 
 		// player containers
-		writeShort(200); // max inv. size
+		writeShort(300); // max inv. size
 		writeShort(50); // max friend list size
 		writeShort(10); // max inc/out friend list size
 		writeShort(50); // max memo send count
