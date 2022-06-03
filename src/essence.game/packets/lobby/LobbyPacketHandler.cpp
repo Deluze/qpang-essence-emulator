@@ -22,6 +22,7 @@
 #include "gameroom/HandleGetGameSettingsRequest.h"
 #include "HandleHandshakeRequest.h"
 #include "HandleLoginRequest.h"
+#include "HandleOpenLootBoxRequest.h"
 #include "inventory/HandleDeleteInventoryCardRequest.h"
 #include "inventory/HandleDisableFunctionCardRequest.h"
 #include "inventory/HandleEnableFunctionCardRequest.h"
@@ -63,9 +64,11 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(649, new HandleUpdateSkillSetRequest());
 	add(652, new HandleDeleteInventoryCardRequest());
 	add(655, new HandleOpenInventoryCardRequest());
-	add(667, new HandleValidateNickNameRequest());
+	// TODO: Re-enable packet when we going to use this feature.
+	//add(667, new HandleValidateNickNameRequest());
 	// 670 - Choose nickname and characters, create account.
-	add(670, new HandleAccountRegistrationRequest());
+	// TODO: Re-enable packet when we going to use this feature.
+	//add(670, new HandleAccountRegistrationRequest());
 	// 767 - Validate/check friend referral.
 	add(676, new HandleReferralRegistrationRequest());
 	add(679, new HandleChangePlayerCharacterRequest());
@@ -136,7 +139,7 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	// PacketId = 904, Direction: SEND, Description: Plays a sound?
 	// PacketId = 905, Direction: SEND, Description: "This item is not allowed to enchant"
 	// PacketId = 906, Direction: RECEIVE, Description: Panthalassa box opening
-
+	add(906, new HandleOpenLootBoxRequest());
 	/*
 		LOBBY_TRADE_ERROR = 877,
 		LOBBY_TRADE_RECEIVE_REQUEST = 878,

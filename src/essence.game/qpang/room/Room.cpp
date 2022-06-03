@@ -24,20 +24,22 @@ Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, cons
 	m_map(map),
 	m_mode(mode),
 	m_state(2),
-	m_maxPlayers(16),
+	m_maxPlayers(mode == GameMode::PVE ? 4 : 16),
 	m_masterPlayerId(0),
 	m_isLevelLimited(false),
 	m_isTeamSorting(false),
-	m_isSkillsEnabled(true),
+	m_isSkillsEnabled(mode == GameMode::PVE ? false : true),
 	m_isMeleeOnly(false),
 	m_scorePoints(40),
 	m_scoreTime(10),
 	m_isPointsGame(false),
 	m_isPlaying(false),
-	m_isEventRoom(false)
+	m_isEventRoom(false),
+	m_isPublicPveRoom(false)
 {
 	m_modeManager = Game::instance()->getRoomManager()->getGameModeManager()->get(mode);
-	m_isReloadGlitchEnabled = false;
+	// Reload glitch is only enabled by default in pve rooms.
+	m_isReloadGlitchEnabled = (m_mode == GameMode::PVE);
 
 	setSkillsEnabled(!m_modeManager->isPublicEnemyMode());
 }
@@ -50,6 +52,8 @@ void Room::addPlayer(GameConnection* conn)
 	}
 
 	auto playerId = conn->getPlayer()->getId();
+
+	printf("(Room::addPlayer) Player %u has entered room #%u.\n", playerId, m_id);
 
 	auto tradeManager = Game::instance()->getTradeManager();
 	tradeManager->cancelActiveTrades(playerId);
@@ -88,6 +92,8 @@ void Room::removePlayer(uint32_t id)
 	{
 		return;
 	}
+
+	printf("(Room::removePlayer) Player %u has left room #%u.\n", it->second->getPlayer()->getId(), m_id);
 
 	m_players.erase(it);
 
@@ -168,7 +174,12 @@ void Room::start()
 		{
 			player->setReady(true); // room master can't ready up.
 			player->setPlaying(true);
-			player->getConnection()->startLoading(curr, player);
+
+			if (m_mode == GameMode::Mode::PVE)
+				player->getConnection()->startLoadingPve(curr, player);
+			else
+				player->getConnection()->startLoading(curr, player);
+
 			player->onStart();
 		}
 		else
@@ -337,13 +348,7 @@ uint8_t Room::getMap() const
 
 void Room::setMap(const uint8_t map)
 {
-	if (map > 12)
-	{
-		return;
-	}
-
 	m_map = map;
-
 	update(CGRoom::Command::MAP_ROOM, map);
 }
 
@@ -365,7 +370,7 @@ void Room::setMode(const uint8_t mode)
 
 	// after changing game modes, these reset.
 
-	if (m_isPointsGame)
+	if (m_isPointsGame && m_mode != 9)
 	{
 		update(CGRoom::Command::SET_POINTS, m_scorePoints);
 	}
@@ -440,7 +445,8 @@ bool Room::isSkillsEnabled() const
 
 void Room::setSkillsEnabled(const bool skillEnabled)
 {
-	m_isSkillsEnabled = skillEnabled;
+	if (m_mode != 9)
+		m_isSkillsEnabled = skillEnabled;
 
 	unreadyAll(true);
 	update(CGRoom::Command::TOGGLE_SKILL, skillEnabled);
@@ -624,4 +630,14 @@ bool Room::isReloadGlitchEnabled() const
 void Room::setIsReloadGlitchEnabled(const bool isReloadGlitchEnabled)
 {
 	m_isReloadGlitchEnabled = isReloadGlitchEnabled;
+}
+
+bool Room::isPublicPveRoom() const
+{
+	return m_isPublicPveRoom;
+}
+
+void Room::setIsPublicPveRoom(bool isPublicPveRoom)
+{
+	m_isPublicPveRoom = isPublicPveRoom;
 }

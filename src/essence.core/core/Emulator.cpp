@@ -68,7 +68,7 @@ void Emulator::run()
 		now = std::chrono::system_clock::now();
 
 		if (nextQueryTime < now) {
-			const auto statement = DATABASE->prepare("SELECT * FROM qfighter.weapons LIMIT 0;");
+			const auto statement = DATABASE->prepare("SELECT * FROM weapons LIMIT 0;");
 
 			statement->fetch();
 

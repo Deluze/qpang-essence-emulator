@@ -5,7 +5,6 @@
 #include <cstdint>
 
 #include "qpang/Position.h"
-#include "qpang/room/session/bullet/Bullet.h"
 
 #include "qpang/room/session/player/effect/PlayerEffectManager.h"
 #include "qpang/room/session/player/weapon/PlayerWeaponManager.h"
@@ -31,7 +30,9 @@ public:
 
 	void tick();
 	void start();
+
 	void stop();
+	void stopPveGame();
 
 	bool canStart();
 	bool isInvincible();
@@ -50,10 +51,28 @@ public:
 	void setPosition(const Position& position);
 	Position getPosition();
 
+	void setFloorNumber(uint8_t floorNumber);
+	uint8_t getFloorNumber() const;
+
+	void increaseGoldenCoinCount();
+	void increaseSilverCoinCount();
+	void increaseBronzeCoinCount();
+
+	uint32_t getGoldenCoinCount() const;
+	uint32_t getSilverCoinCount() const;
+	uint32_t getBronzeCoinCount() const;
+
 	void addHealth(uint16_t health, bool updateOnClient = false);
 	void takeHealth(uint16_t health, bool updateOnClient = false);
 	void setHealth(uint16_t health, bool updateOnClient = false);
+
+	void setPermanentlyDead(bool permanentlyDead);
+
 	bool isDead();
+	bool isPermanentlyDead();
+
+	bool canRespawn();
+	void setCanRespawn(bool canRespawn);
 
 	void respawn();
 	void startRespawnCooldown(bool hasCooldown = true);
@@ -133,6 +152,7 @@ public:
 
 		post(evt);
 	}
+
 private:
 
 	PlayerEffectManager m_effectManager;
@@ -142,12 +162,21 @@ private:
 
 	Position m_position;
 
+	uint8_t m_floorNumber = 0;
+
+	uint32_t m_goldenCoinCount = 0;
+	uint32_t m_silverCoinCount = 0;
+	uint32_t m_bronzeCoinCount = 0;
+
 	time_t m_joinTime;
 	time_t m_startTime;
 	time_t m_invincibleRemovalTime;
 	time_t m_respawnTime;
 
 	bool m_isPlaying; // true if waiting for players is over
+	bool m_permanentlyDead;
+
+	bool m_canRespawn;
 	bool m_isRespawning;
 
 	bool m_isSpectating;
@@ -161,6 +190,8 @@ private:
 	std::array<uint32_t, 9> m_armor;
 
 	std::mutex m_bulletMx;
+
+	uint8_t m_respawnCooldown;
 	
 	bool m_hasQuickRevive;
 	bool m_isInvincible;

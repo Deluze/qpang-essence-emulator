@@ -414,48 +414,72 @@ uint16_t EquipmentManager::getBaseHealth()
 	return 0;
 }
 
-uint16_t EquipmentManager::getBonusHealth()
+uint16_t EquipmentManager::getBonusHealth(const std::shared_ptr<RoomSession>& roomSession)
 {
-	if (auto player = m_player.lock(); player != nullptr)
+	const auto player = m_player.lock();
+
+	const auto equip = m_equips[player->getCharacter()];
+	const auto isPveGameMode = (roomSession != nullptr && roomSession->getRoom()->getMode() == GameMode::PVE);
+
+	switch (player->getInventoryManager()->get(equip[6]).itemId)
 	{
-		auto equip = m_equips[player->getCharacter()];
-
-		switch (player->getInventoryManager()->get(equip[6]).itemId)
+	case 1429407489: // green turtle
+		if (isPveGameMode)
 		{
-		case 1429407489: // green turtle
-			return 10;
-		case 1429410048: // brown turtle
-		case 1429408256: // sidekick
-		case 1429414144: // wallie
-		case 1429414400: // german
-		case 1429430784: // TGS
-		case 1429431040: // orange
-		case 1429409024: // alpha
-		case 1429412097: // yellow helper
-		// Other backpacks
-		case 1429412101:
-		case 1429412102:
-		case 1429412103:
-		case 1429412104:
-		case 1429412105:
-		case 1429412106:
-		case 1429412107:
-		case 1429412108:
-		case 1429412109:
-		case 1429412098:
-		case 1429412099:
-		case 1429412100:
-			// Squirtle shield
-		case 1429410049:
-			return 20;
-		case 1429415424: // novice back
-			return 30;
-		default:
-			return 0;
+			switch (roomSession->getPveRoundManager()->getCurrentRound())
+			{
+			case eRound::CHESS_CASTLE_STAGE_1:
+				return 10;
+			case eRound::CHESS_CASTLE_STAGE_2:
+				return 20;
+			case eRound::CHESS_CASTLE_STAGE_3:
+				return 30;
+			}
 		}
-	}
 
-	return 0;
+		return 10;
+	case 1429410048: // brown turtle
+	case 1429408256: // sidekick
+	case 1429414144: // wallie
+	case 1429414400: // german
+	case 1429430784: // TGS
+	case 1429431040: // orange
+	case 1429409024: // alpha
+	case 1429412097: // yellow helper
+	// Other backpacks
+	case 1429412101:
+	case 1429412102:
+	case 1429412103:
+	case 1429412104:
+	case 1429412105:
+	case 1429412106:
+	case 1429412107:
+	case 1429412108:
+	case 1429412109:
+	case 1429412098:
+	case 1429412099:
+	case 1429412100:
+	case 1429410049: // Squirtle shield
+	case 1429408257: // Frysian backpack
+		if (isPveGameMode)
+		{
+			switch (roomSession->getPveRoundManager()->getCurrentRound())
+			{
+			case eRound::CHESS_CASTLE_STAGE_1:
+				return 20;
+			case eRound::CHESS_CASTLE_STAGE_2:
+				return 40;
+			case eRound::CHESS_CASTLE_STAGE_3:
+				return 60;
+			}
+		}
+
+		return 20;
+	case 1429415424: // novice back
+		return 30;
+	default:
+		return 0;
+	}
 }
 
 bool EquipmentManager::hasFunctionCard(uint32_t functionId)

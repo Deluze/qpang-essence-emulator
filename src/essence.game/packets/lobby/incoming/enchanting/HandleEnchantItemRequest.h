@@ -39,6 +39,7 @@ public:
 
 	void handle(const QpangConnection::Ptr conn, QpangPacket& packet) override
 	{
+		return;
 		const auto player = conn->getPlayer();
 
 		const auto cardId = packet.readLong();

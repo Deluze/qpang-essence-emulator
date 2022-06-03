@@ -64,7 +64,7 @@ void DatabaseDispatcher::run()
 		now = std::chrono::system_clock::now();
 
 		if (nextQueryTime < now) {
-			const auto statement = con->prepareStatement("SELECT * FROM qfighter.weapons LIMIT 0;");
+			const auto statement = con->prepareStatement("SELECT * FROM weapons LIMIT 0;");
 
 			statement->execute();
 

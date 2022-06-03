@@ -102,6 +102,9 @@ public:
 	bool isReloadGlitchEnabled() const;
 	void setIsReloadGlitchEnabled(bool isReloadGlitchEnabled = false);
 
+	bool isPublicPveRoom() const;
+	void setIsPublicPveRoom(bool isPublicPveRoom = false);
+
 	template<typename T, typename... Args>
 	void broadcast(Args... args)
 	{
@@ -156,6 +159,8 @@ private:
 	bool m_isEventRoom;
 
 	bool m_isReloadGlitchEnabled;
+
+	bool m_isPublicPveRoom;
 
 	GameMode* m_modeManager;
 	std::shared_ptr<RoomSession> m_roomSession;

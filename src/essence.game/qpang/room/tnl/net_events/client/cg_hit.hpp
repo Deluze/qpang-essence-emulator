@@ -336,10 +336,18 @@ public:
 				}
 			}
 
+			const auto isPve = (roomSession->getRoom()->getMode() == GameMode::PVE);
+
+			// Don't damage eachother in PVE
+			if (isPve)
+			{
+				damage = 0;
+			}
+
 			dstPlayer->takeHealth(damage);
 
 			if (const auto applyEffect = (rand() % 100) <= weaponUsed.effectChance;
-				applyEffect && !dstPlayerShouldIgnoreDamageFromAllSources && !isSameTeam)
+				applyEffect && !dstPlayerShouldIgnoreDamageFromAllSources && !isSameTeam && !isPve)
 			{
 				if (dstPlayerIsTagged && weaponUsed.effectDuration > 2)
 				{
@@ -347,6 +355,7 @@ public:
 				}
 
 				effectId = weaponUsed.effectId;
+
 				dstPlayer->getEffectManager()->addEffect(srcPlayer, weaponUsed, entityId);
 			}
 		}
@@ -396,7 +405,11 @@ public:
 			srcPlayer->getEntityManager()->addKill(entityId);
 
 			// Killfeed?
-			roomSession->relayPlaying<GCGameState>(dstId, bodyPartHitLocation == 0 ? 28 : 17, weaponId, srcId);
+			if (srcId == dstId)
+				roomSession->relayPlaying<GCGameState>(dstId, 19, weaponId, srcId); // suicide
+			else
+				roomSession->relayPlaying<GCGameState>(dstId, bodyPartHitLocation == 0 ? 28 : 17, weaponId, srcId);
+
 			roomSession->getGameMode()->onPlayerKill(srcPlayer, dstPlayer, weaponUsed, bodyPartHitLocation);
 		}
 	}

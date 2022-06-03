@@ -16,18 +16,20 @@
 
 #include "SendUpdateSkillSet.h"
 
+#include "gc_master_log.hpp"
+
 constexpr auto TAG_BASE_HEALTH = 500;
 
 RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_room(room),
-	m_gameMode(mode),
 	m_isFinished(false),
-	m_essenceHolder(nullptr),
 	m_bluePoints(0),
 	m_yellowPoints(0),
 	m_lastTickTime(NULL),
 	m_essenceDropTime(NULL),
 	m_isEssenceReset(true),
+	m_gameMode(mode),
+	m_essenceHolder(nullptr),
 	m_blueVip(nullptr),
 	m_nextBlueVip(nullptr),
 	m_blueVipSetTime(NULL),
@@ -35,22 +37,39 @@ RoomSession::RoomSession(std::shared_ptr<Room> room, GameMode* mode) :
 	m_nextYellowVip(nullptr),
 	m_yellowVipSetTime(NULL),
 	m_currentlySelectedTag(0),
-	m_tagCountdown(0),
 	m_isSearchingForNextTag(false),
+	m_tagCountdown(0),
 	m_initialWaitTime((CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS") * 1000) + 6000)
 {
 	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
 
 	m_goal = m_room->isPointsGame() ? m_room->getScorePoints() : m_room->getScoreTime();
 	m_isPoints = m_room->isPointsGame();
-	m_startTime = time(NULL) + waitingForPlayersTime + 5;
-	m_endTime = room->isPointsGame() ? NULL : m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
+	m_startTime = time(nullptr) + waitingForPlayersTime + 5;
+	m_endTime = room->isPointsGame()
+		? NULL
+		: m_startTime + (static_cast<uint64_t>(room->getScoreTime()) * 60); // additional 30 seconds bcs waiting for players
 }
 
 void RoomSession::initialize()
 {
-	m_itemManager.initialize(shared_from_this());
-	m_skillManager.initialize(shared_from_this());
+	if (m_room->getMode() == GameMode::Mode::PVE)
+	{
+		m_pveAreaManager.initialize(shared_from_this());
+		m_pveRoundManager.initialize(shared_from_this());
+		m_npcManager.initialize(shared_from_this());
+		m_objectManager.initialize(shared_from_this());
+		m_pveItemManager.initialize(shared_from_this());
+		m_aboveGroundPathfinder.initialize(shared_from_this());
+		m_underGroundPathfinder.initialize(shared_from_this());
+		m_pveWaveManager.initialize(shared_from_this());
+		m_roomSessionBossFightManager.initialize(shared_from_this());
+	}
+	else
+	{
+		m_itemManager.initialize(shared_from_this());
+		m_skillManager.initialize(shared_from_this());
+	}
 
 	m_gameMode->onStart(shared_from_this());
 
@@ -61,7 +80,9 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 {
 	auto player = std::make_shared<RoomSessionPlayer>(conn, shared_from_this(), team);
 
-	if (auto roomPlayer = conn->getPlayer()->getRoomPlayer(); roomPlayer != nullptr)
+	printf("(RoomSession::addPlayer) Player %u has joined the roomsession in room #%u.\n", player->getPlayer()->getId(), m_room->getId());
+
+	if (const auto roomPlayer = conn->getPlayer()->getRoomPlayer(); roomPlayer != nullptr)
 		roomPlayer->setRoomSessionPlayer(player);
 
 	player->initialize();
@@ -84,7 +105,16 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 	m_players[player->getPlayer()->getId()] = player;
 	m_playerMx.unlock();
 
-	auto spawn = Game::instance()->getSpawnManager()->getRandomSpawn(m_room->getMap(), team);
+	const auto map = (m_room->getMode() == GameMode::PVE)
+		? m_pveRoundManager.getMap()
+		: m_room->getMap();
+
+	const auto alivePlayingPlayers = getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team);
+
+	// ReSharper disable once CppUseStructuredBinding
+	const auto spawn = (m_room->getMode() == GameMode::PVE)
+		? Game::instance()->getSpawnManager()->getLeastPopulatedSpawn(map, team, alivePlayingPlayers, shared_from_this())
+		: Game::instance()->getSpawnManager()->getRandomSpawn(map, team);
 
 	player->post(new GCGameState(player->getPlayer()->getId(), 11, 0)); // Necessary to initiate spectator mode in "waiting for players" state
 	player->post(new GCRespawn(player->getPlayer()->getId(), player->getCharacter(), 1, spawn.x, spawn.y, spawn.z));
@@ -108,6 +138,8 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 
 bool RoomSession::removePlayer(uint32_t playerId)
 {
+	printf("(RoomSession::removePlayer) Player %u has left the roomsession for room #%u.\n", playerId, m_room->getId());
+
 	m_playerMx.lock();
 
 	auto it = m_players.find(playerId);
@@ -200,19 +232,30 @@ bool RoomSession::removePlayer(uint32_t playerId)
 				{
 					m_yellowPoints = 1;
 					m_bluePoints = 0;
+
 					finish();
 				}
 				else if (yellowPlayers.empty())
 				{
 					m_yellowPoints = 0;
 					m_bluePoints = 1;
+
 					finish();
 				}
 			}
 		}
 		else
-			if (m_players.size() <= 1)
+		{
+			// ReSharper disable once CppTooWideScope
+			const auto canFinish = (m_room->getMode() == GameMode::PVE)
+				? m_players.empty()
+				: m_players.size() <= 1;
+
+			if (canFinish)
+			{
 				finish();
+			}
+		}
 	}
 
 	return true;
@@ -341,21 +384,31 @@ void RoomSession::handlePlayerFinish(RoomSessionPlayer::Ptr player)
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void RoomSession::handlePlayerPveFinish(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer)
+{
+	// TODO: Handle pve statistics for player (for reference, see handlePlayerFinish).
+}
+
 void RoomSession::tick()
 {
 	if (!m_isFinished)
 	{
 		std::unique_lock<std::recursive_mutex> lg(m_playerMx);
 
+		for (auto& [id, session] : m_players)
+		{
+			session->tick();
+		}
+
 		m_itemManager.tick();
 		m_gameMode->tick(shared_from_this());
-
-		for (auto& [id, session] : m_players)
-			session->tick();
 	}
 
 	if (canFinish())
+	{
 		finish();
+	}
 }
 
 void RoomSession::clear()
@@ -367,17 +420,28 @@ void RoomSession::clear()
 	m_leavers.clear();
 }
 
-bool RoomSession::isFinished()
+bool RoomSession::isFinished() const
 {
 	return m_isFinished;
 }
 
 void RoomSession::finish()
 {
-	if (m_isFinished)
+	if (m_room->getMode() == GameMode::PVE)
+	{
+		finishPveGame(false);
+
 		return;
+	}
+
+	if (m_isFinished)
+	{
+		return;
+	}
 
 	m_isFinished = true;
+
+	// TODO: Reset all pve related managers (items,npcs,objects etcetera).
 
 	m_itemManager.reset();
 	m_essenceHolder.reset();
@@ -402,6 +466,7 @@ void RoomSession::finish()
 	}
 
 	m_leaverMx.lock();
+
 	for (const auto& player : m_leavers)
 	{
 		if (m_gameMode->isMissionMode())
@@ -414,9 +479,10 @@ void RoomSession::finish()
 
 		player->stop();
 	}
+
 	m_leaverMx.unlock();
 
-	auto players = getPlayers();
+	const auto players = getPlayers();
 
 	for (const auto& player : players)
 	{
@@ -428,12 +494,11 @@ void RoomSession::finish()
 	}
 
 	auto playingPlayers = getPlayingPlayers();
-	const auto isPublicEnemyMode = getGameMode()->isPublicEnemyMode();
 
-	if (isPublicEnemyMode)
+	if (const auto isPublicEnemyMode = getGameMode()->isPublicEnemyMode())
 	{
 		std::sort(playingPlayers.begin(), playingPlayers.end(),
-			[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+			[](const RoomSessionPlayer::Ptr& lhs, const RoomSessionPlayer::Ptr& rhs)
 			{
 				return lhs->getTagPoints() > rhs->getTagPoints();
 			}
@@ -442,25 +507,20 @@ void RoomSession::finish()
 	else
 	{
 		std::sort(playingPlayers.begin(), playingPlayers.end(),
-			[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+			[](const RoomSessionPlayer::Ptr& lhs, const RoomSessionPlayer::Ptr& rhs)
 			{
 				return lhs->getScore() > rhs->getScore();
 			}
 		);
 	}
 
-
 	for (const auto& player : players)
 	{
 		const auto actPlayer = player->getPlayer();
 
-		std::vector<GCGameState::BonusInfo> tempBonuses{};
-
 		player->post(new GCGameState(actPlayer->getId(), 1));
-		player->post(new GCGameState(player, 23, tempBonuses));
+		player->post(new GCGameState(player, 23, std::vector<GCGameState::BonusInfo>{}));
 		player->post(new GCScoreResult(shared_from_this(), playingPlayers));
-
-		// TODO: Send gc game state for bonus.
 	}
 
 	m_room->finish();
@@ -469,24 +529,33 @@ void RoomSession::finish()
 bool RoomSession::canFinish()
 {
 	if (m_isFinished)
+	{
 		return false;
+	}
 
 	if (m_isPoints)
 	{
 		if (m_gameMode->isTeamMode())
 		{
-			auto bluePoints = getBluePoints();
-			auto yellowPoints = getYellowPoints();
+			const auto bluePoints = getBluePoints();
+			const auto yellowPoints = getYellowPoints();
 
-			return bluePoints >= m_goal || yellowPoints >= m_goal;
+			return ((bluePoints >= m_goal) || (yellowPoints >= m_goal));
 		}
 
 		return getTopScore() >= m_goal;
 	}
 
-	const auto currTime = time(NULL);
+	const auto currentTime = time(nullptr);
+	const auto noTimeLeft = (currentTime >= m_endTime);
 
-	return currTime >= m_endTime;
+	if (m_room->getMode() == GameMode::PVE)
+	{
+		// Note: All finish related checks for pve will happen in the round manager.
+		return false;
+	}
+
+	return noTimeLeft;
 }
 
 bool RoomSession::isAlmostFinished()
@@ -512,6 +581,77 @@ bool RoomSession::isAlmostFinished()
 
 	return currTime + 60 >= m_endTime;
 
+}
+
+void RoomSession::finishPveGame(const bool didWin)
+{
+	m_isFinished = true;
+
+	m_leaverMx.lock();
+
+	for (const auto& player : m_leavers)
+	{
+		player->stopPveGame();
+	}
+
+	m_leaverMx.unlock();
+
+	const auto players = getPlayers();
+
+	for (const auto& player : players)
+	{
+		if (!player->isSpectating())
+		{
+			handlePlayerPveFinish(player);
+
+			player->stopPveGame();
+		}
+	}
+
+	for (const auto& roomSessionPlayer : players)
+	{
+		const auto player = roomSessionPlayer->getPlayer();
+
+		// Send spectate end?
+		roomSessionPlayer->post(new GCGameState(player->getId(), 1));
+
+		// Send game over.
+		roomSessionPlayer->post(new GCGameState(roomSessionPlayer, 23));
+
+		// Send PvE end result.
+		const uint32_t goldenCoinsEarned = roomSessionPlayer->getGoldenCoinCount();
+		const uint32_t silverCoinsEarned = roomSessionPlayer->getSilverCoinCount();
+		const uint32_t bronzeCoinsEarned = roomSessionPlayer->getBronzeCoinCount();
+
+		constexpr uint32_t bestTimeLeftInMs = 0;
+
+		const auto currentTime = time(nullptr);
+		const auto currentTimeLeftMs = static_cast<uint32_t>((m_endTime - currentTime) * 1000);
+
+		roomSessionPlayer->post(new GCMasterLog(player->getId(), didWin, goldenCoinsEarned, silverCoinsEarned, bronzeCoinsEarned, bestTimeLeftInMs, currentTimeLeftMs));
+
+		if (didWin)
+		{
+			constexpr auto panthalassaBoxBonus = static_cast<uint16_t>(GCGameState::ePveBonusId::PANTHALASSA_BOX_01);
+			constexpr auto omphalosBoxBonus = static_cast<uint16_t>(GCGameState::ePveBonusId::OMPHALOS_BOX_01);
+
+			const std::vector<GCGameState::BonusInfo> bonuses
+			{
+				{panthalassaBoxBonus, 0, 0, panthalassaBoxBonus, 0},
+				{omphalosBoxBonus, 0, 0, panthalassaBoxBonus, 0 }
+			};
+
+			roomSessionPlayer->post(new GCGameState(roomSessionPlayer, 23, bonuses));
+		}
+	}
+
+	m_room->finish();
+}
+
+bool RoomSession::canFinishPveGame()
+{
+	// TODO: Fill in the proper finish conditions..
+	return true;
 }
 
 void RoomSession::setLastRespawnLocation(Spawn spawn)
@@ -578,6 +718,38 @@ uint32_t RoomSession::getTopScore()
 			topScore = player->getScore();
 
 	return topScore;
+}
+
+void RoomSession::resetTime()
+{
+	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
+
+	m_startTime = time(nullptr) + waitingForPlayersTime + 5;
+	m_endTime = m_startTime + m_goal * 60;
+}
+
+void RoomSession::stopTime()
+{
+	// This method stops the time counting down for about 60 seconds.
+	m_startTime = time(nullptr) + 60;
+	m_endTime = m_startTime + m_goal * 60;
+}
+
+bool RoomSession::areAllPlayersPermanentlyDead()
+{
+	auto players = getPlayingPlayers();
+
+	int permanentlyDeadPlayers = 0;
+	for (const auto& player : players)
+	{
+		if (player->isPermanentlyDead())
+			permanentlyDeadPlayers++;
+	}
+
+	if (permanentlyDeadPlayers == players.size())
+		return true;
+
+	return false;
 }
 
 void RoomSession::resetEssence()
@@ -902,8 +1074,12 @@ void RoomSession::spawnPlayer(RoomSessionPlayer::Ptr player)
 	const auto isTeamMode = getGameMode()->isTeamMode();
 	const uint8_t team = (isTeamMode ? player->getTeam() : 0);
 
-	const auto spawn = Game::instance()->getSpawnManager()->
-		getLeastPopulatedSpawn(m_room->getMap(), team, getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team), shared_from_this());
+	const auto map = (m_room->getMode() == GameMode::PVE)
+		? m_pveRoundManager.getMap()
+		: m_room->getMap();
+
+	const auto alivePlayingPlayers = getAlivePlayingPlayersExcept(player->getPlayer()->getId(), team);
+	const auto spawn = Game::instance()->getSpawnManager()->getLeastPopulatedSpawn(map, team, alivePlayingPlayers, shared_from_this());
 
 	setLastRespawnLocation(spawn);
 
@@ -945,27 +1121,38 @@ void RoomSession::syncPlayer(RoomSessionPlayer::Ptr player)
 	m_gameMode->onPlayerSync(player);
 }
 
-uint32_t RoomSession::getElapsedTime()
+uint32_t RoomSession::getElapsedTime() const
 {
-	time_t currTime = time(NULL);
+	const time_t currTime = time(nullptr);
 
 	if (currTime <= m_startTime)
+	{
 		return 0;
+	}
 
 	return (currTime - m_startTime) * 1000;
 }
 
-uint32_t RoomSession::getTimeLeftInSeconds()
+time_t RoomSession::getEndTime() const
+{
+	return m_endTime;
+}
+
+uint32_t RoomSession::getTimeLeftInSeconds() const
 {
 	if (m_isPoints)
+	{
 		return 1;
+	}
 
-	const auto currTime = time(NULL);
+	const auto currTime = time(nullptr);
 
 	if (currTime > m_endTime)
+	{
 		return 0;
+	}
 
-	return m_endTime - currTime;
+	return (m_endTime - currTime);
 }
 
 void RoomSession::killPlayer(RoomSessionPlayer::Ptr killer, RoomSessionPlayer::Ptr target, uint32_t weaponId, bool isHeadshot)
@@ -986,6 +1173,51 @@ GameItemManager* RoomSession::getItemManager()
 RoomSessionSkillManager* RoomSession::getSkillManager()
 {
 	return &m_skillManager;
+}
+
+RoomSessionNpcManager* RoomSession::getNpcManager()
+{
+	return &m_npcManager;
+}
+
+RoomSessionObjectManager* RoomSession::getObjectManager()
+{
+	return &m_objectManager;
+}
+
+RoomSessionPveItemManager* RoomSession::getPveItemManager()
+{
+	return &m_pveItemManager;
+}
+
+RoomSessionPveRoundManager* RoomSession::getPveRoundManager()
+{
+	return &m_pveRoundManager;
+}
+
+Pathfinder* RoomSession::getAboveGroundPathfinder()
+{
+	return &m_aboveGroundPathfinder;
+}
+
+Pathfinder* RoomSession::getUnderGroundPathfinder()
+{
+	return &m_underGroundPathfinder;
+}
+
+RoomSessionPveAreaManager* RoomSession::getPveAreaManager()
+{
+	return &m_pveAreaManager;
+}
+
+RoomSessionPveWaveManager* RoomSession::getPveWaveManager()
+{
+	return &m_pveWaveManager;
+}
+
+RoomSessionBossFightManager* RoomSession::getBossFightManager()
+{
+	return &m_roomSessionBossFightManager;
 }
 
 Room::Ptr RoomSession::getRoom()

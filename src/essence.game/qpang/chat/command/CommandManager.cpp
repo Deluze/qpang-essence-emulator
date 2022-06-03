@@ -6,11 +6,13 @@
 #include "DebugCommand.h"
 #include "DatabaseCommand.h"
 #include "ReloadCommand.h"
-#include "UnlimitedCommand.h"
+#include "MaxPlayersCommand.h"
 #include "AddSkillPointsCommand.h"
+#include "KillNpcCommand.h"
+#include "PveEndRoundCommand.h"
+#include "SpawnNpcCommand.h"
 #include "ToggleReloadGlitchCommand.h"
 #include "qpang/chat/command/Command.h"
-#include "qpang/chat/command/commands/NameChangeCommand.h"
 #include "qpang/chat/command/commands/InvincibleCommand.h"
 #include "qpang/chat/command/commands/PermBanCommand.h"
 #include "qpang/chat/command/commands/DisconnectCommand.h"
@@ -30,6 +32,7 @@
 #include "qpang/chat/command/commands/SpectateCommand.h"
 #include "qpang/chat/command/commands/FakeDeathCommand.h"
 #include "qpang/chat/command/commands/FakeDeathAllCommand.h"
+#include "qpang/chat/command/commands/PveMakePublicCommand.h"
 
 void CommandManager::initialize()
 {
@@ -60,6 +63,12 @@ void CommandManager::initialize()
 		{u"fakedeath", new FakeDeathCommand()},
 		{u"fakedeathall", new FakeDeathAllCommand()},
 		{u"debug", new DebugCommand()},
+		{u"spawnnpc", new SpawnNpcCommand()},
+		{u"killnpc", new KillNpcCommand()},
+		{u"endround", new PveEndRoundCommand()},
+		{u"makepublic", new PveMakePublic()},
+		{u"mp", new PveMakePublic()},
+		{u"maxplayers", new MaxPlayersCommand()}
 	};
 }
 

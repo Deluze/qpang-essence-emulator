@@ -32,6 +32,8 @@ public:
 	void enterRoom(std::shared_ptr<Room> room);
 	void updateRoom(std::shared_ptr<Room> room, TNL::U32 cmd, TNL::U32 val);
 
+	void startLoadingPve(std::shared_ptr<Room> room, std::shared_ptr<RoomPlayer> roomPlayer);
+
 	void startLoading(std::shared_ptr<Room> room, std::shared_ptr<RoomPlayer> roomPlayer);
 	void startSpectating(std::shared_ptr<Room> room, std::shared_ptr<RoomPlayer> roomPlayer);
 	void startGameButNotReady();

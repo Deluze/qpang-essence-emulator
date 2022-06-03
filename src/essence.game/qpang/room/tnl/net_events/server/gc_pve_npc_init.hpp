@@ -3,15 +3,49 @@
 
 #include "GameNetEvent.h"
 
-class GCPvENpcInit : public GameNetEvent
+class GCPvENpcInit final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
+	U32 npcType; // 88
+	U32 npcUid; // 92
+	F32 xPos; // 96
+	F32 yPos; // 100
+	F32 zPos; // 104
+	U16 rotation; // 108
+	U8 shouldExplode = 0; // 110 bool
+	U32 health; // 112
 
-	void pack(EventConnection* conn, BitStream* bstream) {};
-	void unpack(EventConnection* conn, BitStream* bstream) {};
-	void process(EventConnection* ps) {};
+	GCPvENpcInit() : GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient } {}
+
+	GCPvENpcInit(const uint32_t type, const uint32_t npcUid, const Position position, const uint16_t rotation, const uint32_t health, const bool shouldExplode = false)
+		: GameNetEvent{ GC_PVE_NPC_INIT, GuaranteedOrdered, DirServerToClient },
+		npcType(type),
+		npcUid(npcUid),
+		xPos(position.x),
+		yPos(position.y),
+		zPos(position.z),
+		rotation(rotation),
+		health(health),
+		shouldExplode(shouldExplode)
+	{
+
+	}
+
+	void pack(EventConnection* conn, BitStream* bstream) override
+	{
+		bstream->write(npcType);
+		bstream->write(npcUid);
+		bstream->write(xPos);
+		bstream->write(yPos);
+		bstream->write(zPos);
+		bstream->write(rotation);
+		bstream->write(shouldExplode);
+		bstream->write(health);
+	}
+
+	void unpack(EventConnection* conn, BitStream* bstream) override {}
+	void process(EventConnection* ps) override {}
 
 	TNL_DECLARE_CLASS(GCPvENpcInit);
 };

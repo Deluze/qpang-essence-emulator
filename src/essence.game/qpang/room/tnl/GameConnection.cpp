@@ -20,6 +20,10 @@
 #include "qpang/room/tnl/net_events/server/gc_respawn.hpp"
 #include "qpang/room/tnl/net_events/server/gc_arranged_accept.hpp"
 
+#include "qpang/room/tnl/net_events/server/gc_pve_start.hpp"
+#include "qpang/room/tnl/net_events/server/gc_pve_user_init.hpp"
+#include "qpang/room/tnl/net_events/server/gc_pve_new_round.hpp"
+
 TNL_IMPLEMENT_NETCONNECTION(GameConnection, TNL::NetClassGroupGame, true);
 
 GameConnection::GameConnection() : TNL::EventConnection()
@@ -113,6 +117,15 @@ void GameConnection::enterRoom(std::shared_ptr<Room> room)
 void GameConnection::updateRoom(std::shared_ptr<Room> room, TNL::U32 cmd, TNL::U32 val)
 {
 	postNetEvent(new GCRoom(m_player->getId(), cmd, val, room));
+}
+
+void GameConnection::startLoadingPve(std::shared_ptr<Room> room, RoomPlayer::Ptr roomPlayer)
+{
+	/*postNetEvent(new GCPvEStart(room, m_player->getId()));
+	postNetEvent(new GCPvEUserInit(roomPlayer));
+	postNetEvent(new GCGameState(m_player->getId(), 12));*/
+
+	startLoading(room, roomPlayer);
 }
 
 void GameConnection::startLoading(std::shared_ptr<Room> room, RoomPlayer::Ptr roomPlayer)

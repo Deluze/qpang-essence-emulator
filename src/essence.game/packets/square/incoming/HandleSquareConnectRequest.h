@@ -24,7 +24,7 @@ public:
 
 		player->setSquareConn(conn);
 
-		conn->setPlayer(player);
+		conn->setPlayer(player, playerId);
 
 		const std::vector<Square::Ptr> squares = Game::instance()->getSquareManager()->list();
 

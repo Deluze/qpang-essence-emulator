@@ -41,6 +41,8 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	m_timeAliveAsTag(0),
 	m_damageDealtToTag(0),
 	m_damageDealtAsTag(0),
+	m_canRespawn(true),
+	m_permanentlyDead(false),
 	m_conn(conn),
 	m_roomSession(roomSession)
 {
@@ -59,12 +61,17 @@ RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomS
 	auto* equipManager = player->getEquipmentManager();
 
 	m_baseHealth = equipManager->getBaseHealth();
-	m_bonusHealth = equipManager->getBonusHealth();
+	m_bonusHealth = equipManager->getBonusHealth(roomSession);
+
 	m_health = getDefaultHealth();
 
 	m_armor = equipManager->getArmorItemIdsByCharacter(m_character);
 
 	m_hasQuickRevive = equipManager->hasFunctionCard(QUICK_REVIVE);
+	m_respawnCooldown = m_hasQuickRevive ? 5 : 7;
+
+	if (auto room = roomSession->getRoom(); room->getMode() == GameMode::PVE)
+		m_respawnCooldown = 10;
 
 	m_expRate += equipManager->hasFunctionCard(EXP_MAKER_25) ? 25 : 0;
 	m_expRate += equipManager->hasFunctionCard(EXP_MAKER_50) ? 50 : 0;
@@ -147,10 +154,12 @@ void RoomSessionPlayer::tick()
 	if (needsToRemoveInvincibility)
 		removeInvincibility();
 
-	const auto needsToRespawn = m_respawnTime <= time(NULL) && m_isRespawning;
-
-	if (needsToRespawn)
-		respawn();
+	if (m_canRespawn)
+	{
+		const auto needsToRespawn = m_respawnTime <= time(NULL) && m_isRespawning;
+		if (needsToRespawn)
+			respawn();
+	}
 }
 
 void RoomSessionPlayer::start()
@@ -195,6 +204,28 @@ void RoomSessionPlayer::stop()
 
 	Game::instance()->getLevelManager()->onPlayerFinish(curr);
 	Game::instance()->getAchievementManager()->onPlayerFinish(curr);
+
+	player->update();
+
+	player->send(SendAccountUpdate(player));
+	player->send(SendUpdateSkillSet(player->getEquipmentManager()->getEquippedSkillCards()));
+}
+
+void RoomSessionPlayer::stopPveGame()
+{
+	m_entityManager.close();
+
+	const auto player = getPlayer();
+	const auto roomSessionPlayer = shared_from_this();
+
+	player->getEquipmentManager()->finishRound(roomSessionPlayer);
+
+	/* TODO: Once pve stats are worked out, call this to save the stats to the database.
+	player->getStatsManager()->apply(roomSessionPlayer);*/
+
+	/* TODO: Perhaps rework this (level and achievement for pve specificly).
+	Game::instance()->getLevelManager()->onPlayerFinish(roomSessionPlayer);
+	Game::instance()->getAchievementManager()->onPlayerFinish(roomSessionPlayer);*/
 
 	player->update();
 
@@ -278,6 +309,46 @@ Position RoomSessionPlayer::getPosition()
 	return m_position;
 }
 
+void RoomSessionPlayer::setFloorNumber(const uint8_t floorNumber)
+{
+	m_floorNumber = floorNumber;
+}
+
+uint8_t RoomSessionPlayer::getFloorNumber() const
+{
+	return m_floorNumber;
+}
+
+void RoomSessionPlayer::increaseGoldenCoinCount()
+{
+	m_goldenCoinCount++;
+}
+
+void RoomSessionPlayer::increaseSilverCoinCount()
+{
+	m_silverCoinCount++;
+}
+
+void RoomSessionPlayer::increaseBronzeCoinCount()
+{
+	m_bronzeCoinCount++;
+}
+
+uint32_t RoomSessionPlayer::getGoldenCoinCount() const
+{
+	return m_goldenCoinCount;
+}
+
+uint32_t RoomSessionPlayer::getSilverCoinCount() const
+{
+	return m_silverCoinCount;
+}
+
+uint32_t RoomSessionPlayer::getBronzeCoinCount() const
+{
+	return m_bronzeCoinCount;
+}
+
 void RoomSessionPlayer::addHealth(uint16_t health, bool updateClient)
 {
 	if (m_health > m_baseHealth + m_bonusHealth)
@@ -313,6 +384,26 @@ void RoomSessionPlayer::setHealth(uint16_t health, bool updateClient)
 bool RoomSessionPlayer::isDead()
 {
 	return m_health <= 0;
+}
+
+bool RoomSessionPlayer::isPermanentlyDead()
+{
+	return isDead() && m_permanentlyDead;
+}
+
+bool RoomSessionPlayer::canRespawn()
+{
+	return m_canRespawn && !m_permanentlyDead;
+}
+
+void RoomSessionPlayer::setCanRespawn(bool canRespawn) 
+{
+	m_canRespawn = canRespawn;
+}
+
+void RoomSessionPlayer::setPermanentlyDead(bool permanentlyDead)
+{
+	m_permanentlyDead = permanentlyDead;
 }
 
 void RoomSessionPlayer::respawn()
@@ -364,7 +455,7 @@ uint16_t RoomSessionPlayer::getDefaultHealth()
 
 uint8_t RoomSessionPlayer::getRespawnCooldown()
 {
-	return m_hasQuickRevive ? 5 : 7;
+	return m_respawnCooldown;
 }
 
 std::array<uint32_t, 9> RoomSessionPlayer::getArmor()

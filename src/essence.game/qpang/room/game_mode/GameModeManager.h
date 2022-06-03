@@ -9,6 +9,7 @@
 #include "qpang/room/game_mode/modes/PublicEnemy.h"
 #include "qpang/room/game_mode/modes/Vip.h"
 #include "qpang/room/game_mode/modes/Practice.h"
+#include "qpang/room/game_mode/modes/PlayerVsEnvironment.h"
 
 class GameMode;
 
@@ -32,5 +33,6 @@ private:
 		{4, new Vip()},
 		{5, new Practice()},
 		{8, new PublicEnemy()},
+		{9, new PlayerVsEnvironment()},
 	};
 };

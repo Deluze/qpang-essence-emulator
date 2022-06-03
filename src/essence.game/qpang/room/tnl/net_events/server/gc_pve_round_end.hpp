@@ -7,11 +7,11 @@ class GCPvERoundEnd : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvERoundEnd() : GameNetEvent{ GC_PVE_ROUND_END, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
+	GCPvERoundEnd() : GameNetEvent{ GC_PVE_ROUND_END, GuaranteedOrdered, DirServerToClient} {}
 
-	void pack(EventConnection* conn, BitStream* bstream) {};
-	void unpack(EventConnection* conn, BitStream* bstream) {};
-	void process(EventConnection* ps) {};
+	void pack(EventConnection* conn, BitStream* bstream) {}
+	void unpack(EventConnection* conn, BitStream* bstream) {}
+	void process(EventConnection* ps) {}
 
 	TNL_DECLARE_CLASS(GCPvERoundEnd);
 };

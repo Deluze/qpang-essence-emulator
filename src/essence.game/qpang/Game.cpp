@@ -2,9 +2,7 @@
 
 #include <boost/thread.hpp>
 #include <any>
-
 #include "packets/lobby/outgoing/account/SendAccountDuplicateLogin.h"
-#include "packets/lobby/outgoing/trading/SendTradeCancelOther.h"
 
 #include "packets/lobby/incoming/trading/HandleUpdateTradeStateRequest.h"
 
@@ -57,6 +55,7 @@ void Game::initialize()
 	m_levelManager.initialize();
 	m_craneManager.initialize();
 	m_leaderboard.refresh();
+	m_pveManager.initialize();
 
 	m_roomServer.initialize();
 }
@@ -94,6 +93,8 @@ void Game::removeClient(Player::Ptr player)
 {
 	assert(player != nullptr);
 
+	printf("(Game::removeClient) Player %u has left the game.\n", player->getId());
+
 	m_playerMx.lock();
 	m_players.erase(player->getId());
 	m_playersByNickname.erase(player->getName());
@@ -107,7 +108,7 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 	auto player = std::make_shared<Player>(playerId);
 
 	player->setLobbyConn(conn);
-	conn->setPlayer(player);
+	conn->setPlayer(player, playerId);
 
 	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
 
@@ -126,6 +127,8 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 
 	m_players[playerId] = player;
 	m_playersByNickname[StringConverter::ToLowerCase(player->getName())] = player;
+
+	printf("(Game::createPlayer) Player %u has joined the game.\n", playerId);
 }
 
 Player::Ptr Game::getPlayer(uint32_t playerId)
@@ -273,6 +276,11 @@ TradeManager* Game::getTradeManager()
 	return &m_tradeManager;
 }
 
+PveManager* Game::getPveManager()
+{
+	return &m_pveManager;
+}
+
 DatabaseDispatcher* Game::getDatabaseDispatcher()
 {
 	return &m_dbDispatcher;
@@ -287,7 +295,9 @@ void Game::onLobbyConnectionClosed(QpangConnection::Ptr conn)
 		m_squareServer->removeConnection(conn);
 
 		if (player->isClosed())
+		{
 			return;
+		}
 
 		player->close();
 

@@ -6,6 +6,7 @@
 #include <array>
 #include <memory>
 
+#include "RoomSession.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
 class Player;
@@ -46,7 +47,8 @@ public:
 	bool hasMeleeWeapon();
 
 	uint16_t getBaseHealth();
-	uint16_t getBonusHealth();
+	uint16_t getBonusHealth(const std::shared_ptr<RoomSession>& roomSession);
+
 	bool hasFunctionCard(uint32_t functionId);
 
 	uint8_t getExtraAmmoForWeaponIndex(uint8_t index);

@@ -246,3 +246,7 @@ void GameMode::onPlayerKill(std::shared_ptr<RoomSessionPlayer> killer, std::shar
 	if (roomSession->canFinish())
 		roomSession->finish();
 }
+
+void GameMode::onPlayerDeathByNpc(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer, const std::shared_ptr<PveNpc>& npc)
+{
+}

@@ -39,6 +39,8 @@ public:
 
 			if (!result->hasResults()) // invalid uuid
 			{
+				printf("(HandleLoginRequest->handle) Closing connection due to invalid uuid.\n");
+
 				conn->send(SendAccountVerificationFailure());
 
 				return conn->close();
@@ -49,6 +51,8 @@ public:
 
 		if (Game::instance()->getBanManager()->isBanned(userId))
 		{
+			printf("(HandleLoginRequest->handle) Closing connection due to banned player.\n");
+
 			conn->send(SendAccountBanned());
 
 			return conn->close();
@@ -65,6 +69,8 @@ public:
 
 			if (!result->hasResults())
 			{
+				printf("(HandleLoginRequest->handle) Closing connection due to unknown player.\n");
+
 				return conn->close();
 			}
 

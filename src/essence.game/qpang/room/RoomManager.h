@@ -21,10 +21,11 @@ public:
 	std::shared_ptr<Room> get(uint32_t id);
 
 	GameModeManager* getGameModeManager() const;
+
+	std::recursive_mutex m_roomMx;
 private:
 	uint32_t getAvailableRoomId();
 
-	std::recursive_mutex m_roomMx;
 	std::unordered_map<uint32_t, std::shared_ptr<Room>> m_rooms;
 
 	GameModeManager* m_gameModeManager;

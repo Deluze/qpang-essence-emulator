@@ -3,6 +3,16 @@
 #include "Spawn.h"
 #include <cmath>
 
+bool AABBHelper::isPositionInArea(const Position position, const Position minBound, const Position maxBound)
+{
+	const auto isWithinX = (((position.x >= minBound.x) && (position.x <= maxBound.x))
+		|| ((position.x <= minBound.x) && (position.x >= maxBound.x)));
+	const auto isWithinZ = (((position.z >= minBound.z) && (position.z <= maxBound.z))
+		|| ((position.z <= minBound.z) && (position.z >= maxBound.z)));
+
+	return (isWithinX && isWithinZ);
+}
+
 // ReSharper disable once CppInconsistentNaming
 bool AABBHelper::isPositionInBetweenBounds(const Position point, const Position minBound, const Position maxBound)
 {
