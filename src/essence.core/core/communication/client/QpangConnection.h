@@ -15,9 +15,9 @@
 
 using namespace boost::asio::ip;
 
-class Player;
 class QpangServer;
 class PacketHandler;
+class Player;
 
 class QpangConnection : public std::enable_shared_from_this<QpangConnection>
 {
@@ -45,7 +45,7 @@ public:
 
 	void setPacketHandler(PacketHandler* packetHandler);
 
-	void setPlayer(std::shared_ptr<Player> player);
+	void setPlayer(std::shared_ptr<Player> player, uint32_t playerId);
 	std::shared_ptr<Player> getPlayer();
 
 	inline tcp::socket& getSocket()
@@ -74,6 +74,7 @@ private:
 	PacketHandler* m_packetHandler;
 
 	std::shared_ptr<Player> m_player;
+	uint32_t m_playerId;
 
 	time_t m_timeLastPackReceived;
 	uint32_t m_connectionId;

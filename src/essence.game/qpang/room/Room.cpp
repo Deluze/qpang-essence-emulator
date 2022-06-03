@@ -53,7 +53,7 @@ void Room::addPlayer(GameConnection* conn)
 
 	auto playerId = conn->getPlayer()->getId();
 
-	printf("(Room::addPlayer) Adding player %u to room %u.\n", playerId, m_id);
+	printf("(Room::addPlayer) Player %u has entered room #%u.\n", playerId, m_id);
 
 	auto tradeManager = Game::instance()->getTradeManager();
 	tradeManager->cancelActiveTrades(playerId);
@@ -93,7 +93,7 @@ void Room::removePlayer(uint32_t id)
 		return;
 	}
 
-	printf("(Room::removePlayer) Removing player %u from room %u.\n", it->second->getPlayer()->getId(), m_id);
+	printf("(Room::removePlayer) Player %u has left room #%u.\n", it->second->getPlayer()->getId(), m_id);
 
 	m_players.erase(it);
 

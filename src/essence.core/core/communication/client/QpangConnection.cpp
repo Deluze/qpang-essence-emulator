@@ -6,13 +6,14 @@
 #include "core/communication/PacketHandler.h"
 #include "core/communication/server/QpangServer.h"
 
-QpangConnection::QpangConnection(tcp::socket&& socket, uint32_t connectionId) :
+QpangConnection::QpangConnection(tcp::socket&& socket, const uint32_t connectionId) :
 	m_socket(std::move(socket)),
 	m_isConnected(true),
 	m_isInitialized(false),
+	m_packetHandler(nullptr),
+	m_playerId(0),
 	m_timeLastPackReceived(0),
-	m_connectionId(connectionId),
-	m_packetHandler(nullptr)
+	m_connectionId(connectionId)
 {
 	m_socket.non_blocking(true);
 }
@@ -54,14 +55,21 @@ void QpangConnection::send(const ServerPacket& packet)
 		return;
 
 	auto pack = packet;
-	
+
+	// Adds 4 bytes to the payload
+	// first 2 (short) bytes is the payloadlength (payload.size + size of payload header)
+	// next 2 (short) bytes is the packet id
 	pack.writePayloadHeader();
+	// Writes the checksum to the packet.
 	pack.writeChecksum();
 
 	std::vector<char> sendBuf;
 
+	// Resize the send buffer to the size of the packet header (4 bytes, packet length (2 bytes) and encrypted (1 byte) and unknown (1byte)
+	// and the size of the payload (NOTE: this payload exists out of the payload data, size and packet id.
 	sendBuf.resize(sizeof(Packet::Header) + pack.payload.size());
 
+	// Set the packet header length to the sendbuffer size.
 	pack.header.length = static_cast<uint16_t>(sendBuf.size());
 	pack.header.isEncrypted = true;
 
@@ -86,10 +94,12 @@ void QpangConnection::send(const ServerPacket& packet)
 
 void QpangConnection::close()
 {
-	printf("(QpangConnection::close) Closing connection %u.\n", m_connectionId);
-
 	if (!m_isConnected)
+	{
 		return;
+	}
+
+	printf("(QpangConnection::close) Disconnecting player (id = %u).\n", m_playerId);
 
 	m_isConnected = false;
 
@@ -152,9 +162,10 @@ void QpangConnection::setPacketHandler(PacketHandler* packetHandler)
 	m_packetHandler = packetHandler;
 }
 
-void QpangConnection::setPlayer(std::shared_ptr<Player> player)
+void QpangConnection::setPlayer(std::shared_ptr<Player> player, uint32_t playerId)
 {
 	m_player = player;
+	m_playerId = playerId;
 }
 
 std::shared_ptr<Player> QpangConnection::getPlayer()
@@ -162,15 +173,45 @@ std::shared_ptr<Player> QpangConnection::getPlayer()
 	return m_player;
 }
 
-void QpangConnection::onHeaderRead(const boost::system::error_code& e)
+void QpangConnection::onHeaderRead(const boost::system::error_code& ec)
 {
 	try
 	{
 		if (!m_isConnected)
 			return;
 
-		if (e)
-			return close();
+		const auto errorMessage = ec.message();
+
+		if (ec)
+		{
+			if (ec == boost::asio::error::eof)
+			{
+				/*printf("(QpangConnection::onHeaderRead) An error occurred for player (id = %u).\n", m_playerId);
+				printf("(QpangConnection::onHeaderRead) An end of line error occurred, we gracefully ignore it.\n");
+				printf("(QpangConnection::onHeaderRead) Corresponding end_of_file error message: %s.\n", errorMessage.c_str());*/
+			}
+			else if (ec == boost::asio::error::timed_out)
+			{
+				printf("(QpangConnection::onHeaderRead) An error occurred for player (id = %u).\n", m_playerId);
+				printf("(QpangConnection::onHeaderRead) A time out error occurred, we gracefully ignore it.\n");
+				printf("(QpangConnection::onHeaderRead) Corresponding time_out error message: %s.\n", errorMessage.c_str());
+			}
+			else if (errorMessage == "The semaphore timeout period has expired")
+			{
+				printf("(QpangConnection::onHeaderRead) An error occurred for player (id = %u).\n", m_playerId);
+				printf("(QpangConnection::onHeaderRead) Received a semaphore timeout period, we gracefully ignore it.\n");
+			}
+			else
+			{
+				printf("(QpangConnection::onHeaderRead) An error occurred for player (id = %u).\n", m_playerId);
+				printf("(QpangConnection::onHeaderRead) Received an unknown error, we should close the connection.\n");
+				printf("(QpangConnection::onHeaderRead) Corresponding unknown error message: %s.\n", errorMessage.c_str());
+
+				close();
+
+				return;
+			}
+		}
 
 		std::lock_guard<std::recursive_mutex> m(m_receiveMutex);
 
@@ -178,7 +219,7 @@ void QpangConnection::onHeaderRead(const boost::system::error_code& e)
 
 		if (packetLength >= 8096)
 			return;
-		
+
 		// resize the buffer so the payload fits in
 		m_packet.payload.resize(packetLength);
 
@@ -192,24 +233,51 @@ void QpangConnection::onHeaderRead(const boost::system::error_code& e)
 		}
 		catch (const boost::system::error_code& e)
 		{
-			std::cout << "An exception occurred: " << e.message() << std::endl;
+			printf("(QpangConnection::onHeaderRead) (Async read attempt) An exception occurred: %s.\n", ec.message().c_str());
 		}
 	}
 	catch (const std::exception& ee)
 	{
-		std::cout << "An exception occurred: " << ee.what() << std::endl;
+		printf("(QpangConnection::onHeaderRead) (Any exception) An exception occurred: %s.\n", ee.what());
 	}
 }
 
-void QpangConnection::onPayloadRead(const boost::system::error_code& e)
+void QpangConnection::onPayloadRead(const boost::system::error_code& ec)
 {
 	if (!m_isConnected)
 		return;
 
-	if (e)
+	const auto errorMessage = ec.message();
+
+	if (ec)
 	{
-		std::cout << e.message() << std::endl;
-		return close();
+		if (ec == boost::asio::error::eof)
+		{
+			/*printf("(QpangConnection::onPayloadRead) An error occurred for player (id = %u).\n", m_playerId);
+			printf("(QpangConnection::onPayloadRead) An end of line error occurred, we gracefully ignore it.\n");
+			printf("(QpangConnection::onPayloadRead) Corresponding end_of_file error message: %s.\n", errorMessage.c_str());*/
+		}
+		else if (ec == boost::asio::error::timed_out)
+		{
+			printf("(QpangConnection::onPayloadRead) An error occurred for player (id = %u).\n", m_playerId);
+			printf("(QpangConnection::onPayloadRead) A time out error occurred, we gracefully ignore it.\n");
+			printf("(QpangConnection::onPayloadRead) Corresponding time_out error message: %s.\n", errorMessage.c_str());
+		}
+		else if (errorMessage == "The semaphore timeout period has expired")
+		{
+			printf("(QpangConnection::onPayloadRead) An error occurred for player (id = %u).\n", m_playerId);
+			printf("(QpangConnection::onPayloadRead) Received a semaphore timeout period, we gracefully ignore it.\n");
+		}
+		else
+		{
+			printf("(QpangConnection::onPayloadRead) An error occurred for player (id = %u).\n", m_playerId);
+			printf("(QpangConnection::onPayloadRead) Received an unknown error, we should close the connection.\n");
+			printf("(QpangConnection::onPayloadRead) Corresponding unknown error message: %s.\n", errorMessage.c_str());
+
+			close();
+
+			return;
+		}
 	}
 
 	m_timeLastPackReceived = time(NULL);
@@ -243,16 +311,42 @@ void QpangConnection::write(std::vector<char> buff)
 	}
 	catch (const boost::system::error_code& ec)
 	{
-		std::cout << "An exception occurred: " << ec.message() << std::endl;
+		printf("(QpangConnection::write) An exception occurred: %s.\n", ec.message().c_str());
+
 		close();
 	}
 }
 
-void QpangConnection::onWriteFinish(const boost::system::error_code& e)
+void QpangConnection::onWriteFinish(const boost::system::error_code& ec)
 {
-	if (e)
+	const auto errorMessage = ec.message();
+
+	if (ec)
 	{
-		std::cout << "An error occurred: " << e.message() << std::endl;
-		close();
+		if (ec == boost::asio::error::eof)
+		{
+			//printf("(QpangConnection::onWriteFinish) An error occurred for player (id = %u).\n", m_playerId);
+			//printf("(QpangConnection::onWriteFinish) An end of line error occurred, we gracefully ignore it.\n");
+			//printf("(QpangConnection::onWriteFinish) Corresponding end_of_file error message: %s.\n", errorMessage.c_str());
+		}
+		else if (ec == boost::asio::error::timed_out)
+		{
+			printf("(QpangConnection::onWriteFinish) An error occurred for player (id = %u).\n", m_playerId);
+			printf("(QpangConnection::onWriteFinish) A time out error occurred, we gracefully ignore it.\n");
+			printf("(QpangConnection::onWriteFinish) Corresponding time_out error message: %s.\n", errorMessage.c_str());
+		}
+		else if (errorMessage == "The semaphore timeout period has expired")
+		{
+			printf("(QpangConnection::onWriteFinish) An error occurred for player (id = %u).\n", m_playerId);
+			printf("(QpangConnection::onWriteFinish) Received a semaphore timeout period, we gracefully ignore it.\n");
+		}
+		else
+		{
+			printf("(QpangConnection::onWriteFinish) An error occurred for player (id = %u).\n", m_playerId);
+			printf("(QpangConnection::onWriteFinish) Received an unknown error, we should close the connection.\n");
+			printf("(QpangConnection::onWriteFinish) Corresponding unknown error message: %s.\n", errorMessage.c_str());
+
+			close();
+		}
 	}
 }

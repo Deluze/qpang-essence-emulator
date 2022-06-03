@@ -42,6 +42,7 @@ void SquarePacketHandler::handle(QpangConnection::Ptr conn, QpangPacket packet)
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "[PacketHandler::handle] An exception occurred handling ID: " << packet.getPacketId() << " -- " << e.what() << std::endl;
+		printf("(SquarePacketHandler::handle) An exception occurred whilst attempting to handle square packet id %u.\n", packet.getPacketId());
+		printf("(SquarePacketHandler::handle) Corresponding exception: %s.\n", e.what());
 	}
 }

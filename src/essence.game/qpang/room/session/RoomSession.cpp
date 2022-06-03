@@ -80,7 +80,7 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 {
 	auto player = std::make_shared<RoomSessionPlayer>(conn, shared_from_this(), team);
 
-	printf("(RoomSession::addPlayer) Adding player %u to roomsession for room %u.\n", player->getPlayer()->getId(), m_room->getId());
+	printf("(RoomSession::addPlayer) Player %u has joined the roomsession in room #%u.\n", player->getPlayer()->getId(), m_room->getId());
 
 	if (const auto roomPlayer = conn->getPlayer()->getRoomPlayer(); roomPlayer != nullptr)
 		roomPlayer->setRoomSessionPlayer(player);
@@ -138,7 +138,7 @@ void RoomSession::addPlayer(GameConnection* conn, uint8_t team)
 
 bool RoomSession::removePlayer(uint32_t playerId)
 {
-	printf("(RoomSession::removePlayer) Removing player %u from roomsession for room %u.\n", playerId, m_room->getId());
+	printf("(RoomSession::removePlayer) Player %u has left the roomsession for room #%u.\n", playerId, m_room->getId());
 
 	m_playerMx.lock();
 

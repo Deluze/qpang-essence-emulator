@@ -93,7 +93,7 @@ void Game::removeClient(Player::Ptr player)
 {
 	assert(player != nullptr);
 
-	printf("(Game::removeClient) Removing client %u.\n", player->getId());
+	printf("(Game::removeClient) Player %u has left the game.\n", player->getId());
 
 	m_playerMx.lock();
 	m_players.erase(player->getId());
@@ -108,7 +108,7 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 	auto player = std::make_shared<Player>(playerId);
 
 	player->setLobbyConn(conn);
-	conn->setPlayer(player);
+	conn->setPlayer(player, playerId);
 
 	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
 
@@ -117,8 +117,6 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 
 	if (playerFound)
 	{
-		printf("(Game::createPlayer) Closing connection for player %u due to a duplicate account login.\n", playerId);
-
 		it->second->send(SendAccountDuplicateLogin());
 		it->second->close();
 	}
@@ -130,7 +128,7 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 	m_players[playerId] = player;
 	m_playersByNickname[StringConverter::ToLowerCase(player->getName())] = player;
 
-	printf("(Game::createPlayer) Creating player %u.\n", playerId);
+	printf("(Game::createPlayer) Player %u has joined the game.\n", playerId);
 }
 
 Player::Ptr Game::getPlayer(uint32_t playerId)
@@ -290,20 +288,16 @@ DatabaseDispatcher* Game::getDatabaseDispatcher()
 
 void Game::onLobbyConnectionClosed(QpangConnection::Ptr conn)
 {
-	printf("(Game::onLobbyConnectionClosed) Closing lobbyServer connection for player %u.\n", conn->getPlayer()->getId());
-
 	m_lobbyServer->removeConnection(conn);
 
 	if (auto player = conn->getPlayer(); player != nullptr)
 	{
-		printf("(Game::onLobbyConnectionClosed) Closing squareServer connection for player %u.\n", conn->getPlayer()->getId());
-
 		m_squareServer->removeConnection(conn);
 
 		if (player->isClosed())
+		{
 			return;
-
-		printf("(Game::onLobbyConnectionClosed) Closing connection for player %u.\n", conn->getPlayer()->getId());
+		}
 
 		player->close();
 
@@ -321,8 +315,6 @@ void Game::onSquareConnectionClosed(QpangConnection::Ptr conn)
 {
 	if (auto player = conn->getPlayer(); player != nullptr)
 	{
-		printf("(Game::onSquareConnectionClosed) onSquareConnectionClosed called for player %u.\n", player->getId());
-
 		auto playerId = player->getId();
 
 		auto tradeManager = Game::instance()->getTradeManager();
@@ -330,8 +322,6 @@ void Game::onSquareConnectionClosed(QpangConnection::Ptr conn)
 
 		if (player->isClosed())
 			return;
-
-		printf("(Game::onSquareConnectionClosed) Closing connection for player %u.\n", conn->getPlayer()->getId());
 
 		player->close();
 

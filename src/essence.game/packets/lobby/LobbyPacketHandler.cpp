@@ -64,9 +64,11 @@ LobbyPacketHandler::LobbyPacketHandler() : PacketHandler()
 	add(649, new HandleUpdateSkillSetRequest());
 	add(652, new HandleDeleteInventoryCardRequest());
 	add(655, new HandleOpenInventoryCardRequest());
-	add(667, new HandleValidateNickNameRequest());
+	// TODO: Re-enable packet when we going to use this feature.
+	//add(667, new HandleValidateNickNameRequest());
 	// 670 - Choose nickname and characters, create account.
-	add(670, new HandleAccountRegistrationRequest());
+	// TODO: Re-enable packet when we going to use this feature.
+	//add(670, new HandleAccountRegistrationRequest());
 	// 767 - Validate/check friend referral.
 	add(676, new HandleReferralRegistrationRequest());
 	add(679, new HandleChangePlayerCharacterRequest());
