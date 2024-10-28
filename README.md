@@ -72,9 +72,9 @@ mkdir build
 cd build
 
 # if < VS 2019
-cmake -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_toolchain_file> ../ 
+cmake -DCMAKE_TOOLCHAIN_FILE="<path_to_vcpkg_toolchain_file>" ../ 
 # if > VS 2019
-cmake  -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_toolchain_file> ../ -A Win32
+cmake -DCMAKE_TOOLCHAIN_FILE="<path_to_vcpkg_toolchain_file>" ../ -A Win32
 ```
 
 If the CMake generation failed, please clear the build directory to prevent caching.
