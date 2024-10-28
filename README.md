@@ -65,7 +65,6 @@ Assuming you have all the prerequisities listed above.
 git clone https://github.com/Deluze/qpang-essence-emulator
 cd qpang-essence-emulator
 
-vcpkg integrate install
 vcpkg install spdlog
 vcpkg install boost
 
@@ -73,9 +72,9 @@ mkdir build
 cd build
 
 # if < VS 2019
-cmake ../
+cmake -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_toolchain_file> ../ 
 # if > VS 2019
-cmake ../ -A Win32
+cmake  -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_toolchain_file> ../ -A Win32
 ```
 
 If the CMake generation failed, please clear the build directory to prevent caching.
