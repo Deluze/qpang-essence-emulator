@@ -54,7 +54,7 @@ std::string ConfigManager::getSetting(std::string key)
 
 	if (it == m_settings.end())
 	{
-		std::cout << "Config key " << key << " does not exist.\n";
+		std::cout << "Config key " << key << " does not exist\n";
 
 		return "";
 	}
