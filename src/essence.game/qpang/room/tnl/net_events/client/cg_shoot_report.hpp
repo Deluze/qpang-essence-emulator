@@ -28,6 +28,16 @@ public:
 		bstream->read(&unk_06);
 		bstream->read(&unk_07);
 		bstream->read(&unk_08);
+
+		// Does not trigger?
+		//std::cout << "CGShootReport::unpack >> unk_01: " << &unk_01 << std::endl;
+		//std::cout << "CGShootReport::unpack >> unk_02: " << &unk_02 << std::endl;
+		//std::cout << "CGShootReport::unpack >> unk_03: " << &unk_03 << std::endl;
+		//std::cout << "CGShootReport::unpack >> unk_04: " << &unk_04 << std::endl;
+		//std::cout << "CGShootReport::unpack >> unk_05: " << &unk_05 << std::endl;
+		//std::cout << "CGShootReport::unpack >> unk_06: " << &unk_06 << std::endl;
+		//std::cout << "CGShootReport::unpack >> unk_07: " << &unk_07 << std::endl;
+		//std::cout << "CGShootReport::unpack >> unk_08: " << &unk_08 << std::endl;
 	};
 	void process(EventConnection* ps) 
 	{

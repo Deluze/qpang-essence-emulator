@@ -30,6 +30,12 @@ public:
 			return;
 		}
 
+		if (player->getRank() == 4 && target->getRank() == 3) {
+			player->broadcast(u"You are not permitted to mute a game master.");
+
+			return;
+		}
+
 		if (target->isMuted())
 		{
 			player->broadcast(u"This player is already muted");
@@ -38,6 +44,6 @@ public:
 
 		target->mute();
 
-		player->broadcast(u"This player is now muted");
+		player->broadcast(u"This player has been muted indefinetly.");
 	}
 };

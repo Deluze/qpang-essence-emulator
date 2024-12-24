@@ -53,23 +53,33 @@ public:
 	{
 		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 		{
-			if (roomPlayer->isSpectating())
+			if (roomPlayer->isSpectating()) 
+			{
 				return;
+			}
 
 			if (auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
 			{
 				auto* weaponManager = session->getWeaponManager();
+
 				if (session->isDead() || !weaponManager->canShoot())
+				{
 					return;
+				}
 
 				if (session->isInvincible())
+				{
 					session->removeInvincibility();
+				}
 				
-				auto playerId = player->getId();
+				const auto playerId = player->getId();
+
 				weaponManager->shoot(entityId);
 
-				if (itemId != 1095434246) // !octo
+				// !octo
+				if (itemId != 1095434246) {
 					session->getEntityManager()->shoot(entityId);
+				}
 				
 				session->getRoomSession()->relayPlayingExcept<GCShoot>(playerId, playerId, itemId, srcX, srcY, srcZ, dirX, dirY, dirZ, entityId, false);
 			}

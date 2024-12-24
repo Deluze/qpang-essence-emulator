@@ -43,12 +43,24 @@ public:
 					
 					auto players = roomSession->getPlayingPlayers();
 
-					std::sort(players.begin(), players.end(),
-						[](RoomSessionPlayer::Ptr &lhs, RoomSessionPlayer::Ptr& rhs)
-						{
-							return lhs->getScore() > rhs->getScore();
-						}
-					);
+					if (roomSession->getGameMode()->isPublicEnemyMode())
+					{
+						std::sort(players.begin(), players.end(),
+							[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+							{
+								return lhs->getTagPoints() > rhs->getTagPoints();
+							}
+						);
+					}
+					else
+					{
+						std::sort(players.begin(), players.end(),
+							[](RoomSessionPlayer::Ptr& lhs, RoomSessionPlayer::Ptr& rhs)
+							{
+								return lhs->getScore() > rhs->getScore();
+							}
+						);
+					}
 
 					session->post(new GCScore(players, roomSession, 1));
 				}

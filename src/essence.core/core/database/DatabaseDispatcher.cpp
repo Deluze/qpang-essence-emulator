@@ -17,13 +17,16 @@ void DatabaseDispatcher::run()
 
 	m_isRunning = true;
 
+	auto now = std::chrono::system_clock::now();
+	auto nextQueryTime = now + std::chrono::hours(1);
+
 	while (m_isRunning)
 	{
 		m_dbMx.lock();
 		const auto queries = m_queries;
 		m_queries.clear();
 		m_dbMx.unlock();
-		
+
 		for (const auto& [query, binds] : queries)
 		{
 			try
@@ -33,13 +36,18 @@ void DatabaseDispatcher::run()
 				uint8_t index = 1;
 				for (const auto& bind : binds)
 				{
-					if (bind.nullable)
-						if (bind.val == 0)
-							stmt->setNull(index, 0);
+					if (!bind.isString) {
+						if (bind.nullable)
+							if (bind.intVal == 0)
+								stmt->setNull(index, 0);
+							else
+								stmt->setBigInt(index, std::to_string(bind.intVal).c_str());
 						else
-							stmt->setBigInt(index, std::to_string(bind.val).c_str());
-					else
-						stmt->setBigInt(index, std::to_string(bind.val).c_str());
+							stmt->setBigInt(index, std::to_string(bind.intVal).c_str());
+					}
+					else {
+						stmt->setString(index, std::string(bind.stringVal.begin(), bind.stringVal.end()));
+					}
 
 					index++;
 				}
@@ -49,8 +57,20 @@ void DatabaseDispatcher::run()
 			}
 			catch (const std::exception& e)
 			{
-				std::cout << "DatabaseDispatcher::run " << e.what() << '\n';
+				std::cout << e.what() << '\n';
 			}
+		}
+
+		now = std::chrono::system_clock::now();
+
+		if (nextQueryTime < now) {
+			const auto statement = con->prepareStatement("SELECT * FROM weapons LIMIT 0;");
+
+			statement->execute();
+
+			delete statement;
+
+			nextQueryTime = now + std::chrono::hours(1);
 		}
 	}
 }
@@ -65,9 +85,9 @@ void DatabaseDispatcher::dispatch(const std::string& query, const std::vector<Bi
 void DatabaseDispatcher::executeAll()
 {
 	m_dbMx.lock();
-	
-	std::cout << "DatabaseDispatcher::executeAll started... ";
-	
+
+	std::cout << "Database dispatcher has started.";
+
 	for (const auto& [query, binds] : m_queries)
 	{
 		try
@@ -77,14 +97,18 @@ void DatabaseDispatcher::executeAll()
 			uint8_t index = 1;
 			for (const auto& bind : binds)
 			{
-				if (bind.nullable)
-					if (bind.val == 0)
-						stmt->setNull(index, 0);
+				if (!bind.isString) {
+					if (bind.nullable)
+						if (bind.intVal == 0)
+							stmt->setNull(index, 0);
+						else
+							stmt->setBigInt(index, std::to_string(bind.intVal).c_str());
 					else
-						stmt->setBigInt(index, std::to_string(bind.val).c_str());
-				else
-					stmt->setBigInt(index, std::to_string(bind.val).c_str());
-
+						stmt->setBigInt(index, std::to_string(bind.intVal).c_str());
+				}
+				else {
+					stmt->setString(index, std::string(bind.stringVal.begin(), bind.stringVal.end()));
+				}
 				index++;
 			}
 
@@ -93,12 +117,12 @@ void DatabaseDispatcher::executeAll()
 		}
 		catch (const std::exception& e)
 		{
-			std::cout << "DatabaseDispatcher::run " << e.what() << '\n';
+			std::cout << "An exception occurred: " << e.what() << '\n';
 		}
 	}
 
-	std::cout << "Done!\n";
-	
+	std::cout << "Database dispatcher is done.\n";
+
 	m_queries.clear();
 
 	m_dbMx.unlock();
@@ -119,7 +143,7 @@ void DatabaseDispatcher::connect()
 	}
 	catch (const sql::SQLException& e)
 	{
-		std::cout << "Database dispatcher: " << e.what() << std::endl;
+		std::cout << "An exception occurred: " << e.what() << std::endl;
 
 		m_initialAttemptConnectCount++;
 

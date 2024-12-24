@@ -20,8 +20,14 @@ public:
 
 	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
-		const auto message = args.at(0);
+		const auto &message = args.at(0);
 
-		Game::instance()->broadcast(message);
+		if (message.empty()) {
+			player->broadcast(u"The message you are attempting to broadcast is empty.");
+
+			return;
+		}
+
+		Game::instance()->broadcast(u"Announcement: " + message);
 	}
 };

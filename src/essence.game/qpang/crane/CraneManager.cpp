@@ -43,22 +43,23 @@ InventoryCard CraneManager::getRandomItem()
 	const auto item = m_items.at(rand() % m_items.size());
 
 	InventoryCard card;
+	
 	card.itemId = item.itemId;
 	card.type = item.itemType;
 	card.isGiftable = true;
 
-	const auto isUnlimited = rand() % 20 == 0;
+	//const auto isUnlimited = rand() % 20 == 0;
 
-	if (isUnlimited)
+	/*if (isUnlimited)
 	{
 		card.periodType = 254;
 		card.period = 1;
 	}
 	else
-	{
+	{*/
 		card.periodType = 3;
 		card.period = (rand() % (item.period / 2)) + item.period;
-	}
+	//}
 
 	return card;
 }

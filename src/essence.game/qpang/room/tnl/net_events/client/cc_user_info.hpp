@@ -7,51 +7,82 @@ class CCUserInfo : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	CCUserInfo() : GameNetEvent{ CC_USERINFO, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer } {};
+	CCUserInfo() : GameNetEvent{ CC_USERINFO, GuaranteedOrdered, DirAny } {}
 
-	U32 unk_01 = 0;
-	U32 unk_02;
-	U16 unk_03;
-	U8 unk_04;
-	U16 unk_05;
-	U8 unk_06;
-	U32 unk_07;
-	U32 unk_08;
-	U32 unk_09;
-	U32 unk_10;
-	U32 unk_11;
-	U32 unk_12;
-	U32 unk_13;
-	U32 unk_14;
-	U8 unk_15;
-	U32 unk_16;
-	U8 unk_17;
+	CCUserInfo(const RoomSessionPlayer::Ptr& roomSessionPlayer) : GameNetEvent{ CC_USERINFO, GuaranteedOrdered, DirAny }
+	{
+		const auto player = roomSessionPlayer->getPlayer();
 
-	void pack(EventConnection* conn, BitStream* bstream) {};
+		const auto equippedSkillCards = player->getEquipmentManager()->getEquippedSkillCards();
+		const auto equippedWeapons = roomSessionPlayer->getWeaponManager()->getWeaponIds();
+
+		this->cmd = 3;
+
+		this->playerId = player->getId();
+		this->dataPlayerId = this->playerId;
+
+		this->skillCard1 = equippedSkillCards[0].itemId;
+		this->skillCard2 = equippedSkillCards[1].itemId;
+		this->skillCard3 = equippedSkillCards[2].itemId;
+
+		const auto activeSkillCard = roomSessionPlayer->getSkillManager()->getActiveSkill();
+		const auto activeSkillCardItemId = (activeSkillCard == nullptr) ? 0 : activeSkillCard->getItemId();
+
+		this->skillCard4 = activeSkillCardItemId;
+
+		this->meleeWeapon = equippedWeapons[3];
+		this->gunWeapon = equippedWeapons[0];
+		this->launcherWeapon = equippedWeapons[1];
+		this->throwingWeapon = equippedWeapons[2];
+
+		this->playerHealth = roomSessionPlayer->getHealth();
+	}
+
+	U32 cmd = 0; // 1 = unk, 2 = unk, 3 = sets data
+	U32 playerId = 0;
+	U16 unk_03 = 0;
+	U8 unk_04 = 0; // selects melee as weapon?
+	U16 playerHealth = 0; // hp decrease?
+	U8 unk_06 = 0; // sets a numberbox
+	U32 skillCard1 = 0;
+	U32 skillCard2 = 0;
+	U32 skillCard3 = 0;
+	U32 skillCard4 = 0;
+	U32 meleeWeapon = 0;
+	U32 gunWeapon = 0;
+	U32 launcherWeapon = 0;
+	U32 throwingWeapon = 0;
+	U8 unk_15 = 0; // something with essence
+	U32 dataPlayerId = 0;
+	U8 unk_17 = 0; // 1 = crash
+
+	void pack(EventConnection* conn, BitStream* bstream)
+	{
+		bstream->write(cmd);
+		bstream->write(playerId);
+		bstream->write(unk_03);
+		bstream->write(unk_04);
+		bstream->write(playerHealth);
+		bstream->write(unk_06);
+		bstream->write(skillCard1);
+		bstream->write(skillCard2);
+		bstream->write(skillCard3);
+		bstream->write(skillCard4);
+		bstream->write(meleeWeapon);
+		bstream->write(gunWeapon);
+		bstream->write(launcherWeapon);
+		bstream->write(throwingWeapon);
+		bstream->write(unk_15);
+		bstream->write(dataPlayerId);
+		bstream->write(unk_17);
+	}
+
 	void unpack(EventConnection* conn, BitStream* bstream)
 	{
-		bstream->read(&unk_01);
-		bstream->read(&unk_02);
-		bstream->read(&unk_03);
-		bstream->read(&unk_04);
-		bstream->read(&unk_05);
-		bstream->read(&unk_06);
-		bstream->read(&unk_07);
-		bstream->read(&unk_08);
-		bstream->read(&unk_09);
-		bstream->read(&unk_10);
-		bstream->read(&unk_11);
-		bstream->read(&unk_12);
-		bstream->read(&unk_13);
-		bstream->read(&unk_14);
-		bstream->read(&unk_15);
-		bstream->read(&unk_16);
-		bstream->read(&unk_17);
-	};
+	}
 
 	void process(EventConnection* conn)
 	{
-
 	}
 
 	TNL_DECLARE_CLASS(CCUserInfo);

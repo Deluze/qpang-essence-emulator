@@ -4,22 +4,16 @@
 #include <iostream>
 
 #include "GameNetEvent.h"
-
 #include "core/Emulator.h"
 #include "core/config/ConfigManager.h"
-
-#include "qpang/room/tnl/net_events/GameNetEvent.h"
 #include "qpang/room/tnl/GameNetInterface.h"
-
-#include "qpang/room/Room.h"
-#include "qpang/room/RoomPlayer.h"
 
 void RoomServer::initialize()
 {
-	m_lastDisposal = time(NULL);
+	m_lastDisposal = time(nullptr);
 
-	auto port = static_cast<uint16_t>(CONFIG_MANAGER->getInt("GAME_PORT"));
-	TNL::Address a(TransportProtocol::IPProtocol, TNL::Address::NamedAddress::Any, port);
+	const auto port = static_cast<uint16_t>(CONFIG_MANAGER->getInt("GAME_PORT"));
+	Address a(IPProtocol, Address::NamedAddress::Any, port);
 
 	try
 	{
@@ -27,8 +21,7 @@ void RoomServer::initialize()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "Game::RunServer: exception: " << e.what() << std::endl;
-		return;
+		std::cout << "[RoomServer::initialize] An exception occurred: " << e.what() << std::endl;
 	}
 }
 
@@ -44,63 +37,73 @@ void RoomServer::run()
 		{
 			m_netInterface->processConnections();
 			m_netInterface->checkIncomingPackets();
+
 			tick();
 		}
 		catch (const std::exception& e)
 		{
-			std::cout << "RoomServer::run " << e.what() << "\n";
+			std::cout << e.what() << "\n";
 		}
 		catch (...)
 		{
-			std::cout << "RoomServer::run unknown exception\n";
+			std::cout << "Unknown exception.\n";
 		}
-	
+
 		m_connMx.unlock();
 	}
 }
 
 void RoomServer::tick()
 {
-	const auto currTime = time(NULL);
-	
+	const auto currTime = time(nullptr);
+
 	if (m_lastTick < currTime)
 	{
 		m_lastTick = currTime;
+
 		Game::instance()->getRoomManager()->tick();
 	}
 
 	if (m_connsToDispose.empty())
+	{
 		return;
+	}
 
 	if (m_lastDisposal <= currTime - 1)
 	{
 		m_lastDisposal = currTime;
-		
+
 		m_connMx.lock();
-		
+
 		for (const auto playerId : m_connsToDispose)
 		{
 			const auto it = m_connections.find(playerId);
 
 			if (it == m_connections.cend())
+			{
 				continue;
-			
+			}
+
 			auto conn = it->second;
-			
+
 			if (conn != NULL)
 			{
 				if (const auto roomPlayer = conn->getPlayer()->getRoomPlayer(); roomPlayer != nullptr)
+				{
 					roomPlayer->getRoom()->removePlayer(playerId);
+				}
 
 				if (conn->getConnectionState() == NetConnection::Connected)
+				{
 					conn->disconnect("disconnected by server");
+				}
 
 				conn->decRef();
 			}
 
 			m_connections.erase(playerId);
 		}
-		
+
 		m_connsToDispose.clear();
 		m_connMx.unlock();
 	}
@@ -111,14 +114,16 @@ void RoomServer::handleEvent(GameNetEvent* netEvent)
 	processEvent(netEvent);
 }
 
-bool RoomServer::createConnection(uint32_t playerId, GameConnection* connection)
+bool RoomServer::createConnection(const uint32_t playerId, GameConnection* connection)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_connMx);
+	std::lock_guard lg(m_connMx);
 
-	auto player = Game::instance()->getOnlinePlayer(playerId);
+	const auto player = Game::instance()->getOnlinePlayer(playerId);
 
 	if (player == nullptr)
+	{
 		return false;
+	}
 
 	connection->incRef();
 	connection->setPlayer(player);
@@ -130,17 +135,20 @@ bool RoomServer::createConnection(uint32_t playerId, GameConnection* connection)
 
 void RoomServer::dropConnection(uint32_t playerId)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_connMx);
+	std::lock_guard lg(m_connMx);
 
 	const auto it = m_connections.find(playerId);
 
 	if (it == m_connections.cend())
+	{
 		return;
+	}
 
-	const auto alreadyGettingDisposed = std::find(m_connsToDispose.cbegin(), m_connsToDispose.cend(), playerId) != m_connsToDispose.cend();
-	
-	if (alreadyGettingDisposed)
+	// already getting disposed
+	if (std::find(m_connsToDispose.cbegin(), m_connsToDispose.cend(), playerId) != m_connsToDispose.cend())
+	{
 		return;
+	}
 
 	m_connsToDispose.push_back(playerId);
 }
@@ -150,22 +158,25 @@ void RoomServer::processEvent(GameNetEvent* netEvent)
 	netEvent->gameConnection->incRef();
 
 	try
-	{		
-		const auto isAuthEvent = netEvent->id == GameNetId::CG_AUTH;
-		const auto isAuthorized = netEvent->gameConnection->getPlayer() != nullptr;
+	{
+		const auto isAuthEvent = netEvent->id == CG_AUTH;
 
-		if (isAuthorized && !isAuthEvent)
+		if (const auto isAuthorized = netEvent->gameConnection->getPlayer() != nullptr; isAuthorized && !isAuthEvent)
+		{
 			netEvent->handle(netEvent->gameConnection, netEvent->gameConnection->getPlayer());
+		}
 		else if (!isAuthorized && isAuthEvent)
+		{
 			netEvent->handle(netEvent->gameConnection, netEvent->gameConnection->getPlayer());
+		}
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "RoomServer::processEvent : " << netEvent->id << " - " << e.what() << std::endl;
+		std::cout << "An exception occurred: " << netEvent->id << " - " << e.what() << std::endl;
 	}
 	catch (...)
 	{
-		std::cout << "RoomServer::processEvent : " << netEvent->id << " - unknown exception \n";
+		std::cout << "An exception occurred: " << netEvent->id << " - Unknown exception.\n";
 	}
 
 	netEvent->gameConnection->decRef();

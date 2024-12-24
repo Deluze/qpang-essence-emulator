@@ -4,11 +4,20 @@
 #include <memory>
 #include <unordered_map>
 #include <mutex>
-#include <array>
+
+#include "ConfigManager.h"
+#include "RoomSessionBossFightManager.h"
+#include "RoomSessionNpcManager.h"
+#include "RoomSessionObjectManager.h"
+#include "RoomSessionPveAreaManager.h"
+#include "RoomSessionPveItemManager.h"
+#include "RoomSessionPveRoundManager.h"
+#include "RoomSessionPveWaveManager.h"
 
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 #include "qpang/room/session/game_item/GameItemManager.h"
-#include "qpang/room/session/skill/RoomSkillManager.h"
+#include "qpang/room/session/skill/RoomSessionSkillManager.h"
+#include "qpang/room/session/pathfinding/Pathfinder.h"
 
 class Room;
 class GameMode;
@@ -28,14 +37,22 @@ public:
 	RoomSessionPlayer::Ptr findEligibleVip(uint8_t team, bool noConditions);
 
 	void handlePlayerFinish(RoomSessionPlayer::Ptr player);
+	void handlePlayerPveFinish(const std::shared_ptr<RoomSessionPlayer>& roomSessionPlayer);
 
 	void tick();
 	void clear();
 
-	bool isFinished();
+	bool isFinished() const;
 	void finish();
 	bool canFinish();
 	bool isAlmostFinished();
+
+	// Note: Pve finish.
+	void finishPveGame(bool didWin = true);
+	static bool canFinishPveGame();
+
+	void setLastRespawnLocation(Spawn spawn);
+	Spawn getLastRespawnLocation() const;
 
 	void addPointsForTeam(uint8_t team, uint32_t amount = 1);
 	void addBluePoints(uint32_t amount = 1);
@@ -47,21 +64,43 @@ public:
 	void spawnPlayer(RoomSessionPlayer::Ptr player);
 	void syncPlayer(RoomSessionPlayer::Ptr player);
 
-	uint32_t getElapsedTime(); // in milliseconds
-	uint32_t getTimeLeftInSeconds();
+	uint32_t getElapsedTime() const; // in milliseconds
+	time_t getEndTime() const;
+	uint32_t getTimeLeftInSeconds() const;
 
 	void killPlayer(RoomSessionPlayer::Ptr killer, RoomSessionPlayer::Ptr target, uint32_t weaponId, bool isHeadshot);
 
 	GameMode* getGameMode();
 	GameItemManager* getItemManager();
-	RoomSkillManager* getSkillManager();
+	RoomSessionSkillManager* getSkillManager();
+
+	RoomSessionNpcManager* getNpcManager();
+	RoomSessionObjectManager* getObjectManager();
+	RoomSessionPveItemManager* getPveItemManager();
+	RoomSessionPveRoundManager* getPveRoundManager();
+	RoomSessionPveAreaManager* getPveAreaManager();
+	RoomSessionPveWaveManager* getPveWaveManager();
+	RoomSessionBossFightManager* getBossFightManager();
+
+	Pathfinder* getAboveGroundPathfinder();
+	Pathfinder* getUnderGroundPathfinder();
+
 	std::shared_ptr<Room> getRoom();
 
 	std::vector<RoomSessionPlayer::Ptr> getPlayers();
 	std::vector<RoomSessionPlayer::Ptr> getPlayingPlayers();
+	std::vector<RoomSessionPlayer::Ptr> getAlivePlayingPlayersExcept(const uint32_t playerId, const uint8_t team);
+	std::vector<RoomSessionPlayer::Ptr> RoomSession::getEligiblePlayersToBeSelectedAsTag();
 	std::vector<RoomSessionPlayer::Ptr> getPlayersForTeam(uint8_t team);
 	uint32_t getPointsForTeam(uint8_t team);
 	uint32_t getTopScore();
+
+	void resetTime();
+	void stopTime();
+
+	bool areAllPlayersPermanentlyDead();
+
+#pragma region Essence
 
 	void resetEssence();
 	void setEssenceHolder(RoomSessionPlayer::Ptr player);
@@ -71,6 +110,10 @@ public:
 	bool isEssenceDropped();
 	bool isEssenceReset();
 	uint32_t getElapsedEssenceDropTime();
+
+#pragma endregion
+
+#pragma region Vip
 
 	void findNextBlueVip();
 	bool isNextBlueVipEligible();
@@ -85,6 +128,38 @@ public:
 	RoomSessionPlayer::Ptr getYellowVip();
 
 	bool isVip(RoomSessionPlayer::Ptr player);
+
+#pragma endregion
+
+#pragma region PublicEnemy
+
+	bool attemptToFindNextTag();
+
+	void resetCurrentlySelectedTag();
+	void selectNextTag(uint32_t playerId);
+
+	void broadcastNextTagHasBeenSelected();
+
+	bool isTagSelected();
+	uint32_t getCurrentlySelectedTag();
+
+	uint32_t getTagCountdown();
+
+	bool hasTagCountdownEnded();
+	void initiateTagCountdown(uint32_t countdownTime = 5000);
+	void decreaseTagCountdown(uint32_t countdownTime = 1000);
+
+	uint32_t getInitialWaitTime();
+
+	bool hasInitialWaitTimeElapsed();
+	void decreaseInitialWaitTime(uint32_t time = 1000);
+	void clearInitialWaitTime();
+
+	void initiateSearchForNextTag();
+	bool isSearchingForNextTag();
+	void stopSearchingForNextTag();
+
+#pragma endregion
 
 	template<typename T, typename... Args>
 	void relay(Args... args)
@@ -160,7 +235,18 @@ private:
 
 	GameMode* m_gameMode;
 	GameItemManager m_itemManager;
-	RoomSkillManager m_skillManager;
+	RoomSessionSkillManager m_skillManager;
+
+	RoomSessionNpcManager m_npcManager;
+	RoomSessionObjectManager m_objectManager;
+	RoomSessionPveItemManager m_pveItemManager;
+	RoomSessionPveRoundManager m_pveRoundManager;
+	RoomSessionPveAreaManager m_pveAreaManager;
+	RoomSessionPveWaveManager m_pveWaveManager;
+	RoomSessionBossFightManager m_roomSessionBossFightManager;
+
+	Pathfinder m_aboveGroundPathfinder;
+	Pathfinder m_underGroundPathfinder;
 
 	std::recursive_mutex m_playerMx;
 	std::unordered_map<uint32_t, RoomSessionPlayer::Ptr> m_players;
@@ -181,4 +267,15 @@ private:
 	RoomSessionPlayer::Ptr m_yellowVip;
 	RoomSessionPlayer::Ptr m_nextYellowVip;
 	time_t m_yellowVipSetTime;
+
+	uint32_t m_currentlySelectedTag;
+
+	bool m_isSearchingForNextTag;
+
+	uint32_t m_tagCountdown;
+	uint32_t m_initialWaitTime;
+
+	Spawn m_lastRespawnLocation{};
+
+	std::vector<uint32_t> m_previouslySelectedTagPlayers = {};
 };

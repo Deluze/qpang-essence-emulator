@@ -49,7 +49,7 @@ public:
 	void update();
 	void apply(std::shared_ptr<RoomSessionPlayer> session);
 
-	void ban(time_t until);
+	void ban(time_t until, uint32_t bannedByUserId);
 
 	InventoryManager* getInventoryManager();
 	EquipmentManager* getEquipmentManager();
@@ -61,6 +61,7 @@ public:
 	uint32_t getId();
 	uint32_t getUserId();
 	std::u16string getName();
+	void setName(std::u16string name);
 	uint8_t getRank();
 
 	uint32_t getExperience();
@@ -95,6 +96,8 @@ public:
 	void unmute();
 	bool isMuted();
 
+	bool isPatreon();
+
 	bool exists();
 
 	std::shared_ptr<SquarePlayer> getSquarePlayer();
@@ -121,6 +124,10 @@ private:
 	uint32_t m_playTime = 0;
 	time_t m_loginTime = 0;
 	uint32_t m_slackerPoints = 0;
+
+	// new
+	bool m_isPatreon = false;
+
 	bool m_isMuted = false;
 	bool m_exists = true;
 	bool m_isClosed = false;

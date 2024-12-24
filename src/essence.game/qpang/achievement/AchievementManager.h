@@ -52,7 +52,6 @@ enum class AchievementID : uint32_t
 	HEAD_COLLECTOR = 131,
 	BIG_HEAD = 141,
 
-
 	MANAGER = 161,
 	HEAD_CHIEF = 162,
 	PRESIDENT = 163,

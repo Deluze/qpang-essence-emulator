@@ -15,6 +15,8 @@ public:
 	enum CMD : U32
 	{
 		SWAP = 0,
+		EQUIP_MACHINE_GUN = 1,
+		UNEQUIP_MACHINE_GUN = 2,
 		RELOAD = 3,
 		ENABLE_SHOOTING = 5,
 	};
@@ -27,7 +29,7 @@ public:
 		bstream->read(&playerId);
 		bstream->read(&cmd);
 		bstream->read(&itemId);
-		bstream->read(&cardId); // can be omitted
+		bstream->read(&seqId);
 	};
 
 	void handle(GameConnection* conn, Player::Ptr player)
@@ -41,7 +43,9 @@ public:
 					if (!session->getWeaponManager()->hasWeapon(itemId))
 						return;
 
-					session->getWeaponManager()->switchWeapon(itemId);
+					auto isReloadGlitchEnabled = session->getRoomSession()->getRoom()->isReloadGlitchEnabled();
+
+					session->getWeaponManager()->switchWeapon(itemId, isReloadGlitchEnabled);
 				}
 				else if (cmd == CMD::RELOAD)
 				{
@@ -51,7 +55,23 @@ public:
 					if (!session->getWeaponManager()->canReload())
 						return;
 
-					session->getWeaponManager()->reload(cardId);
+					session->getWeaponManager()->reload(seqId);
+				}
+				else if (cmd == CMD::UNEQUIP_MACHINE_GUN)
+				{
+					// Check for the ground zero map.
+					if (roomPlayer->getRoom()->getMap() == 8)
+					{
+						session->getWeaponManager()->unequipMachineGun();
+					}
+				}
+				else if (cmd == CMD::EQUIP_MACHINE_GUN)
+				{
+					// Check for the ground zero map.
+					if (roomPlayer->getRoom()->getMap() == 8)
+					{
+						session->getWeaponManager()->equipMachineGun(seqId);
+					}
 				}
 			}
 		}
@@ -65,7 +85,7 @@ public:
 	U32 playerId;
 	U32 cmd;
 	U32 itemId;
-	U64 cardId;
+	U64 seqId;
 
 	TNL_DECLARE_CLASS(CGWeapon);
 };

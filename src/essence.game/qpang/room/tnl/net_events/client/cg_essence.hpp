@@ -14,8 +14,9 @@ class CGEssence : public GameNetEvent
 public:
 	CGEssence() : GameNetEvent{ CG_ESSENCE, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirClientToServer } {};
 
-	U32 unk_01;
-	U32 unk_02;
+	U32 cmd;
+	U32 playerId;
+	// The rest of the unkowns are perhaps related to position of the essence?
 	U32 unk_03;
 	U32 unk_04;
 	U32 unk_05;
@@ -27,8 +28,8 @@ public:
 	void pack(EventConnection* conn, BitStream* bstream) {};
 	void unpack(EventConnection* conn, BitStream* bstream) 
 	{
-		bstream->read(&unk_01);
-		bstream->read(&unk_02);
+		bstream->read(&cmd);
+		bstream->read(&playerId);
 		bstream->read(&unk_03);
 		bstream->read(&unk_04);
 		bstream->read(&unk_05);
@@ -42,7 +43,7 @@ public:
 	{
 		if (auto roomPlayer = player->getRoomPlayer(); roomPlayer != nullptr)
 			if (auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
-				session->getRoomSession()->relayPlaying<GCEssence>(unk_01, unk_02, unk_03, unk_04, unk_05, unk_06, unk_07, unk_08, unk_09);
+				session->getRoomSession()->relayPlaying<GCEssence>(cmd, playerId, unk_03, unk_04, unk_05, unk_06, unk_07, unk_08, unk_09);
 	}
 
 	void process(EventConnection* ps) 

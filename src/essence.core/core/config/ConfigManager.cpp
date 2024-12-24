@@ -17,12 +17,12 @@ bool ConfigManager::initialize()
 		output << CONFIG_TEMPLATE_STRING;
 		output.close();
 
-		std::cout << "Config file generated. Please fill in the server settings and restart the server. \n";
+		std::cout << "Config file generated. Please fill in the server settings and restart the server.\n";
 
 		return false;
 	}
 
-	std::cout << "Parsing configuration file \n";
+	std::cout << "Parsing configuration file.\n";
 
 	std::string line;
 
@@ -37,6 +37,10 @@ bool ConfigManager::initialize()
 		std::string value = line.substr(off + 1, line.size() - key.size() + 1);
 
 		set(key, value);
+
+		if (key == "GAME_REVISION") {
+			std::cout << "Game revision: " << value << "\n";
+		}
 	}
 
 	file.close();

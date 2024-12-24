@@ -9,10 +9,10 @@
 #include "qpang/player/Player.h"
 #include "qpang/room/session/player/RoomSessionPlayer.h"
 
-#include "packets/lobby/outgoing/equipment/SetWeapons.h"
-#include "packets/lobby/outgoing/equipment/SetArmor.h"
+#include "packets/lobby/outgoing/equipment/SendUpdateWeapons.h"
+#include "packets/lobby/outgoing/equipment/SendUpdateArmor.h"
 
-#include "packets/lobby/outgoing/inventory/Inventory.h"
+#include "packets/lobby/outgoing/inventory/SendInventoryCards.h"
 
 void EquipmentManager::initialize(std::shared_ptr<Player> player, uint16_t playerId)
 {
@@ -31,11 +31,11 @@ void EquipmentManager::initialize(std::shared_ptr<Player> player, uint16_t playe
 	stmt->bindInteger(playerId);
 	StatementResult::Ptr res = stmt->fetch();
 
-	std::lock_guard<std::mutex> l(m_mx);
-	
+	std::lock_guard l(m_mx);
+
 	while (res->hasNext())
 	{
-		std::array<uint64_t, 13> equips;
+		std::array<uint64_t, 13> equips{};
 
 		uint16_t characterId = res->getShort("character_id");
 		equips[0] = res->getInt("head");
@@ -67,20 +67,20 @@ std::vector<uint16_t> EquipmentManager::getUnlockedCharacters()
 
 std::array<uint64_t, 13> EquipmentManager::getEquipmentByCharacter(uint16_t characterId)
 {
-	std::lock_guard<std::mutex> l(m_mx);
-	
+	std::lock_guard l(m_mx);
+
 	const auto it = m_equips.find(characterId);
 
 	if (it == m_equips.cend())
 		return {};
-	
+
 	return it->second;
 }
 
 std::array<uint64_t, 9> EquipmentManager::getArmorByCharacter(uint16_t characterId)
 {
-	std::lock_guard<std::mutex> l(m_mx);
-	
+	std::lock_guard l(m_mx);
+
 	auto it = m_equips.find(characterId);
 
 	if (it == m_equips.cend())
@@ -135,8 +135,8 @@ std::array<uint32_t, 4> EquipmentManager::getWeaponItemIdsByCharacter(uint16_t c
 
 std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t characterId)
 {
-	std::lock_guard<std::mutex> l(m_mx);
-	
+	std::lock_guard l(m_mx);
+
 	auto it = m_equips.find(characterId);
 
 	if (it == m_equips.cend())
@@ -152,27 +152,33 @@ std::array<uint64_t, 4> EquipmentManager::getWeaponsByCharacter(uint16_t charact
 	};
 }
 
-std::array<InventoryCard, 3> EquipmentManager::getSkillCards()
+std::array<InventoryCard, 3> EquipmentManager::getEquippedSkillCards()
 {
-	std::lock_guard<std::mutex> l(m_mx);
-	
+	std::lock_guard l(m_mx);
+
+	std::array<InventoryCard, 3> skillCards;
+
 	if (const auto player = m_player.lock(); player != nullptr)
 	{
 		InventoryManager* inv = player->getInventoryManager();
 
-		return {
-			inv->get(m_skillCards[0]),
-			inv->get(m_skillCards[1]),
-			inv->get(m_skillCards[2]),
-		};
+		for (int i = 0; i < m_skillCardIds.size(); i++)
+		{
+			skillCards[i] = inv->get(m_skillCardIds[i]);
+		}
 	}
 
-	return {};
+	return skillCards;
+}
+
+std::vector<uint64_t> EquipmentManager::getEquippedSkillCardIds() const
+{
+	return m_skillCardIds;
 }
 
 void EquipmentManager::removeFunctionCard(uint64_t cardId)
 {
-	std::lock_guard<std::recursive_mutex> g(m_functionCardMx);
+	std::lock_guard g(m_functionCardMx);
 
 	m_functionCards.erase(std::remove_if(m_functionCards.begin(), m_functionCards.end(),
 		[cardId](const uint64_t& lhs)
@@ -182,10 +188,22 @@ void EquipmentManager::removeFunctionCard(uint64_t cardId)
 	), m_functionCards.end());
 }
 
+void EquipmentManager::removeSkillCard(uint64_t cardId)
+{
+	std::lock_guard g(m_skillCardMx);
+
+	m_skillCardIds.erase(std::remove_if(m_skillCardIds.begin(), m_skillCardIds.end(),
+		[cardId](const uint64_t& lhs)
+		{
+			return lhs == cardId;
+		}
+	), m_skillCardIds.end());
+}
+
 void EquipmentManager::unequipItem(uint64_t cardId)
 {
-	std::lock_guard<std::mutex> l(m_mx);
-	
+	std::lock_guard l(m_mx);
+
 	for (size_t i = 0; i < m_unlockedCharacters.size(); i++)
 	{
 		auto character = m_unlockedCharacters[i];
@@ -204,16 +222,23 @@ void EquipmentManager::unequipItem(uint64_t cardId)
 
 void EquipmentManager::addFunctionCard(uint64_t cardId)
 {
-	std::lock_guard<std::recursive_mutex> g(m_functionCardMx);
+	std::lock_guard g(m_functionCardMx);
 
 	m_functionCards.push_back(cardId);
 }
 
 void EquipmentManager::setFunctionCards(const std::vector<uint64_t>& cards)
 {
-	std::lock_guard<std::recursive_mutex> g(m_functionCardMx);
+	std::lock_guard g(m_functionCardMx);
 
 	m_functionCards = cards;
+}
+
+void EquipmentManager::setSkillCardIds(const std::vector<uint64_t>& skillCardIds)
+{
+	std::lock_guard g(m_skillCardMx);
+
+	m_skillCardIds = skillCardIds;
 }
 
 void EquipmentManager::setEquipmentForCharacter(uint16_t character, std::array<uint64_t, 13> equip)
@@ -232,13 +257,19 @@ void EquipmentManager::setWeapons(uint16_t character, const std::array<uint64_t,
 		for (const auto& weapon : weapons)
 		{
 			if (weapon == NULL)
+			{
 				continue;
+			}
 
 			if (!Game::instance()->getWeaponManager()->canEquip(inv->get(weapon).itemId, characterId))
+			{
 				return;
+			}
 
 			if (!inv->hasCard(weapon) || inv->isExpired(weapon))
+			{
 				return;
+			}
 		}
 
 		m_equips[characterId][9] = weapons[0];
@@ -246,7 +277,7 @@ void EquipmentManager::setWeapons(uint16_t character, const std::array<uint64_t,
 		m_equips[characterId][11] = weapons[2];
 		m_equips[characterId][12] = weapons[3];
 
-		player->send(SetWeapons(character, weapons));
+		player->send(SendUpdateWeapons(character, weapons));
 	}
 }
 
@@ -276,7 +307,7 @@ void EquipmentManager::setArmor(uint16_t character, const std::array<uint64_t, 9
 		m_equips[characterId][6] = armor[6];
 		m_equips[characterId][7] = armor[7];
 
-		player->send(SetArmor(character, armor));
+		player->send(SendUpdateArmor(character, armor));
 	}
 }
 
@@ -317,7 +348,7 @@ bool EquipmentManager::hasEquipped(const uint64_t cardId, const uint16_t charact
 		if (equipment == cardId)
 			return true;
 
-	for (const auto& skillCard : m_skillCards)
+	for (const auto& skillCard : m_skillCardIds)
 		if (skillCard == cardId)
 			return true;
 
@@ -363,15 +394,18 @@ uint16_t EquipmentManager::getBaseHealth()
 	{
 		switch (player->getCharacter())
 		{
-		case 850:
-		case 851:
-			return 125;
-		case 578:
-			return 150;
-		case 579:
-			return 90;
-		case 343:
-		case 333:
+		case 850: // sai
+			return 130;
+		case 851: // uru
+			return 140;
+		case 578: // kuma
+			return 200;
+		case 579: // miu miu
+			return 80;
+		case 343: // hana
+			return 100;
+		case 333: // ken
+			return 110;
 		default:
 			return 100;
 		}
@@ -380,33 +414,72 @@ uint16_t EquipmentManager::getBaseHealth()
 	return 0;
 }
 
-uint16_t EquipmentManager::getBonusHealth()
+uint16_t EquipmentManager::getBonusHealth(const std::shared_ptr<RoomSession>& roomSession)
 {
-	if (auto player = m_player.lock(); player != nullptr)
+	const auto player = m_player.lock();
+
+	const auto equip = m_equips[player->getCharacter()];
+	const auto isPveGameMode = (roomSession != nullptr && roomSession->getRoom()->getMode() == GameMode::PVE);
+
+	switch (player->getInventoryManager()->get(equip[6]).itemId)
 	{
-		auto equip = m_equips[player->getCharacter()];
-
-		switch (player->getInventoryManager()->get(equip[6]).itemId)
+	case 1429407489: // green turtle
+		if (isPveGameMode)
 		{
-		case 1429407489: // green turtle
-			return 10;
-		case 1429410048: // brown turtle
-		case 1429408256: // sidekick
-		case 1429414144: // wallie
-		case 1429414400: // german
-		case 1429430784: // TGS
-		case 1429431040: // orange
-		case 1429409024: // alpha
-		case 1429412097: // yellow helper
-			return 20;
-		case 1429415424: // novice back
-			return 30;
-		default:
-			return 0;
+			switch (roomSession->getPveRoundManager()->getCurrentRound())
+			{
+			case eRound::CHESS_CASTLE_STAGE_1:
+				return 10;
+			case eRound::CHESS_CASTLE_STAGE_2:
+				return 20;
+			case eRound::CHESS_CASTLE_STAGE_3:
+				return 30;
+			}
 		}
-	}
 
-	return 0;
+		return 10;
+	case 1429410048: // brown turtle
+	case 1429408256: // sidekick
+	case 1429414144: // wallie
+	case 1429414400: // german
+	case 1429430784: // TGS
+	case 1429431040: // orange
+	case 1429409024: // alpha
+	case 1429412097: // yellow helper
+	// Other backpacks
+	case 1429412101:
+	case 1429412102:
+	case 1429412103:
+	case 1429412104:
+	case 1429412105:
+	case 1429412106:
+	case 1429412107:
+	case 1429412108:
+	case 1429412109:
+	case 1429412098:
+	case 1429412099:
+	case 1429412100:
+	case 1429410049: // Squirtle shield
+	case 1429408257: // Frysian backpack
+		if (isPveGameMode)
+		{
+			switch (roomSession->getPveRoundManager()->getCurrentRound())
+			{
+			case eRound::CHESS_CASTLE_STAGE_1:
+				return 20;
+			case eRound::CHESS_CASTLE_STAGE_2:
+				return 40;
+			case eRound::CHESS_CASTLE_STAGE_3:
+				return 60;
+			}
+		}
+
+		return 20;
+	case 1429415424: // novice back
+		return 30;
+	default:
+		return 0;
+	}
 }
 
 bool EquipmentManager::hasFunctionCard(uint32_t functionId)
@@ -430,12 +503,25 @@ uint8_t EquipmentManager::getExtraAmmoForWeaponIndex(uint8_t index)
 
 		auto itemId = player->getInventoryManager()->get(equip[6]).itemId;
 
-		if (index == 0 && itemId == 1429409536)
+		if (index == 0 && itemId == 1429409536) // schiet ammo
 			return 1;
-		if (index == 1 && itemId == 1429409792)
+		if (index == 1 && itemId == 1429409792) // lanceer ammo
 			return 1;
-		if (index == 2 && itemId == 1429408001)
+		if (index == 2 && itemId == 1429408001) // werp ammo
 			return 1;
+	}
+
+	return 0;
+}
+
+uint32_t EquipmentManager::getEquippedBooster()
+{
+	if (const auto player = m_player.lock(); player != nullptr)
+	{
+		const auto& equip = m_equips[player->getCharacter()];
+		const auto itemId = player->getInventoryManager()->get(equip[7]).itemId;
+
+		return itemId;
 	}
 
 	return 0;
@@ -457,18 +543,22 @@ void EquipmentManager::finishRound(const std::shared_ptr<RoomSessionPlayer>& ses
 		return;
 
 	for (const auto& equipment : it->second)
+	{
 		player->getInventoryManager()->useCard(equipment, playtime);
+	}
 
 	m_functionCardMx.lock();
 
 	for (const auto& function : m_functionCards)
+	{
 		player->getInventoryManager()->useCard(function, playtime);
+	}
 
 	m_functionCardMx.unlock();
 
 	const auto cards = player->getInventoryManager()->list();
 
-	player->send(Inventory(cards));
+	player->getInventoryManager()->sendCards();
 
 	save();
 }

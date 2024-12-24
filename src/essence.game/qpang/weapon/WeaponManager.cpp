@@ -4,152 +4,87 @@
 
 void WeaponManager::initialize()
 {
-	auto stmt = DATABASE->prepare("SELECT * FROM weapons");
-	auto res = stmt->fetch();
+	const auto statement = DATABASE->prepare("SELECT * FROM weapons");
+	const auto result = statement->fetch();
 
-	if (!res->hasResults())
+	if (!result->hasResults())
+	{
 		return;
+	}
 
-	std::lock_guard<std::mutex> lg(m_weaponMx);
+	std::lock_guard lg(m_weaponMx);
 
 	m_weapons.clear();
 
-	std::cout << "Loading weapons... ";
+	std::cout << "Loading weapons.\n";
 
-	while (res->hasNext())
+	while (result->hasNext())
 	{
-		uint32_t itemId = res->getInt("item_id");
-		
-		Weapon wp{
+		const uint32_t itemId = result->getInt("item_id");
+
+		Weapon weapon{
 			itemId,
-			res->getShort("damage"),
-			res->getShort("clip_size"),
-			res->getTiny("clip_amount"),
-			res->getTiny("weight"),
-			res->getTiny("effect_id"),
-			res->getTiny("chance"),
-			res->getTiny("duration"),
-			getWeaponType(itemId),
+			result->getShort("damage"),
+			result->getShort("clip_size"),
+			result->getTiny("clip_amount"),
+			result->getTiny("weight"),
+			result->getTiny("effect_id"),
+			result->getTiny("chance"),
+			result->getTiny("duration"),
+			getWeaponType(result->getInt("type")),
 		};
 
-		m_weapons[wp.itemId] = wp;
+		m_weapons[weapon.itemId] = weapon;
 
-		res->next();
+		result->next();
 	}
 
-	std::cout << m_weapons.size() << " loaded! \n";
+	std::cout << "Loaded " << m_weapons.size() << " weapons.\n";
 }
 
-bool WeaponManager::canEquip(uint32_t weaponId, uint16_t characterId)
+bool WeaponManager::canEquip(const uint32_t weaponId, const uint16_t characterId)
 {
-	auto weapon = get(weaponId);
+	const auto weapon = get(weaponId);
 
-	auto it = m_characterPower.find(characterId);
+	const auto it = m_characterPower.find(characterId);
 
 	if (it == m_characterPower.cend())
+	{
 		return false;
+	}
 
 	return weapon.weight <= it->second;
 }
 
-Weapon WeaponManager::get(uint32_t weaponId)
+Weapon WeaponManager::get(const uint32_t weaponId)
 {
-	std::lock_guard<std::mutex> lg(m_weaponMx);
+	std::lock_guard lg(m_weaponMx);
 
-	auto it = m_weapons.find(weaponId);
+	const auto it = m_weapons.find(weaponId);
 
 	if (it == m_weapons.cend())
+	{
 		return {};
+	}
 
 	return it->second;
 }
 
-WeaponType WeaponManager::getWeaponType(uint32_t weaponId)
+// type: 0 = melee, 1 = rifle, 2 = launcher, 3 = bomb
+WeaponType WeaponManager::getWeaponType(const uint32_t weaponType)
 {
-	switch (weaponId)
+	switch (weaponType)
 	{
-	case 1095172098:
-	case 1095172100:
-	case 1095172102:
-	case 1095172103:
-	case 1095172104:
-	case 1095172105:
-	case 1095172130:
-	case 1095172131:
-	case 1095761958:
-	case 1095172147:
-	case 1095172160:
-	case 1095172097:
+	case 0:
 		return WeaponType::MELEE;
-	case 1095237632:
-	case 1095303169:
-	case 1095761921:
-	case 1095303170:
-	case 1095303171:
-	case 1095303172:
-	case 1095303173:
-	case 1095303177:
-	case 1095303179:
-	case 1095303180:
-	case 1095303181:
-	case 1095368720:
-	case 1095303185:
-	case 1095237671:
-	case 1095237672:
-	case 1095761961:
-	case 1095303231:
-	case 1095303233:
+	case 1:
 		return WeaponType::RIFLE;
-	case 1095368704:
-	case 1095368706:
-	case 1095368707:
-	case 1095368708:
-	case 1095368709:
-	case 1095368710:
-	case 1095368711:
-	case 1095368713:
-	case 1095368716:
-	case 1095368717:
-	case 1095434253:
-	case 1095368718:
-	case 1095368719:
-	case 1095368721:
-	case 1095368734:
-	case 1095368746:
-	case 1095368756:
-	case 1095368757:
-	case 1095368758:
-	case 1095368764:
-	case 1095368766:
+	case 2:
 		return WeaponType::LAUNCHER;
-	case 1095434240:
-	case 1095499776:
-	case 1095434241:
-	case 1095499777:
-	case 1095434242:
-	case 1095499778:
-	case 1095434243:
-	case 1095499779:
-	case 1095434244:
-	case 1095434246:
-	case 1095434249:
-	case 1095434252:
-	case 1095434255:
-	case 1095434256:
-	case 1095434257:
-	case 1095434258:
-	case 1095434277:
-	case 1095434285:
-	case 1095434287:
-	case 1095434290:
-	case 1095434295:
-	case 1095434296:
-	case 1095434297:
-	case 1095434299:
-	case 1095499837:
+	case 3:
+	// 999 = unknown, so we default to bomb.
+	case 999:
 	default:
 		return WeaponType::BOMB;
 	}
-
-	
 }

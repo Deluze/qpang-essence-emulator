@@ -8,6 +8,8 @@
 class PacketEvent
 {
 public:
+	virtual ~PacketEvent() = default;
+
 	virtual bool isUnauthorizedPacket()
 	{
 		return false;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "qpang/room/session/game_item/GameItem.h"
-#include "qpang/skill/Skill.h"
 
 class SkillBook : public GameItem
 {

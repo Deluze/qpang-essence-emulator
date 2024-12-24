@@ -12,13 +12,14 @@
 
 #include "Authenticator.h"
 
-#include "packets/outgoing/LoginSuccess.h"
-#include "packets/outgoing/error/InvalidVersion.h"
-#include "packets/outgoing/error/InvalidUsername.h"
+#include "packets/outgoing/SendAccountLoginSuccess.h"
+#include "packets/outgoing/error/SendInvalidGameVersion.h"
+#include "packets/outgoing/error/SendInvalidAccountUsername.h"
 
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+// TODO: Refactor this class.
 class LoginRequest : public PacketEvent
 {
 public:
@@ -37,13 +38,13 @@ public:
 
 	void invalidUsername(QpangConnection::Ptr conn)
 	{
-		conn->send(InvalidUsername());
+		conn->send(SendInvalidAccountUsername());
 		conn->close();
 	}
 
 	void invalidVersion(QpangConnection::Ptr conn)
 	{
-		conn->send(InvalidVersion());
+		conn->send(SendInvalidGameVersion());
 		conn->close();
 	}
 	
@@ -58,11 +59,13 @@ public:
 		std::string revisionStr = std::to_string(revision);
 		std::string revisionConf = CONFIG_MANAGER->getString("GAME_REVISION");
 
+#ifdef NDEBUG
 		if (revisionStr != revisionConf)
 		{
 			invalidVersion(conn);
 			return;
 		}
+#endif
 
 		const tcp::socket& socket = conn->getSocket();
 		const auto ipAddress = socket.remote_endpoint().address().to_string();
@@ -85,6 +88,7 @@ public:
 			}
 		}
 
+#ifdef NDEBUG
 		if (!Authenticator::verify(username, password))
 		{
 			const auto attempts = failInfo.first + 1;
@@ -92,7 +96,7 @@ public:
 
 			if (attempts == maxFailedLogins)
 			{
-				std::cout << "TIMED OUT " << ipAddress << " - Too many failed login attempts!\n";
+				std::cout << "Timed out " << ipAddress << " - Too many failed login attempts.\n";
 				timestamp = time(NULL);
 			}
 
@@ -101,6 +105,7 @@ public:
 			invalidUsername(conn);
 			return;
 		} // ban check happens on lobby server
+#endif
 
 		auto needsWhitelist = CONFIG_MANAGER->getString("GAME_WHITELIST") == "1";
 
@@ -167,7 +172,7 @@ public:
 		updateSessionStmt->bindString(username.c_str());
 		updateSessionStmt->execute();
 
-		conn->send(LoginSuccess(uuidArr, inet_addr(CONFIG_MANAGER->getString("HOST").c_str())));
+		conn->send(SendAccountLoginSuccess(uuidArr, inet_addr(CONFIG_MANAGER->getString("HOST").c_str())));
 	}
 private:
 	boost::uuids::random_generator m_uuidGenerator;

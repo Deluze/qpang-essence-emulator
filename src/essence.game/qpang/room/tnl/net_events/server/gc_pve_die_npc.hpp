@@ -8,16 +8,21 @@ class GCPvEDieNpc : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvEDieNpc() : GameNetEvent{ GC_PVE_DIE_NPC, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {};;
+	U32 npcUid; // 88
 
-	U32 NPCId;
-
-	void pack(EventConnection* conn, BitStream* bstream) 
+	GCPvEDieNpc() : GameNetEvent{ GC_PVE_DIE_NPC, Guaranteed, DirServerToClient } {}
+	GCPvEDieNpc(const uint32_t npcUid) : GameNetEvent{ GC_PVE_DIE_NPC, Guaranteed, DirServerToClient },
+		npcUid(npcUid)
 	{
-		bstream->write(NPCId);
-	};
-	void unpack(EventConnection* conn, BitStream* bstream) {};
-	void process(EventConnection* ps) {};
+	}
+
+	void pack(EventConnection* conn, BitStream* bstream)
+	{
+		bstream->write(npcUid);
+	}
+
+	void unpack(EventConnection* conn, BitStream* bstream) {}
+	void process(EventConnection* ps) {}
 
 	TNL_DECLARE_CLASS(GCPvEDieNpc);
 };

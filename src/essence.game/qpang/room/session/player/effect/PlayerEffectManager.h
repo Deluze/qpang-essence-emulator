@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <vector>
 #include <unordered_map>
-#include <mutex>
 #include <memory>
 
 #include "qpang/room/session/player/effect/Effect.h"

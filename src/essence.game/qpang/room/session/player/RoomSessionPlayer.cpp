@@ -1,10 +1,12 @@
 #include "RoomSessionPlayer.h"
 
+#include "cc_user_info.hpp"
 #include "ConfigManager.h"
+#include "SendUpdateSkillSet.h"
 
-#include "packets/lobby/outgoing/account/UpdateAccount.h"
+#include "packets/lobby/outgoing/account/SendAccountUpdate.h"
 
-#include "qpang/ItemID.h"
+#include "qpang/ItemId.h"
 #include "qpang/Game.h"
 
 #include "qpang/room/tnl/GameConnection.h"
@@ -16,49 +18,67 @@
 #include "qpang/room/tnl/net_events/server/gc_game_item.hpp"
 
 RoomSessionPlayer::RoomSessionPlayer(GameConnection* conn, std::shared_ptr<RoomSession> roomSession, uint8_t team) :
-	m_conn(conn),
-	m_roomSession(roomSession),
-	m_team(team),
 	m_isPlaying(false),
-	m_isInvincible(false),
 	m_isSpectating(false),
+	m_team(team),
+	m_isInvincible(false),
+	m_expRate(0),
+	m_donRate(0),
+	m_exp(0),
+	m_don(0),
+	m_highestStreak(0),
 	m_streak(0),
 	m_kills(0),
 	m_deaths(0),
 	m_score(0),
-	m_exp(0),
-	m_expRate(0),
-	m_don(0),
-	m_donRate(0),
 	m_playTime(0),
-	m_highestStreak(0),
 	m_highestMultiKill(0),
-	m_eventItemPickUps(0)
+	m_eventItemPickUps(0),
+	m_deathsAsTag(0),
+	m_deathsByTag(0),
+	m_tagKillsAsPlayer(0),
+	m_playerKillsAsTag(0),
+	m_timeAliveAsTag(0),
+	m_damageDealtToTag(0),
+	m_damageDealtAsTag(0),
+	m_canRespawn(true),
+	m_permanentlyDead(false),
+	m_conn(conn),
+	m_roomSession(roomSession)
 {
 	conn->incRef();
 
 	auto player = conn->getPlayer();
 
+	const auto waitingForPlayersTime = CONFIG_MANAGER->getInt("WAITING_FOR_PLAYERS");
+
 	m_joinTime = time(NULL);
-	m_startTime = m_joinTime + 30; // have to wait 30 seconds for waiting for players to last
+	m_startTime = m_joinTime + waitingForPlayersTime;
 	m_character = player->getCharacter();
+
+	m_isPermanentlyInvincible = false;
 
 	auto* equipManager = player->getEquipmentManager();
 
 	m_baseHealth = equipManager->getBaseHealth();
-	m_bonusHealth = equipManager->getBonusHealth();
+	m_bonusHealth = equipManager->getBonusHealth(roomSession);
+
 	m_health = getDefaultHealth();
 
 	m_armor = equipManager->getArmorItemIdsByCharacter(m_character);
 
-	m_hasQuickRevive = equipManager->hasFunctionCard(ItemID::QUICK_REVIVE);
+	m_hasQuickRevive = equipManager->hasFunctionCard(QUICK_REVIVE);
+	m_respawnCooldown = m_hasQuickRevive ? 5 : 7;
 
-	m_expRate += equipManager->hasFunctionCard(ItemID::EXP_MAKER_25) ? 25 : 0;
-	m_expRate += equipManager->hasFunctionCard(ItemID::EXP_MAKER_50) ? 50 : 0;
+	if (auto room = roomSession->getRoom(); room->getMode() == GameMode::PVE)
+		m_respawnCooldown = 10;
+
+	m_expRate += equipManager->hasFunctionCard(EXP_MAKER_25) ? 25 : 0;
+	m_expRate += equipManager->hasFunctionCard(EXP_MAKER_50) ? 50 : 0;
 	m_expRate += CONFIG_MANAGER->getInt("GLOBAL_EXP_RATE");
 
-	m_donRate += equipManager->hasFunctionCard(ItemID::DON_MAKER_25) ? 25 : 0;
-	m_donRate += equipManager->hasFunctionCard(ItemID::DON_MAKER_50) ? 50 : 0;
+	m_donRate += equipManager->hasFunctionCard(DON_MAKER_25) ? 25 : 0;
+	m_donRate += equipManager->hasFunctionCard(DON_MAKER_50) ? 50 : 0;
 	m_donRate += CONFIG_MANAGER->getInt("GLOBAL_DON_RATE");
 
 	auto weaponManager = Game::instance()->getWeaponManager();
@@ -90,10 +110,15 @@ void RoomSessionPlayer::post(GameNetEvent* netEvent)
 void RoomSessionPlayer::initialize()
 {
 	m_isRespawning = false;
-	
+
 	m_effectManager.initialize(shared_from_this());
 	m_weaponManager.initialize(shared_from_this());
-	m_skillManager.initialize(shared_from_this());
+
+	if (m_roomSession->getRoom()->isSkillsEnabled())
+	{
+		m_skillManager.initialize(shared_from_this());
+	}
+
 	m_entityManager.initialize(shared_from_this());
 }
 
@@ -102,6 +127,18 @@ void RoomSessionPlayer::tick()
 	if (canStart())
 	{
 		start();
+
+		if (m_roomSession->getRoom()->isSkillsEnabled() && !m_isSpectating)
+		{
+			const auto equippedSkillCards = this->getPlayer()->getEquipmentManager()->getEquippedSkillCardIds();
+
+			if (!equippedSkillCards.empty())
+			{
+				post(new CCUserInfo(shared_from_this()));
+			}
+
+			getSkillManager()->resetSkillPoints();
+		}
 
 		m_roomSession->spawnPlayer(shared_from_this());
 	}
@@ -113,18 +150,22 @@ void RoomSessionPlayer::tick()
 	}
 
 	const auto needsToRemoveInvincibility = m_invincibleRemovalTime <= time(NULL) && m_isInvincible;
+
 	if (needsToRemoveInvincibility)
 		removeInvincibility();
 
-	const auto needsToRespawn = m_respawnTime <= time(NULL) && m_isRespawning;
-	if (needsToRespawn)
-		respawn();
+	if (m_canRespawn)
+	{
+		const auto needsToRespawn = m_respawnTime <= time(NULL) && m_isRespawning;
+		if (needsToRespawn)
+			respawn();
+	}
 }
 
 void RoomSessionPlayer::start()
 {
 	m_isPlaying = true;
-	
+
 	getPlayer()->getAchievementContainer()->resetRecent();
 
 	m_roomSession->relayExcept<GCGameState>(getPlayer()->getId(), getPlayer()->getId(), 3);
@@ -141,7 +182,23 @@ void RoomSessionPlayer::stop()
 	const auto player = getPlayer();
 
 	const auto curr = shared_from_this();
-	
+
+	const auto equippedInventorySkillCards = player->getEquipmentManager()->getEquippedSkillCards();
+	const auto equippedInGameSkillCards = curr->getSkillManager()->getEquippedSkills();
+
+	for (size_t i = 0; i < equippedInventorySkillCards.size(); i++)
+	{
+		const auto& equippedInventorySkillCard = equippedInventorySkillCards[i];
+		const auto& equippedInGameSkillCard = equippedInGameSkillCards[i];
+
+		if (equippedInGameSkillCard != nullptr)
+		{
+			const uint16_t remainingPeriod = (equippedInventorySkillCard.period - equippedInGameSkillCard->getUseCount());
+
+			curr->getPlayer()->getInventoryManager()->useSkillCard(equippedInventorySkillCard.id, remainingPeriod > 0 ? remainingPeriod : 0);
+		}
+	}
+
 	player->getEquipmentManager()->finishRound(curr);
 	player->getStatsManager()->apply(curr);
 
@@ -150,7 +207,30 @@ void RoomSessionPlayer::stop()
 
 	player->update();
 
-	player->send(UpdateAccount(player));
+	player->send(SendAccountUpdate(player));
+	player->send(SendUpdateSkillSet(player->getEquipmentManager()->getEquippedSkillCards()));
+}
+
+void RoomSessionPlayer::stopPveGame()
+{
+	m_entityManager.close();
+
+	const auto player = getPlayer();
+	const auto roomSessionPlayer = shared_from_this();
+
+	player->getEquipmentManager()->finishRound(roomSessionPlayer);
+
+	/* TODO: Once pve stats are worked out, call this to save the stats to the database.
+	player->getStatsManager()->apply(roomSessionPlayer);*/
+
+	/* TODO: Perhaps rework this (level and achievement for pve specificly).
+	Game::instance()->getLevelManager()->onPlayerFinish(roomSessionPlayer);
+	Game::instance()->getAchievementManager()->onPlayerFinish(roomSessionPlayer);*/
+
+	player->update();
+
+	player->send(SendAccountUpdate(player));
+	player->send(SendUpdateSkillSet(player->getEquipmentManager()->getEquippedSkillCards()));
 }
 
 bool RoomSessionPlayer::canStart()
@@ -170,19 +250,41 @@ bool RoomSessionPlayer::isPlaying()
 	return m_isPlaying;
 }
 
-void RoomSessionPlayer::makeInvincible()
+void RoomSessionPlayer::togglePermanentInvincibility()
+{
+	if (m_isPermanentlyInvincible) {
+		m_isPermanentlyInvincible = false;
+		removeInvincibility();
+	}
+	else
+	{
+		m_isPermanentlyInvincible = true;
+		m_isInvincible = true;
+	}
+}
+
+bool RoomSessionPlayer::isPermanentlyInvincible()
+{
+	return m_isPermanentlyInvincible;
+}
+
+void RoomSessionPlayer::makeInvincible(uint32_t invincibleRemovalTime)
 {
 	m_isInvincible = true;
-	m_invincibleRemovalTime = time(NULL) + 5;
+	m_invincibleRemovalTime = time(NULL) + invincibleRemovalTime;
 }
 
 void RoomSessionPlayer::removeInvincibility()
 {
+	if (m_isPermanentlyInvincible) {
+		return;
+	}
+
 	m_isInvincible = false;
 	m_roomSession->relayPlaying<GCGameState>(getPlayer()->getId(), 8);
 }
 
-void RoomSessionPlayer::addPlayer(RoomSessionPlayer::Ptr player)
+void RoomSessionPlayer::addPlayer(Ptr player)
 {
 	m_conn->addSession(player);
 }
@@ -205,6 +307,46 @@ void RoomSessionPlayer::setPosition(const Position& position)
 Position RoomSessionPlayer::getPosition()
 {
 	return m_position;
+}
+
+void RoomSessionPlayer::setFloorNumber(const uint8_t floorNumber)
+{
+	m_floorNumber = floorNumber;
+}
+
+uint8_t RoomSessionPlayer::getFloorNumber() const
+{
+	return m_floorNumber;
+}
+
+void RoomSessionPlayer::increaseGoldenCoinCount()
+{
+	m_goldenCoinCount++;
+}
+
+void RoomSessionPlayer::increaseSilverCoinCount()
+{
+	m_silverCoinCount++;
+}
+
+void RoomSessionPlayer::increaseBronzeCoinCount()
+{
+	m_bronzeCoinCount++;
+}
+
+uint32_t RoomSessionPlayer::getGoldenCoinCount() const
+{
+	return m_goldenCoinCount;
+}
+
+uint32_t RoomSessionPlayer::getSilverCoinCount() const
+{
+	return m_silverCoinCount;
+}
+
+uint32_t RoomSessionPlayer::getBronzeCoinCount() const
+{
+	return m_bronzeCoinCount;
 }
 
 void RoomSessionPlayer::addHealth(uint16_t health, bool updateClient)
@@ -234,13 +376,34 @@ void RoomSessionPlayer::setHealth(uint16_t health, bool updateClient)
 {
 	m_health = health;
 
-	if (updateClient)
+	if (updateClient) {
 		post(new GCGameState(getPlayer()->getId(), 16, m_health));
+	}
 }
 
 bool RoomSessionPlayer::isDead()
 {
 	return m_health <= 0;
+}
+
+bool RoomSessionPlayer::isPermanentlyDead()
+{
+	return isDead() && m_permanentlyDead;
+}
+
+bool RoomSessionPlayer::canRespawn()
+{
+	return m_canRespawn && !m_permanentlyDead;
+}
+
+void RoomSessionPlayer::setCanRespawn(bool canRespawn) 
+{
+	m_canRespawn = canRespawn;
+}
+
+void RoomSessionPlayer::setPermanentlyDead(bool permanentlyDead)
+{
+	m_permanentlyDead = permanentlyDead;
 }
 
 void RoomSessionPlayer::respawn()
@@ -249,14 +412,13 @@ void RoomSessionPlayer::respawn()
 	m_roomSession->spawnPlayer(shared_from_this());
 }
 
-void RoomSessionPlayer::startRespawnCooldown()
+void RoomSessionPlayer::startRespawnCooldown(const bool hasCooldown)
 {
 	m_isRespawning = true;
-	m_skillManager.resetPoints();
 
-	auto cooldown = getRespawnCooldown();
+	const auto cooldown = (hasCooldown) ? getRespawnCooldown() : 0;
 
-	m_respawnTime = time(NULL) + cooldown;
+	m_respawnTime = (time(nullptr) + cooldown);
 
 	post(new GCGameState(getPlayer()->getId(), 29, cooldown * 1000));
 }
@@ -293,7 +455,7 @@ uint16_t RoomSessionPlayer::getDefaultHealth()
 
 uint8_t RoomSessionPlayer::getRespawnCooldown()
 {
-	return m_hasQuickRevive ? 5 : 10;
+	return m_respawnCooldown;
 }
 
 std::array<uint32_t, 9> RoomSessionPlayer::getArmor()
@@ -319,10 +481,13 @@ uint32_t RoomSessionPlayer::getDon()
 
 	if (playtimeDon >= 250)
 		playtimeDon = 250;
-	
+
 	don += 18 * m_kills;
 	don += 7 * m_deaths;
 	don += 10 * m_eventItemPickUps;
+
+	don += 20 * getTagPoints();
+
 	don += playtimeDon;
 
 	if (m_roomSession->getGameMode()->isMissionMode())
@@ -413,10 +578,13 @@ uint32_t RoomSessionPlayer::getExperience()
 
 	if (playTimeExperience >= 500)
 		playTimeExperience = 500;
-	
+
 	experience += 35 * m_kills;
 	experience += 10 * m_deaths;
 	experience += 10 * m_eventItemPickUps;
+
+	experience += 25 * getTagPoints();
+
 	experience += playTimeExperience;
 
 	if (m_roomSession->getGameMode()->isMissionMode())
@@ -442,6 +610,81 @@ void RoomSessionPlayer::addScore(uint16_t score)
 	m_score += score;
 
 	m_roomSession->addPointsForTeam(m_team, score);
+}
+
+uint16_t RoomSessionPlayer::getTagKillsAsPlayer()
+{
+	return m_tagKillsAsPlayer;
+}
+
+void RoomSessionPlayer::addTagKillAsPlayer()
+{
+	m_tagKillsAsPlayer += 1;
+}
+
+uint16_t RoomSessionPlayer::getPlayerKillsAsTag()
+{
+	return m_playerKillsAsTag;
+}
+
+void RoomSessionPlayer::addPlayerKillAsTag()
+{
+	m_playerKillsAsTag += 1;
+}
+
+uint16_t RoomSessionPlayer::getDeathsAsTag()
+{
+	return m_deathsAsTag;
+}
+
+void RoomSessionPlayer::addDeathAsTag()
+{
+	m_deathsAsTag += 1;
+}
+
+uint16_t RoomSessionPlayer::getDeathsByTag()
+{
+	return m_deathsByTag;
+}
+
+void RoomSessionPlayer::addDeathByTag()
+{
+	m_deathsByTag += 1;
+}
+
+uint16_t RoomSessionPlayer::getTagPoints()
+{
+	return ((m_tagKillsAsPlayer * 5) + (m_playerKillsAsTag * 1));
+}
+
+uint32_t RoomSessionPlayer::getTimeAliveAsTag()
+{
+	return m_timeAliveAsTag;
+}
+
+void RoomSessionPlayer::addTimeAliveAsTag(uint32_t time)
+{
+	m_timeAliveAsTag += time;
+}
+
+uint32_t RoomSessionPlayer::getDamageDealtToTag()
+{
+	return m_damageDealtToTag;
+}
+
+void RoomSessionPlayer::addDamageDealtToTag(uint32_t damage)
+{
+	m_damageDealtToTag += damage;
+}
+
+uint32_t RoomSessionPlayer::getDamageDealtAsTag()
+{
+	return m_damageDealtAsTag;
+}
+
+void RoomSessionPlayer::addDamageDealtAsTag(uint32_t damage)
+{
+	m_damageDealtAsTag += damage;
 }
 
 std::shared_ptr<Player> RoomSessionPlayer::getPlayer()

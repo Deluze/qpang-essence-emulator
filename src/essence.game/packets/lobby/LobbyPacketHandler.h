@@ -2,7 +2,7 @@
 
 #include "core/communication/PacketHandler.h"
 
-class LobbyPacketHandler : public PacketHandler
+class LobbyPacketHandler final : public PacketHandler
 {
 public:
 	LobbyPacketHandler();

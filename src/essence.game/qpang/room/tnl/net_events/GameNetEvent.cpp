@@ -10,10 +10,14 @@ GameNetEvent::GameNetEvent()
 {
 }
 
-GameNetEvent::GameNetEvent(GameNetId gameNetId, NetEvent::GuaranteeType guaranteeType, NetEvent::EventDirection eventDirection) :
+GameNetEvent::GameNetEvent(const GameNetId gameNetId, const GuaranteeType guaranteeType, const EventDirection eventDirection) :
 	TNL::NetEvent(guaranteeType, eventDirection),
 	id(gameNetId)
 {
+	if (gameNetId != CG_MOVE && gameNetId != CG_MOVE_REPORT)
+	{
+		//std::cout << "[" << gameNetIdMapping[gameNetId] << "] GuaranteeType: " << guaranteeTypeMapping[guaranteeType] << ", Direction: " << eventDirectionMapping[eventDirection] << "\n";
+	}
 }
 
 std::u16string GameNetEvent::byteBufferToString(ByteBuffer* buffer, uint32_t length)
@@ -73,5 +77,5 @@ void GameNetEvent::notifyDelivered(EventConnection* ps)
 
 void GameNetEvent::handle(GameConnection* conn, Player::Ptr player)
 {
-	std::cout << "GameNetEvent::handle unhandled event: " << id << std::endl;
+	std::cout << "[GameNetEvent::handle] Unhandled event: " << id << std::endl;
 }

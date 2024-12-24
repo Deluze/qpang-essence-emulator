@@ -10,7 +10,7 @@ class GCGameItem : public GameNetEvent
 
 public:
 
-	struct Item 
+	struct Item
 	{
 		U32 itemId;
 		U32 itemUid;
@@ -18,7 +18,17 @@ public:
 		U32 skillId = 0;
 	};
 
-	GCGameItem() : GameNetEvent{ GC_GAME_ITEM, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient} {}
+	enum CMD : U32 {
+		PICKUP_GAME_ITEM = 1,
+		SPAWN_GAME_ITEM = 2, // and 6
+		REPAIR_KIT = 3, // unimplemented
+		SPAWN_BUNNY_UNK1 = 11, // spawn bunny?
+		SPAWN_BUNNY_UNK2 = 12, // spawn bunny?
+		UNK13 = 13,
+		UNK16 = 16,
+	};
+
+	GCGameItem() : GameNetEvent{ GC_GAME_ITEM, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient } {}
 
 	GCGameItem(U8 cmd, std::vector<GCGameItem::Item> items, U32 weaponIdentifier = 0x00) : GameNetEvent{ GC_GAME_ITEM, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
 	{
@@ -26,7 +36,7 @@ public:
 		this->items = items;
 		this->weaponId = weaponIdentifier;
 	}
-	
+
 	GCGameItem(U8 cmd, U32 playerId, U32 itemId, U32 uid, uint32_t skillId = 0x00) : GameNetEvent{ GC_GAME_ITEM, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
 	{
 		this->cmd = cmd;
@@ -47,8 +57,8 @@ public:
 		bstream->write(skillId);
 		bstream->write(unk_08);
 		bstream->write(U16(items.size()));
-		
-		for (auto &item : items)
+
+		for (auto& item : items)
 		{
 			bstream->write(U32(0));
 			bstream->write(item.itemId);
@@ -68,17 +78,20 @@ public:
 	U8 cmd = 6; // cmd [1 = pick up, 6 = spawn, 14 = refill ammo, others unknown]
 	U32 unk_03 = 0;
 	U32 unk_04 = 0;
+
 	U32 itemId = 0; // pickup only
 	U32 uid = 0; // pickup only
-	U32 skillId = 0;
-	U32 unk_08 = 0;
-	U16 count = 0;
+
+	U32 skillId = 0; // skill item id
+
+	U32 unk_08 = 0; // unknown
+	U16 count = 0; // count?
 
 	/// stuff I don't want to clutter the game item class with
 	U32 weaponId = 0; // refill ammo only
 
 	std::vector<GCGameItem::Item> items;
-	
+
 	TNL_DECLARE_CLASS(GCGameItem);
 };
 

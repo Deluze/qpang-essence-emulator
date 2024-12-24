@@ -27,12 +27,12 @@ public:
 		count(count),
 		hitType(hitType),
 		hitLocation(hitLocation),
-		damageDealt(damage),
 		healthLeft(healthLeft),
+		damageDealt(damage),
 		weaponId(weaponId),
 		rtt(rtt),
 		weaponType(weaponType),
-		unk_16(unk_16),
+		unk_16(unk_16), // Hit location (front, backside, back)
 		killCombo(killCombo),
 		unk_18(unk_18),
 		weaponEffect(effect),
@@ -89,7 +89,7 @@ public:
 	F32 dstPosX;
 	F32 dstPosY;
 	F32 dstPosZ;
-	U32 count; //??
+	U32 count; // entityId, not count?
 	U8 hitType;
 	U8 hitLocation;
 	U16 healthLeft;

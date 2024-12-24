@@ -10,7 +10,7 @@
 class ForceStartAllCommand : public Command
 {
 public:
-	ForceStartAllCommand() : Command(3)
+	ForceStartAllCommand() : Command(4)
 	{
 
 	}

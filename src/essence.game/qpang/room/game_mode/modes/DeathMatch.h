@@ -5,5 +5,4 @@
 class DeathMatch : public GameMode
 {
 public:
-	
 };

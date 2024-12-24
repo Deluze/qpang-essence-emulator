@@ -14,8 +14,8 @@
 #include "qpang/room/session/game_item/items/SkillBook.h"
 #include "qpang/room/session/game_item/items/EventItem.h"
 
-#define RESPAWN_INTERVAL 15
-#define EVENT_ITEM_BATCH_INTERVAL 200
+constexpr auto RESPAWN_INTERVAL = 15;
+constexpr auto EVENT_ITEM_BATCH_INTERVAL = 200;
 
 class GameItem;
 class RoomSession;
@@ -33,22 +33,34 @@ enum ID : uint32_t
 	BRONZE_COIN = 1191182354
 };
 
-static std::vector<uint32_t> possibleItems = {
-	ID::AMMO_CLIP,
-	ID::RED_MEDKIT,
-	ID::GREEN_MEDKIT,
-	ID::SKILL_CARD,
+static std::vector<uint32_t> possibleItemsWithSkillsEnabled =
+{
+	SKILL_CARD,
+	AMMO_CLIP,
+	GREEN_MEDKIT,
+	RED_MEDKIT,
+	SKILL_CARD,
 };
 
-static std::unordered_map<uint32_t, GameItem*> mappedItems = {
-	{ ID::RED_MEDKIT, new RedMedKit() },
-	{ ID::AMMO_CLIP, new AmmoClip() },
-	{ ID::GREEN_MEDKIT, new GreenMedKit() },
-	{ ID::SKILL_CARD, new SkillBook() },
-	{ ID::EVENT_ITEM, new EventItem() },
+static std::vector<uint32_t> possibleItems =
+{
+	AMMO_CLIP,
+	RED_MEDKIT,
+	AMMO_CLIP,
+	GREEN_MEDKIT,
 };
 
-static std::unordered_map<uint32_t, Spawn> mapBounds = {
+static std::unordered_map<uint32_t, GameItem*> mappedItems =
+{
+	{RED_MEDKIT, new RedMedKit() },
+	{AMMO_CLIP, new AmmoClip() },
+	{GREEN_MEDKIT, new GreenMedKit() },
+	{SKILL_CARD, new SkillBook() },
+	{EVENT_ITEM, new EventItem() },
+};
+
+static std::unordered_map<uint32_t, Spawn> mapBounds =
+{
 	{ 0, Spawn({48, 0, 48}) }, // Garden
 	{ 1, Spawn({48, 0, 48}) }, // Diorama
 	{ 2, Spawn({64, 0, 64}) }, // Skycastle
@@ -57,7 +69,7 @@ static std::unordered_map<uint32_t, Spawn> mapBounds = {
 	{ 6, Spawn({58, 0, 38}) }, // City
 	{ 8, Spawn({58, 0, 60}) }, // Bunker
 	{ 9, Spawn({58, 0, 58}) }, // Temple
-	{ 11, Spawn({37, 0, 92}) }, // Bridge
+	{ 11, Spawn({37, 0, 92}) }, // Bridge temporarily disabled
 	{ 12, Spawn({66, 0, 66}) }, // Castaway
 };
 
@@ -82,10 +94,7 @@ public:
 	void onPickUp(std::shared_ptr<RoomSessionPlayer> player, uint32_t spawnId);
 	void onPickUpEventItem(std::shared_ptr<RoomSessionPlayer> player, uint32_t id);
 private:
-
-	void spawnItem(const GameItemManager::GameItemSpawn& item);
-
-	std::unordered_map<uint32_t, GameItemSpawn> m_items;
+	std::vector<GameItemSpawn> m_items;
 	std::unordered_map<uint32_t, bool> m_eventItems;
 	bool m_areSkillsEnabled = false;
 	bool m_isReady = false;

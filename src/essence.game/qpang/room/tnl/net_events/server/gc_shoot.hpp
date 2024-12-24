@@ -43,17 +43,17 @@ public:
 	void unpack(EventConnection* conn, BitStream* bstream) {};
 	void process(EventConnection* ps) {};
 
-	U32 playerId;
-	U32 itemId;
-	U32 unk_03;
-	F32 srcX;
-	F32 srcY;
-	F32 srcZ;
-	F32 dirX;
-	F32 dirY;
-	F32 dirZ;
-	U32 entityId;
-	U32 isP2P;
+	U32 playerId; // 120
+	U32 itemId; // 128
+	U32 unk_03; // 116
+	F32 srcX; // 92
+	F32 srcY; // 96
+	F32 srcZ; // 100
+	F32 dirX; // 104
+	F32 dirY; // 108
+	F32 dirZ; // 112
+	U32 entityId; // 124
+	U32 isP2P; // 88
 
 	TNL_DECLARE_CLASS(GCShoot);
 };

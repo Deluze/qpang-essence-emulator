@@ -28,17 +28,17 @@ public:
 
 		if (target == nullptr)
 		{
-			player->broadcast(u"This player does not exist");
+			player->broadcast(u"This player does not exist.");
 			return;
 		}
 
 		if (!target->isMuted())
 		{
-			player->broadcast(u"This player is not muted");
+			player->broadcast(u"This player is not muted.");
 			return;
 		}
 
 		target->unmute();
-		player->broadcast(u"This player is now unmuted");
+		player->broadcast(u"This player is now unmuted.");
 	}
 };

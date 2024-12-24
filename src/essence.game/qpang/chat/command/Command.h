@@ -17,6 +17,7 @@
 class Command
 {
 public:
+	virtual ~Command() = default;
 
 	enum Validation : uint8_t
 	{
@@ -36,13 +37,29 @@ public:
 
 	virtual bool canHandle(std::shared_ptr<Player> player)
 	{
-		if (m_rank == 3 && player->getRank() == 4)
-			return false;
-		else if (m_rank == 4 && player->getRank() >= 3)
-			return true;
-		else if (m_rank <= player->getRank())
-			return true;
+		auto playerRank = player->getRank();
 
+		// GM's may execute all commands.
+		if (playerRank == 3) {
+			return true;
+		}
+
+		// Required rank = GM, player rank must also be GM.
+		if (m_rank == 3 && playerRank == 3) {
+			return true;
+		}
+
+		// Required rank = Helper, player rank must be GM or Helper.
+		if (m_rank == 4 && (playerRank == 3 || playerRank == 4)) {
+			return true;
+		}
+
+		// Required rank = Player, everyone may execute this command.
+		if (m_rank == 1) {
+			return true;
+		}
+
+		// If the rank is not for Player, Helper or GM, don't allow it to be executed.
 		return false;
 	}
 

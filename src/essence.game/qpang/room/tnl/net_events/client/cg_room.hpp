@@ -13,7 +13,7 @@ class CGRoom : public GameNetEvent
 	typedef NetEvent Parent;
 public:
 
-	CGRoom() : GameNetEvent{ CG_ROOM, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirClientToServer }
+	CGRoom() : GameNetEvent{ CG_ROOM, GuaranteedOrdered, DirClientToServer }
 	{
 		titleBuffer = new ByteBuffer();
 	};
@@ -45,143 +45,272 @@ public:
 		bstream->read(&unk_20);
 		bstream->read(&unk_21);
 		bstream->read(&unk_22);
+
+		//std::cout
+		//	<< "CGRoom::unpack >> PlayerId: " << playerId << ", Cmd: " << (int)cmd << ", Value: " << (int)value << ", Mode: " << (int)mode
+		//	<< ", MemberCount: " << (int)memberCount << ", Goal: " << (int)goal << ", TimeAmount: " << (int)timeAmount << ", IsRounds: " << (int)isRounds << std::endl;
+
+		//std::cout << "CGRoom::unpack >> Unk11: " << (int)unk_11 << ", Unk12: " << (int)unk_12 << ", Unk13: " << (int)unk_13 << ", Unk14: " << (int)unk_14
+		//	<< ", Unk19: " << (int)unk_19 << ", Unk20: " << (int)unk_20 << ", Unk21: " << (int)unk_21 << ", Unk22: " << (int)unk_22 << std::endl;
+
+		//std::cout << "CGRoom::unpack >> _160: " << (int)_160 << ", _161: " << (int)_161 << ", _162: " << (int)_162 << ", _163: " << (int)_163 << std::endl;
 	};
 
-	void handle(GameConnection* conn, Player::Ptr player)
+	void handle(GameConnection* conn, const Player::Ptr player)
 	{
-		std::u16string title = byteBufferToString(titleBuffer, 30);
+		const std::u16string title = byteBufferToString(titleBuffer, 30);
 
 		delete titleBuffer;
 
-		if (cmd == Command::CREATE_ROOM || cmd == Command::CREATE_EVENT_ROOM)
+		bool usesTweakTool = (unk_19 == 1337 && unk_20 == 1337 && unk_21 == 1337 && unk_22 == 1337);
+		if (cmd == CREATE_ROOM || cmd == CREATE_EVENT_ROOM)
 		{
-			if (cmd == Command::CREATE_EVENT_ROOM && player->getRank() != 3)
+			if (cmd == CREATE_EVENT_ROOM && player->getRank() != 3)
+			{
 				return conn->disconnect("Cannot create event room");
+			}
 
 			const auto isValidMode =
 				mode == GameMode::Mode::DM ||
 				mode == GameMode::Mode::TDM ||
 				mode == GameMode::Mode::PTE ||
-				mode == GameMode::Mode::VIP;
-			
-			if (!isValidMode || map > 12)
+				mode == GameMode::Mode::VIP ||
+				mode == GameMode::Mode::PREY ||
+				mode == GameMode::Mode::PVE;
+
+			if (mode == GameMode::Mode::PVE)
+			{
+				/*if (player->getName().compare(u"hinnie") != 0 && player->getName().compare(u"Jarrett") != 0)
+				{
+					player->broadcast(u"Sorry, but you can't create a pve room.");
+					return;
+				}*/
+
+				// FIXME: We should also disconnect the connection, otherwise the second time the player sends this packet
+				// it will fail. It will work after that though.
+				// However, if we disconnect the connection, the client wont see the broadcast message.
+				// Possible, but bad? solution is to disconnect, Sleep for roughly a sec, then call the broadcast and return.
+				if (!usesTweakTool)
+				{
+					player->broadcast(u"Sorry, but you have to use the tweak tool in order to create a PVE room. You can enable it in the launcher.");
+					return;
+				}
+
+				// For now, lets default the map to 120 since starting from different maps/stages is not yet supported.
+				map = 120;
+			}
+
+			if (!isValidMode)
 			{
 				conn->disconnect("Invalid gamemode");
-				return player->broadcast(u"Sorry, but this game mode has not been implemented yet");
+				player->broadcast(u"Sorry, but this game mode has not been implemented yet");
+				return;
 			}
 
 			if (Game::instance()->getRoomManager()->list().size() >= CONFIG_MANAGER->getInt("GAME_MAX_ROOMS"))
-				return conn->disconnect("Failed to create room");
+			{
+				conn->disconnect("Failed to create room");
+				return;
+			}
 
-			auto room = Game::instance()->getRoomManager()->create(title, static_cast<uint8_t>(map), mode);
+			const auto room = Game::instance()->getRoomManager()->create(title, static_cast<uint8_t>(map), mode);
 
-			room->setEventRoom(cmd == Command::CREATE_EVENT_ROOM);
+			room->setEventRoom(cmd == CREATE_EVENT_ROOM);
 			room->addPlayer(conn);
 		}
-
-		else if (cmd == Command::JOIN_ROOM)
+		else if (cmd == JOIN_ROOM)
 		{
-			auto room = Game::instance()->getRoomManager()->get(roomId);
+			const auto room = Game::instance()->getRoomManager()->get(roomId);
 
 			if (room == nullptr)
-				return conn->disconnect("Couldn't find room ID");
+			{
+				conn->disconnect("Couldn't find room ID");
+				return;
+			}
+
+			if (room->getMode() == GameMode::Mode::PVE)
+			{
+				/*if (!room->isPublicPveRoom())
+				{
+					if (player->getName().compare(u"hinnie") != 0 && player->getName().compare(u"Jarrett") != 0)
+					{
+						player->broadcast(u"Sorry, but you can't join this pve room.");
+						return;
+					}
+				}*/
+
+				// FIXME: We should also disconnect the connection, otherwise the second time the player sends this packet
+				// it will fail. It will work after that though.
+				// However, if we disconnect the connection, the client wont see the broadcast message.
+				// Possible, but bad? solution is to disconnect, Sleep for roughly a sec, then call the broadcast and return.
+				if (!usesTweakTool)
+				{
+					player->broadcast(u"Sorry, but you have to use the tweak tool in order to join a PVE room. You can enable it in the launcher.");
+					return;
+				}
+			}
 
 			if (room->getPlayerCount() >= room->getMaxPlayers())
+			{
 				return conn->disconnect("Room is full");
+			}
 
-			auto pass = room->getPassword();
+			const auto roomPassword = room->getPassword();
 
-			if (!pass.empty() && player->getRank() < 3)
-				if (pass != password)
-					return;
+			const auto playerRank = player->getRank();
+			const auto playerCanBypassPasswordCheck = ((playerRank == 3) || (playerRank == 4));
 
-			room->addPlayer(conn);
+			// If the room has no password OR the player is a GM or Helper, they can bypass the password check.
+			if (roomPassword.empty() || playerCanBypassPasswordCheck)
+			{
+				room->addPlayer(conn);
+
+				return;
+			}
+
+			// Compare the given password with the room password.
+			if (password == roomPassword)
+			{
+				room->addPlayer(conn);
+			}
 		}
-
 		else
 		{
-			auto roomPlayer = player->getRoomPlayer();
+			const auto roomPlayer = player->getRoomPlayer();
 
 			if (roomPlayer == nullptr)
+			{
 				return;
+			}
 
-			auto room = roomPlayer->getRoom();
+			const auto room = roomPlayer->getRoom();
 
 			if (room->getMasterId() != player->getId())
+			{
 				return;
+			}
 
 			if (room->isPlaying())
+			{
 				return;
+			}
 
 			switch (cmd)
 			{
-			case Command::MAP_ROOM:
+			case MAP_ROOM:
 			{
-				room->setMap(value);
+				const auto mapId = static_cast<uint8_t>(value);
+
+				// Note: So, switching difficulty in a PvE room triggers a change in the mapId
+				// and thus if we do allow switching difficulties we need to take that into account. 
+				if (room->getMode() == GameMode::Mode::PVE)
+				{
+					break;
+				}
+
+				// FIXME: We probably need to add a gamemode check to ensure a player can set a certain mapId.
+
+				room->setMap(mapId);
+
+				break;
 			}
-			break;
-			case Command::MODE_ROOM:
+			case MODE_ROOM:
 			{
 				const auto isValidMode =
 					mode == GameMode::Mode::DM ||
 					mode == GameMode::Mode::TDM ||
 					mode == GameMode::Mode::PTE ||
-					mode == GameMode::Mode::VIP;
+					mode == GameMode::Mode::VIP ||
+					mode == GameMode::Mode::PREY ||
+					mode == GameMode::Mode::PVE;
 
 				if (!isValidMode)
 				{
-					conn->postNetEvent(new GCRoom(player->getId(), Command::MODE_ROOM, room));
-					return player->broadcast(u"Sorry, but this game mode has not been implemented yet");
+					conn->postNetEvent(new GCRoom(player->getId(), MODE_ROOM, room));
+
+					player->broadcast(u"Sorry, but this game mode has not been implemented yet");
+
+					break;
 				}
 
 				room->setMode(mode);
+
+				if (room->getMode() == GameMode::PREY)
+				{
+					room->setSkillsEnabled(false);
+
+					break;
+				}
+
+				room->setSkillsEnabled(true);
+
+				break;
 			}
-			break;
-			case Command::SET_POINTS:
+			case SET_POINTS:
 			{
-				room->setScorePoints(value);
-				room->setIsPointsGame(true);
+				if (value == 10 || value == 15 || value == 20 || value == 25 || value == 30 || value == 35 || value == 40)
+				{
+					room->setScorePoints(value);
+					room->setIsPointsGame(true);
+				}
+
+				break;
 			}
-			break;
-			case Command::SET_TIME:
+			case SET_TIME:
 			{
-				room->setScoreTime(value);
-				room->setIsPointsGame(false);
+				if (value == 5 || value == 10 || value == 15 || value == 20)
+				{
+					room->setScoreTime(value);
+					room->setIsPointsGame(false);
+				}
+
+				break;
 			}
-			break;
-			case Command::PLAYERS_ROOM:
+			case PLAYERS_ROOM:
 			{
 				if (value == 4 || value == 8 || value == 12 || value == 16)
+				{
 					room->setMaxPlayers(value);
+				}
+
+				break;
 			}
-			break;
-			case Command::PASS_ROOM:
+			case PASS_ROOM:
 			{
 				room->setPassword(password);
+				break;
 			}
-			break;
-			case Command::LEVEL_ROOM:
+			case LEVEL_ROOM:
 			{
 				room->setLevelLimited(value);
+				break;
 			}
-			break;
-			case Command::TOGGLE_MELEE:
+			case TOGGLE_MELEE:
 			{
 				room->setMeleeOnly(value);
+				room->setSkillsEnabled(false);
+				break;
 			}
-			break;
-			case Command::TOGGLE_SKILL:
+			case TOGGLE_SKILL:
 			{
-				// room->setSkillsEnabled(!room->isSkillsEnabled());
-				// disabled
+				if (room->getMode() == GameMode::PREY)
+				{
+					room->setSkillsEnabled(false);
+
+					break;
+				}
+
+				room->setSkillsEnabled(!room->isSkillsEnabled());
+
+				break;
 			}
-			break;
-			case Command::TEAM_ROOM:
+			case TEAM_ROOM:
 			{
 				room->setTeamSorting(value);
+				break;
 			}
-			break;
 			default:
+				std::cout << "CGRoom::handle >> Unknown cmd: " << cmd << std::endl;
 				break;
 			}
 		}
@@ -211,7 +340,7 @@ public:
 	};
 
 	U32 playerId = 0; //92
-	U32 cmd = Command::CREATE_ROOM; //96
+	U32 cmd = CREATE_ROOM; //96
 
 	union {
 		U32 value = 0; //100

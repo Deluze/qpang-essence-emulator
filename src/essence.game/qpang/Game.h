@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <mutex>
 
+#include "PveManager.h"
 #include "core/Emulator.h"
 #include "core/communication/server/QpangServer.h"
 #include "core/database/DatabaseDispatcher.h"
@@ -23,13 +24,14 @@
 #include "qpang/level/LevelManager.h"
 #include "qpang/crane/CraneManager.h"
 #include "qpang/leaderboard/Leaderboard.h"
+#include "qpang/trading/TradeManager.h"
 
 #include "qpang/room/RoomServer.h"
 
 #include "packets/lobby/LobbyPacketHandler.h"
 #include "packets/square/SquarePacketHandler.h"
 
-#include "qpang/ItemID.h"
+#include "qpang/ItemId.h"
 
 class Player;
 
@@ -57,6 +59,8 @@ public:
 
 	std::shared_ptr<Player> getOnlinePlayer(uint32_t playerId);
 	std::shared_ptr<Player> getOnlinePlayer(const std::u16string& nickname);
+	
+	std::unordered_map<uint32_t, std::shared_ptr<Player>> getPlayers();
 
 	void broadcast(const std::u16string& message);
 	void send(LobbyServerPacket& pack);
@@ -76,6 +80,8 @@ public:
 	LevelManager* getLevelManager();
 	Leaderboard* getLeaderboard();
 	CraneManager* getCraneManager();
+	TradeManager* getTradeManager();
+	PveManager* getPveManager();
 
 	DatabaseDispatcher* getDatabaseDispatcher();
 
@@ -108,6 +114,8 @@ private:
 	AchievementManager m_achievementManager;
 	LevelManager m_levelManager;
 	CraneManager m_craneManager;
+	TradeManager m_tradeManager;
+	PveManager m_pveManager;
 
 	Leaderboard m_leaderboard;
 

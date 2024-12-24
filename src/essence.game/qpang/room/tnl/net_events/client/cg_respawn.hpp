@@ -34,7 +34,9 @@ public:
 		{
 			if (auto session = roomPlayer->getRoomSessionPlayer(); session != nullptr)
 			{
-				if (session->isDead())
+				// Can respawn is used for PVE. If the player doesn't have any gold coins left
+				// the player shouldn't be able to respawn.
+				if (session->isDead() || !session->canRespawn())
 					return;
 
 				auto& spawn = Game::instance()->getSpawnManager()->getRandomTeleportSpawn(roomPlayer->getRoom()->getMap());

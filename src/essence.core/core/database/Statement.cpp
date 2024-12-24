@@ -61,14 +61,16 @@ void Statement::bindLongOrNull(uint64_t val)
 	m_bindIndex++;
 }
 
-void Statement::bindShort(uint16_t val)
-{
-	
-}
-
 void Statement::bindFlag(bool val)
 {
 	m_stmt->setBoolean(m_bindIndex, val);
+
+	m_bindIndex++;
+}
+
+void Statement::bindDouble(const double_t val)
+{
+	m_stmt->setDouble(m_bindIndex, val);
 
 	m_bindIndex++;
 }

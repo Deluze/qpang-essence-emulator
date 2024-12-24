@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/communication/packet/ServerPacket.h"
-
 #include "qpang/player/inventory/InventoryCard.h"
 
 class GiftWriter
@@ -13,5 +12,6 @@ public:
 		packet->writeLong(card.id);
 		packet->writeFlag(true);
 		packet->writeInt(card.timeCreated);
+		packet->writeEmpty(4);
 	}
 };

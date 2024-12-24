@@ -29,6 +29,7 @@
 #include "tnlBitStream.h"
 #include "tnlLog.h"
 #include "tnlNetInterface.h"
+#include <stdio.h>
 
 namespace TNL {
 
@@ -135,6 +136,12 @@ bool EventConnection::readConnectAccept(BitStream *stream, const char **errorStr
 
 void EventConnection::processEvent(NetEvent *theEvent)
 {
+    if (theEvent == nullptr)
+    {
+        printf("EventConnection::processEvent: theEvent is nullptr!\n");
+        return;
+    }
+
    if(getConnectionState() == NetConnection::Connected)
       theEvent->process(this);
 }

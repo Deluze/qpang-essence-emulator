@@ -19,12 +19,12 @@ public:
 		auto roomPlayer = player->getRoomPlayer();
 
 		if (roomPlayer == nullptr)
-			return player->broadcast(u"You need to be in a room in order to use this command");
+			return player->broadcast(u"You need to be in a room in order to use this command.");
 
 		auto roomSession = roomPlayer->getRoom()->getRoomSession();
 
 		if (roomSession == nullptr)
-			return player->broadcast(u"The room is currently not playing");
+			return player->broadcast(u"The room is currently not playing.");
 
 		roomSession->finish();
 	}

@@ -21,11 +21,11 @@ public:
 	{
 		bstream->read(&playerId);
 		bstream->read(&unk_02); // cmd?
-		bstream->read(&unk_03);
-		bstream->read(&unk_04);
-		bstream->read(&unk_05);
-		bstream->read(&unk_06);
-		bstream->read(&uid); // uid
+		bstream->read(&unk_03);	// always 1
+		bstream->read(&unk_04);	// always 0
+		bstream->read(&unk_05);	// always 1
+		bstream->read(&unk_06); // always 0
+		bstream->read(&uid); // identifier of this game item in the map
 	};
 
 	void handle(GameConnection* conn, Player::Ptr player)

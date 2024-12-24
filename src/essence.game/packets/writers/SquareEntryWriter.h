@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/communication/packet/ServerPacket.h"
-
 #include "qpang/square/Square.h"
 
 class SquareEntryWriter

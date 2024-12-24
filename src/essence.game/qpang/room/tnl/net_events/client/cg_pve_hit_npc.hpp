@@ -2,59 +2,198 @@
 #define CG_PVE_HIT_NPC_H
 
 #include "GameNetEvent.h"
-class CGPvEHitNpc : public GameNetEvent
+#include "gc_pve_hit_npc.hpp"
+
+class CGPvEHitNpc final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	CGPvEHitNpc() : GameNetEvent{ CG_PVE_HIT_NPC, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
+	U32 playerId; // 140
+	U32 targetNpcUid; // 144
+	U32 unk_03; // 88
+	F32 impactPosX; // 116
+	F32 impactPosY; // 120
+	F32 impactPosZ; // 124
+	F32 impactOffsetPosX; // 128
+	F32 impactOffsetPosY; // 132
+	F32 impactOffsetPosZ; // 136
+	U32 entityId; // 92 possible entity id?
+	U8 unk_11; // 148 
+	U8 bodyPartId; // 149
+	U32 weaponItemId; // 96
+	U64 weaponCardId; // 108 104
+	U8 weaponType; // 112
+	U32 bodyPartIdCopy; // 156
+	U8 hitLocation; // 150
+	U8 unk_18; // 151
+	U32 unk_19; // 152
 
-	U32 unk_01;
-	U32 unk_02;
-	U32 unk_03;
-	U32 unk_04;
-	U32 unk_05;
-	U32 unk_06;
-	U32 unk_07;
-	U32 unk_08;
-	U32 unk_09;
-	U32 unk_10;
-	U8 unk_11;
-	U8 unk_12;
-	U32 unk_13;
-	U64 unk_14;
-	U8 unk_15;
-	U32 unk_16;
-	U8 unk_17;
-	U8 unk_18;
-	U32 unk_19;
+	CGPvEHitNpc() : GameNetEvent{ CG_PVE_HIT_NPC, GuaranteedOrdered, DirClientToServer } {}
 
-
-	void pack(EventConnection* conn, BitStream* bstream) {};
-	void unpack(EventConnection* conn, BitStream* bstream)
+	void pack(EventConnection* conn, BitStream* bstream) override {}
+	void unpack(EventConnection* conn, BitStream* bstream) override
 	{
-		bstream->read(&unk_01);
-		bstream->read(&unk_02);
+		bstream->read(&playerId);
+		bstream->read(&targetNpcUid);
 		bstream->read(&unk_03);
-		bstream->read(&unk_04);
-		bstream->read(&unk_05);
-		bstream->read(&unk_06);
-		bstream->read(&unk_07);
-		bstream->read(&unk_08);
-		bstream->read(&unk_09);
-		bstream->read(&unk_10);
+		bstream->read(&impactPosX);
+		bstream->read(&impactPosY);
+		bstream->read(&impactPosZ);
+		bstream->read(&impactOffsetPosX);
+		bstream->read(&impactOffsetPosY);
+		bstream->read(&impactOffsetPosZ);
+		bstream->read(&entityId);
 		bstream->read(&unk_11);
-		bstream->read(&unk_12);
-		bstream->read(&unk_13);
-		bstream->read(&unk_14);
-		bstream->read(&unk_15);
-		bstream->read(&unk_16);
-		bstream->read(&unk_17);
+		bstream->read(&bodyPartId);
+		bstream->read(&weaponItemId);
+		bstream->read(&weaponCardId);
+		bstream->read(&weaponType);
+		bstream->read(&bodyPartIdCopy);
+		bstream->read(&hitLocation);
 		bstream->read(&unk_18);
 		bstream->read(&unk_19);
-	};
-	void process(EventConnection* ps) 
+	}
+
+	void handle(GameConnection* conn, const Player::Ptr player) override
 	{
-	};
+		/*std::cout << std::endl;
+		std::cout << "============ CGPvEHitNpc Report ============" << std::endl;
+		std::cout << "playerId: " << (int)playerId << std::endl;
+		std::cout << "targetNpcUid: " << (int)targetNpcUid << std::endl;
+		std::cout << std::endl;
+		std::cout << "unk_03: " << (int)unk_03 << std::endl;
+		std::cout << std::endl;
+		std::cout << "impactPosX: " << (float)impactPosX << std::endl;
+		std::cout << "impactPosY: " << (float)impactPosY << std::endl;
+		std::cout << "impactPosZ: " << (float)impactPosZ << std::endl;
+		std::cout << std::endl;
+		std::cout << "impactOffsetPosX: " << (float)impactOffsetPosX << std::endl;
+		std::cout << "impactOffsetPosY: " << (float)impactOffsetPosY << std::endl;
+		std::cout << "impactOffsetPosZ: " << (float)impactOffsetPosZ << std::endl;
+		std::cout << std::endl;
+		std::cout << "entityId: " << (int)entityId << std::endl;
+		std::cout << "unk_11: " << (int)unk_11 << std::endl;
+		std::cout << std::endl;
+		std::cout << "bodyPartId: " << (int)bodyPartId << std::endl;
+		std::cout << std::endl;
+
+		std::cout << "weaponItemId: " << (int)weaponItemId << std::endl;
+		std::cout << "weaponCardId: " << (int)weaponCardId << std::endl;
+		std::cout << "weaponType: " << (int)weaponType << std::endl;
+
+		std::cout << std::endl;
+
+		std::cout << "bodyPartIdCopy: " << (int)bodyPartIdCopy << std::endl;
+		std::cout << std::endl;
+		std::cout << "hitLocation: " << (int)hitLocation << std::endl;
+		std::cout << std::endl;
+		std::cout << "unk_18: " << (int)unk_18 << std::endl;
+		std::cout << "unk_19: " << (int)unk_19 << std::endl;
+		std::cout << "============================================" << std::endl;*/
+
+		const auto roomPlayer = player->getRoomPlayer();
+
+		if (roomPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSessionPlayer = roomPlayer->getRoomSessionPlayer();
+
+		if (roomSessionPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSession = roomSessionPlayer->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		// Check if player is dead, you can not deal damage when you're dead.
+		if (roomSessionPlayer->isDead())
+		{
+			return;
+		}
+
+		const auto targetNpc = roomSession->getNpcManager()->findNpcByUid(targetNpcUid);
+
+		// Check if npc exists.
+		if (targetNpc == nullptr)
+		{
+			return;
+		}
+
+		// Check if the hit npc is dead, dead npc's can not take MORE damage.
+		if (targetNpc->isDead())
+		{
+			return;
+		}
+
+		// Make sure the player has the weapon that is used.
+		if (const auto hasWeapon = roomSessionPlayer->getWeaponManager()->hasWeapon(weaponItemId); !hasWeapon)
+		{
+			return;
+		}
+
+		// Make sure the player owns the actual weapon card.
+		if (const auto hasWeaponCard = player->getInventoryManager()->hasCard(weaponCardId); !hasWeaponCard)
+		{
+			return;
+		}
+
+		// TODO: Check if weaponType matches with the used weapon.
+
+		const auto bodyPart = targetNpc->getBodyPartById(bodyPartId);
+
+		if (bodyPart == nullptr)
+		{
+			return;
+		}
+
+		const auto impactPos = Position{ impactPosX, impactPosY, impactPosZ };
+		const auto impactOffsetPos = Position{ impactOffsetPosX, impactOffsetPosY, impactOffsetPosZ };
+
+		const auto weaponUsed = Game::instance()->getWeaponManager()->get(weaponItemId);
+
+		// FIXME: Right now we grab the weaponType the client sends us. But we want to use the weapon type that we
+		// have stored in the database, currently it is not stored as 71-76 range but rather 1-4 so that's something that needs to change first.
+
+		const auto cgPvEHitNpcData = CGPvEHitNpcData
+		{
+			roomSessionPlayer,
+			targetNpc,
+			unk_03,
+			impactPos,
+			impactOffsetPos,
+			entityId,
+			unk_11,
+			bodyPartId,
+			weaponUsed,
+			weaponCardId,
+			static_cast<eWeaponType>(weaponType),
+			static_cast<eHitLocation>(hitLocation),
+			unk_18,
+			unk_19
+		};
+
+		roomSession->getNpcManager()->onCGPvEHitNpc(cgPvEHitNpcData);
+
+		if (roomSessionPlayer->isInvincible())
+		{
+			roomSessionPlayer->removeInvincibility();
+		}
+
+		if (weaponUsed.weaponType != WeaponType::BOMB)
+			targetNpc->setLastAttackerId(player->getId());
+	}
+
+	void process(EventConnection* ps) override
+	{
+		post<CGPvEHitNpc>(ps);
+	}
 
 	TNL_DECLARE_CLASS(CGPvEHitNpc);
 };

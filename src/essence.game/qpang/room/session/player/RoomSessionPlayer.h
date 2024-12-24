@@ -5,7 +5,6 @@
 #include <cstdint>
 
 #include "qpang/Position.h"
-#include "qpang/room/session/bullet/Bullet.h"
 
 #include "qpang/room/session/player/effect/PlayerEffectManager.h"
 #include "qpang/room/session/player/weapon/PlayerWeaponManager.h"
@@ -16,7 +15,6 @@ class GameNetEvent;
 class RoomSession;
 class GameConnection;
 class Player;
-class Skill;
 
 class RoomSessionPlayer : public std::enable_shared_from_this<RoomSessionPlayer>
 {
@@ -32,13 +30,18 @@ public:
 
 	void tick();
 	void start();
+
 	void stop();
+	void stopPveGame();
 
 	bool canStart();
 	bool isInvincible();
+	bool isPermanentlyInvincible();
 	bool isPlaying();
 
-	void makeInvincible();
+	void togglePermanentInvincibility();
+
+	void makeInvincible(uint32_t invincibleRemovalTime = 5);
 	void removeInvincibility();
 	void addPlayer(RoomSessionPlayer::Ptr player);
 
@@ -48,13 +51,31 @@ public:
 	void setPosition(const Position& position);
 	Position getPosition();
 
+	void setFloorNumber(uint8_t floorNumber);
+	uint8_t getFloorNumber() const;
+
+	void increaseGoldenCoinCount();
+	void increaseSilverCoinCount();
+	void increaseBronzeCoinCount();
+
+	uint32_t getGoldenCoinCount() const;
+	uint32_t getSilverCoinCount() const;
+	uint32_t getBronzeCoinCount() const;
+
 	void addHealth(uint16_t health, bool updateOnClient = false);
 	void takeHealth(uint16_t health, bool updateOnClient = false);
 	void setHealth(uint16_t health, bool updateOnClient = false);
+
+	void setPermanentlyDead(bool permanentlyDead);
+
 	bool isDead();
+	bool isPermanentlyDead();
+
+	bool canRespawn();
+	void setCanRespawn(bool canRespawn);
 
 	void respawn();
-	void startRespawnCooldown();
+	void startRespawnCooldown(bool hasCooldown = true);
 
 	void setSpectating(bool isSpectating = true);
 	bool isSpectating();
@@ -81,6 +102,7 @@ public:
 	void healTeam(uint16_t healing);
 
 	uint16_t getScore();
+
 	uint16_t getKills();
 	uint16_t getDeaths();
 	uint32_t getPlaytime();
@@ -91,6 +113,29 @@ public:
 	void addKill();
 	void addDeath();
 	void addScore(uint16_t score = 1);
+
+	uint16_t getTagKillsAsPlayer();
+	void addTagKillAsPlayer();
+
+	uint16_t getPlayerKillsAsTag();
+	void addPlayerKillAsTag();
+
+	uint16_t getDeathsAsTag();
+	void addDeathAsTag();
+
+	uint16_t getDeathsByTag();
+	void addDeathByTag();
+
+	uint16_t getTagPoints();
+
+	uint32_t getTimeAliveAsTag();
+	void addTimeAliveAsTag(uint32_t time = 1);
+
+	uint32_t getDamageDealtToTag();
+	void addDamageDealtToTag(uint32_t damage);
+
+	uint32_t getDamageDealtAsTag();
+	void addDamageDealtAsTag(uint32_t damage);
 
 	std::shared_ptr<Player> getPlayer();
 	GameConnection* getGameConnection();
@@ -107,6 +152,7 @@ public:
 
 		post(evt);
 	}
+
 private:
 
 	PlayerEffectManager m_effectManager;
@@ -116,12 +162,21 @@ private:
 
 	Position m_position;
 
+	uint8_t m_floorNumber = 0;
+
+	uint32_t m_goldenCoinCount = 0;
+	uint32_t m_silverCoinCount = 0;
+	uint32_t m_bronzeCoinCount = 0;
+
 	time_t m_joinTime;
 	time_t m_startTime;
 	time_t m_invincibleRemovalTime;
 	time_t m_respawnTime;
 
 	bool m_isPlaying; // true if waiting for players is over
+	bool m_permanentlyDead;
+
+	bool m_canRespawn;
 	bool m_isRespawning;
 
 	bool m_isSpectating;
@@ -135,9 +190,12 @@ private:
 	std::array<uint32_t, 9> m_armor;
 
 	std::mutex m_bulletMx;
+
+	uint8_t m_respawnCooldown;
 	
 	bool m_hasQuickRevive;
 	bool m_isInvincible;
+	bool m_isPermanentlyInvincible;
 
 	uint16_t m_expRate;
 	uint16_t m_donRate;
@@ -153,6 +211,16 @@ private:
 	uint32_t m_playTime;
 	uint32_t m_highestMultiKill;
 	uint32_t m_eventItemPickUps;
+
+	uint16_t m_deathsAsTag;
+	uint16_t m_deathsByTag;
+
+	uint16_t m_tagKillsAsPlayer;
+	uint16_t m_playerKillsAsTag;
+
+	uint32_t m_timeAliveAsTag;
+	uint32_t m_damageDealtToTag;
+	uint32_t m_damageDealtAsTag;
 	
 	GameConnection* m_conn;
 	std::shared_ptr<RoomSession> m_roomSession;

@@ -38,6 +38,11 @@ public:
 	uint32_t getTeamKills();
 	uint32_t getTeamDeaths();
 
+	uint32_t getDeathsAsTag();
+	uint32_t getDeathsByTag();
+	uint32_t getTagKillsAsPlayer();
+	uint32_t getPlayerKillsAsTag();
+
 	void apply(std::shared_ptr<RoomSessionPlayer> player);
 
 	void addKills(uint32_t val);
@@ -64,7 +69,18 @@ public:
 
 	void addTeamKills(uint32_t val = 1);
 	void addTeamDeaths(uint32_t val = 1);
-	
+
+	void addDeathsAsTag(uint32_t val = 1);
+	void addDeathsByTag(uint32_t val = 1);
+	void addTagKillsAsPlayer(uint32_t val = 1);
+	void addPlayerKillsAsTag(uint32_t val = 1);
+
+	void addTimeAliveAsTag(uint32_t val);
+	void addDamageDealtToTag(uint32_t val);
+	void addDamageDealtAsTag(uint32_t val);
+
+	void addPublicEnemyGamesPlayed(uint32_t val = 1);
+
 private:
 	std::weak_ptr<Player> m_player;
 
@@ -91,4 +107,16 @@ private:
 	uint32_t m_teamDeaths = 0;
 
 	uint32_t m_eventItemPickUps = 0;
+
+	uint16_t m_deathsAsTag = 0;
+	uint16_t m_deathsByTag = 0;
+
+	uint16_t m_tagKillsAsPlayer = 0;
+	uint16_t m_playerKillsAsTag = 0;
+
+	uint32_t m_timeAliveAsTag = 0;
+	uint32_t m_damageDealtToTag = 0;
+	uint32_t m_damageDealtAsTag = 0;
+
+	uint32_t m_publicEnemyGamesPlayed = 0;
 };

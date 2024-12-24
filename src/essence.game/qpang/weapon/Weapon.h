@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-enum WeaponType : uint8_t
+enum class WeaponType : uint8_t
 {
 	MELEE,
 	RIFLE,

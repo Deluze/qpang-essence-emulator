@@ -3,30 +3,44 @@
 
 #include "GameNetEvent.h"
 
-class GCPvEAreaTriggerInit : public GameNetEvent
+class GCPvEAreaTriggerInit final : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvEAreaTriggerInit() : GameNetEvent{ GC_PVEA_AREA_TRIGGER_INIT, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirAny } {};
+	U32 areaId = 0; // 88
 
-	U32 unk_01;
-	U32 unk_02;
-	U32 unk_03;
-	U32 unk_04;
-	U32 unk_05;
-	U8 unk_06;
+	F32 minBoundX = 0.00f; // 92
+	F32 minBoundZ = 0.00f; // 96
 
-	void pack(EventConnection* conn, BitStream* bstream)
+	F32 maxBoundX = 0.00f; // 100
+	F32 maxBoundZ = 0.00f; // 104
+
+	U8 cmd = 1;  // 108 Create area = 1
+
+	GCPvEAreaTriggerInit() : GameNetEvent{ GC_PVEA_AREA_TRIGGER_INIT, GuaranteedOrdered, DirServerToClient } {}
+
+	explicit GCPvEAreaTriggerInit(const std::shared_ptr<PveArea>& pveArea)
+		: GameNetEvent{ GC_PVEA_AREA_TRIGGER_INIT, GuaranteedOrdered, DirServerToClient },
+		areaId(pveArea->getUid()),
+		minBoundX(pveArea->getMinBound().x),
+		minBoundZ(pveArea->getMinBound().z),
+		maxBoundX(pveArea->getMaxBound().x),
+		maxBoundZ(pveArea->getMaxBound().z)
 	{
-		bstream->write(unk_01);
-		bstream->write(unk_02);
-		bstream->write(unk_03);
-		bstream->write(unk_04);
-		bstream->write(unk_05);
-		bstream->write(unk_06);
-	};
-	void unpack(EventConnection* conn, BitStream* bstream) {};
-	void process(EventConnection* ps) {};
+	}
+
+	void pack(EventConnection* conn, BitStream* bstream) override
+	{
+		bstream->write(areaId);
+		bstream->write(minBoundX);
+		bstream->write(minBoundZ);
+		bstream->write(maxBoundX);
+		bstream->write(maxBoundZ);
+		bstream->write(cmd);
+	}
+
+	void unpack(EventConnection* conn, BitStream* bstream) override {}
+	void process(EventConnection* ps) override {}
 
 	TNL_DECLARE_CLASS(GCPvEAreaTriggerInit);
 };

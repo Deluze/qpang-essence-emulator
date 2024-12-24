@@ -31,8 +31,11 @@ public:
 		this->playerRank = spectatorMode ? 3 : player->getRank();
 		this->refers = player->getPrestige();
 		this->level = player->getLevel();
-		this->life = player->getEquipmentManager()->getBaseHealth() + player->getEquipmentManager()->getBonusHealth();
+		this->life = player->getEquipmentManager()->getBaseHealth() + player->getEquipmentManager()->getBonusHealth(nullptr);
 		this->experience = player->getExperience();
+
+		if (roomPlayer->getRoom()->getMode() == GameMode::PVE)
+			this->actionId = player->getCoins();
 	}
 
 	GCJoin(RoomSessionPlayer::Ptr session, bool spectatorMode = false) : GameNetEvent{ GC_JOIN, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient }
@@ -56,6 +59,9 @@ public:
 		this->level = player->getLevel();
 		this->life = session->getDefaultHealth();
 		this->experience = player->getExperience();
+
+		if (session->getRoomSession()->getRoom()->getMode() == GameMode::PVE)
+			this->actionId = player->getCoins();
 	}
 
 	void pack(EventConnection* conn, BitStream* bstream)

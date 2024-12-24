@@ -6,18 +6,18 @@
 #include "qpang/player/inventory/InventoryManager.h"
 #include "qpang/player/inventory/InventoryCard.h"
 
-#include "packets/lobby/outgoing/shop/CardPurchaseComplete.h"
-#include "packets/lobby/outgoing/shop/ShopItems.h"
+#include "packets/lobby/outgoing/shop/SendShopCardPurchaseComplete.h"
+#include "packets/lobby/outgoing/shop/SendShopItems.h"
 
 void ShopManager::initialize()
 {
 	m_items.clear();
 	m_orderedItems.clear();
-	
-	const auto stmt = DATABASE->prepare("SELECT * FROM `items`");
+
+	const auto stmt = DATABASE->prepare("SELECT * FROM `items` ORDER BY seq_id");
 	const auto res = stmt->fetch();
 
-	std::cout << "Loading shop items... ";
+	std::cout << "Loading shop items.\n";
 
 	while (res->hasNext())
 	{
@@ -37,60 +37,95 @@ void ShopManager::initialize()
 
 		m_items[item.seqId] = item;
 		m_orderedItems.push_back(item);
-		
+
 		res->next();
 	}
 
-	std::cout << m_items.size() << " loaded! \n";
+	std::cout << "Loaded " << m_items.size() << " items.\n";
 }
 
 std::vector<ShopItem> ShopManager::list()
 {
-	std::vector<ShopItem> items;
+	std::vector<ShopItem> items{};
 
 	for (const auto& [id, item] : m_items)
+	{
 		items.push_back(item);
+	}
 
 	return items;
 }
 
-ShopItem ShopManager::get(uint32_t seqId)
+void ShopManager::sendShopItems(const Player::Ptr& player)
+{
+	// list of every element. the size of this list = the first short
+	const std::vector<ShopItem> items = list();
+
+	// the amount of elements after which the packet will be divided. can be configured
+	constexpr uint16_t partitionSize = 75;
+
+	// the amount of partitions to send
+	const auto partitionCount = static_cast<uint32_t>(ceil(items.size() / static_cast<double>(partitionSize)));
+
+	for (uint16_t i = 0; i < partitionCount; i++)
+	{
+		// this value = the second short
+		const uint16_t currentSendCount = i * partitionSize + partitionSize >= items.size()
+			? static_cast<uint16_t>(items.size())
+			: i * partitionSize + partitionSize;
+
+		// create a sublist. the size of this = the third short
+		std::vector<ShopItem> partition = slice(items, i * partitionSize + 1, currentSendCount);
+
+		// now send the data
+		player->send(SendShopItems(partition, static_cast<uint16_t>(items.size()), currentSendCount, static_cast<uint16_t>(partition.size())));
+	}
+}
+
+ShopItem ShopManager::get(const uint32_t seqId)
 {
 	auto it = m_items.find(seqId);
-	
+
 	return it != m_items.cend() ? (*it).second : ShopItem{};
 }
 
-bool ShopManager::exists(uint32_t seqId)
+bool ShopManager::exists(const uint32_t seqId)
 {
 	return m_items.find(seqId) != m_items.cend();
 }
 
-void ShopManager::buy(std::shared_ptr<Player> player, uint32_t seqId)
+InventoryCard ShopManager::buy(const std::shared_ptr<Player>& player, const uint32_t seqId, const bool updateShopItems)
 {
-	// TODO; packages
+	// TODO: Allow players to buy shop packages.
 	assert(player != nullptr);
 
 	if (!exists(seqId))
-		return;
+	{
+		return InventoryCard{};
+	}
 
 	if (!player->getInventoryManager()->hasSpace())
-		return;
+	{
+		return InventoryCard{};
+	}
 
-	auto& shopItem = get(seqId);
+	const auto& shopItem = get(seqId);
 
 	if (shopItem.soldCount >= shopItem.stock && shopItem.stock != 9999)
-		return;
+	{
+		return InventoryCard{};
+	}
 
 	const auto money = shopItem.isCash ? player->getCash() : player->getDon();
-	const auto hasEnough = money >= shopItem.price;
 
-	if (!hasEnough)
-		return;
+	if (const auto hasEnough = money >= shopItem.price; !hasEnough)
+	{
+		return InventoryCard{};
+	}
 
 	auto card = InventoryCard::fromShopItem(shopItem);
 
-	auto stmt = DATABASE->prepare(
+	const auto stmt = DATABASE->prepare(
 		"INSERT INTO player_items (player_id, item_id, period, period_type, type, active, opened, giftable, boosted, boost_level, time)" \
 		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -104,20 +139,21 @@ void ShopManager::buy(std::shared_ptr<Player> player, uint32_t seqId)
 	stmt->bindInteger(card.isGiftable);
 	stmt->bindInteger(card.boostLevel > 0);
 	stmt->bindInteger(card.boostLevel);
-	stmt->bindLong(time(NULL));
+	stmt->bindLong(time(nullptr));
 
 	stmt->execute();
 
 	ShopItem* itemPtr = &m_items[seqId];
 	itemPtr->soldCount++;
 
-	auto stmt2 = DATABASE->prepare("UPDATE items SET sold_count = ? WHERE seq_id = ?");
+	const auto stmt2 = DATABASE->prepare("UPDATE items SET sold_count = ? WHERE seq_id = ?");
+
 	stmt2->bindInteger(itemPtr->soldCount);
 	stmt2->bindInteger(itemPtr->seqId);
 
 	stmt2->execute();
 
-	auto cardId = stmt->getLastInsertId();
+	const auto cardId = stmt->getLastInsertId();
 
 	card.id = cardId;
 	card.playerOwnerId = player->getId();
@@ -126,6 +162,11 @@ void ShopManager::buy(std::shared_ptr<Player> player, uint32_t seqId)
 
 	player->getInventoryManager()->addCard(card);
 
-	player->send(ShopItems(list()));
-	player->send(CardPurchaseComplete(shopItem, { card }, shopItem.isCash ? player->getCash() : player->getDon()));
+	if (updateShopItems)
+	{
+		sendShopItems(player);
+		player->send(SendShopCardPurchaseComplete(shopItem, { card }, shopItem.isCash ? player->getCash() : player->getDon()));
+	}
+
+	return card;
 }

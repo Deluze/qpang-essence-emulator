@@ -12,7 +12,7 @@ class CommandManager
 public:
 	void initialize();
 
-	bool isCommand(const std::u16string& command);
+	bool isCommand(std::u16string& command);
 	void handle(std::shared_ptr<Player> player, const std::u16string& command, const std::u16string& arg);
 
 private:

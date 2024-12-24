@@ -6,14 +6,14 @@
 #include "qpang/Game.h"
 #include "qpang/player/Player.h"
 
-#include "packets/lobby/outgoing/friend/AppearOnline.h"
-#include "packets/lobby/outgoing/friend/AppearOffline.h"
-#include "packets/lobby/outgoing/friend/AddIncomingFriend.h"
-#include "packets/lobby/outgoing/friend/AddOutgoingFriend.h"
-#include "packets/lobby/outgoing/friend/OutgoingFriendAccepted.h"
-#include "packets/lobby/outgoing/friend/AcceptIncomingFriend.h"
-#include "packets/lobby/outgoing/friend/RemoveFriend.h"
-#include "packets/lobby/outgoing/friend/FriendRemoved.h"
+#include "packets/lobby/outgoing/friend/SendAppearOnline.h"
+#include "packets/lobby/outgoing/friend/SendAppearOffline.h"
+#include "packets/lobby/outgoing/friend/SendAddIncomingFriend.h"
+#include "packets/lobby/outgoing/friend/SendAddOutgoingFriend.h"
+#include "packets/lobby/outgoing/friend/SendOutgoingFriendAccepted.h"
+#include "packets/lobby/outgoing/friend/SendAcceptIncomingFriend.h"
+#include "packets/lobby/outgoing/friend/SendRemoveFriend.h"
+#include "packets/lobby/outgoing/friend/SendFriendRemoved.h"
 
 void FriendManager::initialize(std::shared_ptr<Player> player, uint32_t playerId)
 {
@@ -58,13 +58,13 @@ void FriendManager::initialize(std::shared_ptr<Player> player, uint32_t playerId
 void FriendManager::appearOnline()
 {
 	if (const auto player = m_player.lock(); player != nullptr)
-		send(AppearOnline(player->getId()));
+		send(SendAppearOnline(player->getId()));
 }
 
 void FriendManager::appearOffline()
 {
 	if (const auto player = m_player.lock(); player != nullptr)
-		send(AppearOffline(player->getId()));
+		send(SendAppearOffline(player->getId()));
 }
 
 void FriendManager::send(const LobbyServerPacket& packet)
@@ -128,7 +128,7 @@ void FriendManager::addIncomingFriend(std::shared_ptr<Player> target)
 
 		m_incomingFriends[fr.playerId] = fr;
 
-		player->send(AddIncomingFriend(fr));
+		player->send(SendAddIncomingFriend(fr));
 	}
 }
 
@@ -153,7 +153,7 @@ void FriendManager::addOutgoingFriend(std::shared_ptr<Player> target)
 
 		m_outgoingFriends[fr.playerId] = fr;
 
-		player->send(AddOutgoingFriend(fr));
+		player->send(SendAddOutgoingFriend(fr));
 	}
 }
 
@@ -203,7 +203,7 @@ void FriendManager::acceptIncoming(std::shared_ptr<Player> target)
 
 		setStateDB(target->getId(), 1);
 
-		player->send(AcceptIncomingFriend(fr));
+		player->send(SendAcceptIncomingFriend(fr));
 
 		m_incomingFriends.erase(it);
 	}
@@ -227,7 +227,7 @@ void FriendManager::onOutgoingAccepted(std::shared_ptr<Player> target)
 
 		setStateDB(target->getId(), 1);
 
-		player->send(OutgoingFriendAccepted(fr));
+		player->send(SendOutgoingFriendAccepted(fr));
 
 		m_outgoingFriends.erase(it);
 	}
@@ -241,7 +241,7 @@ void FriendManager::remove(uint32_t playerId)
 		m_friends.erase(playerId);
 		m_mx.unlock();
 		
-		player->send(RemoveFriend(playerId));
+		player->send(SendRemoveFriend(playerId));
 
 		removeFromDB(playerId);
 	}
@@ -262,7 +262,7 @@ void FriendManager::onRemoved(uint32_t playerId)
 
 		m_friends.erase(it);
 
-		player->send(FriendRemoved(fr));
+		player->send(SendFriendRemoved(fr));
 
 		removeFromDB(playerId);
 	}

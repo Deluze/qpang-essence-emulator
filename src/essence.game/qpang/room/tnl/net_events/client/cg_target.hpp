@@ -2,6 +2,7 @@
 #define CG_TARGET_H
 
 #include "GameNetEvent.h"
+#include "gc_target.hpp"
 
 class CGTarget : public GameNetEvent
 {
@@ -16,19 +17,40 @@ public:
 		bstream->read(&playerId);
 		bstream->read(&targetId);
 	};
+
+	void handle(GameConnection* conn, Player::Ptr player)
+	{
+		//std::cout << "CGTarget::handle >> CMD: " << cmd << ", PlayerID: " << playerId << ", TargetID: " << targetId << std::endl;
+
+		const auto roomPlayer = player->getRoomPlayer();
+
+		if (roomPlayer == nullptr)
+		{
+			return;
+		}
+
+		const auto roomSession = roomPlayer->getRoom()->getRoomSession();
+
+		if (roomSession == nullptr)
+		{
+			return;
+		}
+
+		const auto sourcePlayer = roomSession->find(playerId);
+		const auto targetPlayer = roomSession->find(targetId);
+
+		if (sourcePlayer == nullptr || targetPlayer == nullptr)
+		{
+			return;
+		}
+
+		sourcePlayer->post(new GCTarget(cmd, playerId, targetId));
+		targetPlayer->post(new GCTarget(cmd, playerId, targetId));
+	};
+
 	void process(EventConnection* ps)
 	{
-		//auto player = sGame->FindPlayer(ps, playerId);
-
-		//if (player)
-		//{
-		//	auto room = player->GetRoom();
-		//
-		//	if (room && room->GetPlayer(targetId))
-		//	{
-		//		room->OnPlayerTarget(*this);
-		//	}
-		//}
+		post<CGTarget>(ps);
 	};
 
 	U32 playerId;

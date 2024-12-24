@@ -20,7 +20,7 @@ public:
 
 	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
-		auto nickname = args.at(0);
+		auto &nickname = args.at(0);
 
 		auto target = Game::instance()->getOnlinePlayer(nickname);
 
@@ -31,6 +31,6 @@ public:
 		}
 
 		target->close();
-		player->broadcast(u"Done!");
+		player->broadcast(u"Successfully disconnected the player.");
 	}
 };

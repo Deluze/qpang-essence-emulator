@@ -31,6 +31,6 @@ public:
 		}
 
 		target->close();
-		player->broadcast(u"Done!");
+		player->broadcast(u"Successfully disconnected the player.");
 	}
 };
