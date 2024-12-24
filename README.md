@@ -44,10 +44,10 @@ It conists out of:
 - **Automatic square generation so they don't get overcrowded** (50 players max, configurable)
 - **Full working machine guns in the bunker/ground zero map**
 - **Trading. Trade your items with someone else!**
+- **PvE gamemode**
 
 Missing features:
 
-- PvE gamemode
 - Memos (Not a priority at the moment)
 - Registration in-game (WIP)
 - Card boosting/enhancing (WIP)
