@@ -1,3 +1,5 @@
+**This project is archived and thus unmaintained. The emulator contains some exploits that allows attackers to impersonate other players and execute GM-commands. Therefore, please only use this emulator for research & educational purposes!**
+
 # QPang Essence Emulator
 
 This is the first ever QPang server emulator that is built around the 2012/03/14 revision of the client (20120314), but should also support newer versions.
