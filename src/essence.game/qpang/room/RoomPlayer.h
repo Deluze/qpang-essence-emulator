@@ -1,8 +1,7 @@
 #pragma once
 
-#include <memory>
-#include <vector>
 #include <cstdint>
+#include <memory>
 
 class Player;
 class Room;
@@ -10,39 +9,40 @@ class RoomSessionPlayer;
 class GameConnection;
 class GameNetEvent;
 
-class RoomPlayer
+class RoomPlayer  // NOLINT(cppcoreguidelines-special-member-functions)
 {
 public:
+	// ReSharper disable once CppInconsistentNaming
 	using Ptr = std::shared_ptr<RoomPlayer>;
 
-	RoomPlayer(GameConnection* conn, std::shared_ptr<Room> room);
+	RoomPlayer(GameConnection* conn, const std::shared_ptr<Room>& room);
 	~RoomPlayer();
 
-	std::shared_ptr<Player> getPlayer();
-	std::shared_ptr<Room> getRoom();
+	[[nodiscard]] std::shared_ptr<Player> getPlayer() const;
+	[[nodiscard]] std::shared_ptr<Room> getRoom() const;
 
 	// When calling this MAKE SURE that the lifetime of RoomPlayer is longer than of the GameConnection this function returns
-	GameConnection* getConnection();
+	[[nodiscard]] GameConnection* getConnection() const;
 
-	void send(GameNetEvent* evt);
+	void send(GameNetEvent* evt) const;
 
-	uint8_t getTeam();
+	[[nodiscard]] uint8_t getTeam() const;
 	void setTeam(uint8_t team);
 
-	bool isReady();
+	[[nodiscard]] bool isReady() const;
 	void setReady(bool isReady = true);
 
-	bool isPlaying();
+	[[nodiscard]] bool isPlaying() const;
 	void setPlaying(bool isPlaying = true);
 
-	bool isSpectating();
+	[[nodiscard]] bool isSpectating() const;
 	void setSpectating(bool isSpectating = true);
 
-	void setRoomSessionPlayer(std::shared_ptr<RoomSessionPlayer> player);
+	void setRoomSessionPlayer(const std::shared_ptr<RoomSessionPlayer>& player);
 	
-	void onStart();
+	void onStart() const;
 
-	std::shared_ptr<RoomSessionPlayer> getRoomSessionPlayer();
+	[[nodiscard]] std::shared_ptr<RoomSessionPlayer> getRoomSessionPlayer() const;
 private:
 	uint8_t m_team;
 	bool m_isReady;
@@ -52,6 +52,4 @@ private:
 	GameConnection* m_conn = nullptr;
 	std::shared_ptr<Room> m_room;
 	std::weak_ptr<RoomSessionPlayer> m_roomSessionPlayer;
-
-
 };

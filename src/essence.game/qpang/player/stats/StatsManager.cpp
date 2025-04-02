@@ -40,6 +40,14 @@ void StatsManager::initialize(std::shared_ptr<Player> player, uint32_t playerId)
 	m_teamKills = res->getInt("team_kills");
 	m_teamDeaths = res->getInt("team_deaths");
 	m_eventItemPickUps = res->getInt("event_item_pickups");
+	m_deathsAsTag = res->getInt("deaths_as_tag");
+	m_deathsByTag = res->getInt("deaths_by_tag");
+	m_tagKillsAsPlayer = res->getInt("tag_kills_as_player");
+	m_playerKillsAsTag = res->getInt("player_kills_as_tag");
+	m_timeAliveAsTag = res->getInt("time_alive_as_tag");
+	m_damageDealtAsTag = res->getInt("damage_dealt_as_tag");
+	m_damageDealtToTag = res->getInt("damage_dealt_to_tag");
+	m_publicEnemyGamesPlayed = res->getInt("public_enemy_games_played");
 }
 
 void StatsManager::save()
@@ -49,7 +57,8 @@ void StatsManager::save()
 		DATABASE_DISPATCHER->dispatch(
 			"UPDATE player_stats " \
 			"SET kills = ?, deaths = ?, n_won = ?, n_lost = ?, n_drew = ?, m_won = ?, m_lost = ?, m_drew = ?, playtime = ?, slacker_points = ?, " \
-			"melee_kills = ?, gun_kills = ?, launcher_kills = ?, bomb_kills = ?, headshot_kills = ?, headshot_deaths = ?, team_kills = ?, team_deaths = ?, event_item_pickups = ? "
+			"melee_kills = ?, gun_kills = ?, launcher_kills = ?, bomb_kills = ?, headshot_kills = ?, headshot_deaths = ?, team_kills = ?, team_deaths = ?, event_item_pickups = ?, " \
+			"deaths_as_tag = ?, deaths_by_tag = ?, tag_kills_as_player = ?, player_kills_as_tag = ?, time_alive_as_tag = ?, damage_dealt_as_tag = ?, damage_dealt_to_tag = ?, public_enemy_games_played = ? "
 			"WHERE player_id = ?",
 			{
 				m_kills,
@@ -71,6 +80,14 @@ void StatsManager::save()
 				m_teamKills,
 				m_teamDeaths,
 				m_eventItemPickUps,
+				m_deathsAsTag,
+				m_deathsByTag,
+				m_tagKillsAsPlayer,
+				m_playerKillsAsTag,
+				m_timeAliveAsTag,
+				m_damageDealtAsTag,
+				m_damageDealtToTag,
+				m_publicEnemyGamesPlayed,
 				player->getId()
 			}
 		);
@@ -152,6 +169,26 @@ uint32_t StatsManager::getTeamDeaths()
 	return m_teamDeaths;
 }
 
+uint32_t StatsManager::getDeathsAsTag()
+{
+	return m_deathsAsTag;
+}
+
+uint32_t StatsManager::getDeathsByTag()
+{
+	return m_deathsByTag;
+}
+
+uint32_t StatsManager::getTagKillsAsPlayer()
+{
+	return m_tagKillsAsPlayer;
+}
+
+uint32_t StatsManager::getPlayerKillsAsTag()
+{
+	return m_playerKillsAsTag;
+}
+
 uint32_t StatsManager::getMeleeKills()
 {
 	return m_meleeKills;
@@ -177,7 +214,19 @@ void StatsManager::apply(std::shared_ptr<RoomSessionPlayer> player)
 	addKills(player->getKills());
 	addDeaths(player->getDeaths());
 	addPlaytime(player->getPlaytime());
+
 	m_eventItemPickUps += player->getEventItemPickUps();
+
+	addDeathsAsTag(player->getDeathsAsTag());
+	addDeathsByTag(player->getDeathsByTag());
+	addTagKillsAsPlayer(player->getTagKillsAsPlayer());
+	addPlayerKillsAsTag(player->getPlayerKillsAsTag());
+
+	addTimeAliveAsTag(player->getTimeAliveAsTag());
+	addDamageDealtAsTag(player->getDamageDealtAsTag());
+	addDamageDealtToTag(player->getDamageDealtToTag());
+
+	addPublicEnemyGamesPlayed();
 
 	save();
 }
@@ -204,6 +253,10 @@ void StatsManager::clearKD()
 	m_bombKills = 0;
 	m_headshotKills = 0;
 	m_headshotDeaths = 0;
+	m_deathsAsTag = 0;
+	m_deathsByTag = 0;
+	m_tagKillsAsPlayer = 0;
+	m_playerKillsAsTag = 0;
 
 	save();
 }
@@ -251,6 +304,7 @@ void StatsManager::clearWL()
 	m_missionWon = 0;
 	m_missionLost = 0;
 	m_missionDrew = 0;
+	m_publicEnemyGamesPlayed = 0;
 
 	save();
 }
@@ -298,4 +352,44 @@ void StatsManager::addTeamKills(uint32_t val)
 void StatsManager::addTeamDeaths(uint32_t val)
 {
 	m_teamDeaths += val;
+}
+
+void StatsManager::addDeathsAsTag(uint32_t val)
+{
+	m_deathsAsTag += val;
+}
+
+void StatsManager::addDeathsByTag(uint32_t val)
+{
+	m_deathsByTag += val;
+}
+
+void StatsManager::addTagKillsAsPlayer(uint32_t val)
+{
+	m_tagKillsAsPlayer += val;
+}
+
+void StatsManager::addPlayerKillsAsTag(uint32_t val)
+{
+	m_playerKillsAsTag += val;
+}
+
+void StatsManager::addTimeAliveAsTag(uint32_t val)
+{
+	m_timeAliveAsTag += val;
+}
+
+void StatsManager::addDamageDealtToTag(uint32_t val)
+{
+	m_damageDealtToTag += val;
+}
+
+void StatsManager::addDamageDealtAsTag(uint32_t val)
+{
+	m_damageDealtAsTag += val;
+}
+
+void StatsManager::addPublicEnemyGamesPlayed(uint32_t val)
+{
+	m_publicEnemyGamesPlayed += val;
 }

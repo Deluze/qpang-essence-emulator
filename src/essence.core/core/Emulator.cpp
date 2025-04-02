@@ -6,7 +6,7 @@
 
 #include <iostream>
 #ifdef WIN32
-	#include <Windows.h>
+#include <Windows.h>
 #endif
 
 #include "core/database/Database.h"
@@ -19,18 +19,19 @@ void Emulator::initialize()
 
 	SetConsoleTextAttribute(handle, 13);
 #endif
-	std::cout	<< "                   ^		\n"
-				<< "                  / \\			\n"
-				<< "                 /   \\			\n"
-				<< "                /   Essence		\n"
-				<< "               /       Emulator	\n"
-				<< "              /         \\		\n"
-				<< "              \\         /	    \n"
-				<< "           By: \\       /   	\n"
-				<< "              Dennis &/     	\n"
-				<< "                 Deluze     	\n"
-				<< "                  \\ /     		\n"
-				<< "                   v     		\n \n";
+	std::cout << "                   ^		\n"
+		<< "                  / \\			\n"
+		<< "                 /   \\			\n"
+		<< "                /   Essence		\n"
+		<< "               /       Emulator	\n"
+		<< "              /         \\		\n"
+		<< "              \\         /	    \n"
+		<< "           By: \\       /   	\n"
+		<< "              Dennis &/     	\n"
+		<< "                 Deluze &    	\n"
+		<< "                    Yestin		\n"
+		<< "                  \\ /     		\n"
+		<< "                   v     		\n \n";
 #ifdef WIN32
 	SetConsoleTextAttribute(handle, FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN);
 #endif
@@ -40,7 +41,7 @@ void Emulator::initialize()
 
 	if (!m_configManager->initialize() || !m_database->initialize())
 	{
-		std::cout << "Errors encountered, can not start emulator. \n";
+		std::cout << "Errors encountered, can not start emulator.\n";
 		abort();
 	}
 }
@@ -57,11 +58,22 @@ void Emulator::run()
 	for (QpangServer* server : m_servers)
 		boost::thread t(std::bind(&QpangServer::listen, server));
 
-	std::cout << "Emulator is running! \n";
+	std::cout << "Emulator is running.\n";
+
+	auto now = std::chrono::system_clock::now();
+	auto nextQueryTime = now + std::chrono::hours(1);
 
 	while (m_isRunning)
 	{
-		// do console commands
+		now = std::chrono::system_clock::now();
+
+		if (nextQueryTime < now) {
+			const auto statement = DATABASE->prepare("SELECT * FROM weapons LIMIT 0;");
+
+			statement->fetch();
+
+			nextQueryTime = now + std::chrono::hours(1);
+		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}

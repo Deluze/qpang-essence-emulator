@@ -19,35 +19,40 @@ It conists out of:
 - **Event relays**: Matches won't be p2p anymore, and every event is now relayed between players on the server-side, yay!
 - **User Authentication** (with bcrypt hashed passwords, yes, this server doesn't use plain text passwords. :^))
 - **Fully working inventory/character customization** (besides name changers & quick revive)
+- **Gifting** You can gift items to others from your inventory and from the shop
 - **Friends**
 - **Chat, Whispers & In-Game Announcements**
 - **Bans & Mutes**
 - **Gamerooms**
-  - **TDM, DM, Essence & VIP game modes**
-  - **Melee only**
-  - **Power-ups**
+  - **Various gamemodes**: DeathMatch, TeamDeathMatch, Protect the Essence, VIP and Tagplay.
+  - **Melee only mode**
+  - **In-game Power-ups** (medkit, team medkit, ammunition)
   - **Team balancing**
+  - **In-game skillcards (20 implemented cards)**, by picking up a skillbook in-game you receive a weighted random skillcard based on its class (bronze, silver, gold or rainbow), to activate this skillcard you musth have enough skillpoints. Skillpoints can be earned by fighting with other players, more specificly; by killing other players and getting attacked by other players.                        
+    For more information about skillcards, visit [our website](https://www.qfighter.eu/skillcards).
   - **Ensures "quality" matches**, prevents players from joining late game and losing items
   - **Most achievements are implemented** (We don't know what the requirements of some achievements are)
-  - **Points & Time based matches**
-  - **Cash & Coin drops**
+  - **Point & Time based matches**
+  - **Cash, coin and event item drops**
   - **Weapon effects**
+  - **Game Invites**
+  - **Team and All chat**
 - **Custom in-game commands**
 - **Configurable crane machine**
 - **Configurable shop**
+- **Extending cards in inventory**
 - **In-game leaderboards**
+- **Daily login bonus (bunny in park)**
 - **Automatic square generation so they don't get overcrowded** (50 players max, configurable)
+- **Full working machine guns in the bunker/ground zero map**
+- **Trading. Trade your items with someone else!**
+- **PvE gamemode**
 
 Missing features:
 
-- PvE gamemode
-- Memos
-- Game invites
-- Trading
-- Registration in-game
-- Skill cards
-- Card boosting/enhancing (purposefully unimplemented, design choice)
-- Daily login bonus
+- Memos (Not a priority at the moment)
+- Registration in-game (WIP)
+- Card boosting/enhancing (WIP)
 - In-game quests
 
 ## Installation

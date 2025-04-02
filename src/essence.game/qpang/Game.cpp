@@ -2,8 +2,9 @@
 
 #include <boost/thread.hpp>
 #include <any>
+#include "packets/lobby/outgoing/account/SendAccountDuplicateLogin.h"
 
-#include "packets/lobby/outgoing/account/DuplicateLogin.h"
+#include "packets/lobby/incoming/trading/HandleUpdateTradeStateRequest.h"
 
 #include "utils/StringConverter.h"
 
@@ -15,14 +16,14 @@ void thread1()
 {
 	std::vector<Player::Ptr> players;
 
-	
+
 }
 
 void thread2()
 {
 	std::vector<Player::Ptr> players;
 
-	
+
 }
 
 void Game::test()
@@ -39,7 +40,6 @@ void Game::initialize()
 	m_lobbyServer = new QpangServer(8005);
 	m_squareServer = new QpangServer(8012);
 
-
 	m_lobbyServer->setAcceptHandler(std::bind(&Game::onLobbyConnection, Game::instance(), std::placeholders::_1));
 	m_squareServer->setAcceptHandler(std::bind(&Game::onSquareConnection, Game::instance(), std::placeholders::_1));
 
@@ -55,6 +55,7 @@ void Game::initialize()
 	m_levelManager.initialize();
 	m_craneManager.initialize();
 	m_leaderboard.refresh();
+	m_pveManager.initialize();
 
 	m_roomServer.initialize();
 }
@@ -73,15 +74,15 @@ void Game::tick()
 		{
 			boost::thread t2(&DatabaseDispatcher::run, &m_dbDispatcher);
 			t2.join();
-			std::cout << "Game::run DatabaseDispatcher exited\n";
+			std::cout << "DatabaseDispatcher exited.\n";
 		}
 		catch (const std::exception& e)
 		{
-			std::cout << "Game::tick " << e.what() << std::endl;
+			std::cout << "An exception occurred: " << e.what() << std::endl;
 		}
 		catch (...)
 		{
-			std::cout << "Game::tick FATAL uncaught exception \n";
+			std::cout << "FATAL uncaught exception.\n";
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -91,7 +92,9 @@ void Game::tick()
 void Game::removeClient(Player::Ptr player)
 {
 	assert(player != nullptr);
-	
+
+	printf("(Game::removeClient) Player %u has left the game.\n", player->getId());
+
 	m_playerMx.lock();
 	m_players.erase(player->getId());
 	m_playersByNickname.erase(player->getName());
@@ -101,20 +104,20 @@ void Game::removeClient(Player::Ptr player)
 }
 
 void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
-{	
+{
 	auto player = std::make_shared<Player>(playerId);
 
 	player->setLobbyConn(conn);
-	conn->setPlayer(player);
+	conn->setPlayer(player, playerId);
 
 	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
-	
+
 	const auto it = m_players.find(playerId);
 	const auto playerFound = it != m_players.cend();
 
 	if (playerFound)
 	{
-		it->second->send(DuplicateLogin());
+		it->second->send(SendAccountDuplicateLogin());
 		it->second->close();
 	}
 
@@ -124,6 +127,8 @@ void Game::createPlayer(QpangConnection::Ptr conn, uint32_t playerId)
 
 	m_players[playerId] = player;
 	m_playersByNickname[StringConverter::ToLowerCase(player->getName())] = player;
+
+	printf("(Game::createPlayer) Player %u has joined the game.\n", playerId);
 }
 
 Player::Ptr Game::getPlayer(uint32_t playerId)
@@ -168,6 +173,11 @@ Player::Ptr Game::getOnlinePlayer(const std::u16string& nickname)
 	auto it = m_playersByNickname.find(StringConverter::ToLowerCase(nickname));
 
 	return it != m_playersByNickname.cend() ? it->second : nullptr;
+}
+
+std::unordered_map<uint32_t, std::shared_ptr<Player>> Game::getPlayers()
+{
+	return m_players;
 }
 
 void Game::broadcast(const std::u16string& message)
@@ -261,6 +271,16 @@ CraneManager* Game::getCraneManager()
 	return &m_craneManager;
 }
 
+TradeManager* Game::getTradeManager()
+{
+	return &m_tradeManager;
+}
+
+PveManager* Game::getPveManager()
+{
+	return &m_pveManager;
+}
+
 DatabaseDispatcher* Game::getDatabaseDispatcher()
 {
 	return &m_dbDispatcher;
@@ -272,8 +292,12 @@ void Game::onLobbyConnectionClosed(QpangConnection::Ptr conn)
 
 	if (auto player = conn->getPlayer(); player != nullptr)
 	{
+		m_squareServer->removeConnection(conn);
+
 		if (player->isClosed())
+		{
 			return;
+		}
 
 		player->close();
 
@@ -289,10 +313,13 @@ void Game::onLobbyConnection(QpangConnection::Ptr conn)
 
 void Game::onSquareConnectionClosed(QpangConnection::Ptr conn)
 {
-	m_squareServer->removeConnection(conn);
-
 	if (auto player = conn->getPlayer(); player != nullptr)
 	{
+		auto playerId = player->getId();
+
+		auto tradeManager = Game::instance()->getTradeManager();
+		tradeManager->cancelActiveTrades(playerId);
+
 		if (player->isClosed())
 			return;
 

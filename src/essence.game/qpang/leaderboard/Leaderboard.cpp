@@ -4,11 +4,11 @@
 #include "core/database/Database.h"
 
 #include "qpang/Game.h"
-#include "packets/lobby/outgoing/player/UpdatePlayerRanking.h"
+#include "packets/lobby/outgoing/player/SendUpdatePlayerRanking.h"
 
 void Leaderboard::refresh()
 {
-	std::cout << "Loading leaderboard... ";
+	std::cout << "Refreshing the leaderboard.\n";
 
 	std::lock_guard<std::mutex> g(m_mx);
 
@@ -35,13 +35,13 @@ void Leaderboard::refresh()
 		const auto player = Game::instance()->getOnlinePlayer(playerId);
 
 		if (player != nullptr)
-			player->send(UpdatePlayerRanking(pos));
+			player->send(SendUpdatePlayerRanking(pos));
 
 		rank++;
 		res->next();
 	}
 
-	std::cout << "loaded!" << '\n';
+	std::cout << "Leaderboard has been refreshed.\n";
 }
 
 Leaderboard::Position Leaderboard::getPosition(uint32_t playerId)

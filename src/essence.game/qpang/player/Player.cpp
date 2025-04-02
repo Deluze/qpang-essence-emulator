@@ -10,11 +10,11 @@
 #include "qpang/square/SquareManager.h"
 #include "qpang/room/tnl/GameConnection.h"
 
-#include "packets/square/outgoing/JoinSquareSuccess.h"
-#include "packets/square/outgoing/UpdatePlayerLevel.h"
-#include "packets/lobby/outgoing/player/UpdateCharacter.h"
-#include "packets/lobby/outgoing/player/ReceiveWhisper.h"
-#include "packets/lobby/outgoing/Broadcast.h"
+#include "packets/square/outgoing/SendJoinSquareSuccess.h"
+#include "packets/square/outgoing/SendUpdateSquarePlayerLevel.h"
+#include "packets/lobby/outgoing/player/SendUpdatePlayerCharacter.h"
+#include "packets/lobby/outgoing/player/SendPlayerReceiveWhisper.h"
+#include "packets/lobby/outgoing/SendMessageBroadcast.h"
 
 Player::Player(uint32_t playerId) :
 	m_playerId(playerId),
@@ -48,6 +48,7 @@ void Player::initialize()
 		m_coins = res->getInt("coins");
 		m_experience = res->getInt("experience");
 		m_isMuted = res->getTiny("is_muted") == 1;
+		m_isPatreon = res->getTiny("is_patreon") == 1;
 	}
 
 	m_inventoryManager.initialize(shared_from_this(), m_playerId);
@@ -66,16 +67,17 @@ void Player::setLobbyConn(QpangConnection::Ptr conn)
 }
 
 void Player::setSquareConn(QpangConnection::Ptr conn)
-{	
+{
 	m_squareConn = conn;
 }
 
 void Player::broadcast(const std::u16string& message) const
 {
-	Broadcast br(message);
-	
-	if (const auto lobbyConn = m_lobbyConn.lock(); lobbyConn != nullptr)
+	SendMessageBroadcast br(message);
+
+	if (const auto lobbyConn = m_lobbyConn.lock(); lobbyConn != nullptr) {
 		lobbyConn->send(br);
+	}
 }
 
 void Player::send(const SquareServerPacket& packet) const
@@ -93,7 +95,7 @@ void Player::send(const LobbyServerPacket& packet) const
 void Player::close()
 {
 	m_mx.lock();
-	
+
 	if (m_isClosed)
 	{
 		m_mx.unlock();
@@ -108,7 +110,7 @@ void Player::close()
 
 	if (auto squareConn = m_squareConn.lock(); squareConn != nullptr)
 		squareConn->close();
-	
+
 	m_mx.unlock();
 
 	setOnlineStatus(false);
@@ -122,7 +124,7 @@ void Player::close()
 
 	m_lobbyConn.reset();
 	m_squareConn.reset();
-	
+
 	update();
 }
 
@@ -132,8 +134,8 @@ bool Player::isClosed()
 }
 
 void Player::whisper(const std::u16string& nickname, const std::u16string& message) const
-{	
-	send(ReceiveWhisper(nickname, message));
+{
+	send(SendPlayerReceiveWhisper(nickname, message));
 }
 
 void Player::enterSquare(std::shared_ptr<SquarePlayer> squarePlayer)
@@ -143,7 +145,7 @@ void Player::enterSquare(std::shared_ptr<SquarePlayer> squarePlayer)
 	m_squarePlayer = squarePlayer;
 
 	setOnlineStatus();
-	send(JoinSquareSuccess(squarePlayer));
+	send(SendJoinSquareSuccess(squarePlayer));
 }
 
 void Player::leaveSquare()
@@ -156,10 +158,17 @@ void Player::setRoomPlayer(std::shared_ptr<RoomPlayer> roomPlayer)
 	m_roomPlayer = roomPlayer;
 }
 
+void Player::setName(std::u16string name)
+{
+	m_name = name;
+
+	update();
+}
+
 void Player::update()
 {
 	DATABASE_DISPATCHER->dispatch(
-		"UPDATE players SET default_character = ?, don = ?, cash = ?, coins = ?, level = ?, prestige = ?, experience = ? WHERE id = ?",
+		"UPDATE players SET default_character = ?, don = ?, cash = ?, coins = ?, level = ?, prestige = ?, experience = ?, name = ? WHERE id = ?",
 		{
 			m_character,
 			m_don,
@@ -168,6 +177,7 @@ void Player::update()
 			m_level,
 			m_prestige,
 			m_experience,
+			m_name,
 			m_playerId,
 		}
 	);
@@ -177,10 +187,15 @@ void Player::apply(std::shared_ptr<RoomSessionPlayer> session)
 {
 }
 
-void Player::ban(time_t until)
+void Player::ban(time_t until, uint32_t bannedByUserId)
 {
 	const auto currTime = time(NULL);
-	DATABASE_DISPATCHER->dispatch("INSERT INTO user_bans (`user_id`, `timestamp_ban`, `timestamp_unban`) VALUES (?, ?, ?)", { m_userId, static_cast<uint64_t>(currTime), static_cast<uint64_t>(until) });
+	DATABASE_DISPATCHER->dispatch("INSERT INTO user_bans (`user_id`, `timestamp_ban`, `timestamp_unban`, `banned_by_user_id`) VALUES (?, ?, ?, ?)", {
+		m_userId,
+		static_cast<uint64_t>(currTime),
+		static_cast<uint64_t>(until),
+		bannedByUserId
+		});
 
 	close();
 }
@@ -255,7 +270,7 @@ void Player::setLevel(uint8_t level)
 	m_level = level;
 
 	if (auto squarePlayer = m_squarePlayer.lock(); squarePlayer != nullptr)
-		squarePlayer->getSquare()->sendPacket(UpdatePlayerLevel{ m_playerId, m_level });
+		squarePlayer->getSquare()->sendPacket(SendUpdateSquarePlayerLevel{ m_playerId, m_level });
 }
 
 uint8_t Player::getPrestige()
@@ -267,7 +282,7 @@ void Player::setCharacter(uint16_t character)
 {
 	m_character = character;
 
-	send(UpdateCharacter(character));
+	send(SendUpdatePlayerCharacter(character));
 }
 
 uint16_t Player::getCharacter()
@@ -323,7 +338,7 @@ void Player::removeCash(uint32_t val)
 		m_cash = 0;
 	else
 		m_cash -= val;
-	
+
 	update();
 }
 
@@ -363,7 +378,7 @@ void Player::mute()
 {
 	m_isMuted = true;
 
-	broadcast(u"You have been muted by QPang staff");
+	broadcast(u"You have been restricted from chatting by a moderator.");
 
 	DATABASE_DISPATCHER->dispatch("UPDATE `players` SET `is_muted` = 1 WHERE `id` = ?", { m_playerId });
 }
@@ -372,14 +387,19 @@ void Player::unmute()
 {
 	m_isMuted = false;
 
-	broadcast(u"You have been unmuted and can now use chat again");
+	broadcast(u"Your restriction from talking in chat has been lifted.");
 
 	DATABASE_DISPATCHER->dispatch("UPDATE `players` SET `is_muted` = 0 WHERE `id` = ?", { m_playerId });
-}	
+}
 
 bool Player::isMuted()
 {
 	return m_isMuted;
+}
+
+bool Player::isPatreon() 
+{
+	return m_isPatreon;
 }
 
 bool Player::exists()

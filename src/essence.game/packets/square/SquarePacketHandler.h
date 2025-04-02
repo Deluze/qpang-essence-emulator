@@ -2,7 +2,7 @@
 
 #include "core/communication/PacketHandler.h"
 
-class SquarePacketHandler : public PacketHandler
+class SquarePacketHandler final : public PacketHandler
 {
 public:
 	SquarePacketHandler();

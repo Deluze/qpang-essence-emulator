@@ -9,6 +9,13 @@ class GCTarget : public GameNetEvent
 public:
 	GCTarget() : GameNetEvent{ GC_TARGET, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient } {};
 
+	GCTarget(U32 cmd, U32 playerId, U32 targetId) : GameNetEvent{ GC_TARGET, NetEvent::GuaranteeType::Guaranteed, NetEvent::DirServerToClient } 
+	{
+		this->cmd = cmd;
+		this->playerId = playerId;
+		this->targetId = targetId;
+	};
+
 	void pack(EventConnection* conn, BitStream* bstream)
 	{
 		bstream->write(cmd);

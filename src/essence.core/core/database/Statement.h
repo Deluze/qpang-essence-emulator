@@ -25,6 +25,8 @@ public:
 	void bindByte(uint8_t val);
 	void bindFlag(bool val);
 
+	void bindDouble(double_t val);
+
 	void clearBinds();
 
 	StatementResult::Ptr fetch();

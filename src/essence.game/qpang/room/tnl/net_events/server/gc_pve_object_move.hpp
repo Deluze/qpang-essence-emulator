@@ -8,9 +8,32 @@ class GCPvEObjectMove : public GameNetEvent
 {
 	typedef NetEvent Parent;
 public:
-	GCPvEObjectMove() : GameNetEvent{ GC_PVE_OBJECT_MOVE, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirAny } {};
+	U32 objectUid;
+	F32 positionX;
+	F32 positionY;
+	F32 positionZ;
+	U32 durationMs;
 
-	void pack(EventConnection* conn, BitStream* bstream) {};
+	GCPvEObjectMove() : GameNetEvent{ GC_PVE_OBJECT_MOVE, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient } {};
+
+	GCPvEObjectMove(U32 objectUid, F32 positionX, F32 positionY, F32 positionZ, U32 durationMs) : GameNetEvent{ GC_PVE_OBJECT_MOVE, NetEvent::GuaranteeType::GuaranteedOrdered, NetEvent::DirServerToClient }
+	{
+		this->objectUid = objectUid;
+		this->positionX = positionX;
+		this->positionY = positionY;
+		this->positionZ = positionZ;
+		this->durationMs = durationMs;
+	};
+
+	void pack(EventConnection* conn, BitStream* bstream) 
+	{
+		bstream->write(objectUid);
+		bstream->write(positionX);
+		bstream->write(positionY);
+		bstream->write(positionZ);
+		bstream->write(durationMs);
+	};
+
 	void unpack(EventConnection* conn, BitStream* bstream) {};
 	void process(EventConnection* ps) {};
 

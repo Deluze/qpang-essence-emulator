@@ -20,6 +20,10 @@
 #include "qpang/room/tnl/net_events/server/gc_respawn.hpp"
 #include "qpang/room/tnl/net_events/server/gc_arranged_accept.hpp"
 
+#include "qpang/room/tnl/net_events/server/gc_pve_start.hpp"
+#include "qpang/room/tnl/net_events/server/gc_pve_user_init.hpp"
+#include "qpang/room/tnl/net_events/server/gc_pve_new_round.hpp"
+
 TNL_IMPLEMENT_NETCONNECTION(GameConnection, TNL::NetClassGroupGame, true);
 
 GameConnection::GameConnection() : TNL::EventConnection()
@@ -27,21 +31,21 @@ GameConnection::GameConnection() : TNL::EventConnection()
 
 /// #------------------------------------------------------------------------------ 	
 /// 
-/// ## UDP³×Æ®¿öÅ© Å¸ÀÓ¾Æ¿ô°Ë»ç 	
+/// ## UDPï¿½ï¿½Æ®ï¿½ï¿½Å© Å¸ï¿½Ó¾Æ¿ï¿½Ë»ï¿½ 	
 /// 
 /// #------------------------------------------------------------------------------ 	
 /// 
-/// 	pingTimeout = 5000	# ¹Ð¸®ÃÊ ´ÜÀ§
+/// 	pingTimeout = 5000	# ï¿½Ð¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 /// 
-/// 	pingRetryCnt = 10 	# ÃÖ´ë °Ë»ç È½¼ö
+/// 	pingRetryCnt = 10 	# ï¿½Ö´ï¿½ ï¿½Ë»ï¿½ È½ï¿½ï¿½
 	setPingTimeouts(5000, 10);
 ///#------------------------------------------------------------------------------ 	
 ///
-///## flowControlÀ» auto off ÇÏ¸é »ç¿ëÇÏ´Â °ª 	
+///## flowControlï¿½ï¿½ auto off ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ 	
 ///
 ///#------------------------------------------------------------------------------ 	
 ///
-///	flowControl = 1 # auto = 1, manual = 0, autoÀÏ °æ¿ì ¾Æ·¡ ¼³Á¤À» »ç¿ëÇÏÁö ¾Ê´Â´Ù.
+///	flowControl = 1 # auto = 1, manual = 0, autoï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´Â´ï¿½.
 ///
 ///	minSendPeriod = 50		# Minimum millisecond delay(maximum rate) between packet sends
 ///
@@ -82,7 +86,7 @@ void GameConnection::onConnectionTerminated(TNL::NetConnection::TerminationReaso
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "GameConnection::onConectTerminated " << e.what() << std::endl;
+		std::cout << "An exception occurred: " << e.what() << std::endl;
 	}
 }
 
@@ -97,7 +101,7 @@ void GameConnection::onConnectTerminated(TNL::NetConnection::TerminationReason r
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "GameConnection::onConectTerminated " << e.what() << std::endl;
+		std::cout << e.what() << std::endl;
 	}
 }
 
@@ -113,6 +117,15 @@ void GameConnection::enterRoom(std::shared_ptr<Room> room)
 void GameConnection::updateRoom(std::shared_ptr<Room> room, TNL::U32 cmd, TNL::U32 val)
 {
 	postNetEvent(new GCRoom(m_player->getId(), cmd, val, room));
+}
+
+void GameConnection::startLoadingPve(std::shared_ptr<Room> room, RoomPlayer::Ptr roomPlayer)
+{
+	/*postNetEvent(new GCPvEStart(room, m_player->getId()));
+	postNetEvent(new GCPvEUserInit(roomPlayer));
+	postNetEvent(new GCGameState(m_player->getId(), 12));*/
+
+	startLoading(room, roomPlayer);
 }
 
 void GameConnection::startLoading(std::shared_ptr<Room> room, RoomPlayer::Ptr roomPlayer)

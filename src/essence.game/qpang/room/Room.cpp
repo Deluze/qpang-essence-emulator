@@ -3,64 +3,80 @@
 #include <algorithm>
 
 #include "qpang/Game.h"
-#include "qpang/room/RoomManager.h"
 #include "qpang/player/Player.h"
-#include "qpang/room/tnl/GameConnection.h"
-#include "qpang/room/session/RoomSession.h"
+#include "qpang/room/RoomManager.h"
 #include "qpang/room/RoomPlayer.h"
-
-#include "qpang/room/tnl/net_events/client/cg_room.hpp"
+#include "qpang/room/session/RoomSession.h"
+#include "qpang/room/tnl/GameConnection.h"
 #include "qpang/room/tnl/net_events/client/cg_exit.hpp"
-
-#include "qpang/room/tnl/net_events/server/gc_join.hpp"
-#include "qpang/room/tnl/net_events/server/gc_room.hpp"
+#include "qpang/room/tnl/net_events/client/cg_room.hpp"
 #include "qpang/room/tnl/net_events/server/gc_exit.hpp"
 #include "qpang/room/tnl/net_events/server/gc_game_state.hpp"
+#include "qpang/room/tnl/net_events/server/gc_join.hpp"
+#include "qpang/room/tnl/net_events/server/gc_room.hpp"
 
-
-Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, const uint8_t mode, const uint32_t host, const uint16_t port) :
-	m_id(id),
-	m_name(name),
+Room::Room(const uint32_t id, const std::u16string name, const uint8_t map, const uint8_t mode, const uint32_t host,
+	const uint16_t port) :
 	m_host(host),
 	m_port(port),
+	m_id(id),
+	m_name(name),
 	m_map(map),
 	m_mode(mode),
 	m_state(2),
-	m_maxPlayers(16),
+	m_maxPlayers(mode == GameMode::PVE ? 4 : 16),
+	m_masterPlayerId(0),
 	m_isLevelLimited(false),
 	m_isTeamSorting(false),
-	m_isSkillsEnabled(false),
+	m_isSkillsEnabled(mode == GameMode::PVE ? false : true),
 	m_isMeleeOnly(false),
-	m_isPointsGame(false),
 	m_scorePoints(40),
 	m_scoreTime(10),
-	m_isPlaying(false)
+	m_isPointsGame(false),
+	m_isPlaying(false),
+	m_isEventRoom(false),
+	m_isPublicPveRoom(false)
 {
 	m_modeManager = Game::instance()->getRoomManager()->getGameModeManager()->get(mode);
+	// Reload glitch is only enabled by default in pve rooms.
+	m_isReloadGlitchEnabled = (m_mode == GameMode::PVE);
+
+	setSkillsEnabled(!m_modeManager->isPublicEnemyMode());
 }
 
 void Room::addPlayer(GameConnection* conn)
 {
 	if (conn == nullptr || conn->getPlayer() == nullptr)
+	{
 		return;
+	}
+
+	auto playerId = conn->getPlayer()->getId();
+
+	printf("(Room::addPlayer) Player %u has entered room #%u.\n", playerId, m_id);
+
+	auto tradeManager = Game::instance()->getTradeManager();
+	tradeManager->cancelActiveTrades(playerId);
 
 	conn->incRef();
-	
-	auto roomPlayer = std::make_shared<RoomPlayer>(conn, shared_from_this());
+
+	const auto roomPlayer = std::make_shared<RoomPlayer>(conn, shared_from_this());
 
 	conn->getPlayer()->setRoomPlayer(roomPlayer);
 
 	if (m_players.empty())
+	{
 		m_masterPlayerId = roomPlayer->getPlayer()->getId();
+	}
 
 	roomPlayer->setTeam(getAvailableTeam());
 
 	m_playerMx.lock();
 	m_players[conn->getPlayer()->getId()] = roomPlayer;
 	m_playerMx.unlock();
-	
+
 	conn->enterRoom(shared_from_this());
-	
+
 	syncPlayers(roomPlayer);
 
 	conn->decRef();
@@ -68,62 +84,81 @@ void Room::addPlayer(GameConnection* conn)
 
 void Room::removePlayer(uint32_t id)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+	std::lock_guard lg(m_playerMx);
 
 	const auto it = m_players.find(id);
 
 	if (it == m_players.cend())
+	{
 		return;
+	}
+
+	printf("(Room::removePlayer) Player %u has left room #%u.\n", it->second->getPlayer()->getId(), m_id);
 
 	m_players.erase(it);
 
 	if (id == m_masterPlayerId)
+	{
 		m_masterPlayerId = findNewMaster();
+	}
 
 	if (m_roomSession != nullptr)
+	{
 		m_roomSession->removePlayer(id);
+	}
 
 	broadcastWaiting<GCExit>(id, CGExit::Command::LEAVE, m_masterPlayerId);
 
 	if (m_masterPlayerId == NULL)
 	{
-		if(!m_players.empty())
-			for (const auto&[id, player] : m_players)
+		if (!m_players.empty())
+		{
+			for (const auto& [id, player] : m_players)
+			{
 				player->getConnection()->disconnect("room closed");
+			}
+		}
+
 		Game::instance()->getRoomManager()->remove(m_id);
 	}
 }
 
 std::shared_ptr<RoomPlayer> Room::getPlayer(uint32_t id)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+	std::lock_guard lg(m_playerMx);
 
 	auto it = m_players.find(id);
 
 	if (it == m_players.cend())
+	{
 		return nullptr;
+	}
 
 	return (*it).second;
 }
 
-std::shared_ptr<RoomSession> Room::getRoomSession()
+std::shared_ptr<RoomSession> Room::getRoomSession() const
 {
 	return m_roomSession;
 }
 
-void Room::tick()
+void Room::tick() const
 {
 	if (m_isPlaying && m_roomSession != nullptr)
+	{
 		m_roomSession->tick();
+	}
 }
 
 void Room::start()
 {
 	if (m_isPlaying)
+	{
 		return;
+	}
 
 	const auto curr = shared_from_this();
-	
+
 	m_roomSession = std::make_shared<RoomSession>(curr, m_modeManager);
 
 	m_roomSession->initialize();
@@ -139,11 +174,18 @@ void Room::start()
 		{
 			player->setReady(true); // room master can't ready up.
 			player->setPlaying(true);
-			player->getConnection()->startLoading(curr, player);
+
+			if (m_mode == GameMode::Mode::PVE)
+				player->getConnection()->startLoadingPve(curr, player);
+			else
+				player->getConnection()->startLoading(curr, player);
+
 			player->onStart();
 		}
 		else
+		{
 			player->getConnection()->startGameButNotReady();
+		}
 	}
 
 	m_playerMx.unlock();
@@ -151,21 +193,27 @@ void Room::start()
 
 void Room::close()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+	std::lock_guard lg(m_playerMx);
 
 	for (const auto& [id, player] : m_players)
+	{
 		player->getConnection()->disconnect("room closed");
+	}
 
 	Game::instance()->getRoomManager()->remove(m_id);
 }
 
-void Room::update(uint32_t cmd, uint32_t val)
+void Room::update(const uint32_t cmd, const uint32_t val)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+	std::lock_guard lg(m_playerMx);
 
 	for (const auto& [id, roomPlayer] : m_players)
+	{
 		if (!roomPlayer->isPlaying())
+		{
 			roomPlayer->getConnection()->postNetEvent(new GCRoom(id, cmd, val, shared_from_this()));
+		}
+	}
 }
 
 void Room::finish()
@@ -179,9 +227,9 @@ void Room::finish()
 	unreadyAll();
 }
 
-void Room::syncPlayers(std::shared_ptr<RoomPlayer> player)
+void Room::syncPlayers(const std::shared_ptr<RoomPlayer> player)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+	std::lock_guard lg(m_playerMx);
 
 	player->getConnection()->postNetEvent(new GCJoin(player));
 
@@ -199,48 +247,70 @@ void Room::syncPlayers(std::shared_ptr<RoomPlayer> player)
 
 void Room::balancePlayers()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+	std::lock_guard lg(m_playerMx);
 
 	for (const auto& [id, roomPlayer] : m_players)
 	{
 		if (!m_modeManager->isTeamMode())
+		{
 			roomPlayer->setTeam(0);
+		}
 		else
 		{
 			if (roomPlayer->getTeam() != 0)
+			{
 				continue;
+			}
+
+			const auto availableTeam = getAvailableTeam();
 
 			roomPlayer->setTeam(getAvailableTeam());
 		}
 	}
 }
 
-bool Room::canStartInTeam(uint8_t team) const
+bool Room::canStartInTeam(const uint8_t team) const
 {
 	if (m_roomSession == nullptr)
+	{
 		return true;
+	}
 
 	if (!m_roomSession->getGameMode()->isTeamMode())
+	{
 		return true;
-	
+	}
+
 	const auto bluePlayers = m_roomSession->getPlayersForTeam(1);
 	const auto yellowPlayers = m_roomSession->getPlayersForTeam(2);
 
 	if (team == 1) // blue
 	{
 		if (bluePlayers.empty())
+		{
 			return true;
-		
+		}
+
 		if (bluePlayers.size() - 1 >= yellowPlayers.size())
+		{
 			return false;
+		}
 	}
-	else // yellow
+	else if (team == 2)// yellow
 	{
 		if (yellowPlayers.empty())
+		{
 			return true;
-		
+		}
+
 		if (yellowPlayers.size() - 1 >= bluePlayers.size())
+		{
 			return false;
+		}
+	}
+	else
+	{
+		return false;
 	}
 
 	return true;
@@ -276,13 +346,9 @@ uint8_t Room::getMap() const
 	return m_map;
 }
 
-void Room::setMap(uint8_t map)
+void Room::setMap(const uint8_t map)
 {
-	if (map > 12)
-		return;
-	
 	m_map = map;
-
 	update(CGRoom::Command::MAP_ROOM, map);
 }
 
@@ -291,7 +357,7 @@ uint8_t Room::getMode() const
 	return m_mode;
 }
 
-void Room::setMode(uint8_t mode)
+void Room::setMode(const uint8_t mode)
 {
 	m_mode = mode;
 
@@ -304,10 +370,14 @@ void Room::setMode(uint8_t mode)
 
 	// after changing game modes, these reset.
 
-	if (m_isPointsGame)
+	if (m_isPointsGame && m_mode != 9)
+	{
 		update(CGRoom::Command::SET_POINTS, m_scorePoints);
+	}
 	else
+	{
 		update(CGRoom::Command::SET_TIME, m_scoreTime);
+	}
 }
 
 GameMode* Room::getModeManager() const
@@ -320,7 +390,7 @@ uint8_t Room::getState() const
 	return m_state;
 }
 
-void Room::setState(uint8_t state)
+void Room::setState(const uint8_t state)
 {
 	m_state = state;
 }
@@ -335,7 +405,7 @@ uint8_t Room::getMaxPlayers() const
 	return m_maxPlayers;
 }
 
-void Room::setMaxPlayers(uint8_t maxPlayers)
+void Room::setMaxPlayers(const uint8_t maxPlayers)
 {
 	m_maxPlayers = maxPlayers;
 
@@ -347,7 +417,7 @@ bool Room::isLevelLimited() const
 	return m_isLevelLimited;
 }
 
-void Room::setLevelLimited(bool levelLimited)
+void Room::setLevelLimited(const bool levelLimited)
 {
 	m_isLevelLimited = levelLimited;
 
@@ -359,21 +429,24 @@ bool Room::isTeamSorting() const
 	return m_isTeamSorting;
 }
 
-void Room::setTeamSorting(bool teamSorting)
+void Room::setTeamSorting(const bool teamSorting)
 {
 	m_isTeamSorting = teamSorting;
 
 	update(CGRoom::Command::TEAM_ROOM, teamSorting);
 }
 
+// TODO: Rename to "areSkillsEnabled"
 bool Room::isSkillsEnabled() const
 {
+	// TODO: Rename to "m_areSkillsEnabled"
 	return m_isSkillsEnabled;
 }
 
-void Room::setSkillsEnabled(bool skillEnabled)
+void Room::setSkillsEnabled(const bool skillEnabled)
 {
-	m_isSkillsEnabled = skillEnabled;
+	if (m_mode != 9)
+		m_isSkillsEnabled = skillEnabled;
 
 	unreadyAll(true);
 	update(CGRoom::Command::TOGGLE_SKILL, skillEnabled);
@@ -384,28 +457,32 @@ bool Room::isMeleeOnly() const
 	return m_isMeleeOnly;
 }
 
-void Room::setMeleeOnly(bool meleeOnly)
+void Room::setMeleeOnly(const bool meleeOnly)
 {
 	m_isMeleeOnly = meleeOnly;
 
 	if (meleeOnly)
+	{
 		m_isSkillsEnabled = false;
+	}
 
 	unreadyAll(true);
 	update(CGRoom::Command::TOGGLE_MELEE, meleeOnly);
 }
 
-uint32_t Room::getMasterId()
+uint32_t Room::getMasterId() const
 {
 	return m_masterPlayerId;
 }
 
 uint32_t Room::findNewMaster()
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+	std::lock_guard lg(m_playerMx);
 
 	if (m_players.empty())
+	{
 		return 0;
+	}
 
 	return m_players.begin()->first;
 }
@@ -413,11 +490,13 @@ uint32_t Room::findNewMaster()
 uint8_t Room::getAvailableTeam()
 {
 	if (!m_modeManager->isTeamMode())
+	{
 		return 0;
+	}
 
 	m_playerMx.lock();
-	
-	size_t yellowCount = std::count_if(m_players.cbegin(), m_players.cend(),
+
+	const size_t yellowCount = std::count_if(m_players.cbegin(), m_players.cend(),
 		[](const std::pair<uint32_t, RoomPlayer::Ptr>& pair) {
 			return pair.second->getTeam() == 2;
 		});
@@ -425,22 +504,26 @@ uint8_t Room::getAvailableTeam()
 	m_playerMx.unlock();
 
 	if (yellowCount * 2 >= m_players.size())
+	{
 		return 1;
-	
+	}
+
 	return 2;
 }
 
 bool Room::isTeamAvailable(uint8_t team)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
-	
+	std::lock_guard lg(m_playerMx);
+
 	if (team != 1 && team != 2)
+	{
 		return false;
+	}
 
 	m_playerMx.lock();
-	
-	size_t teamCount = std::count_if(m_players.cbegin(), m_players.cend(),
-		[team](std::pair<uint32_t, RoomPlayer::Ptr> pair) {
+
+	const size_t teamCount = std::count_if(m_players.cbegin(), m_players.cend(),
+		[team](const std::pair<uint32_t, RoomPlayer::Ptr> pair) {
 			return pair.second->getTeam() == team;
 		});
 
@@ -449,57 +532,59 @@ bool Room::isTeamAvailable(uint8_t team)
 	return teamCount * 2 < m_maxPlayers;
 }
 
-uint32_t Room::getScorePoints()
+uint32_t Room::getScorePoints() const
 {
 	return m_scorePoints;
 }
 
-void Room::setScorePoints(uint32_t points)
+void Room::setScorePoints(const uint32_t points)
 {
 	m_scorePoints = points;
 
 	update(CGRoom::Command::SET_POINTS, points);
 }
 
-uint32_t Room::getScoreTime()
+uint32_t Room::getScoreTime() const
 {
 	return m_scoreTime;
 }
 
-void Room::setScoreTime(uint32_t minutes)
+void Room::setScoreTime(const uint32_t minutes)
 {
 	m_scoreTime = minutes;
 
 	update(CGRoom::Command::SET_TIME, minutes);
 }
 
-bool Room::isPointsGame()
+bool Room::isPointsGame() const
 {
 	return m_isPointsGame;
 }
 
-void Room::setIsPointsGame(bool isPoints)
+void Room::setIsPointsGame(const bool isPoints)
 {
 	m_isPointsGame = isPoints;
 }
 
-bool Room::isPlaying()
+bool Room::isPlaying() const
 {
 	return m_isPlaying;
 }
 
-void Room::unreadyAll(bool notify)
+void Room::unreadyAll(const bool notify)
 {
-	std::lock_guard<std::recursive_mutex> lg(m_playerMx);
+	std::lock_guard lg(m_playerMx);
 
 	for (const auto& [id, player] : m_players)
 	{
 		if (player->isReady())
 		{
 			player->setReady(false);
-			
+
 			if (notify)
-				player->getPlayer()->broadcast(u"Your ready status has been removed because the room rules got updated");
+			{
+				player->getPlayer()->broadcast(u"Your ready status has been removed because the room rules have changed.");
+			}
 		}
 
 		if (player->isPlaying())
@@ -510,7 +595,7 @@ void Room::unreadyAll(bool notify)
 	}
 }
 
-std::string Room::getPassword()
+std::string Room::getPassword() const
 {
 	return m_password;
 }
@@ -518,19 +603,41 @@ std::string Room::getPassword()
 void Room::setPassword(std::string& password)
 {
 	if (password.size() > 4)
+	{
 		password.resize(4);
+	}
 
 	m_password = password;
 
 	update(CGRoom::Command::PASS_ROOM, 0);
 }
 
-bool Room::isEventRoom()
+bool Room::isEventRoom() const
 {
 	return m_isEventRoom;
 }
 
-void Room::setEventRoom(bool isEventRoom)
+void Room::setEventRoom(const bool isEventRoom)
 {
 	m_isEventRoom = isEventRoom;
+}
+
+bool Room::isReloadGlitchEnabled() const
+{
+	return m_isReloadGlitchEnabled;
+}
+
+void Room::setIsReloadGlitchEnabled(const bool isReloadGlitchEnabled)
+{
+	m_isReloadGlitchEnabled = isReloadGlitchEnabled;
+}
+
+bool Room::isPublicPveRoom() const
+{
+	return m_isPublicPveRoom;
+}
+
+void Room::setIsPublicPveRoom(bool isPublicPveRoom)
+{
+	m_isPublicPveRoom = isPublicPveRoom;
 }

@@ -32,7 +32,9 @@ void PlayerEffectManager::tick()
 		effect.weapon.effectDuration--;
 
 		if (effect.weapon.effectId == 12 || effect.weapon.effectId == 13) // poison || fire
+		{
 			takeDamageFromEffect(effect);
+		}
 	}
 
 	m_effects.erase(std::remove_if(m_effects.begin(), m_effects.end(),
@@ -43,7 +45,7 @@ void PlayerEffectManager::tick()
 				removeEffect(eff.weapon.effectId);
 				return true;
 			}
-			
+
 			return false;
 		}
 	), m_effects.end());
@@ -105,8 +107,14 @@ void PlayerEffectManager::removeEffect(uint8_t effectId)
 		}
 	);
 
-	if (sameEffectsCount == 0) // this was the last effect
-		player->getRoomSession()->relayPlaying<GCWeapon>(player->getPlayer()->getId(), 6, effectId);
+	if (sameEffectsCount == 0) {
+		// this was the last effect
+
+		if (const auto roomSession = player->getRoomSession(); roomSession != nullptr)
+		{
+			roomSession->relayPlaying<GCWeapon>(player->getPlayer()->getId(), 6, effectId);
+		}
+	}
 }
 
 void PlayerEffectManager::takeDamageFromEffect(const Effect& effect)
@@ -120,13 +128,19 @@ void PlayerEffectManager::takeDamageFromEffect(const Effect& effect)
 
 		if (const auto owner = effect.target.lock(); owner != nullptr)
 		{
-			player->getRoomSession()->relayPlaying<GCHit>(owner->getPlayer()->getId(), player->getPlayer()->getId(), 1, 0, 0, 0, 0, 0, 0, effect.entityId,
-				1, 1, player->getHealth(), 5, effect.weapon.itemId, 1, 1, 1, owner->getStreak() + 1, 0, 0);
+			if (const auto roomSession = player->getRoomSession(); roomSession != nullptr)
+			{
+				roomSession->relayPlaying<GCHit>(owner->getPlayer()->getId(), player->getPlayer()->getId(), 1, 0, 0, 0, 0, 0, 0, effect.entityId,
+					1, 1, player->getHealth(), 5, effect.weapon.itemId, 1, 1, 1, owner->getStreak() + 1, 0, 0);
+			}
 
 			if (player->isDead())
 			{
-				owner->getRoomSession()->getGameMode()->onPlayerKill(owner, player, effect.weapon, 1);
-				owner->getRoomSession()->relayPlaying<GCGameState>(player->getPlayer()->getId(), 17, effect.weapon.effectId, owner->getPlayer()->getId());
+				if (const auto roomSession = owner->getRoomSession(); roomSession != nullptr)
+				{
+					roomSession->getGameMode()->onPlayerKill(owner, player, effect.weapon, 1);
+					roomSession->relayPlaying<GCGameState>(player->getPlayer()->getId(), 17, effect.weapon.effectId, owner->getPlayer()->getId());
+				}
 			}
 		}
 	}

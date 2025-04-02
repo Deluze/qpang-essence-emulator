@@ -3,7 +3,7 @@
 #include "qpang/Game.h"
 #include "qpang/chat/command/Command.h"
 
-#include "packets/lobby/outgoing/shop/ShopItems.h"
+#include "packets/lobby/outgoing/shop/SendShopItems.h"
 
 class ReloadShopCommand : public Command
 {
@@ -13,14 +13,11 @@ public:
 
 	}
 
-	void handle(std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
+	void handle(const std::shared_ptr<Player> player, const std::vector<std::u16string>& args)
 	{
-		auto shopManager = Game::instance()->getShopManager();
-		shopManager->initialize();
-		const auto items = Game::instance()->getShopManager()->list();
+		Game::instance()->getShopManager()->initialize();
+		Game::instance()->getShopManager()->sendShopItems(player);
 		
-		Game::instance()->send(ShopItems(items));
-		
-		player->broadcast(u"Reloaded!");
+		player->broadcast(u"Reloaded the shop.");
 	}
 };

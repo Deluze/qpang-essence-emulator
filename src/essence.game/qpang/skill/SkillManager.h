@@ -1,10 +1,13 @@
 #pragma once
 
+#include <cstdint>
+#include <unordered_map>
+
+#include <qpang/skill/skills/Skill.h>
+
 #include <memory>
 #include <unordered_map>
 #include <functional>
-
-class Skill;
 
 class SkillManager
 {
@@ -13,7 +16,10 @@ public:
 
 	void initialize();
 
-	std::unordered_map<uint32_t, std::function<std::unique_ptr<Skill>()>> getSkillsForMode(uint8_t mode);
+	std::vector<std::function<std::unique_ptr<Skill>()>> SkillManager::getSkillsForGameMode(uint8_t mode);
 private:
-	std::unordered_map<uint8_t, std::unordered_map<uint32_t, std::function<std::unique_ptr<Skill>()>>> m_skills;
+	void initializeDeathMatchSkills();
+	void initializeTeamDeathMatchSkills();
+
+	std::unordered_map<uint8_t, std::vector<std::function<std::unique_ptr<Skill>()>>> m_skills;
 };
